@@ -1,0 +1,84 @@
+---
+interface Props { label: string; }
+const { label } = Astro.props;
+---
+
+<div class="device-stage" aria-label={label}>
+  <div class="device desktop">
+    <div class="window-head"><i></i><i></i><i></i><b>FAEVault</b></div>
+    <div class="vault-rows">
+      <div class="vault-row"><span class="vault-icon blue"></span><span class="vault-text"><i></i><em></em></span></div>
+      <div class="vault-row"><span class="vault-icon violet"></span><span class="vault-text"><i></i><em></em></span></div>
+      <div class="vault-row"><span class="vault-icon green"></span><span class="vault-text"><i></i><em></em></span></div>
+    </div>
+  </div>
+  <svg class="sync-bridge" viewBox="0 0 150 150" aria-hidden="true">
+    <defs><linearGradient id="sync-gradient" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#2b7b9c"></stop><stop offset=".5" stop-color="#58b4d7"></stop><stop offset="1" stop-color="#3a9d85"></stop></linearGradient></defs>
+    <path class="sync-path-shadow" d="M35 85 C58 24,92 8,104 10"></path>
+    <path class="sync-path" d="M35 85 C58 24,92 8,104 10"></path>
+  </svg>
+  <i class="sync-port desktop-port"><b></b></i><i class="sync-port phone-port"><b></b></i>
+  <i class="sync-particle outbound"></i><i class="sync-particle secondary inbound"></i>
+  <span class="sync-label">ENCRYPTED SYNC ↔</span>
+  <div class="device phone">
+    <div class="phone-speaker"></div>
+    <div class="phone-lock"><i></i></div>
+    <div class="phone-line"></div><div class="phone-line short"></div>
+    <div class="phone-button"></div>
+  </div>
+</div>
+
+<style>
+  .device-stage { position: relative; width: 540px; height: 420px; max-width: 100%; perspective: 1000px; }
+  .device { position: absolute; z-index: 3; border: 1px solid rgba(69,115,134,.22); background: rgba(255,255,255,.58); box-shadow: 0 28px 65px rgba(35,76,94,.15); backdrop-filter: blur(20px); transition: transform .48s cubic-bezier(.2,.75,.2,1), box-shadow .45s ease, border-color .35s ease; }
+  .desktop { width: 350px; height: 230px; left: 5px; top: 100px; border-radius: 5px; transform: rotateY(7deg) rotateZ(-2deg); }
+  .phone { width: 112px; height: 230px; right: 4px; top: 50px; border-radius: 25px; transform: rotateZ(5deg); }
+  .device-stage:hover .desktop { transform: rotateY(4deg) rotateZ(-1deg); box-shadow: 0 36px 78px rgba(30,81,103,.22); border-color: rgba(45,137,173,.38); }
+  .device-stage:hover .phone { transform: rotateZ(2deg); box-shadow: 0 34px 72px rgba(30,81,103,.2); border-color: rgba(45,137,173,.38); }
+  .window-head { height: 29px; border-bottom: 1px solid rgba(86,124,140,.15); display: flex; align-items: center; gap: 5px; padding: 0 11px; }
+  .window-head i { width: 5px; height: 5px; border-radius: 50%; background: #a8c0ca; }
+  .window-head b { margin-left: auto; color: #78909a; font-size: 7px; letter-spacing: .12em; }
+  .vault-rows { padding: 14px; display: grid; gap: 9px; }
+  .vault-row { display: flex; align-items: center; gap: 9px; padding: 9px; border-radius: 10px; background: rgba(230,241,245,.63); transition: transform .25s ease, background .25s ease; }
+  .vault-row:hover { transform: translateX(4px); background: rgba(224,241,246,.9); }
+  .vault-icon { width: 23px; height: 23px; border-radius: 7px; }
+  .blue { background: linear-gradient(135deg,#83c6e4,#347c9d); } .violet { background: linear-gradient(135deg,#b8a3df,#7554a0); } .green { background: linear-gradient(135deg,#95d5ba,#3a8c6d); }
+  .vault-text { flex: 1; display: grid; gap: 5px; }
+  .vault-text i, .vault-text em { height: 4px; border-radius: 9px; }
+  .vault-text i { width: 58%; background: #7396a5; } .vault-text em { width: 82%; background: #b2c8d1; }
+  .phone-speaker { width: 26px; height: 4px; margin: 12px auto 0; border-radius: 99px; background: rgba(67,95,107,.2); }
+  .phone-lock { position: relative; width: 46px; height: 46px; margin: 25px auto 20px; border-radius: 15px; background: rgba(62,145,177,.14); }
+  .phone-lock::before { content: ''; position: absolute; left: 16px; top: 10px; width: 12px; height: 11px; border: 2px solid #2c7895; border-bottom: 0; border-radius: 9px 9px 0 0; }
+  .phone-lock i { position: absolute; left: 12px; top: 20px; width: 22px; height: 17px; border-radius: 5px; background: #2c7895; }
+  .phone-line { height: 5px; margin: 9px 18px; border-radius: 9px; background: rgba(70,117,136,.2); } .phone-line.short { width: 48%; }
+  .phone-button { height: 28px; margin: 28px 15px; border-radius: 99px; background: #245c73; }
+  .sync-bridge { position: absolute; z-index: 4; left: 320px; top: 150px; width: 150px; height: 150px; pointer-events: none; overflow: visible; }
+  .sync-path-shadow { fill: none; stroke: rgba(37,118,151,.13); stroke-width: 9; stroke-linecap: round; transition: stroke .35s ease; }
+  .sync-path { fill: none; stroke: url(#sync-gradient); stroke-width: 2.2; stroke-linecap: round; stroke-dasharray: 8 7; filter: drop-shadow(0 0 5px rgba(45,138,176,.34)); animation: sync-dash 4.5s linear infinite; transition: stroke-width .3s ease, filter .3s ease; }
+  .sync-port { position: absolute; z-index: 7; width: 14px; height: 14px; border: 2px solid rgba(49,130,161,.72); border-radius: 50%; background: rgba(239,252,255,.96); box-shadow: 0 0 0 6px rgba(61,151,184,.1), 0 0 14px rgba(42,132,169,.42); transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease; }
+  .sync-port b { position: absolute; inset: 3px; border-radius: 50%; background: #3d98b9; }
+  .sync-port::after { content: ''; position: absolute; inset: -7px; border: 1px solid rgba(63,157,190,.35); border-radius: 50%; opacity: 0; }
+  .desktop-port { left: 348px; top: 228px; }
+  .phone-port { left: 417px; top: 153px; border-color: rgba(55,150,126,.75); box-shadow: 0 0 0 6px rgba(55,150,126,.1), 0 0 14px rgba(55,150,126,.4); }
+  .phone-port b { background: #3a9d85; }
+  .sync-particle { position: absolute; z-index: 6; left: 320px; top: 150px; width: 12px; height: 12px; margin: -6px; border: 3px solid #2d82a5; border-radius: 50%; background: #e9fbff; box-shadow: 0 0 13px rgba(38,137,177,.85); offset-path: path("M 35 85 C 58 24, 92 8, 104 10"); offset-position: 0 0; offset-rotate: 0deg; animation: sync-travel 2.6s cubic-bezier(.45,.05,.55,.95) infinite; transition: box-shadow .3s ease; }
+  .sync-particle.secondary { width: 8px; height: 8px; margin: -4px; border-width: 2px; opacity: .72; animation-delay: -.8s; animation-duration: 3.1s; }
+  .sync-particle.inbound { border-color: #3a9d85; background: #effff9; box-shadow: 0 0 13px rgba(49,157,132,.82); animation-name: sync-return; }
+  .sync-label { position: absolute; z-index: 5; left: 350px; top: 184px; padding: 6px 9px; border-radius: 99px; background: rgba(244,250,250,.78); color: #39758d; font: 8px/1 ui-monospace, monospace; letter-spacing: .08em; opacity: .75; transition: opacity .3s ease, transform .3s ease; }
+  .device-stage:hover .sync-path { stroke-width: 3; filter: drop-shadow(0 0 10px rgba(38,139,179,.65)); animation-duration: 2.3s; }
+  .device-stage:hover .sync-path-shadow { stroke: rgba(37,118,151,.18); }
+  .device-stage:hover .sync-particle { animation-duration: 1.45s; box-shadow: 0 0 19px rgba(38,137,177,1); }
+  .device-stage:hover .sync-particle.inbound { animation-duration: 1.7s; box-shadow: 0 0 19px rgba(49,157,132,1); }
+  .device-stage:hover .sync-port { transform: scale(1.18); box-shadow: 0 0 0 9px rgba(61,151,184,.13), 0 0 20px rgba(42,132,169,.68); }
+  .device-stage:hover .phone-port { box-shadow: 0 0 0 9px rgba(55,150,126,.13), 0 0 20px rgba(55,150,126,.66); }
+  .device-stage:hover .sync-port::after { animation: port-pulse 1.6s ease-out infinite; }
+  .device-stage:hover .phone-button { background: #2a7189; box-shadow: 0 7px 18px rgba(36,92,115,.22); }
+  .device-stage:hover .sync-label { opacity: 1; transform: translateY(-3px); }
+  @keyframes sync-dash { to { stroke-dashoffset: -150; } }
+  @keyframes sync-travel { 0% { offset-distance: 0%; opacity: 0; transform: scale(.65); } 15% { opacity: 1; } 52% { transform: scale(1.22); } 85% { opacity: 1; } 100% { offset-distance: 100%; opacity: 0; transform: scale(.7); } }
+  @keyframes sync-return { 0% { offset-distance: 100%; opacity: 0; transform: scale(.65); } 15% { opacity: 1; } 52% { transform: scale(1.18); } 85% { opacity: 1; } 100% { offset-distance: 0%; opacity: 0; transform: scale(.7); } }
+  @keyframes port-pulse { from { opacity: .7; transform: scale(.6); } to { opacity: 0; transform: scale(1.7); } }
+  @media (max-width: 620px) { .device-stage { width: 510px; transform: scale(.66); transform-origin: left top; margin-bottom: -125px; } }
+  @media (hover: none) { .device-stage:hover .desktop { transform: rotateY(7deg) rotateZ(-2deg); } .device-stage:hover .phone { transform: rotateZ(5deg); } }
+  @media (prefers-reduced-motion: reduce) { .sync-particle { offset-distance: 50%; opacity: 1; } }
+</style>

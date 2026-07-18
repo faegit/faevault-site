@@ -1,6 +1,7 @@
 ---
-import { absoluteUrl, SITE_NAME, withBase } from '../config/site';
+import { absoluteUrl, SITE_NAME, withBaseAsset } from '../config/site';
 import { localeMeta, localePath, otherLocale, uiText, type Locale } from '../i18n/config';
+import { ClientRouter } from 'astro:transitions';
 
 interface Props {
   locale: Locale;
@@ -22,11 +23,13 @@ const canonical = absoluteUrl(`/${locale}${routePath === '/' ? '' : routePath}/`
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
-    <link rel="icon" href={withBase('/favicon.ico')} sizes="any" />
+    <meta name="theme-color" content="#f2f6f4" />
+    <link rel="icon" href={withBaseAsset('/favicon.ico')} sizes="any" />
     <link rel="canonical" href={canonical} />
     <link rel="alternate" hreflang={localeMeta[locale].htmlLang} href={canonical} />
     <link rel="alternate" hreflang={localeMeta[alternate].htmlLang} href={absoluteUrl(`/${alternate}${routePath === '/' ? '' : routePath}/`)} />
     <title>{title} · {SITE_NAME}</title>
+    <ClientRouter />
   </head>
   <body>
     <a class="skip-link" href="#main">{text.skipToContent}</a>
@@ -41,19 +44,19 @@ const canonical = absoluteUrl(`/${locale}${routePath === '/' ? '' : routePath}/`
       </nav>
       <a class="language-switch" href={localePath(alternate, routePath)} hreflang={localeMeta[alternate].htmlLang}>{text.switchLanguage}</a>
     </header>
-    <main id="main"><slot /></main>
+    <main id="main" transition:animate="fade"><slot /></main>
   </body>
 </html>
 
 <style is:global>
-  :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f6f8; color: #172030; }
+  :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f2f6f4; color: #172b35; }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
-  body { margin: 0; min-width: 320px; }
+  body { margin: 0; min-width: 320px; overflow-x: hidden; background: #f2f6f4; }
   a { color: inherit; text-decoration: none; }
   .skip-link { position: fixed; top: .75rem; left: .75rem; z-index: 100; padding: .65rem 1rem; border-radius: 999px; background: #172030; color: #fff; transform: translateY(-160%); }
   .skip-link:focus { transform: translateY(0); }
-  .site-header { position: sticky; top: 0; z-index: 20; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 2rem; width: min(1180px, calc(100% - 2rem)); margin: 1rem auto 0; padding: .75rem 1rem; border: 1px solid rgba(255,255,255,.72); border-radius: 999px; background: rgba(255,255,255,.7); box-shadow: 0 14px 44px rgba(41,61,91,.09); backdrop-filter: blur(18px); }
+  .site-header { position: fixed; top: 1rem; left: 50%; z-index: 30; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 2rem; width: min(1180px, calc(100% - 2rem)); padding: .75rem 1rem; border: 1px solid rgba(255,255,255,.72); border-radius: 999px; background: rgba(250,253,252,.68); box-shadow: 0 14px 44px rgba(41,61,91,.09); backdrop-filter: blur(18px); transform: translateX(-50%); }
   .brand { font-weight: 760; letter-spacing: -.04em; }
   nav { display: flex; align-items: center; gap: 1.25rem; color: #526074; font-size: .92rem; }
   nav a, .language-switch { transition: color .2s ease, transform .2s ease; }
@@ -61,6 +64,10 @@ const canonical = absoluteUrl(`/${locale}${routePath === '/' ? '' : routePath}/`
   .support-link { color: #2869df; font-weight: 650; }
   .language-switch { justify-self: end; font-size: .9rem; color: #526074; }
   main { min-height: 80vh; }
+  ::view-transition-old(root) { animation: .28s ease both page-out; }
+  ::view-transition-new(root) { animation: .42s cubic-bezier(.2,.75,.2,1) both page-in; }
+  @keyframes page-out { to { opacity: 0; transform: translateY(-8px) scale(.995); } }
+  @keyframes page-in { from { opacity: 0; transform: translateY(12px) scale(.995); } }
   @media (max-width: 760px) { .site-header { grid-template-columns: 1fr auto; } nav { display: none; } }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
 </style>
