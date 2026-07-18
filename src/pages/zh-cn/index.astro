@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout locale="zh-cn" title="密码、通行密钥与重要资料，安心留在自己手中" description="FAEVault 是一款重视隐私、跨设备使用体验与长期可靠性的密码管理工具。">
+  <section class="foundation-hero">
+    <p class="eyebrow">由一个人认真做，也为每一个真实的人而做</p>
+    <h1>把重要的东西，<br />安心留在自己手中。</h1>
+    <p class="lede">FAEVault 正在成为一座安静、可靠的数字保险库。这里将记录它如何成长，也会把每一步使用方法讲清楚。</p>
+    <div class="actions">
+      <a class="primary" href="./support/">直接支持</a>
+      <a href="./guides/">了解如何使用</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .foundation-hero { width: min(980px, calc(100% - 3rem)); margin: 0 auto; padding: clamp(7rem, 15vw, 12rem) 0 10rem; }
+  .eyebrow { color: #4778cc; font-size: .88rem; letter-spacing: .08em; }
+  h1 { max-width: 900px; margin: 1.3rem 0; font-size: clamp(3rem, 8vw, 7rem); line-height: .98; letter-spacing: -.075em; font-weight: 720; }
+  .lede { max-width: 630px; color: #637087; font-size: clamp(1.05rem, 2vw, 1.28rem); line-height: 1.8; }
+  .actions { display: flex; gap: 1rem; align-items: center; margin-top: 2.4rem; }
+  .actions a { padding: .85rem 1.15rem; border-radius: 999px; color: #315a9f; transition: transform .2s ease, box-shadow .2s ease; }
+  .actions a:hover { transform: translateY(-2px); }
+  .actions .primary { background: #2f72e8; color: white; box-shadow: 0 12px 28px rgba(47,114,232,.24); }
+</style>

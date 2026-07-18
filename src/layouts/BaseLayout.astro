@@ -1,0 +1,66 @@
+---
+import { absoluteUrl, SITE_NAME, withBase } from '../config/site';
+import { localeMeta, localePath, otherLocale, uiText, type Locale } from '../i18n/config';
+
+interface Props {
+  locale: Locale;
+  title: string;
+  description: string;
+  routePath?: string;
+}
+
+const { locale, title, description, routePath = '/' } = Astro.props;
+const alternate = otherLocale(locale);
+const text = uiText[locale];
+const canonical = absoluteUrl(`/${locale}${routePath === '/' ? '' : routePath}/`);
+---
+
+<!doctype html>
+<html lang={localeMeta[locale].htmlLang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <link rel="icon" href={withBase('/favicon.ico')} sizes="any" />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang={localeMeta[locale].htmlLang} href={canonical} />
+    <link rel="alternate" hreflang={localeMeta[alternate].htmlLang} href={absoluteUrl(`/${alternate}${routePath === '/' ? '' : routePath}/`)} />
+    <title>{title} · {SITE_NAME}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{text.skipToContent}</a>
+    <header class="site-header">
+      <a class="brand" href={localePath(locale)} aria-label={`${SITE_NAME} ${text.nav.home}`}>{SITE_NAME}</a>
+      <nav aria-label="Primary">
+        <a href={localePath(locale)}>{text.nav.home}</a>
+        <a href={localePath(locale, 'guides')}>{text.nav.guides}</a>
+        <a href={localePath(locale, 'journey')}>{text.nav.journey}</a>
+        <a href={localePath(locale, 'download')}>{text.nav.download}</a>
+        <a class="support-link" href={localePath(locale, 'support')}>{text.nav.support}</a>
+      </nav>
+      <a class="language-switch" href={localePath(alternate, routePath)} hreflang={localeMeta[alternate].htmlLang}>{text.switchLanguage}</a>
+    </header>
+    <main id="main"><slot /></main>
+  </body>
+</html>
+
+<style is:global>
+  :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f6f8; color: #172030; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; min-width: 320px; }
+  a { color: inherit; text-decoration: none; }
+  .skip-link { position: fixed; top: .75rem; left: .75rem; z-index: 100; padding: .65rem 1rem; border-radius: 999px; background: #172030; color: #fff; transform: translateY(-160%); }
+  .skip-link:focus { transform: translateY(0); }
+  .site-header { position: sticky; top: 0; z-index: 20; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 2rem; width: min(1180px, calc(100% - 2rem)); margin: 1rem auto 0; padding: .75rem 1rem; border: 1px solid rgba(255,255,255,.72); border-radius: 999px; background: rgba(255,255,255,.7); box-shadow: 0 14px 44px rgba(41,61,91,.09); backdrop-filter: blur(18px); }
+  .brand { font-weight: 760; letter-spacing: -.04em; }
+  nav { display: flex; align-items: center; gap: 1.25rem; color: #526074; font-size: .92rem; }
+  nav a, .language-switch { transition: color .2s ease, transform .2s ease; }
+  nav a:hover, .language-switch:hover { color: #3579f6; transform: translateY(-1px); }
+  .support-link { color: #2869df; font-weight: 650; }
+  .language-switch { justify-self: end; font-size: .9rem; color: #526074; }
+  main { min-height: 80vh; }
+  @media (max-width: 760px) { .site-header { grid-template-columns: 1fr auto; } nav { display: none; } }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+</style>
