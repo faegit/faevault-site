@@ -121,10 +121,42 @@ const navLabels = locale === 'zh-cn'
 </div>
 
 <style>
-  :root { --snap-duration: .72s; }
+  :root { --card-duration: .72s; }
   html:has(.home) { overflow: hidden; height: 100%; }
-  .home { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scroll-behavior: smooth; }
-  .snap-section { min-height: 100vh; scroll-snap-align: start; display: flex; flex-direction: column; justify-content: center; position: relative; }
+  .home { height: 100vh; overflow: hidden; perspective: 1100px; perspective-origin: 50% 40%; position: relative; }
+
+  .snap-section {
+    position: absolute; inset: 0; z-index: 1;
+    display: flex; flex-direction: column; justify-content: center;
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+    opacity: 0; pointer-events: none;
+    clip-path: circle(0% at 50% 50%);
+    transform: translateY(30px) scale(.96);
+    will-change: transform, opacity, clip-path;
+  }
+  .snap-section.active {
+    z-index: 2; opacity: 1; pointer-events: auto;
+    clip-path: circle(150% at 50% 50%);
+    transform: translateY(0) scale(1);
+  }
+  .snap-section.leaving {
+    z-index: 3; pointer-events: none;
+    animation: card-leave var(--card-duration) cubic-bezier(.55,0,.45,1) both;
+  }
+  .snap-section.entering {
+    z-index: 2;
+    animation: card-enter var(--card-duration) cubic-bezier(.18,.78,.18,1) both;
+  }
+
+  @keyframes card-leave {
+    0% { opacity: 1; clip-path: circle(150% at 50% 50%); transform: rotateX(0deg) translateY(0) scale(1); }
+    100% { opacity: 0; clip-path: circle(0% at 50% 50%); transform: rotateX(7deg) translateY(-35px) scale(.9); }
+  }
+  @keyframes card-enter {
+    0% { opacity: 0; clip-path: circle(0% at 50% 50%); transform: rotateX(-4deg) translateY(55px) scale(.92); }
+    100% { opacity: 1; clip-path: circle(150% at 50% 50%); transform: rotateX(0deg) translateY(0) scale(1); }
+  }
+
   .snap-section > * { width: min(1180px, calc(100% - 6rem)); margin: 0 auto; }
 
   .hero-inner { display: grid; grid-template-columns: minmax(340px, 580px) minmax(420px, 1fr); gap: 3vw; align-items: center; }
@@ -143,7 +175,7 @@ const navLabels = locale === 'zh-cn'
   .device-wrap { justify-self: end; transform: scale(.88); transform-origin: right center; }
   .device-wrap :global(.device-stage) { width: 520px; height: 400px; }
 
-  .scroll-hint { position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; opacity: .4; }
+  .scroll-hint { position: absolute; bottom: 2.5rem; left: 50%; z-index: 4; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; opacity: .4; transition: opacity .4s ease; pointer-events: none; }
   .scroll-hint i { width: 2px; height: 14px; border-radius: 99px; background: #3d7d93; animation: scroll-bounce 2.2s ease-in-out infinite; }
   .scroll-hint i:nth-child(2) { animation-delay: .25s; } .scroll-hint i:nth-child(3) { animation-delay: .5s; }
   @keyframes scroll-bounce { 0%, 60%, 100% { transform: translateY(0); opacity: .3; } 30% { transform: translateY(6px); opacity: .9; } }
@@ -209,45 +241,72 @@ const navLabels = locale === 'zh-cn'
     const home = document.querySelector('.home') as HTMLElement | null;
     if (!home) return;
 
-    const sections = home.querySelectorAll('.snap-section');
+    const sections = [...home.querySelectorAll('.snap-section')] as HTMLElement[];
     const dots = home.querySelectorAll('[data-snap-dot]');
     const scrollHint = home.querySelector('.scroll-hint') as HTMLElement | null;
 
-    let activeIndex = -1;
-    let ticking = false;
+    let current = 0;
+    let busy = false;
 
     function updateNav(index: number) {
       dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
       if (scrollHint) scrollHint.style.opacity = index === 0 ? '.4' : '0';
     }
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting && entry.intersectionRatio >= .35) {
-          const idx = [...sections].indexOf(entry.target);
-          if (idx !== activeIndex) {
-            activeIndex = idx;
-            if (!ticking) {
-              requestAnimationFrame(() => { updateNav(activeIndex); ticking = false; });
-              ticking = true;
-            }
-          }
-        }
-      });
-    }, { threshold: [.35, .5, .65] });
+    function goTo(index: number) {
+      if (busy || index === current || index < 0 || index >= sections.length) return;
+      busy = true;
 
-    sections.forEach(s => observer.observe(s));
+      const cur = sections[current];
+      const next = sections[index];
 
-    dots.forEach(dot => {
+      next.style.display = 'flex';
+      void next.offsetHeight;
+      next.classList.add('entering');
+      cur.classList.add('leaving');
+
+      const DURATION = 780;
+      setTimeout(() => {
+        cur.classList.remove('active', 'leaving');
+        cur.style.display = 'none';
+        next.classList.remove('entering');
+        next.classList.add('active');
+        current = index;
+        busy = false;
+        updateNav(index);
+      }, DURATION);
+    }
+
+    sections[0].style.display = 'flex';
+    void sections[0].offsetHeight;
+    sections[0].classList.add('active');
+    updateNav(0);
+
+    home.addEventListener('wheel', (e) => {
+      if (busy) return;
+      if (e.deltaY > 0) goTo(current + 1);
+      else if (e.deltaY < 0) goTo(current - 1);
+    }, { passive: true });
+
+    {
+      let touchY = 0;
+      home.addEventListener('touchstart', (e) => { touchY = e.touches[0].clientY; }, { passive: true });
+      home.addEventListener('touchend', (e) => {
+        const dy = e.changedTouches[0].clientY - touchY;
+        if (Math.abs(dy) > 40) goTo(dy < 0 ? current + 1 : current - 1);
+      }, { passive: true });
+    }
+
+    dots.forEach((dot) => {
       dot.addEventListener('click', (e) => {
         e.preventDefault();
         const href = dot.getAttribute('href');
         if (!href) return;
-        const target = document.getElementById(href.slice(1));
-        if (target) target.scrollIntoView({ behavior: 'smooth' });
+        const idx = sections.findIndex((s) => s.id === href.slice(1));
+        if (idx >= 0) goTo(idx);
       });
     });
 
-    document.addEventListener('astro:before-swap', () => { observer.disconnect(); });
+    document.addEventListener('astro:before-swap', () => { busy = true; });
   })();
 </script>
