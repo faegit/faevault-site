@@ -124,11 +124,7 @@ const navLabels = locale === 'zh-cn'
   :root { --card-duration: .72s; }
   .home { height: 100vh; overflow: hidden; perspective: 1100px; perspective-origin: 50% 40%; position: relative; }
 
-  html:has(.home)::view-transition-old(root) { animation: fade-only .26s ease both; }
-  html:has(.home)::view-transition-new(root) { animation: fade-only .36s ease both reverse; mix-blend-mode: normal; }
-  html[data-home]::view-transition-old(root) { animation: fade-only .26s ease both; }
-  html[data-home]::view-transition-new(root) { animation: fade-only .36s ease both reverse; mix-blend-mode: normal; }
-  @keyframes fade-only { 0% { opacity: 1; } 100% { opacity: 0; } }
+
 
   .snap-section {
     position: absolute; inset: 0; z-index: 1;
@@ -312,13 +308,6 @@ const navLabels = locale === 'zh-cn'
       });
     });
 
-    document.documentElement.dataset.home = '';
-
     document.addEventListener('astro:before-swap', () => { busy = true; });
-    document.addEventListener('astro:page-load', () => {
-      if (!document.querySelector('.home')) {
-        delete document.documentElement.dataset.home;
-      }
-    });
   })();
 </script>
