@@ -204,17 +204,17 @@ const navLabels = locale === 'zh-cn'
 
 <script>
   (function() {
-    const home = document.querySelector('.home');
+    const home = document.querySelector('.home') as HTMLElement | null;
     if (!home) return;
 
     const sections = home.querySelectorAll('.snap-section');
     const dots = home.querySelectorAll('[data-snap-dot]');
-    const scrollHint = home.querySelector('.scroll-hint');
+    const scrollHint = home.querySelector('.scroll-hint') as HTMLElement | null;
 
     let activeIndex = -1;
     let ticking = false;
 
-    function updateNav(index) {
+    function updateNav(index: number) {
       dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
       if (scrollHint) scrollHint.style.opacity = index === 0 ? '.4' : '0';
     }
@@ -239,7 +239,9 @@ const navLabels = locale === 'zh-cn'
     dots.forEach(dot => {
       dot.addEventListener('click', (e) => {
         e.preventDefault();
-        const target = document.getElementById(dot.getAttribute('href').slice(1));
+        const href = dot.getAttribute('href');
+        if (!href) return;
+        const target = document.getElementById(href.slice(1));
         if (target) target.scrollIntoView({ behavior: 'smooth' });
       });
     });
