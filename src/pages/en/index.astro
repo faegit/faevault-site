@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout locale="en" title="Keep passwords, passkeys, and important details in your own hands" description="FAEVault is a privacy-minded password manager built for dependable use across devices.">
+  <section class="foundation-hero">
+    <p class="eyebrow">Built carefully by one person, for real people</p>
+    <h1>Keep what matters<br />in your own hands.</h1>
+    <p class="lede">FAEVault is growing into a quiet, dependable digital vault. This site will document its journey and explain every important workflow clearly.</p>
+    <div class="actions">
+      <a class="primary" href="./support/">Support directly</a>
+      <a href="./guides/">Learn how it works</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .foundation-hero { width: min(980px, calc(100% - 3rem)); margin: 0 auto; padding: clamp(7rem, 15vw, 12rem) 0 10rem; }
+  .eyebrow { color: #4778cc; font-size: .88rem; letter-spacing: .08em; text-transform: uppercase; }
+  h1 { max-width: 920px; margin: 1.3rem 0; font-size: clamp(3rem, 8vw, 7rem); line-height: .98; letter-spacing: -.075em; font-weight: 720; }
+  .lede { max-width: 650px; color: #637087; font-size: clamp(1.05rem, 2vw, 1.28rem); line-height: 1.8; }
+  .actions { display: flex; gap: 1rem; align-items: center; margin-top: 2.4rem; }
+  .actions a { padding: .85rem 1.15rem; border-radius: 999px; color: #315a9f; transition: transform .2s ease, box-shadow .2s ease; }
+  .actions a:hover { transform: translateY(-2px); }
+  .actions .primary { background: #2f72e8; color: white; box-shadow: 0 12px 28px rgba(47,114,232,.24); }
+</style>
