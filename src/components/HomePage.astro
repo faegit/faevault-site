@@ -92,8 +92,22 @@ const navLabels = locale === 'zh-cn'
 
   <section class="snap-section split" id="why">
     <div class="split-inner">
-      <div class="split-copy"><p class="eyebrow">{copy.storyKicker}</p><h2>{copy.storyTitle.split('\n').map((line) => <>{line}<br /></>)}</h2></div>
-      <div class="prose"><p>{copy.storyBody}</p><blockquote>{copy.quote}</blockquote></div>
+      <div class="split-copy">
+        <p class="eyebrow">{copy.storyKicker}</p>
+        <h2>{copy.storyTitle.split('\n').map((line) => <>{line}<br /></>)}</h2>
+        <blockquote class="slide-quote">{copy.quote.split('，').length > 1 ? copy.quote : copy.quote}</blockquote>
+      </div>
+      <div class="carousel-wrap">
+        <div class="carousel" data-carousel>
+          <div class="carousel-track" data-track>
+            <div class="carousel-slide" style="background:linear-gradient(135deg,#0f4c5c,#1a7a8a)"><div class="mock-phone"><div class="mock-notch"></div><div class="mock-body"><div class="mock-icon">🔐</div><p class="mock-label">{locale === 'zh-cn' ? '保险库' : 'Vault'}</p><div class="mock-items"><i></i><i></i><i></i><i></i></div></div></div></div>
+            <div class="carousel-slide" style="background:linear-gradient(135deg,#1a497a,#2a7aaa)"><div class="mock-phone"><div class="mock-notch"></div><div class="mock-body"><div class="mock-icon">🔑</div><p class="mock-label">{locale === 'zh-cn' ? '密码列表' : 'Passwords'}</p><div class="mock-items"><i></i><i></i><i></i><i></i></div></div></div></div>
+            <div class="carousel-slide" style="background:linear-gradient(135deg,#3a2a6a,#5a4a9a)"><div class="mock-phone"><div class="mock-notch"></div><div class="mock-body"><div class="mock-icon">🔄</div><p class="mock-label">{locale === 'zh-cn' ? '同步' : 'Sync'}</p><div class="mock-items"><i></i><i></i><i></i><i></i></div></div></div></div>
+            <div class="carousel-slide" style="background:linear-gradient(135deg,#1a5a3a,#2a8a5a)"><div class="mock-phone"><div class="mock-notch"></div><div class="mock-body"><div class="mock-icon">⚙️</div><p class="mock-label">{locale === 'zh-cn' ? '设置' : 'Settings'}</p><div class="mock-items"><i></i><i></i><i></i><i></i></div></div></div></div>
+          </div>
+          <div class="carousel-dots" data-dots></div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -181,9 +195,26 @@ const navLabels = locale === 'zh-cn'
   .scroll-hint i:nth-child(2) { animation-delay: .25s; } .scroll-hint i:nth-child(3) { animation-delay: .5s; }
   @keyframes scroll-bounce { 0%, 60%, 100% { transform: translateY(0); opacity: .3; } 30% { transform: translateY(6px); opacity: .9; } }
 
-  .split-inner { display: grid; grid-template-columns: 1.05fr .8fr; gap: 7vw; align-items: center; }
-  .prose > p { color: #5a727c; font: 1rem/1.9 Georgia, serif; }
-  blockquote { margin: 2.5rem 0 0; padding: 0 0 0 1.4rem; border-left: 2px solid rgba(43,124,154,.5); color: #254c5d; font: italic 1.35rem/1.5 Georgia, serif; }
+  .split-inner { display: grid; grid-template-columns: 1.05fr .9fr; gap: 5vw; align-items: center; }
+  .slide-quote { margin: 2rem 0 0; padding: 0 0 0 1.2rem; border-left: 2px solid rgba(43,124,154,.4); color: #254c5d; font: italic .95rem/1.6 Georgia, serif; max-width: 400px; }
+
+  .carousel-wrap { width: 100%; max-width: 380px; margin: 0 auto; }
+  .carousel { position: relative; overflow: hidden; border-radius: 1.5rem; box-shadow: 0 24px 70px rgba(42,83,99,.14); background: #fff; }
+  .carousel-track { display: flex; transition: transform .48s cubic-bezier(.2,.75,.2,1); }
+  .carousel-slide { flex: 0 0 100%; aspect-ratio: 9/16; display: flex; align-items: center; justify-content: center; }
+
+  .mock-phone { width: 82%; display: flex; flex-direction: column; background: rgba(255,255,255,.13); border-radius: 1.2rem; padding: 1rem .5rem .7rem; backdrop-filter: blur(4px); }
+  .mock-notch { width: 36%; height: 5px; margin: 0 auto .6rem; border-radius: 99px; background: rgba(255,255,255,.25); }
+  .mock-body { display: flex; flex-direction: column; align-items: center; padding: .8rem .6rem 1.2rem; }
+  .mock-icon { font-size: 2.6rem; line-height: 1; margin-bottom: .3rem; filter: drop-shadow(0 4px 12px rgba(0,0,0,.12)); }
+  .mock-label { margin: 0 0 .8rem; color: #fff; font-size: 1rem; font-weight: 700; letter-spacing: .04em; text-shadow: 0 2px 8px rgba(0,0,0,.1); }
+  .mock-items { display: flex; flex-direction: column; gap: .4rem; width: 100%; }
+  .mock-items i { display: block; height: 5px; border-radius: 99px; background: rgba(255,255,255,.22); }
+  .mock-items i:nth-child(1) { width: 78%; } .mock-items i:nth-child(2) { width: 62%; } .mock-items i:nth-child(3) { width: 84%; } .mock-items i:nth-child(4) { width: 52%; }
+
+  .carousel-dots { display: flex; justify-content: center; gap: .55rem; padding: .65rem 0 .15rem; }
+  .carousel-dots button { width: 7px; height: 7px; padding: 0; border: none; border-radius: 50%; background: rgba(60,112,130,.25); cursor: pointer; transition: background .3s ease, transform .3s ease; }
+  .carousel-dots button.active { background: #287795; transform: scale(1.35); box-shadow: 0 0 0 3px rgba(40,119,149,.15); }
 
   .journey-inner { display: grid; grid-template-columns: 1fr .4fr; gap: 7vw; align-items: center; }
   .journey-copy { max-width: 660px; }
@@ -220,6 +251,7 @@ const navLabels = locale === 'zh-cn'
     .device-wrap { justify-self: center; transform: scale(.78); transform-origin: center; }
     .hero-inner > * { min-width: 0; }
     .split-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+    .carousel-wrap { max-width: 320px; }
     .journey-inner { grid-template-columns: 1fr; gap: 2rem; }
     .journey-line { right: 2rem; }
     .milestones { flex-direction: row; justify-content: flex-end; gap: 2rem; }
@@ -234,6 +266,9 @@ const navLabels = locale === 'zh-cn'
     .milestones { display: none; }
     .support-inner { border-radius: 1.7rem; padding: 3rem 1.5rem; }
     .snap-section > * { width: calc(100% - 2.5rem); }
+    .split-copy h2 { font-size: clamp(1.6rem, 8vw, 2.8rem); }
+    .carousel-wrap { max-width: 260px; }
+    .mock-icon { font-size: 2rem; }
   }
 </style>
 
@@ -314,5 +349,44 @@ const navLabels = locale === 'zh-cn'
         if (i !== current) s.style.display = 'none';
       });
     });
+
+    { /* carousel */ }
+    const carouselEl = home.querySelector('[data-carousel]') as HTMLElement | null;
+    if (carouselEl) {
+      const track = carouselEl.querySelector('[data-track]') as HTMLElement;
+      const dotsContainer = carouselEl.querySelector('[data-dots]');
+      const slides = [...track.children] as HTMLElement[];
+      let carIndex = 0;
+      let carTimer: ReturnType<typeof setInterval>;
+      const paused = { current: false };
+
+      function renderDots() {
+        dotsContainer!.innerHTML = '';
+        slides.forEach((_, i) => {
+          const btn = document.createElement('button');
+          btn.setAttribute('data-car-dot', String(i));
+          if (i === 0) btn.className = 'active';
+          btn.addEventListener('click', () => { goCar(i); });
+          dotsContainer!.appendChild(btn);
+        });
+      }
+
+      function goCar(i: number) {
+        if (i === carIndex || i < 0 || i >= slides.length) return;
+        carIndex = i;
+        track.style.transform = `translateX(-${i * 100}%)`;
+        dotsContainer!.querySelectorAll('button').forEach((b, idx) => {
+          b.classList.toggle('active', idx === i);
+        });
+      }
+
+      function autoAdvance() { if (!paused.current) goCar((carIndex + 1) % slides.length); }
+
+      renderDots();
+      carTimer = setInterval(autoAdvance, 4200);
+
+      carouselEl.addEventListener('mouseenter', () => { paused.current = true; });
+      carouselEl.addEventListener('mouseleave', () => { paused.current = false; });
+    }
   })();
 </script>
