@@ -54,7 +54,7 @@ const canonical = absoluteUrl(`/${locale}${routePath === '/' ? '' : routePath}/`
   :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f2f6f4; color: #172b35; }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
-  body { margin: 0; min-width: 320px; overflow-x: hidden; background: #f2f6f4; }
+  body { margin: 0; min-width: 320px; overflow-x: hidden; }
   a { color: inherit; text-decoration: none; }
   .skip-link { position: fixed; top: .75rem; left: .75rem; z-index: 100; padding: .65rem 1rem; border-radius: 999px; background: #172030; color: #fff; transform: translateY(-160%); }
   .skip-link:focus { transform: translateY(0); }
@@ -74,3 +74,43 @@ const canonical = absoluteUrl(`/${locale}${routePath === '/' ? '' : routePath}/`
   @media (max-width: 760px) { .site-header { grid-template-columns: 1fr auto; } nav { display: none; } }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
 </style>
+
+<script>
+  (function() {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const selectors = 'main p, main blockquote, main .intro-line span, main .support-story span';
+    let observer;
+    function init() {
+      const elements = document.querySelectorAll(selectors);
+      if (!elements.length) return;
+      observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          const el = entry.target;
+          if (el.dataset.tw) return;
+          el.dataset.tw = '1';
+          observer.unobserve(el);
+          const text = el.textContent;
+          if (!text || text.trim().length < 2) return;
+          el.textContent = '';
+          let i = 0;
+          const base = 28;
+          (function tick() {
+            if (i < text.length) {
+              el.textContent = text.slice(0, i + 1);
+              const ch = text[i];
+              i++;
+              const extra = /[。！？.!?]/.test(ch) ? base * 5
+                         : /[，、；,;]/.test(ch) ? base * 2.5
+                         : 0;
+              setTimeout(tick, base + extra + (Math.random() - .5) * 8);
+            }
+          })();
+        });
+      }, { threshold: .08, rootMargin: '0px 0px -20px 0px' });
+      elements.forEach(el => observer.observe(el));
+    }
+    document.addEventListener('astro:page-load', init);
+    init();
+  })();
+</script>
