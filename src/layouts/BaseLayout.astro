@@ -79,17 +79,17 @@ const canonical = absoluteUrl(`/${locale}${routePath === '/' ? '' : routePath}/`
   (function() {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const selectors = 'main p, main blockquote, main .intro-line span, main .support-story span';
-    let observer;
+    let observer: IntersectionObserver | null;
     function init() {
       const elements = document.querySelectorAll(selectors);
       if (!elements.length) return;
       observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (!entry.isIntersecting) return;
-          const el = entry.target;
+          const el = entry.target as HTMLElement;
           if (el.dataset.tw) return;
           el.dataset.tw = '1';
-          observer.unobserve(el);
+          observer!.unobserve(el);
           const text = el.textContent;
           if (!text || text.trim().length < 2) return;
           el.textContent = '';
@@ -108,7 +108,7 @@ const canonical = absoluteUrl(`/${locale}${routePath === '/' ? '' : routePath}/`
           })();
         });
       }, { threshold: .08, rootMargin: '0px 0px -20px 0px' });
-      elements.forEach(el => observer.observe(el));
+      elements.forEach(el => observer!.observe(el));
     }
     document.addEventListener('astro:page-load', init);
     init();
