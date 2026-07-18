@@ -68,11 +68,11 @@ const navLabels = locale === 'zh-cn'
 ---
 
 <div class="home" data-snap-container>
-  <nav class="snap-nav" aria-label="Section navigation">
+  <div class="snap-nav-zone"><nav class="snap-nav" aria-label="Section navigation">
     {sections.map((s, i) => (
       <a href={`#${s.id}`} data-snap-dot={i} aria-label={navLabels[i]}><span>{navLabels[i]}</span></a>
     ))}
-  </nav>
+  </nav></div>
 
   <section class="snap-section hero" id="opening">
     <div class="hero-inner">
@@ -172,7 +172,9 @@ const navLabels = locale === 'zh-cn'
   .support-button { display: inline-flex; align-items: center; gap: .7rem; }
   .support-button:hover { gap: 1rem; }
 
-  .snap-nav { position: fixed; right: 1.5rem; top: 50%; z-index: 20; transform: translateY(-50%); display: flex; flex-direction: column; gap: .65rem; }
+  .snap-nav-zone { position: fixed; right: 0; top: 0; bottom: 0; z-index: 20; width: 4rem; display: flex; align-items: center; justify-content: flex-end; padding-right: .5rem; }
+  .snap-nav { display: flex; flex-direction: column; gap: .65rem; opacity: 0; transform: translateX(100%); transition: opacity .32s ease, transform .32s cubic-bezier(.2,.75,.2,1); pointer-events: none; }
+  .snap-nav-zone:hover .snap-nav, .snap-nav-zone:focus-within .snap-nav { opacity: 1; transform: translateX(0); pointer-events: auto; }
   .snap-nav a { position: relative; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; text-decoration: none; }
   .snap-nav a::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: rgba(60,112,130,.3); transition: transform .4s cubic-bezier(.2,.75,.2,1), background .4s ease, box-shadow .4s ease; }
   .snap-nav a:hover::before { transform: scale(1.5); background: rgba(60,112,130,.55); }
@@ -194,7 +196,7 @@ const navLabels = locale === 'zh-cn'
     .hero-inner { padding-top: 2rem; }
     .device-wrap { transform: scale(.6); transform-origin: center; margin-bottom: -2rem; }
     .scroll-hint { display: none; }
-    .snap-nav { right: .75rem; }
+    .snap-nav-zone { width: 2.5rem; padding-right: .25rem; }
     .journey-line { display: none; }
     .milestones { display: none; }
     .support-inner { border-radius: 1.7rem; padding: 3rem 1.5rem; }
