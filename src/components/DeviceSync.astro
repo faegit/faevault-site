@@ -18,8 +18,9 @@ const { label } = Astro.props;
     <path class="sync-path" d="M35 85 C58 24,92 8,104 10"></path>
   </svg>
   <i class="sync-port desktop-port"><b></b></i><i class="sync-port phone-port"><b></b></i>
-  <i class="sync-particle outbound"></i><i class="sync-particle secondary inbound"></i>
-  <span class="sync-label">ENCRYPTED SYNC ↔</span>
+  <i class="sync-particle outbound"></i>
+  <i class="sync-particle inbound"></i><i class="sync-particle inbound inbound-trail"></i>
+  <span class="sync-label"><b>PC</b><i>⇄</i><b>PHONE</b></span>
   <div class="device phone">
     <div class="phone-speaker"></div>
     <div class="phone-lock"><i></i></div>
@@ -62,9 +63,10 @@ const { label } = Astro.props;
   .phone-port { left: 417px; top: 153px; border-color: rgba(55,150,126,.75); box-shadow: 0 0 0 6px rgba(55,150,126,.1), 0 0 14px rgba(55,150,126,.4); }
   .phone-port b { background: #3a9d85; }
   .sync-particle { position: absolute; z-index: 6; left: 320px; top: 150px; width: 12px; height: 12px; margin: -6px; border: 3px solid #2d82a5; border-radius: 50%; background: #e9fbff; box-shadow: 0 0 13px rgba(38,137,177,.85); offset-path: path("M 35 85 C 58 24, 92 8, 104 10"); offset-position: 0 0; offset-rotate: 0deg; animation: sync-travel 2.6s cubic-bezier(.45,.05,.55,.95) infinite; transition: box-shadow .3s ease; }
-  .sync-particle.secondary { width: 8px; height: 8px; margin: -4px; border-width: 2px; opacity: .72; animation-delay: -.8s; animation-duration: 3.1s; }
-  .sync-particle.inbound { border-color: #3a9d85; background: #effff9; box-shadow: 0 0 13px rgba(49,157,132,.82); animation-name: sync-return; }
-  .sync-label { position: absolute; z-index: 5; left: 350px; top: 184px; padding: 6px 9px; border-radius: 99px; background: rgba(244,250,250,.78); color: #39758d; font: 8px/1 ui-monospace, monospace; letter-spacing: .08em; opacity: .75; transition: opacity .3s ease, transform .3s ease; }
+  .sync-particle.inbound { width: 12px; height: 12px; margin: -6px; border-color: #269b79; background: #effff9; box-shadow: 0 0 16px rgba(38,155,121,.95); animation-name: sync-return; animation-delay: -.9s; animation-duration: 2.85s; }
+  .sync-particle.inbound-trail { width: 6px; height: 6px; margin: -3px; border-width: 2px; opacity: .78; animation-delay: -1.12s; }
+  .sync-label { position: absolute; z-index: 5; left: 350px; top: 184px; display: flex; align-items: center; gap: 5px; padding: 6px 9px; border-radius: 99px; background: rgba(244,250,250,.82); color: #39758d; font: 8px/1 ui-monospace, monospace; letter-spacing: .07em; opacity: .82; transition: opacity .3s ease, transform .3s ease; }
+  .sync-label b { font-weight: 750; } .sync-label i { color: #319b7f; font-size: 11px; font-style: normal; animation: exchange-hint 1.5s ease-in-out infinite; }
   .device-stage:hover .sync-path { stroke-width: 3; filter: drop-shadow(0 0 10px rgba(38,139,179,.65)); animation-duration: 2.3s; }
   .device-stage:hover .sync-path-shadow { stroke: rgba(37,118,151,.18); }
   .device-stage:hover .sync-particle { animation-duration: 1.45s; box-shadow: 0 0 19px rgba(38,137,177,1); }
@@ -76,7 +78,8 @@ const { label } = Astro.props;
   .device-stage:hover .sync-label { opacity: 1; transform: translateY(-3px); }
   @keyframes sync-dash { to { stroke-dashoffset: -150; } }
   @keyframes sync-travel { 0% { offset-distance: 0%; opacity: 0; transform: scale(.65); } 15% { opacity: 1; } 52% { transform: scale(1.22); } 85% { opacity: 1; } 100% { offset-distance: 100%; opacity: 0; transform: scale(.7); } }
-  @keyframes sync-return { 0% { offset-distance: 100%; opacity: 0; transform: scale(.65); } 15% { opacity: 1; } 52% { transform: scale(1.18); } 85% { opacity: 1; } 100% { offset-distance: 0%; opacity: 0; transform: scale(.7); } }
+  @keyframes sync-return { 0% { offset-distance: 100%; opacity: 0; transform: scale(.7); } 9% { opacity: 1; } 48% { transform: scale(1.2); } 91% { opacity: 1; } 100% { offset-distance: 0%; opacity: 0; transform: scale(.72); } }
+  @keyframes exchange-hint { 50% { color: #277fa1; transform: scaleX(1.18); } }
   @keyframes port-pulse { from { opacity: .7; transform: scale(.6); } to { opacity: 0; transform: scale(1.7); } }
   @media (max-width: 620px) { .device-stage { width: 510px; transform: scale(.66); transform-origin: left top; margin-bottom: -125px; } }
   @media (hover: none) { .device-stage:hover .desktop { transform: rotateY(7deg) rotateZ(-2deg); } .device-stage:hover .phone { transform: rotateZ(5deg); } }

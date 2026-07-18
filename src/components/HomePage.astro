@@ -3,7 +3,6 @@ import type { Locale } from '../i18n/config';
 import { localePath } from '../i18n/config';
 import DeviceSync from './DeviceSync.astro';
 import FluidBackdrop from './FluidBackdrop.astro';
-import TimelineRail from './TimelineRail.astro';
 
 interface Props { locale: Locale; }
 const { locale } = Astro.props;
@@ -14,8 +13,6 @@ const copy = locale === 'zh-cn' ? {
   support: '直接支持开发',
   storyLink: '阅读开发故事',
   syncLabel: '桌面端与手机端之间的加密数据同步',
-  railLabel: '页面章节',
-  rail: ['开场', '为什么做', '成长路径', '使用与下载', '支持'],
   storyKicker: '为什么继续做下去',
   storyTitle: '工具可以很冷静，\n但它保护的是人的生活。',
   storyBody: '一串密码背后，可能是一段工作、一份回忆，或一个不想失去的账号。FAEVault 的故事不会用虚构的苦难催促赞助，而会如实记录那些反复打磨、推倒重来，以及终于让某件事变得更可靠的时刻。',
@@ -40,8 +37,6 @@ const copy = locale === 'zh-cn' ? {
   support: 'Support development',
   storyLink: 'Read the development story',
   syncLabel: 'Encrypted data moving between desktop and phone',
-  railLabel: 'Page sections',
-  rail: ['Opening', 'Why', 'Journey', 'Guides', 'Support'],
   storyKicker: 'Why keep building',
   storyTitle: 'Tools can be quiet.\nWhat they protect is human.',
   storyBody: 'Behind a password may be someone’s work, a memory, or an account they cannot afford to lose. FAEVault will not invent hardship to pressure people into donating. Its story will honestly document the rebuilding, the difficult choices, and the moments when something finally became more dependable.',
@@ -61,12 +56,10 @@ const copy = locale === 'zh-cn' ? {
   supportButton: 'Open the support page',
 };
 
-const railItems = ['opening', 'why', 'journey', 'guides', 'support'].map((id, index) => ({ href: `#${id}`, label: copy.rail[index] }));
 ---
 
 <div class="home" data-fluid-root>
   <FluidBackdrop />
-  <TimelineRail label={copy.railLabel} items={railItems} />
 
   <section class="hero" id="opening">
     <div class="hero-copy reveal">
