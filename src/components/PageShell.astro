@@ -1,0 +1,26 @@
+---
+interface Props { theme: string; kicker: string; title: string; intro: string; }
+const { theme, kicker, title, intro } = Astro.props;
+---
+
+<div class={`inner-page theme-${theme}`}>
+  <header class="page-intro">
+    <p>{kicker}</p>
+    <h1>{title}</h1>
+    <div class="intro-line"><i></i><span>{intro}</span></div>
+  </header>
+  <slot />
+</div>
+
+<style>
+  .inner-page { position: relative; width: min(1160px, calc(100% - 3rem)); min-height: 100vh; margin: 0 auto; padding: 10rem 0 7rem; }
+  .page-intro { max-width: 900px; animation: intro-reveal .75s .08s cubic-bezier(.18,.78,.18,1) both; }
+  .page-intro > p { margin: 0 0 1.2rem; color: var(--page-accent, #277a98); font-size: .72rem; font-weight: 820; letter-spacing: .17em; text-transform: uppercase; }
+  h1 { max-width: 980px; margin: 0; color: #17303b; font: 500 clamp(3.2rem, 7vw, 6.7rem)/.99 Georgia, serif; letter-spacing: -.065em; }
+  .intro-line { display: grid; grid-template-columns: 70px minmax(0, 620px); gap: 1.2rem; align-items: start; margin-top: 2rem; color: #58717c; font: 1rem/1.85 Georgia, serif; }
+  .intro-line i { height: 1px; margin-top: .9rem; background: linear-gradient(90deg, var(--page-accent, #277a98), transparent); }
+  .theme-guides { --page-accent: #287c9d; } .theme-journey { --page-accent: #6c68b4; } .theme-download { --page-accent: #278e78; } .theme-support { --page-accent: #b46b66; }
+  @keyframes intro-reveal { from { opacity: 0; filter: blur(8px); transform: translateY(26px); } }
+  @media (max-width: 620px) { .inner-page { width: calc(100% - 2rem); padding-top: 8rem; } .intro-line { grid-template-columns: 42px 1fr; } }
+  @media (prefers-reduced-motion: reduce) { .page-intro { animation: none; } }
+</style>
