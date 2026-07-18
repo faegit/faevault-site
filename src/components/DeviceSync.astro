@@ -3,7 +3,7 @@ interface Props { label: string; }
 const { label } = Astro.props;
 ---
 
-<div class="device-stage" aria-label={label}>
+<div class="device-stage" data-device-stage aria-label={label}>
   <div class="device desktop">
     <div class="window-head"><i></i><i></i><i></i><b>FAEVault</b></div>
     <div class="vault-rows">
@@ -52,25 +52,64 @@ const { label } = Astro.props;
   .phone-button { height: 28px; margin: 28px 15px; border-radius: 99px; background: #245c73; }
   .data-orbit { position: absolute; z-index: 2; left: 25px; top: 30px; width: 485px; height: 345px; border-radius: 50%; opacity: .72; filter: drop-shadow(0 0 8px rgba(56,145,177,.18)); transition: opacity .35s ease, filter .35s ease, transform .5s cubic-bezier(.2,.75,.2,1); }
   .data-orbit::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: conic-gradient(from 35deg, rgba(48,133,164,.16), rgba(68,177,154,.62), rgba(84,172,205,.2), rgba(48,133,164,.68), rgba(48,133,164,.16)); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px)); mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px)); }
-  .orbit-runner { position: absolute; z-index: 6; inset: 0; border-radius: 50%; animation: orbit-clockwise 4.2s linear infinite; }
+  .orbit-runner { position: absolute; z-index: 6; inset: 0; border-radius: 50%; transform: rotate(0deg); will-change: transform; }
   .orbit-runner b { position: absolute; left: 50%; top: -6px; width: 12px; height: 12px; margin-left: -6px; border: 3px solid #2d82a5; border-radius: 50%; background: #e9fbff; box-shadow: 0 0 15px rgba(38,137,177,.92); }
-  .orbit-runner.inbound { animation-name: orbit-counterclockwise; animation-delay: -1.2s; animation-duration: 4.6s; }
+  .orbit-runner.inbound { transform: rotate(150deg); }
   .orbit-runner.inbound b { border-color: #269b79; background: #effff9; box-shadow: 0 0 16px rgba(38,155,121,.95); }
-  .orbit-runner.trail { animation-delay: -1.48s; }
+  .orbit-runner.trail { transform: rotate(132deg); }
   .orbit-runner.trail b { top: -3px; width: 6px; height: 6px; margin-left: -3px; border-width: 2px; opacity: .8; }
   .sync-label { position: absolute; z-index: 5; left: 211px; top: 190px; display: flex; align-items: center; gap: 6px; padding: 7px 10px; border: 1px solid rgba(78,143,165,.13); border-radius: 99px; background: rgba(244,250,250,.78); color: #39758d; box-shadow: 0 8px 24px rgba(58,100,115,.08); font: 8px/1 ui-monospace, monospace; letter-spacing: .07em; opacity: .84; transition: opacity .3s ease, transform .3s ease; }
   .sync-label b { font-weight: 750; } .sync-label i { color: #319b7f; font-size: 11px; font-style: normal; animation: exchange-hint 1.5s ease-in-out infinite; }
   .device-stage:hover .data-orbit { opacity: 1; filter: drop-shadow(0 0 13px rgba(46,145,179,.42)); transform: scale(1.015); }
-  .device-stage:hover .orbit-runner { animation-duration: 2.7s; }
-  .device-stage:hover .orbit-runner.inbound { animation-duration: 3s; }
   .device-stage:hover .orbit-runner b { box-shadow: 0 0 21px rgba(38,137,177,1); }
   .device-stage:hover .orbit-runner.inbound b { box-shadow: 0 0 22px rgba(38,155,121,1); }
   .device-stage:hover .phone-button { background: #2a7189; box-shadow: 0 7px 18px rgba(36,92,115,.22); }
   .device-stage:hover .sync-label { opacity: 1; transform: translateY(-3px); }
-  @keyframes orbit-clockwise { to { transform: rotate(360deg); } }
-  @keyframes orbit-counterclockwise { to { transform: rotate(-360deg); } }
   @keyframes exchange-hint { 50% { color: #277fa1; transform: scaleX(1.18); } }
   @media (max-width: 620px) { .device-stage { width: 510px; transform: scale(.66); transform-origin: left top; margin-bottom: -125px; } }
   @media (hover: none) { .device-stage:hover .desktop { transform: rotateY(7deg) rotateZ(-2deg); } .device-stage:hover .phone { transform: rotateZ(5deg); } }
-  @media (prefers-reduced-motion: reduce) { .orbit-runner { animation: none; } .orbit-runner.inbound { transform: rotate(180deg); } .orbit-runner.trail { transform: rotate(205deg); } }
+  @media (prefers-reduced-motion: reduce) { .orbit-runner.inbound { transform: rotate(180deg) !important; } .orbit-runner.trail { transform: rotate(205deg) !important; } }
 </style>
+
+<script>
+  function startDeviceOrbits() {
+    document.querySelectorAll<HTMLElement>('[data-device-stage]').forEach((stage) => {
+      if (stage.dataset.orbitReady) return;
+      stage.dataset.orbitReady = 'true';
+      const outbound = stage.querySelector<HTMLElement>('.orbit-runner.outbound');
+      const inbound = stage.querySelector<HTMLElement>('.orbit-runner.inbound:not(.trail)');
+      const trail = stage.querySelector<HTMLElement>('.orbit-runner.trail');
+      if (!outbound || !inbound || !trail) return;
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      let frame = 0;
+      let previousTime = performance.now();
+      let speedMultiplier = 1;
+      let targetMultiplier = 1;
+      const angles = { outbound: 0, inbound: 150, trail: 132 };
+      const enter = () => { targetMultiplier = 1.62; };
+      const leave = () => { targetMultiplier = 1; };
+      stage.addEventListener('pointerenter', enter);
+      stage.addEventListener('pointerleave', leave);
+
+      const tick = (now: number) => {
+        const delta = Math.min(48, Math.max(0, now - previousTime));
+        previousTime = now;
+        const responseTime = targetMultiplier > speedMultiplier ? 420 : 720;
+        speedMultiplier += (targetMultiplier - speedMultiplier) * (1 - Math.exp(-delta / responseTime));
+        angles.outbound = (angles.outbound + delta * .0857 * speedMultiplier) % 360;
+        angles.inbound = (angles.inbound - delta * .0783 * speedMultiplier) % 360;
+        angles.trail = (angles.trail - delta * .0783 * speedMultiplier) % 360;
+        outbound.style.transform = `rotate(${angles.outbound}deg)`;
+        inbound.style.transform = `rotate(${angles.inbound}deg)`;
+        trail.style.transform = `rotate(${angles.trail}deg)`;
+        stage.dataset.orbitSpeed = speedMultiplier.toFixed(3);
+        frame = requestAnimationFrame(tick);
+      };
+      frame = requestAnimationFrame(tick);
+      document.addEventListener('astro:before-swap', () => cancelAnimationFrame(frame), { once: true });
+    });
+  }
+  document.addEventListener('astro:page-load', startDeviceOrbits);
+  startDeviceOrbits();
+</script>
