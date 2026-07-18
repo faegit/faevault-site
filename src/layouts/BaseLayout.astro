@@ -67,10 +67,10 @@ const canonical = absoluteUrl(`/${locale}${routePath === '/' ? '' : routePath}/`
   .language-switch { justify-self: end; font-size: .9rem; color: #526074; }
   main { min-height: 80vh; }
   .ambient-layer { position: fixed; inset: 0; z-index: -2; pointer-events: none; }
-  ::view-transition-old(root) { animation: .36s cubic-bezier(.45,0,.55,1) both page-out; }
-  ::view-transition-new(root) { animation: .58s cubic-bezier(.18,.78,.18,1) both page-in; }
-  @keyframes page-out { to { opacity: 0; filter: blur(10px); transform: scale(.985); clip-path: inset(3% 2% 3% 2% round 2rem); } }
-  @keyframes page-in { from { opacity: 0; filter: blur(14px); transform: scale(1.018); clip-path: inset(8% 4% 8% 4% round 3rem); } }
+  ::view-transition-old(root) { animation: .22s ease both crossfade-out; }
+  ::view-transition-new(root) { animation: .24s ease .06s both crossfade-in; mix-blend-mode: normal; }
+  @keyframes crossfade-out { to { opacity: 0; } }
+  @keyframes crossfade-in { from { opacity: 0; } }
   @media (max-width: 760px) { .site-header { grid-template-columns: 1fr auto; } nav { display: none; } }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
 </style>
