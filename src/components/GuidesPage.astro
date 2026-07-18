@@ -1,0 +1,41 @@
+---
+import type { Locale } from '../i18n/config';
+import PageShell from './PageShell.astro';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const c = locale === 'zh-cn' ? {
+  kicker: '使用指南', title: '需要答案时，路径应该清晰可见。', intro: '教程不会堆成一堵文档墙，而是沿真实任务展开。当前内容为结构占位，后续会补充双端截图与逐步操作。',
+  nodes: [['01','第一次打开','创建或导入保险库'],['02','保存与整理','密码、通行密钥和模块化资料'],['03','自动完成','自动填充与 Credential Manager'],['04','双端协作','同步、备份与冲突处理'],['05','安全维护','生物识别、泄露检查与恢复']],
+  note: '选择一条路径开始', soon: '详细教程即将补充',
+} : {
+  kicker: 'Guides', title: 'When you need an answer, the path should be visible.', intro: 'The guides follow real tasks instead of becoming a wall of documentation. Screenshots and complete walkthroughs for both platforms will be added later.',
+  nodes: [['01','First launch','Create or import a vault'],['02','Save and organise','Passwords, passkeys, and modular details'],['03','Complete automatically','Autofill and Credential Manager'],['04','Work across devices','Sync, backups, and conflict handling'],['05','Maintain security','Biometrics, breach checks, and recovery']],
+  note: 'Choose a path to begin', soon: 'Detailed guides coming soon',
+};
+---
+
+<PageShell theme="guides" kicker={c.kicker} title={c.title} intro={c.intro}>
+  <section class="guide-network" aria-label={c.note}>
+    <div class="network-aura"></div>
+    <p class="network-note">{c.note}</p>
+    <div class="route-line"></div>
+    {c.nodes.map(([number,title,detail], index) => <article style={`--i:${index}`}><b>{number}</b><i></i><div><h2>{title}</h2><p>{detail}</p></div><span>{c.soon}</span></article>)}
+  </section>
+</PageShell>
+
+<style>
+  .guide-network { position: relative; min-height: 680px; margin-top: 6rem; padding: 3rem 0; overflow: hidden; }
+  .network-aura { position: absolute; left: 12%; top: 5%; width: 58%; height: 70%; border-radius: 50%; background: radial-gradient(circle, rgba(75,177,207,.15), transparent 68%); filter: blur(22px); animation: breathe 5s ease-in-out infinite; }
+  .network-note { margin: 0 0 4rem 13%; color: #557581; font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; }
+  .route-line { position: absolute; left: 18%; top: 7rem; bottom: 4rem; width: 2px; background: linear-gradient(#0000, #47a3c4 12%, #5dbba1 85%, #0000); box-shadow: 0 0 18px rgba(63,159,190,.28); }
+  article { position: relative; display: grid; grid-template-columns: 50px 28px minmax(220px,1fr) auto; gap: 1.5rem; align-items: center; width: min(820px, 78%); margin: 0 0 2.1rem 14%; padding: 1rem 0; animation: node-in .62s calc(.15s + var(--i) * .09s) cubic-bezier(.18,.78,.18,1) both; }
+  article > b { color: #5a8797; font: .72rem/1 ui-monospace, monospace; }
+  article > i { position: relative; z-index: 2; width: 13px; height: 13px; border: 3px solid #eafafa; border-radius: 50%; background: #368eab; box-shadow: 0 0 0 7px rgba(54,142,171,.13), 0 0 18px rgba(54,142,171,.36); animation: node-pulse 2.8s calc(var(--i) * -.45s) ease-in-out infinite; }
+  h2 { margin: 0; color: #244551; font: 500 1.5rem/1.2 Georgia, serif; } article p { margin: .35rem 0 0; color: #6a8089; font-size: .84rem; }
+  article span { color: #799099; font-size: .7rem; opacity: 0; transform: translateX(-10px); transition: opacity .25s ease, transform .25s ease; }
+  article:hover span { opacity: 1; transform: translateX(0); }
+  @keyframes node-in { from { opacity: 0; transform: translateX(-28px); } }
+  @keyframes node-pulse { 50% { transform: scale(1.25); box-shadow: 0 0 0 11px rgba(54,142,171,.08), 0 0 24px rgba(54,142,171,.5); } }
+  @keyframes breathe { 50% { transform: translate(7%,6%) scale(1.12); } }
+  @media (max-width: 700px) { .guide-network { margin-top: 3rem; } .route-line { left: 28px; } .network-note { margin-left: 0; } article { grid-template-columns: 34px 20px 1fr; width: 100%; margin-left: 0; gap: .8rem; } article span { display: none; } }
+</style>
