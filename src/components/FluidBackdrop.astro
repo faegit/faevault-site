@@ -1,0 +1,81 @@
+<div class="fluid-field" data-fluid-field aria-hidden="true">
+  <i></i><i></i><i></i><i></i>
+  <span class="pointer-aura"></span>
+</div>
+
+<style>
+  .fluid-field { position: fixed; inset: -8rem; z-index: -2; overflow: hidden; pointer-events: none; opacity: .68; contain: strict; isolation: isolate; transform: translateZ(0); backface-visibility: hidden; }
+  .fluid-field i { position: absolute; left: 0; top: 0; display: block; filter: blur(54px); will-change: transform; transform: translate3d(0,0,0); backface-visibility: hidden; }
+  .fluid-field i:nth-child(1) { width: min(42vw, 620px); height: min(38vw, 520px); border-radius: 43% 57% 61% 39% / 52% 44% 56% 48%; background: rgba(72,190,224,.39); transform: translate3d(6vw,17vh,0); }
+  .fluid-field i:nth-child(2) { width: min(48vw, 700px); height: min(38vw, 560px); border-radius: 58% 42% 39% 61% / 44% 57% 43% 56%; background: rgba(124,129,219,.21); transform: translate3d(76vw,5vh,0); }
+  .fluid-field i:nth-child(3) { width: min(38vw, 560px); height: min(34vw, 480px); border-radius: 39% 61% 55% 45% / 59% 41% 57% 43%; background: rgba(74,207,158,.23); transform: translate3d(16vw,33vh,0); }
+  .fluid-field i:nth-child(4) { width: min(34vw, 500px); height: min(30vw, 430px); border-radius: 62% 38% 47% 53% / 41% 54% 46% 59%; background: rgba(238,177,104,.14); transform: translate3d(48vw,54vh,0); }
+  .pointer-aura { position: absolute; width: 19rem; height: 19rem; margin: -9.5rem 0 0 -9.5rem; border-radius: 50%; background: radial-gradient(circle, rgba(232,253,255,.55), rgba(87,181,214,.13) 43%, transparent 70%); filter: blur(15px); opacity: 0; transition: opacity .3s ease; }
+  :global(.fluid-active) .pointer-aura { opacity: 1; }
+  @media (max-width: 760px) { .fluid-field { opacity: .52; inset: -6rem; } .fluid-field i { min-width: 18rem; min-height: 16rem; } }
+  @media (prefers-reduced-motion: reduce) { .fluid-field { opacity: .38; } .pointer-aura { display: none; } }
+</style>
+
+<script>
+  function startFluidField() {
+    const field = document.querySelector<HTMLElement>('[data-fluid-field]');
+    const root = field?.closest<HTMLElement>('[data-fluid-root]');
+    if (!field || !root || field.dataset.ready) return;
+    field.dataset.ready = 'true';
+    const blobs = [...field.querySelectorAll<HTMLElement>('i')];
+    const aura = field.querySelector<HTMLElement>('.pointer-aura');
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const pointer = { x: .5, y: .42, tx: .5, ty: .42, on: false, energy: 0 };
+    const phase = [0, 1.7, 3.4, 5.2];
+    const speed = [.00031, .00022, .00027, .00019];
+    const base = [[.06,.03], [.54,.02], [.22,.48], [.67,.52]];
+    let frame = 0;
+    let lastPaint = 0;
+    const enter = () => { pointer.on = true; root.classList.add('fluid-active'); };
+    const leave = () => { pointer.on = false; root.classList.remove('fluid-active'); };
+    const move = (event: PointerEvent) => {
+      const bounds = root.getBoundingClientRect();
+      const x = (event.clientX - bounds.left) / bounds.width;
+      const y = (event.clientY - bounds.top) / bounds.height;
+      pointer.energy = Math.min(1, pointer.energy + Math.hypot(x - pointer.tx, y - pointer.ty) * 4);
+      pointer.tx = x; pointer.ty = y;
+    };
+    root.addEventListener('pointerenter', enter);
+    root.addEventListener('pointerleave', leave);
+    root.addEventListener('pointermove', move, { passive: true });
+    if (!reduce) {
+      const startedAt = performance.now();
+      const tick = (now: number) => {
+        frame = requestAnimationFrame(tick);
+        if (now - lastPaint < 22) return;
+        lastPaint = now;
+        const time = now - startedAt;
+        pointer.x += (pointer.tx - pointer.x) * .075;
+        pointer.y += (pointer.ty - pointer.y) * .075;
+        pointer.energy *= .94;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        if (aura) aura.style.transform = `translate3d(${pointer.x * width}px,${pointer.y * height}px,0) scale(${1 + pointer.energy * .18})`;
+        blobs.forEach((blob, index) => {
+          const velocity = speed[index] * (1 + pointer.energy * .7);
+          const p = phase[index];
+          let x = (base[index][0] + Math.sin(time * velocity + p) * .16 + Math.sin(time * velocity * .43 + p) * .06) * width;
+          let y = (base[index][1] + Math.cos(time * velocity * .81 + p) * .14 + Math.sin(time * velocity * .51 + p) * .05) * height;
+          const dx = pointer.x * width - x;
+          const dy = pointer.y * height - y;
+          const distance = Math.max(100, Math.hypot(dx, dy));
+          const influence = pointer.on ? Math.max(0, 1 - distance / (width * .58)) : 0;
+          x += dx * influence * (.1 + index * .012);
+          y += dy * influence * (.1 + index * .01);
+          const scale = 1 + Math.sin(time * velocity * .66 + p) * .09 + influence * .16 + pointer.energy * .035;
+          const rotation = Math.sin(time * velocity * .48 + p) * 28 + influence * 12;
+          blob.style.transform = `translate3d(${x}px,${y}px,0) rotate(${rotation}deg) scale(${scale})`;
+        });
+      };
+      tick(startedAt);
+    }
+    document.addEventListener('astro:before-swap', () => cancelAnimationFrame(frame), { once: true });
+  }
+  document.addEventListener('astro:page-load', startFluidField);
+  startFluidField();
+</script>

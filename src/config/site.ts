@@ -15,3 +15,7 @@ export function withBase(path = '/'): string {
 export function absoluteUrl(path = '/'): string {
   return new URL(withBase(path), SITE_ORIGIN).toString();
 }
+
+export function withBaseAsset(path: string): string {
+  return `${SITE_BASE_PATH}/${path.replace(/^\/+/, '')}`;
+}

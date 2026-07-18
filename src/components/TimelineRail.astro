@@ -1,0 +1,23 @@
+---
+interface Item { href: string; label: string; }
+interface Props { label: string; items: Item[]; }
+const { label, items } = Astro.props;
+---
+
+<nav class="timeline-rail" aria-label={label}>
+  <svg viewBox="0 0 72 560" preserveAspectRatio="none" aria-hidden="true"><path d="M39 2 C13 72, 57 130, 31 201 C10 259, 61 309, 34 378 C18 423, 50 476, 27 558"></path></svg>
+  {items.map((item, index) => <a href={item.href} style={`--point-y:${7 + index * 21}%`}><i></i><span>{item.label}</span></a>)}
+</nav>
+
+<style>
+  .timeline-rail { position: fixed; z-index: 15; left: max(1.1rem, calc((100vw - 1440px)/2)); top: 18vh; width: 96px; height: 64vh; min-height: 420px; }
+  svg { position: absolute; left: 0; top: 0; width: 54px; height: 100%; overflow: visible; }
+  path { fill: none; stroke: rgba(49,103,122,.25); stroke-width: 1.4; stroke-dasharray: 3 8; stroke-linecap: round; }
+  a { position: absolute; left: 0; top: var(--point-y); display: flex; align-items: center; gap: .55rem; color: #67808a; font-size: .68rem; transform: translateX(19px); transition: color .25s ease, transform .25s ease; }
+  a:nth-of-type(even) { transform: translateX(31px); }
+  a:hover { color: #246b87; transform: translateX(36px); }
+  a i { width: 8px; height: 8px; flex: 0 0 auto; border: 2px solid rgba(43,119,150,.58); border-radius: 50%; background: rgba(244,250,249,.88); box-shadow: 0 0 0 5px rgba(79,166,194,.08); transition: background .25s ease, box-shadow .25s ease; }
+  a:hover i { background: #3b9cbc; box-shadow: 0 0 0 8px rgba(79,166,194,.13); }
+  a span { white-space: nowrap; opacity: .72; }
+  @media (max-width: 1180px) { .timeline-rail { display: none; } }
+</style>
