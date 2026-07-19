@@ -100,10 +100,10 @@ const navLabels = locale === 'zh-cn'
       <div class="carousel-wrap">
         <div class="carousel" data-carousel>
           <div class="carousel-track" data-track>
-            <div class="carousel-slide" style="background:linear-gradient(135deg,#0f4c5c,#1a7a8a)"><div class="mock-phone"><div class="mock-notch"></div><div class="mock-body"><div class="mock-icon">🔐</div><p class="mock-label">{locale === 'zh-cn' ? '保险库' : 'Vault'}</p><div class="mock-items"><i></i><i></i><i></i><i></i></div></div></div></div>
-            <div class="carousel-slide" style="background:linear-gradient(135deg,#1a497a,#2a7aaa)"><div class="mock-phone"><div class="mock-notch"></div><div class="mock-body"><div class="mock-icon">🔑</div><p class="mock-label">{locale === 'zh-cn' ? '密码列表' : 'Passwords'}</p><div class="mock-items"><i></i><i></i><i></i><i></i></div></div></div></div>
-            <div class="carousel-slide" style="background:linear-gradient(135deg,#3a2a6a,#5a4a9a)"><div class="mock-phone"><div class="mock-notch"></div><div class="mock-body"><div class="mock-icon">🔄</div><p class="mock-label">{locale === 'zh-cn' ? '同步' : 'Sync'}</p><div class="mock-items"><i></i><i></i><i></i><i></i></div></div></div></div>
-            <div class="carousel-slide" style="background:linear-gradient(135deg,#1a5a3a,#2a8a5a)"><div class="mock-phone"><div class="mock-notch"></div><div class="mock-body"><div class="mock-icon">⚙️</div><p class="mock-label">{locale === 'zh-cn' ? '设置' : 'Settings'}</p><div class="mock-items"><i></i><i></i><i></i><i></i></div></div></div></div>
+            <div class="carousel-slide" style="background:linear-gradient(145deg,#0b3a48 0%,#1a7a8a 60%,#2a9aaa 100%)"><div class="mock-phone"><div class="mock-status"><span class="mock-time">9:41</span><span class="mock-icons"><i></i><i></i><i></i></span></div><div class="mock-body"><div class="mock-icon">🔐</div><p class="mock-label">{locale === 'zh-cn' ? '保险库' : 'Vault'}</p><div class="mock-card"><i class="mc-row"></i><i class="mc-row thin"></i></div><div class="mock-card"><i class="mc-row"></i><i class="mc-row thin"></i></div></div><div class="mock-home"></div></div></div>
+            <div class="carousel-slide" style="background:linear-gradient(145deg,#122d5a 0%,#2a7aaa 60%,#3a9aba 100%)"><div class="mock-phone"><div class="mock-status"><span class="mock-time">9:41</span><span class="mock-icons"><i></i><i></i><i></i></span></div><div class="mock-body"><div class="mock-icon">🔑</div><p class="mock-label">{locale === 'zh-cn' ? '密码列表' : 'Passwords'}</p><div class="mock-card"><i class="mc-row"></i><i class="mc-row thin"></i></div><div class="mock-card"><i class="mc-row"></i><i class="mc-row thin"></i></div></div><div class="mock-home"></div></div></div>
+            <div class="carousel-slide" style="background:linear-gradient(145deg,#2a1a5a 0%,#5a4a9a 60%,#7a5aaa 100%)"><div class="mock-phone"><div class="mock-status"><span class="mock-time">9:41</span><span class="mock-icons"><i></i><i></i><i></i></span></div><div class="mock-body"><div class="mock-icon">🔄</div><p class="mock-label">{locale === 'zh-cn' ? '同步' : 'Sync'}</p><div class="mock-card"><i class="mc-row"></i><i class="mc-row thin"></i></div><div class="mock-card"><i class="mc-row"></i><i class="mc-row thin"></i></div></div><div class="mock-home"></div></div></div>
+            <div class="carousel-slide" style="background:linear-gradient(145deg,#0a4a2a 0%,#2a8a5a 60%,#3a9a6a 100%)"><div class="mock-phone"><div class="mock-status"><span class="mock-time">9:41</span><span class="mock-icons"><i></i><i></i><i></i></span></div><div class="mock-body"><div class="mock-icon">⚙️</div><p class="mock-label">{locale === 'zh-cn' ? '设置' : 'Settings'}</p><div class="mock-card"><i class="mc-row"></i><i class="mc-row thin"></i></div><div class="mock-card"><i class="mc-row"></i><i class="mc-row thin"></i></div></div><div class="mock-home"></div></div></div>
           </div>
           <div class="carousel-dots" data-dots></div>
         </div>
@@ -199,22 +199,29 @@ const navLabels = locale === 'zh-cn'
   .slide-quote { margin: 2rem 0 0; padding: 0 0 0 1.2rem; border-left: 2px solid rgba(43,124,154,.4); color: #254c5d; font: italic .95rem/1.6 Georgia, serif; max-width: 400px; }
 
   .carousel-wrap { width: 100%; max-width: 380px; margin: 0 auto; }
-  .carousel { position: relative; overflow: hidden; border-radius: 1.5rem; box-shadow: 0 24px 70px rgba(42,83,99,.14); background: #fff; }
-  .carousel-track { display: flex; transition: transform .48s cubic-bezier(.2,.75,.2,1); }
-  .carousel-slide { flex: 0 0 100%; aspect-ratio: 9/16; display: flex; align-items: center; justify-content: center; }
+  .carousel { position: relative; overflow: hidden; border-radius: 1.5rem; box-shadow: 0 28px 80px rgba(42,83,99,.16), 0 2px 0 rgba(255,255,255,.3) inset; background: #fff; }
+  .carousel-track { display: flex; transition: transform .52s cubic-bezier(.22,.72,.28,1); }
+  .carousel-slide { flex: 0 0 100%; aspect-ratio: 9/16; display: flex; align-items: center; justify-content: center; position: relative; }
+  .carousel-slide::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 0%, rgba(255,255,255,.08) 0%, transparent 60%); pointer-events: none; }
 
-  .mock-phone { width: 82%; display: flex; flex-direction: column; background: rgba(255,255,255,.13); border-radius: 1.2rem; padding: 1rem .5rem .7rem; backdrop-filter: blur(4px); }
-  .mock-notch { width: 36%; height: 5px; margin: 0 auto .6rem; border-radius: 99px; background: rgba(255,255,255,.25); }
-  .mock-body { display: flex; flex-direction: column; align-items: center; padding: .8rem .6rem 1.2rem; }
-  .mock-icon { font-size: 2.6rem; line-height: 1; margin-bottom: .3rem; filter: drop-shadow(0 4px 12px rgba(0,0,0,.12)); }
-  .mock-label { margin: 0 0 .8rem; color: #fff; font-size: 1rem; font-weight: 700; letter-spacing: .04em; text-shadow: 0 2px 8px rgba(0,0,0,.1); }
-  .mock-items { display: flex; flex-direction: column; gap: .4rem; width: 100%; }
-  .mock-items i { display: block; height: 5px; border-radius: 99px; background: rgba(255,255,255,.22); }
-  .mock-items i:nth-child(1) { width: 78%; } .mock-items i:nth-child(2) { width: 62%; } .mock-items i:nth-child(3) { width: 84%; } .mock-items i:nth-child(4) { width: 52%; }
+  .mock-phone { width: 78%; display: flex; flex-direction: column; background: rgba(0,0,0,.22); border-radius: 1.4rem; padding: .45rem .45rem .55rem; backdrop-filter: blur(8px); box-shadow: 0 2px 0 rgba(255,255,255,.08) inset, 0 8px 32px rgba(0,0,0,.18); }
+  .mock-status { display: flex; justify-content: space-between; align-items: center; padding: 0 .35rem .35rem; }
+  .mock-time { color: rgba(255,255,255,.7); font-size: .6rem; font-weight: 620; letter-spacing: .02em; }
+  .mock-icons { display: flex; gap: 3px; align-items: center; }
+  .mock-icons i { display: block; border-radius: 1px; background: rgba(255,255,255,.5); }
+  .mock-icons i:nth-child(1) { width: 10px; height: 6px; border: 1px solid rgba(255,255,255,.3); border-radius: 1px; background: none; }
+  .mock-icons i:nth-child(2) { width: 3px; height: 3px; border-radius: 50%; } .mock-icons i:nth-child(3) { width: 8px; height: 4px; border-radius: 1px; }
+  .mock-body { display: flex; flex-direction: column; align-items: center; padding: .6rem .5rem .8rem; background: rgba(255,255,255,.06); border-radius: .8rem; }
+  .mock-icon { font-size: 2.2rem; line-height: 1; margin-bottom: .15rem; filter: drop-shadow(0 2px 8px rgba(0,0,0,.1)); }
+  .mock-label { margin: 0 0 .6rem; color: #fff; font-size: .85rem; font-weight: 720; letter-spacing: .06em; text-shadow: 0 1px 6px rgba(0,0,0,.12); text-transform: uppercase; }
+  .mock-card { width: 100%; background: rgba(255,255,255,.1); border-radius: .45rem; padding: .45rem; margin-bottom: .35rem; display: flex; flex-direction: column; gap: .3rem; }
+  .mc-row { display: block; height: 4px; border-radius: 99px; background: rgba(255,255,255,.18); width: 70%; }
+  .mc-row.thin { height: 3px; width: 50%; background: rgba(255,255,255,.1); }
+  .mock-home { width: 26%; height: 3px; margin: .45rem auto .15rem; border-radius: 99px; background: rgba(255,255,255,.25); }
 
-  .carousel-dots { display: flex; justify-content: center; gap: .55rem; padding: .65rem 0 .15rem; }
-  .carousel-dots button { width: 7px; height: 7px; padding: 0; border: none; border-radius: 50%; background: rgba(60,112,130,.25); cursor: pointer; transition: background .3s ease, transform .3s ease; }
-  .carousel-dots button.active { background: #287795; transform: scale(1.35); box-shadow: 0 0 0 3px rgba(40,119,149,.15); }
+  .carousel-dots { display: flex; justify-content: center; gap: .5rem; padding: .65rem 0 .2rem; }
+  .carousel-dots button { width: 6px; height: 6px; padding: 0; border: none; border-radius: 50%; background: rgba(60,112,130,.22); cursor: pointer; transition: background .35s ease, transform .35s cubic-bezier(.2,.75,.2,1), box-shadow .35s ease; }
+  .carousel-dots button.active { background: #287795; transform: scale(1.5); box-shadow: 0 0 0 4px rgba(40,119,149,.12); }
 
   .journey-inner { display: grid; grid-template-columns: 1fr .4fr; gap: 7vw; align-items: center; }
   .journey-copy { max-width: 660px; }
