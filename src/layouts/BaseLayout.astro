@@ -22,7 +22,7 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
 <html lang={localeMeta[locale].htmlLang}>
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="generator" content={Astro.generator} />
         <meta name="description" content={description} />
         <meta name="theme-color" content="#f2f6f4" />
@@ -202,6 +202,13 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
         }
         nav {
             display: none;
+        }
+        .site-header {
+            width: calc(100% - 1.2rem);
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.5rem 0.8rem;
+            top: 0.6rem;
         }
     }
     @media (prefers-reduced-motion: reduce) {
