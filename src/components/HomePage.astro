@@ -785,16 +785,6 @@ const workflowItems =
         display: grid;
         place-items: center;
     }
-    .workflow-stack {
-        width: 100%;
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 1rem;
-    }
-    .workflow-stack {
-        /* reserve height so transforms don't collapse layout */
-        min-height: 12.5rem;
-    }
     .workflow-card {
         transition:
             transform 420ms ease,
@@ -819,23 +809,21 @@ const workflowItems =
         transform: translateY(40px) scale(0.92);
         z-index: 80;
     }
-    /* Desktop: make cards overlap by absolutely positioning them inside the stack */
-    @media (min-width: 761px) {
-        .workflow-stack {
-            display: block;
-            position: relative;
-            width: min(720px, 100%);
-            margin: 0 auto;
-            min-height: 12.5rem; /* keep space for absolutely positioned cards */
-        }
-        .workflow-stack .workflow-card {
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 0;
-            margin: 0 auto;
-            width: 100%;
-        }
+    /* Make cards overlap by absolutely positioning them inside the stack (all sizes) */
+    .workflow-stack {
+        display: block;
+        position: relative;
+        width: min(720px, 100%);
+        margin: 0 auto;
+        min-height: 12.5rem;
+    }
+    .workflow-stack .workflow-card {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        margin: 0 auto;
+        width: 100%;
     }
     .workflow-card {
         position: relative;
@@ -1000,9 +988,10 @@ const workflowItems =
         function initWorkflowCarousel() {
             const stack = document.querySelector<HTMLElement>(".workflow-stack");
             if (!stack) return;
-            stack.setAttribute("data-stacked", "true");
+            const el = stack;
+            el.setAttribute("data-stacked", "true");
             function applyOffsets() {
-                const cards = Array.from(stack.children) as HTMLElement[];
+                const cards = Array.from(el.children) as HTMLElement[];
                 cards.forEach((card, i) => {
                     const y = i * 20;
                     const scale = 1 - i * 0.04;
@@ -1020,7 +1009,7 @@ const workflowItems =
             setInterval(() => {
                 if (running) return;
                 running = true;
-                const first = stack.children[0];
+                const first = el.children[0];
                 if (!first) {
                     running = false;
                     return;
@@ -1028,7 +1017,7 @@ const workflowItems =
                 first.classList.add("fade-up");
                 // wait for fade-up transition then move the node to the end
                 setTimeout(() => {
-                    stack.appendChild(first);
+                    el.appendChild(first);
                     applyOffsets();
                     running = false;
                 }, 480);
@@ -1053,7 +1042,6 @@ const workflowItems =
         const dotsContainer = carouselEl.querySelector("[data-dots]");
         const slides = [...track.children] as HTMLElement[];
         let carIndex = 0;
-        let carTimer: ReturnType<typeof setInterval>;
         const paused = { current: false };
 
         function renderDots() {
@@ -1083,7 +1071,7 @@ const workflowItems =
         }
 
         renderDots();
-        carTimer = setInterval(autoAdvance, 4200);
+        setInterval(autoAdvance, 4200);
 
         carouselEl.addEventListener("mouseenter", () => {
             paused.current = true;
