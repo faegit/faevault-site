@@ -17,7 +17,10 @@ const c =
               windows: "Windows 版本",
               androidDetail: "版本 3.6.1 · arm64-v8a / universal",
               windowsDetail: "正在准备中",
-              note: "其他 CPU 架构（armeabi-v7a、x86_64、x86）请从 GitHub Releases 获取。",
+              notePre: "其他 CPU 架构（armeabi-v7a、x86_64、x86）请从 ",
+              noteLink: "GitHub Releases",
+              notePost: " 获取。",
+              releaseUrl: "https://github.com/faegit/faevault-site/releases/tag/v3.6.1",
           }
         : {
               kicker: "Download",
@@ -29,7 +32,10 @@ const c =
               windows: "Windows build",
               androidDetail: "Version 3.6.1 · arm64-v8a / universal",
               windowsDetail: "Coming soon",
-              note: "Other CPU architectures (armeabi-v7a, x86_64, x86) are available on GitHub Releases.",
+              notePre: "Other CPU architectures (armeabi-v7a, x86_64, x86) are available on ",
+              noteLink: "GitHub Releases",
+              notePost: ".",
+              releaseUrl: "https://github.com/faegit/faevault-site/releases/tag/v3.6.1",
           };
 ---
 
@@ -38,7 +44,7 @@ const c =
         <div class="platform-orbits" aria-hidden="true"><i></i><i></i><b></b></div>
         <article class="android"><span>ANDROID</span><h2>{c.android}</h2><p>{c.androidDetail}</p><a class="dl-btn" href="https://github.com/faegit/faevault-site/releases/download/v3.6.1/app-arm64-v8a-release.apk" target="_blank" rel="noopener noreferrer">{c.androidBtn}</a></article>
         <article class="windows"><span>WINDOWS</span><h2>{c.windows}</h2><p>{c.windowsDetail}</p><a class="dl-btn disabled" aria-disabled="true">{c.windowsBtn}</a></article>
-        <p class="release-note">{c.note}</p>
+        <p class="release-note">{c.notePre}<a href={c.releaseUrl} target="_blank" rel="noopener noreferrer">{c.noteLink}</a>{c.notePost}</p>
     </section>
 </PageShell>
 
@@ -160,6 +166,15 @@ const c =
             0.9rem/1.7 Georgia,
             serif;
         transform: translateX(-50%);
+    }
+    .release-note a {
+        color: #287795;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        transition: color 0.2s ease;
+    }
+    .release-note a:hover {
+        color: #1a5f75;
     }
     @keyframes platform-in {
         from {
