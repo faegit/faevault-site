@@ -236,7 +236,7 @@ const workflowItems =
 
     .hero-inner {
         display: grid;
-        grid-template-columns: minmax(340px, 580px) minmax(420px, 1fr);
+        grid-template-columns: minmax(280px, 560px) minmax(320px, 1fr);
         gap: 3vw;
         align-items: center;
     }
@@ -412,7 +412,7 @@ const workflowItems =
     }
     .device-wrap {
         justify-self: end;
-        transform: scale(0.88);
+        transform: scale(0.92);
         transform-origin: right center;
     }
     .device-wrap :global(.device-stage) {
@@ -654,6 +654,15 @@ const workflowItems =
     @media (max-width: 760px) {
         .showcase-wrap {
             max-width: 100%;
+        }
+        .hero-inner {
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+            align-items: start;
+        }
+        .device-wrap {
+            justify-self: center;
+            transform: scale(0.95);
         }
         .showcase-grid {
             grid-template-columns: 1fr;
