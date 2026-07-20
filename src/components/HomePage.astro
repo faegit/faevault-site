@@ -948,15 +948,15 @@ const features =
     document.addEventListener("astro:page-load", () => { equalizeHeights(); applyOffsets(current); });
     window.addEventListener("resize", () => { equalizeHeights(); applyOffsets(current); });
 
-    // Click to bring card to front
-    CARDS.forEach((card, i) => {
+    // Click top card to advance it to the end
+    CARDS.forEach((card) => {
         card.addEventListener("click", function onClick() {
-            if (running || i === current) return;
+            if (running) return;
             running = true;
             const oldCard = CARDS[current];
             oldCard.classList.add("fade-up");
             setTimeout(() => {
-                current = i;
+                current = (current + 1) % COUNT;
                 oldCard.classList.remove("fade-up");
                 applyOffsets(current);
                 running = false;
