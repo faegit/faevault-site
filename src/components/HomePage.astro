@@ -921,6 +921,13 @@ const features =
     const COUNT = CARDS.length;
     if (COUNT < 2) return;
 
+    function equalizeHeights() {
+        let maxH = 0;
+        CARDS.forEach(c => { c.style.height = "auto"; maxH = Math.max(maxH, c.offsetHeight); });
+        if (maxH > 0) CARDS.forEach(c => { c.style.height = `${maxH}px`; });
+        return maxH;
+    }
+
     function applyOffsets(activeIndex: number) {
         CARDS.forEach((card, i) => {
             const offset = (i - activeIndex + COUNT) % COUNT;
@@ -936,7 +943,10 @@ const features =
 
     let current = 0;
     let running = false;
+    equalizeHeights();
     applyOffsets(0);
+    document.addEventListener("astro:page-load", () => { equalizeHeights(); applyOffsets(current); });
+    window.addEventListener("resize", () => { equalizeHeights(); applyOffsets(current); });
 
     // Click to bring card to front
     CARDS.forEach((card, i) => {
