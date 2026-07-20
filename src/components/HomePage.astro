@@ -111,16 +111,18 @@ const features =
                 <h2>{copy.guideTitle}</h2>
                 <p>{copy.guideBody}</p>
             </div>
-            <div class="feature-grid">
-                {
-                    features.map((item) => (
-                        <article class="feature-card">
-                            <span class={`feature-icon ${item.accent}`} />
-                            <strong>{item.title}</strong>
-                            <p>{item.body}</p>
-                        </article>
-                    ))
-                }
+            <div class="workflow-side">
+                <div class="workflow-stack">
+                    {
+                        features.map((item) => (
+                            <article class="workflow-card" data-feature>
+                                <span class={`workflow-dot ${item.accent}`} />
+                                <strong>{item.title}</strong>
+                                <p>{item.body}</p>
+                            </article>
+                        ))
+                    }
+                </div>
             </div>
         </div>
     </section>
@@ -193,7 +195,6 @@ const features =
     </section>
 
     <section class="section journey" id="journey">
-        <div class="journey-line" aria-hidden="true"><i></i><i></i><i></i></div>
         <div class="journey-inner">
             <div class="journey-copy section-copy">
                 <p class="eyebrow">{copy.journeyKicker}</p>
@@ -701,36 +702,6 @@ const features =
         max-width: 580px;
         margin: 1.4rem 0;
     }
-    .journey-line {
-        position: absolute;
-        right: 23%;
-        top: 14%;
-        bottom: 14%;
-        width: 70px;
-        border-left: 1px dashed rgba(42, 113, 140, 0.27);
-        transform: rotate(4deg);
-    }
-    .journey-line i {
-        position: absolute;
-        left: -5px;
-        width: 10px;
-        height: 10px;
-        border: 2px solid #3c8eaa;
-        border-radius: 50%;
-        background: #eef7f5;
-        box-shadow: 0 0 0 7px rgba(60, 142, 170, 0.08);
-    }
-    .journey-line i:nth-child(1) {
-        top: 7%;
-    }
-    .journey-line i:nth-child(2) {
-        top: 46%;
-        left: 3px;
-    }
-    .journey-line i:nth-child(3) {
-        top: 87%;
-        left: -9px;
-    }
     .milestones {
         display: flex;
         flex-direction: column;
@@ -773,25 +744,43 @@ const features =
         color: #173f50;
         line-height: 1.05;
     }
-    .feature-grid {
+    .workflow-side {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1.2rem;
-        width: 100%;
+        place-items: center;
     }
-    .feature-card {
-        padding: 1.4rem 1.3rem;
+    .workflow-stack {
+        display: block;
+        position: relative;
+        width: min(720px, 100%);
+        margin: 0 auto;
+        min-height: 14rem;
+    }
+    .workflow-stack .workflow-card {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        margin: 0 auto;
+        width: 100%;
+        padding: 1.15rem 1.2rem;
         border-radius: 1.45rem;
         border: 1px solid rgba(71, 106, 122, 0.14);
         background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(241, 248, 251, 0.92));
         box-shadow: 0 20px 40px rgba(41, 81, 95, 0.1);
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        transform-origin: center;
+        will-change: transform, box-shadow, z-index;
+        cursor: pointer;
+        transition: transform 420ms ease, opacity 420ms ease;
     }
-    .feature-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 28px 52px rgba(41, 81, 95, 0.16);
+    .workflow-card.active {
+        box-shadow: 0 28px 52px rgba(41, 81, 95, 0.17), 0 0 0 1px rgba(63, 143, 175, 0.15);
+        background: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(244, 250, 252, 0.96));
     }
-    .feature-icon {
+    .workflow-card.fade-up {
+        transform: translateY(-36px) scale(1.02) !important;
+        opacity: 0 !important;
+    }
+    .workflow-dot {
         display: inline-block;
         width: 0.72rem;
         height: 0.72rem;
@@ -800,34 +789,34 @@ const features =
         background: linear-gradient(135deg, #72c3db, #2c7695);
         box-shadow: 0 0 0 4px rgba(42, 118, 149, 0.16);
     }
-    .feature-icon.flow {
+    .workflow-dot.flow {
         background: linear-gradient(135deg, #9bd7ba, #4a8b6c);
         box-shadow: 0 0 0 4px rgba(74, 139, 108, 0.16);
     }
-    .feature-icon.sync {
+    .workflow-dot.sync {
         background: linear-gradient(135deg, #c6b3f4, #7b5fb1);
         box-shadow: 0 0 0 4px rgba(123, 95, 177, 0.16);
     }
-    .feature-icon.passkey {
+    .workflow-dot.passkey {
         background: linear-gradient(135deg, #f4b37a, #c97d3a);
         box-shadow: 0 0 0 4px rgba(201, 125, 58, 0.16);
     }
-    .feature-icon.ocr {
+    .workflow-dot.ocr {
         background: linear-gradient(135deg, #7ac4e8, #3a8fb0);
         box-shadow: 0 0 0 4px rgba(58, 143, 176, 0.16);
     }
-    .feature-icon.security {
+    .workflow-dot.security {
         background: linear-gradient(135deg, #e87a8a, #b03a4a);
         box-shadow: 0 0 0 4px rgba(176, 58, 74, 0.16);
     }
-    .feature-card strong {
+    .workflow-card strong {
         display: block;
         margin-bottom: 0.55rem;
         color: #173f50;
         font-size: 0.96rem;
         font-weight: 760;
     }
-    .feature-card p {
+    .workflow-card p {
         margin: 0;
         color: #5d7480;
         font-size: 0.92rem;
@@ -884,16 +873,10 @@ const features =
             grid-template-columns: 1fr;
             gap: 2rem;
         }
-        .journey-line {
-            right: 2rem;
-        }
         .milestones {
             flex-direction: row;
             justify-content: flex-end;
             gap: 2rem;
-        }
-        .feature-grid {
-            grid-template-columns: repeat(2, 1fr);
         }
     }
     @media (max-width: 760px) {
@@ -916,12 +899,6 @@ const features =
             transform-origin: center;
             margin-bottom: -2rem;
         }
-        .journey-line {
-            display: none;
-        }
-        .milestones {
-            display: none;
-        }
         .support-inner {
             border-radius: 1.7rem;
             padding: 3rem 1.5rem;
@@ -934,5 +911,81 @@ const features =
         }
     }
 </style>
+
+<script>
+(function() {
+    const stack = document.querySelector<HTMLElement>(".workflow-stack");
+    if (!stack) return;
+    const el = stack as HTMLElement;
+    const CARDS = Array.from(el.children) as HTMLElement[];
+    const COUNT = CARDS.length;
+    if (COUNT < 2) return;
+
+    function applyOffsets(activeIndex: number) {
+        CARDS.forEach((card, i) => {
+            const offset = (i - activeIndex + COUNT) % COUNT;
+            const y = offset * 18;
+            const scale = 1 - offset * 0.035;
+            card.style.transition = "transform 420ms ease, opacity 420ms ease";
+            card.style.transform = `translateY(${y}px) scale(${scale})`;
+            card.style.zIndex = `${COUNT - offset}`;
+            card.style.opacity = String(1 - offset * 0.06);
+            card.classList.toggle("active", offset === 0);
+        });
+    }
+
+    let current = 0;
+    let running = false;
+    applyOffsets(0);
+
+    // Click to bring card to front
+    CARDS.forEach((card, i) => {
+        card.addEventListener("click", function onClick() {
+            if (running || i === current) return;
+            running = true;
+            const oldCard = CARDS[current];
+            oldCard.classList.add("fade-up");
+            setTimeout(() => {
+                current = i;
+                oldCard.classList.remove("fade-up");
+                applyOffsets(current);
+                running = false;
+            }, 440);
+        });
+    });
+
+    // Auto-rotate
+    const DELAY = 4500;
+    let timer = setInterval(() => {
+        if (running) return;
+        running = true;
+        const oldCard = CARDS[current];
+        oldCard.classList.add("fade-up");
+        setTimeout(() => {
+            current = (current + 1) % COUNT;
+            oldCard.classList.remove("fade-up");
+            applyOffsets(current);
+            running = false;
+        }, 440);
+    }, DELAY);
+
+    // Pause on hover
+    el.addEventListener("mouseenter", () => { clearInterval(timer); });
+    el.addEventListener("mouseleave", () => {
+        timer = setInterval(() => {
+            if (running) return;
+            running = true;
+            const oldCard = CARDS[current];
+            oldCard.classList.add("fade-up");
+            setTimeout(() => {
+                current = (current + 1) % COUNT;
+                oldCard.classList.remove("fade-up");
+                applyOffsets(current);
+                running = false;
+            }, 440);
+        }, DELAY);
+    });
+})();
+</script>
 
 
