@@ -797,6 +797,8 @@ const features =
         justify-content: center;
     }
     .support-inner {
+        position: relative;
+        overflow: hidden;
         width: min(900px, calc(100% - 3rem)) !important;
         margin: 0 auto !important;
         padding: clamp(3.5rem, 7vw, 6rem);
@@ -805,6 +807,31 @@ const features =
         background: linear-gradient(135deg, rgba(229, 248, 247, 0.82), rgba(229, 237, 251, 0.68));
         box-shadow: 0 28px 90px rgba(42, 83, 99, 0.12);
         backdrop-filter: blur(22px);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        transform-style: preserve-3d;
+        will-change: transform;
+    }
+    .support-inner::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            105deg,
+            transparent 30%,
+            rgba(255, 255, 255, 0.5) 45%,
+            rgba(255, 255, 255, 0.65) 50%,
+            rgba(255, 255, 255, 0.5) 55%,
+            transparent 70%
+        );
+        background-size: 300% 100%;
+        background-position: 100% 0;
+        pointer-events: none;
+        animation: shimmer 5s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+        0%, 60% { background-position: 100% 0; }
+        70% { background-position: 0 0; }
+        100% { background-position: 0 0; }
     }
     .support-inner h2 {
         max-width: 700px;
@@ -937,6 +964,26 @@ const features =
     document.addEventListener("astro:page-load", initStack);
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initStack);
     else initStack();
+})();
+</script>
+<script>
+(function() {
+    const MAX = 6;
+    function initTilt() {
+        const card = document.querySelector<HTMLElement>(".support-inner");
+        if (!card) return;
+        card.addEventListener("mousemove", (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width;
+            const y = (e.clientY - rect.top) / rect.height;
+            card.style.transform = `perspective(800px) rotateX(${(y - 0.5) * -MAX}deg) rotateY(${(x - 0.5) * MAX}deg)`;
+        });
+        card.addEventListener("mouseleave", () => {
+            card.style.transform = "perspective(800px) rotateX(0) rotateY(0)";
+        });
+    }
+    initTilt();
+    document.addEventListener("astro:page-load", initTilt);
 })();
 </script>
 
