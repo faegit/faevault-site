@@ -11,22 +11,24 @@ const c =
               kicker: "下载",
               title: "在你的设备上，继续掌控自己的资料。",
               intro: "Android 版通过 GitHub Releases 发布，arm64 架构适配绝大多数现代手机。",
-              ready: "下载 APK",
+              androidBtn: "下载 APK",
+              windowsBtn: "暂无可用版本",
               android: "Android 版本",
               windows: "Windows 版本",
               androidDetail: "版本 3.6.1 · arm64-v8a / universal",
-              windowsDetail: "版本待发布",
+              windowsDetail: "正在准备中",
               note: "其他 CPU 架构（armeabi-v7a、x86_64、x86）请从 GitHub Releases 获取。",
           }
         : {
               kicker: "Download",
               title: "Keep control on every device you use.",
               intro: "Android builds are delivered through GitHub Releases. arm64-v8a covers most modern phones.",
-              ready: "Download APK",
+              androidBtn: "Download APK",
+              windowsBtn: "Not available yet",
               android: "Android build",
               windows: "Windows build",
               androidDetail: "Version 3.6.1 · arm64-v8a / universal",
-              windowsDetail: "Version TBD",
+              windowsDetail: "Coming soon",
               note: "Other CPU architectures (armeabi-v7a, x86_64, x86) are available on GitHub Releases.",
           };
 ---
@@ -34,8 +36,8 @@ const c =
 <PageShell theme="download" kicker={c.kicker} title={c.title} intro={c.intro}>
     <section class="platform-system">
         <div class="platform-orbits" aria-hidden="true"><i></i><i></i><b></b></div>
-        <article class="android"><span>ANDROID</span><h2>{c.android}</h2><p>{c.androidDetail}</p><a class="dl-btn" href="https://github.com/faegit/faevault-site/releases/download/v3.6.1/app-arm64-v8a-release.apk" target="_blank" rel="noopener noreferrer">{c.ready}</a></article>
-        <article class="windows"><span>WINDOWS</span><h2>{c.windows}</h2><p>{c.windowsDetail}</p><a class="dl-btn disabled" aria-disabled="true">{c.ready}</a></article>
+        <article class="android"><span>ANDROID</span><h2>{c.android}</h2><p>{c.androidDetail}</p><a class="dl-btn" href="https://github.com/faegit/faevault-site/releases/download/v3.6.1/app-arm64-v8a-release.apk" target="_blank" rel="noopener noreferrer">{c.androidBtn}</a></article>
+        <article class="windows"><span>WINDOWS</span><h2>{c.windows}</h2><p>{c.windowsDetail}</p><a class="dl-btn disabled" aria-disabled="true">{c.windowsBtn}</a></article>
         <p class="release-note">{c.note}</p>
     </section>
 </PageShell>
