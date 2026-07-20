@@ -40,8 +40,8 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
             <a class="brand" href={localePath(locale)} aria-label={`${brandName} ${text.nav.home}`}>{brandName}</a>
             <nav aria-label="Primary">
                 <a href={localePath(locale)}>{text.nav.home}</a>
-                <a href={localePath(locale, "guides")}>{text.nav.guides}</a>
                 <a href={localePath(locale, "download")}>{text.nav.download}</a>
+                <a href={localePath(locale, "guides")}>{text.nav.guides}</a>
                 <a href={localePath(locale, "journey")}>{text.nav.journey}</a>
                 <a class="support-link" href={localePath(locale, "support")}>{text.nav.support}</a>
             </nav>
