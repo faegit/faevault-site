@@ -132,6 +132,7 @@ const features =
             <div class="split-copy section-copy">
                 <p class="eyebrow">{copy.storyKicker}</p>
                 <h2>{copy.storyTitle}</h2>
+                <p class="story-body">{copy.storyBody}</p>
                 <blockquote class="slide-quote">{copy.quote}</blockquote>
             </div>
             <div class="showcase-wrap" aria-label={locale === "zh-cn" ? "保险库 产品展示" : "FAEVault product showcase"}>
@@ -424,8 +425,16 @@ const features =
         gap: 5vw;
         align-items: center;
     }
+    .story-body {
+        max-width: 520px;
+        margin: 1rem 0 0;
+        color: #4f6974;
+        font:
+            1rem/1.8 Georgia,
+            serif;
+    }
     .slide-quote {
-        margin: 2rem 0 0;
+        margin: 1.8rem 0 0;
         padding: 0 0 0 1.2rem;
         border-left: 2px solid rgba(43, 124, 154, 0.4);
         color: #254c5d;
@@ -914,43 +923,40 @@ const features =
 
 <script>
 (function() {
-    const stack = document.querySelector<HTMLElement>(".workflow-stack");
-    if (!stack) return;
-    const el = stack as HTMLElement;
-    const CARDS = Array.from(el.children) as HTMLElement[];
-    const COUNT = CARDS.length;
-    if (COUNT < 2) return;
+    let timer: ReturnType<typeof setInterval>;
 
-    function equalizeHeights() {
-        let maxH = 0;
-        CARDS.forEach(c => { c.style.height = "auto"; maxH = Math.max(maxH, c.offsetHeight); });
-        if (maxH > 0) CARDS.forEach(c => { c.style.height = `${maxH}px`; });
-        return maxH;
-    }
+    function initStack() {
+        const stack = document.querySelector<HTMLElement>(".workflow-stack");
+        if (!stack) return;
+        const CARDS = Array.from(stack.children) as HTMLElement[];
+        const COUNT = CARDS.length;
+        if (COUNT < 2) return;
 
-    function applyOffsets(activeIndex: number) {
-        CARDS.forEach((card, i) => {
-            const offset = (i - activeIndex + COUNT) % COUNT;
-            const y = offset * 18;
-            const scale = 1 - offset * 0.035;
-            card.style.transition = "transform 420ms ease, opacity 420ms ease";
-            card.style.transform = `translateY(${y}px) scale(${scale})`;
-            card.style.zIndex = `${COUNT - offset}`;
-            card.style.opacity = String(1 - offset * 0.06);
-            card.classList.toggle("active", offset === 0);
-        });
-    }
+        function equalizeHeights() {
+            let maxH = 0;
+            CARDS.forEach(c => { c.style.height = "auto"; maxH = Math.max(maxH, c.offsetHeight); });
+            if (maxH > 0) CARDS.forEach(c => { c.style.height = `${maxH}px`; });
+        }
 
-    let current = 0;
-    let running = false;
-    equalizeHeights();
-    applyOffsets(0);
-    document.addEventListener("astro:page-load", () => { equalizeHeights(); applyOffsets(current); });
-    window.addEventListener("resize", () => { equalizeHeights(); applyOffsets(current); });
+        function applyOffsets(activeIndex: number) {
+            CARDS.forEach((card, i) => {
+                const offset = (i - activeIndex + COUNT) % COUNT;
+                const y = offset * 18;
+                const scale = 1 - offset * 0.035;
+                card.style.transition = "transform 420ms ease, opacity 420ms ease";
+                card.style.transform = `translateY(${y}px) scale(${scale})`;
+                card.style.zIndex = `${COUNT - offset}`;
+                card.style.opacity = String(1 - offset * 0.06);
+                card.classList.toggle("active", offset === 0);
+            });
+        }
 
-    // Click top card to advance it to the end
-    CARDS.forEach((card) => {
-        card.addEventListener("click", function onClick() {
+        let current = 0;
+        let running = false;
+        equalizeHeights();
+        applyOffsets(0);
+
+        function advance() {
             if (running) return;
             running = true;
             const oldCard = CARDS[current];
@@ -961,40 +967,24 @@ const features =
                 applyOffsets(current);
                 running = false;
             }, 440);
+        }
+
+        CARDS.forEach((card) => { card.addEventListener("click", advance); });
+
+        const DELAY = 4500;
+        clearInterval(timer);
+        timer = setInterval(advance, DELAY);
+
+        stack.addEventListener("mouseenter", () => { clearInterval(timer); });
+        stack.addEventListener("mouseleave", () => {
+            clearInterval(timer);
+            timer = setInterval(advance, DELAY);
         });
-    });
+    }
 
-    // Auto-rotate
-    const DELAY = 4500;
-    let timer = setInterval(() => {
-        if (running) return;
-        running = true;
-        const oldCard = CARDS[current];
-        oldCard.classList.add("fade-up");
-        setTimeout(() => {
-            current = (current + 1) % COUNT;
-            oldCard.classList.remove("fade-up");
-            applyOffsets(current);
-            running = false;
-        }, 440);
-    }, DELAY);
-
-    // Pause on hover
-    el.addEventListener("mouseenter", () => { clearInterval(timer); });
-    el.addEventListener("mouseleave", () => {
-        timer = setInterval(() => {
-            if (running) return;
-            running = true;
-            const oldCard = CARDS[current];
-            oldCard.classList.add("fade-up");
-            setTimeout(() => {
-                current = (current + 1) % COUNT;
-                oldCard.classList.remove("fade-up");
-                applyOffsets(current);
-                running = false;
-            }, 440);
-        }, DELAY);
-    });
+    document.addEventListener("astro:page-load", initStack);
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initStack);
+    else initStack();
 })();
 </script>
 
