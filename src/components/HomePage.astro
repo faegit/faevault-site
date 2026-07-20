@@ -20,6 +20,7 @@ const copy =
               storyTitle: "无广告 · 免费 ·\n安全透明。",
               storyBody: "保险库不含任何广告，所有核心功能免费使用。数据采用 scrypt + AES-256-GCM 本地加密，不经任何外部服务器；加密方案与安全设计公开透明，经反复审计验证。",
               quote: "好的工具不需要在隐私和便利之间做取舍。",
+              whitepaperLink: "查看安全白皮书",
               journeyKicker: "持续推进的产品理念",
               journeyTitle: "不是一次性功能展示，\n而是一段持续完善的路径。",
               journeyBody: "从 Android 到 Windows，保险库会不断把产品体验打磨得更顺手、更可靠。",
@@ -44,6 +45,7 @@ const copy =
               storyTitle: "No ads · Free ·\nSecurity you can see.",
               storyBody: "FAEVault contains no ads and all core features are free. Data is encrypted locally with scrypt + AES-256-GCM, never touching external servers. The encryption design and security architecture are transparent and regularly reviewed.",
               quote: "A good tool shouldn't make you choose between privacy and convenience.",
+              whitepaperLink: "Read the security whitepaper",
               journeyKicker: "A product in progress",
               journeyTitle: "Not a one-off feature showcase,\nbut a path that keeps improving.",
               journeyBody: "From Android to Windows, FAEVault keeps refining the experience into something more dependable.",
@@ -134,6 +136,7 @@ const features =
                 <h2>{copy.storyTitle}</h2>
                 <p class="story-body">{copy.storyBody}</p>
                 <blockquote class="slide-quote">{copy.quote}</blockquote>
+                <a class="text-link whitepaper-link" href={localePath(locale, "security")}>{copy.whitepaperLink}<span aria-hidden="true">→</span></a>
             </div>
             <div class="showcase-wrap" aria-label={locale === "zh-cn" ? "保险库 产品展示" : "FAEVault product showcase"}>
                 <div class="showcase-shell">
@@ -442,6 +445,9 @@ const features =
             italic 0.95rem/1.6 Georgia,
             serif;
         max-width: 400px;
+    }
+    .whitepaper-link {
+        margin-top: 1.6rem;
     }
 
     .showcase-wrap {
