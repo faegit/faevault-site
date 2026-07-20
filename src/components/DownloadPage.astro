@@ -49,6 +49,14 @@ const c =
 </PageShell>
 
 <style>
+    :global(.inner-page.theme-download) {
+        padding-top: clamp(4.4rem, 8vw, 7rem);
+    }
+    @media (max-width: 760px) {
+        :global(.inner-page.theme-download) {
+            padding-top: clamp(4.2rem, 14vw, 5.5rem);
+        }
+    }
     .platform-system {
         position: relative;
         overflow: hidden;
