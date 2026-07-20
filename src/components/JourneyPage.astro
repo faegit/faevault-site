@@ -99,16 +99,18 @@ const c = locale === "zh-cn"
 ---
 <PageShell theme="journey" kicker={c.kicker} title={c.title} intro="">
   <section class="story-field">
-    {
-      c.story.map((chapter, idx) => (
-        <article class="story-chapter" style={`--i:${idx}`}>
-          <h2>{chapter.title}</h2>
-          {chapter.paragraphs.map((p) => (
-            <p>{p}</p>
-          ))}
-        </article>
-      ))
-    }
+    <div class="story-container">
+      {
+        c.story.map((chapter, idx) => (
+          <article class="story-chapter" style={`--i:${idx}`}>
+            <h2>{chapter.title}</h2>
+            {chapter.paragraphs.map((p) => (
+              <p>{p}</p>
+            ))}
+          </article>
+        ))
+      }
+    </div>
   </section>
 </PageShell>
 
@@ -116,8 +118,15 @@ const c = locale === "zh-cn"
   .story-field {
     max-width: 800px;
     margin: 5rem auto 0;
+  }
+  .story-container {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(71, 106, 122, 0.1);
+    border-radius: 2rem;
+    padding: clamp(2rem, 4vw, 3.5rem) clamp(1.5rem, 3vw, 3rem);
+    box-shadow: 0 8px 30px rgba(41, 81, 95, 0.06);
     display: grid;
-    gap: 4.5rem;
+    gap: 4rem;
   }
   .story-chapter {
     animation: fadeIn 0.7s calc(0.08s + var(--i) * 0.1s) cubic-bezier(0.18, 0.78, 0.18, 1) both;
@@ -140,6 +149,7 @@ const c = locale === "zh-cn"
     from { opacity: 0; transform: translateY(20px); }
   }
   @media (max-width: 760px) {
-    .story-field { gap: 3rem; margin-top: 3rem; }
+    .story-field { margin-top: 3rem; }
+    .story-container { gap: 2.5rem; padding: 1.5rem; border-radius: 1.3rem; }
   }
 </style>
