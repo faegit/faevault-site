@@ -1,115 +1,397 @@
 ---
-interface Props { label: string; }
+interface Props {
+    label: string;
+}
 const { label } = Astro.props;
 ---
 
 <div class="device-stage" data-device-stage aria-label={label}>
-  <div class="device desktop">
-    <div class="window-head"><i></i><i></i><i></i><b>FAEVault</b></div>
-    <div class="vault-rows">
-      <div class="vault-row"><span class="vault-icon blue"></span><span class="vault-text"><i></i><em></em></span></div>
-      <div class="vault-row"><span class="vault-icon violet"></span><span class="vault-text"><i></i><em></em></span></div>
-      <div class="vault-row"><span class="vault-icon green"></span><span class="vault-text"><i></i><em></em></span></div>
+    <div class="device desktop">
+        <div class="window-head"><i></i><i></i><i></i><b>FAEVault 保险库</b></div>
+        <div class="vault-rows">
+            <div class="vault-row"><span class="vault-icon blue"></span><span class="vault-text"><i></i><em></em></span></div>
+            <div class="vault-row"><span class="vault-icon violet"></span><span class="vault-text"><i></i><em></em></span></div>
+            <div class="vault-row"><span class="vault-icon green"></span><span class="vault-text"><i></i><em></em></span></div>
+        </div>
     </div>
-  </div>
-  <div class="data-orbit" aria-hidden="true">
-    <i class="orbit-runner outbound"><b></b></i>
-    <i class="orbit-runner inbound"><b></b></i>
-    <i class="orbit-runner inbound trail"><b></b></i>
-  </div>
-  <span class="sync-label"><b>PC</b><i>⇄</i><b>PHONE</b></span>
-  <div class="device phone">
-    <div class="phone-speaker"></div>
-    <div class="phone-lock"><i></i></div>
-    <div class="phone-line"></div><div class="phone-line short"></div>
-    <div class="phone-button"></div>
-  </div>
+    <div class="data-orbit" aria-hidden="true">
+        <i class="orbit-runner outbound"><b></b></i>
+        <i class="orbit-runner inbound"><b></b></i>
+        <i class="orbit-runner inbound trail"><b></b></i>
+    </div>
+    <span class="sync-label"><b>PC</b><i>⇄</i><b>PHONE</b></span>
+    <div class="device phone">
+        <div class="phone-speaker"></div>
+        <div class="phone-lock"><i></i></div>
+        <div class="phone-line"></div><div class="phone-line short"></div>
+        <div class="phone-button"></div>
+    </div>
 </div>
 
 <style>
-  .device-stage { position: relative; width: 540px; height: 420px; max-width: 100%; perspective: 1000px; }
-  .device { position: absolute; z-index: 3; border: 1px solid rgba(69,115,134,.22); background: rgba(255,255,255,.58); box-shadow: 0 28px 65px rgba(35,76,94,.15); backdrop-filter: blur(20px); transition: transform .48s cubic-bezier(.2,.75,.2,1), box-shadow .45s ease, border-color .35s ease; }
-  .desktop { width: 350px; height: 230px; left: 5px; top: 100px; border-radius: 5px; transform: rotateY(7deg) rotateZ(-2deg); }
-  .phone { width: 112px; height: 230px; right: 4px; top: 50px; border-radius: 25px; transform: rotateZ(5deg); }
-  .device-stage:hover .desktop { transform: rotateY(4deg) rotateZ(-1deg); box-shadow: 0 36px 78px rgba(30,81,103,.22); border-color: rgba(45,137,173,.38); }
-  .device-stage:hover .phone { transform: rotateZ(2deg); box-shadow: 0 34px 72px rgba(30,81,103,.2); border-color: rgba(45,137,173,.38); }
-  .window-head { height: 29px; border-bottom: 1px solid rgba(86,124,140,.15); display: flex; align-items: center; gap: 5px; padding: 0 11px; }
-  .window-head i { width: 5px; height: 5px; border-radius: 50%; background: #a8c0ca; }
-  .window-head b { margin-left: auto; color: #78909a; font-size: 7px; letter-spacing: .12em; }
-  .vault-rows { padding: 14px; display: grid; gap: 9px; }
-  .vault-row { display: flex; align-items: center; gap: 9px; padding: 9px; border-radius: 10px; background: rgba(230,241,245,.63); transition: transform .25s ease, background .25s ease; }
-  .vault-row:hover { transform: translateX(4px); background: rgba(224,241,246,.9); }
-  .vault-icon { width: 23px; height: 23px; border-radius: 7px; }
-  .blue { background: linear-gradient(135deg,#83c6e4,#347c9d); } .violet { background: linear-gradient(135deg,#b8a3df,#7554a0); } .green { background: linear-gradient(135deg,#95d5ba,#3a8c6d); }
-  .vault-text { flex: 1; display: grid; gap: 5px; }
-  .vault-text i, .vault-text em { height: 4px; border-radius: 9px; }
-  .vault-text i { width: 58%; background: #7396a5; } .vault-text em { width: 82%; background: #b2c8d1; }
-  .phone-speaker { width: 26px; height: 4px; margin: 12px auto 0; border-radius: 99px; background: rgba(67,95,107,.2); }
-  .phone-lock { position: relative; width: 46px; height: 46px; margin: 25px auto 20px; border-radius: 15px; background: rgba(62,145,177,.14); }
-  .phone-lock::before { content: ''; position: absolute; left: 16px; top: 10px; width: 12px; height: 11px; border: 2px solid #2c7895; border-bottom: 0; border-radius: 9px 9px 0 0; }
-  .phone-lock i { position: absolute; left: 12px; top: 20px; width: 22px; height: 17px; border-radius: 5px; background: #2c7895; }
-  .phone-line { height: 5px; margin: 9px 18px; border-radius: 9px; background: rgba(70,117,136,.2); } .phone-line.short { width: 48%; }
-  .phone-button { height: 28px; margin: 28px 15px; border-radius: 99px; background: #245c73; }
-  .data-orbit { position: absolute; z-index: 2; left: 25px; top: 30px; width: 485px; height: 345px; border-radius: 50%; opacity: .72; filter: drop-shadow(0 0 8px rgba(56,145,177,.18)); transition: opacity .35s ease, filter .35s ease, transform .5s cubic-bezier(.2,.75,.2,1); }
-  .data-orbit::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: conic-gradient(from 35deg, rgba(48,133,164,.16), rgba(68,177,154,.62), rgba(84,172,205,.2), rgba(48,133,164,.68), rgba(48,133,164,.16)); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px)); mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px)); }
-  .orbit-runner { position: absolute; z-index: 6; inset: 0; border-radius: 50%; transform: rotate(0deg); will-change: transform; }
-  .orbit-runner b { position: absolute; left: 50%; top: -6px; width: 12px; height: 12px; margin-left: -6px; border: 3px solid #2d82a5; border-radius: 50%; background: #e9fbff; box-shadow: 0 0 15px rgba(38,137,177,.92); }
-  .orbit-runner.inbound { transform: rotate(150deg); }
-  .orbit-runner.inbound b { border-color: #269b79; background: #effff9; box-shadow: 0 0 16px rgba(38,155,121,.95); }
-  .orbit-runner.trail { transform: rotate(132deg); }
-  .orbit-runner.trail b { top: -3px; width: 6px; height: 6px; margin-left: -3px; border-width: 2px; opacity: .8; }
-  .sync-label { position: absolute; z-index: 5; left: 211px; top: 190px; display: flex; align-items: center; gap: 6px; padding: 7px 10px; border: 1px solid rgba(78,143,165,.13); border-radius: 99px; background: rgba(244,250,250,.78); color: #39758d; box-shadow: 0 8px 24px rgba(58,100,115,.08); font: 8px/1 ui-monospace, monospace; letter-spacing: .07em; opacity: .84; transition: opacity .3s ease, transform .3s ease; }
-  .sync-label b { font-weight: 750; } .sync-label i { color: #319b7f; font-size: 11px; font-style: normal; animation: exchange-hint 1.5s ease-in-out infinite; }
-  .device-stage:hover .data-orbit { opacity: 1; filter: drop-shadow(0 0 13px rgba(46,145,179,.42)); transform: scale(1.015); }
-  .device-stage:hover .orbit-runner b { box-shadow: 0 0 21px rgba(38,137,177,1); }
-  .device-stage:hover .orbit-runner.inbound b { box-shadow: 0 0 22px rgba(38,155,121,1); }
-  .device-stage:hover .phone-button { background: #2a7189; box-shadow: 0 7px 18px rgba(36,92,115,.22); }
-  .device-stage:hover .sync-label { opacity: 1; transform: translateY(-3px); }
-  @keyframes exchange-hint { 50% { color: #277fa1; transform: scaleX(1.18); } }
-  @media (max-width: 620px) { .device-stage { width: 510px; transform: scale(.66); transform-origin: left top; margin-bottom: -125px; } }
-  @media (hover: none) { .device-stage:hover .desktop { transform: rotateY(7deg) rotateZ(-2deg); } .device-stage:hover .phone { transform: rotateZ(5deg); } }
-  @media (prefers-reduced-motion: reduce) { .orbit-runner.inbound { transform: rotate(180deg) !important; } .orbit-runner.trail { transform: rotate(205deg) !important; } }
+    .device-stage {
+        position: relative;
+        width: 540px;
+        height: 420px;
+        max-width: 100%;
+        perspective: 1000px;
+    }
+    .device {
+        position: absolute;
+        z-index: 3;
+        border: 1px solid rgba(69, 115, 134, 0.22);
+        background: rgba(255, 255, 255, 0.58);
+        box-shadow: 0 28px 65px rgba(35, 76, 94, 0.15);
+        backdrop-filter: blur(20px);
+        transition:
+            transform 0.48s cubic-bezier(0.2, 0.75, 0.2, 1),
+            box-shadow 0.45s ease,
+            border-color 0.35s ease;
+    }
+    .desktop {
+        width: 350px;
+        height: 230px;
+        left: 5px;
+        top: 100px;
+        border-radius: 5px;
+        transform: rotateY(7deg) rotateZ(-2deg);
+    }
+    .phone {
+        width: 112px;
+        height: 230px;
+        right: 4px;
+        top: 50px;
+        border-radius: 25px;
+        transform: rotateZ(5deg);
+    }
+    .device-stage:hover .desktop {
+        transform: rotateY(4deg) rotateZ(-1deg);
+        box-shadow: 0 36px 78px rgba(30, 81, 103, 0.22);
+        border-color: rgba(45, 137, 173, 0.38);
+    }
+    .device-stage:hover .phone {
+        transform: rotateZ(2deg);
+        box-shadow: 0 34px 72px rgba(30, 81, 103, 0.2);
+        border-color: rgba(45, 137, 173, 0.38);
+    }
+    .window-head {
+        height: 29px;
+        border-bottom: 1px solid rgba(86, 124, 140, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 0 11px;
+    }
+    .window-head i {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #a8c0ca;
+    }
+    .window-head b {
+        margin-left: auto;
+        color: #78909a;
+        font-size: 7px;
+        letter-spacing: 0.12em;
+    }
+    .vault-rows {
+        padding: 14px;
+        display: grid;
+        gap: 9px;
+    }
+    .vault-row {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 9px;
+        border-radius: 10px;
+        background: rgba(230, 241, 245, 0.63);
+        transition:
+            transform 0.25s ease,
+            background 0.25s ease;
+    }
+    .vault-row:hover {
+        transform: translateX(4px);
+        background: rgba(224, 241, 246, 0.9);
+    }
+    .vault-icon {
+        width: 23px;
+        height: 23px;
+        border-radius: 7px;
+    }
+    .blue {
+        background: linear-gradient(135deg, #83c6e4, #347c9d);
+    }
+    .violet {
+        background: linear-gradient(135deg, #b8a3df, #7554a0);
+    }
+    .green {
+        background: linear-gradient(135deg, #95d5ba, #3a8c6d);
+    }
+    .vault-text {
+        flex: 1;
+        display: grid;
+        gap: 5px;
+    }
+    .vault-text i,
+    .vault-text em {
+        height: 4px;
+        border-radius: 9px;
+    }
+    .vault-text i {
+        width: 58%;
+        background: #7396a5;
+    }
+    .vault-text em {
+        width: 82%;
+        background: #b2c8d1;
+    }
+    .phone-speaker {
+        width: 26px;
+        height: 4px;
+        margin: 12px auto 0;
+        border-radius: 99px;
+        background: rgba(67, 95, 107, 0.2);
+    }
+    .phone-lock {
+        position: relative;
+        width: 46px;
+        height: 46px;
+        margin: 25px auto 20px;
+        border-radius: 15px;
+        background: rgba(62, 145, 177, 0.14);
+    }
+    .phone-lock::before {
+        content: "";
+        position: absolute;
+        left: 16px;
+        top: 10px;
+        width: 12px;
+        height: 11px;
+        border: 2px solid #2c7895;
+        border-bottom: 0;
+        border-radius: 9px 9px 0 0;
+    }
+    .phone-lock i {
+        position: absolute;
+        left: 12px;
+        top: 20px;
+        width: 22px;
+        height: 17px;
+        border-radius: 5px;
+        background: #2c7895;
+    }
+    .phone-line {
+        height: 5px;
+        margin: 9px 18px;
+        border-radius: 9px;
+        background: rgba(70, 117, 136, 0.2);
+    }
+    .phone-line.short {
+        width: 48%;
+    }
+    .phone-button {
+        height: 28px;
+        margin: 28px 15px;
+        border-radius: 99px;
+        background: #245c73;
+    }
+    .data-orbit {
+        position: absolute;
+        z-index: 2;
+        left: 25px;
+        top: 30px;
+        width: 485px;
+        height: 345px;
+        border-radius: 50%;
+        opacity: 0.72;
+        filter: drop-shadow(0 0 8px rgba(56, 145, 177, 0.18));
+        transition:
+            opacity 0.35s ease,
+            filter 0.35s ease,
+            transform 0.5s cubic-bezier(0.2, 0.75, 0.2, 1);
+    }
+    .data-orbit::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: conic-gradient(
+            from 35deg,
+            rgba(48, 133, 164, 0.16),
+            rgba(68, 177, 154, 0.62),
+            rgba(84, 172, 205, 0.2),
+            rgba(48, 133, 164, 0.68),
+            rgba(48, 133, 164, 0.16)
+        );
+        -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px));
+        mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px));
+    }
+    .orbit-runner {
+        position: absolute;
+        z-index: 6;
+        inset: 0;
+        border-radius: 50%;
+        transform: rotate(0deg);
+        will-change: transform;
+    }
+    .orbit-runner b {
+        position: absolute;
+        left: 50%;
+        top: -6px;
+        width: 12px;
+        height: 12px;
+        margin-left: -6px;
+        border: 3px solid #2d82a5;
+        border-radius: 50%;
+        background: #e9fbff;
+        box-shadow: 0 0 15px rgba(38, 137, 177, 0.92);
+    }
+    .orbit-runner.inbound {
+        transform: rotate(150deg);
+    }
+    .orbit-runner.inbound b {
+        border-color: #269b79;
+        background: #effff9;
+        box-shadow: 0 0 16px rgba(38, 155, 121, 0.95);
+    }
+    .orbit-runner.trail {
+        transform: rotate(132deg);
+    }
+    .orbit-runner.trail b {
+        top: -3px;
+        width: 6px;
+        height: 6px;
+        margin-left: -3px;
+        border-width: 2px;
+        opacity: 0.8;
+    }
+    .sync-label {
+        position: absolute;
+        z-index: 5;
+        left: 211px;
+        top: 190px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 10px;
+        border: 1px solid rgba(78, 143, 165, 0.13);
+        border-radius: 99px;
+        background: rgba(244, 250, 250, 0.78);
+        color: #39758d;
+        box-shadow: 0 8px 24px rgba(58, 100, 115, 0.08);
+        font:
+            8px/1 ui-monospace,
+            monospace;
+        letter-spacing: 0.07em;
+        opacity: 0.84;
+        transition:
+            opacity 0.3s ease,
+            transform 0.3s ease;
+    }
+    .sync-label b {
+        font-weight: 750;
+    }
+    .sync-label i {
+        color: #319b7f;
+        font-size: 11px;
+        font-style: normal;
+        animation: exchange-hint 1.5s ease-in-out infinite;
+    }
+    .device-stage:hover .data-orbit {
+        opacity: 1;
+        filter: drop-shadow(0 0 13px rgba(46, 145, 179, 0.42));
+        transform: scale(1.015);
+    }
+    .device-stage:hover .orbit-runner b {
+        box-shadow: 0 0 21px rgba(38, 137, 177, 1);
+    }
+    .device-stage:hover .orbit-runner.inbound b {
+        box-shadow: 0 0 22px rgba(38, 155, 121, 1);
+    }
+    .device-stage:hover .phone-button {
+        background: #2a7189;
+        box-shadow: 0 7px 18px rgba(36, 92, 115, 0.22);
+    }
+    .device-stage:hover .sync-label {
+        opacity: 1;
+        transform: translateY(-3px);
+    }
+    @keyframes exchange-hint {
+        50% {
+            color: #277fa1;
+            transform: scaleX(1.18);
+        }
+    }
+    @media (max-width: 620px) {
+        .device-stage {
+            width: 510px;
+            transform: scale(0.66);
+            transform-origin: left top;
+            margin-bottom: -125px;
+        }
+    }
+    @media (hover: none) {
+        .device-stage:hover .desktop {
+            transform: rotateY(7deg) rotateZ(-2deg);
+        }
+        .device-stage:hover .phone {
+            transform: rotateZ(5deg);
+        }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .orbit-runner.inbound {
+            transform: rotate(180deg) !important;
+        }
+        .orbit-runner.trail {
+            transform: rotate(205deg) !important;
+        }
+    }
 </style>
 
 <script>
-  function startDeviceOrbits() {
-    document.querySelectorAll<HTMLElement>('[data-device-stage]').forEach((stage) => {
-      if (stage.dataset.orbitReady) return;
-      stage.dataset.orbitReady = 'true';
-      const outbound = stage.querySelector<HTMLElement>('.orbit-runner.outbound');
-      const inbound = stage.querySelector<HTMLElement>('.orbit-runner.inbound:not(.trail)');
-      const trail = stage.querySelector<HTMLElement>('.orbit-runner.trail');
-      if (!outbound || !inbound || !trail) return;
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    function startDeviceOrbits() {
+        document.querySelectorAll<HTMLElement>("[data-device-stage]").forEach((stage) => {
+            if (stage.dataset.orbitReady) return;
+            stage.dataset.orbitReady = "true";
+            const outbound = stage.querySelector<HTMLElement>(".orbit-runner.outbound");
+            const inbound = stage.querySelector<HTMLElement>(".orbit-runner.inbound:not(.trail)");
+            const trail = stage.querySelector<HTMLElement>(".orbit-runner.trail");
+            if (!outbound || !inbound || !trail) return;
+            if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-      let frame = 0;
-      let previousTime = performance.now();
-      let speedMultiplier = 1;
-      let targetMultiplier = 1;
-      const angles = { outbound: 0, inbound: 150, trail: 132 };
-      const enter = () => { targetMultiplier = 1.62; };
-      const leave = () => { targetMultiplier = 1; };
-      stage.addEventListener('pointerenter', enter);
-      stage.addEventListener('pointerleave', leave);
+            let frame = 0;
+            let previousTime = performance.now();
+            let speedMultiplier = 1;
+            let targetMultiplier = 1;
+            const angles = { outbound: 0, inbound: 150, trail: 132 };
+            const enter = () => {
+                targetMultiplier = 1.62;
+            };
+            const leave = () => {
+                targetMultiplier = 1;
+            };
+            stage.addEventListener("pointerenter", enter);
+            stage.addEventListener("pointerleave", leave);
 
-      const tick = (now: number) => {
-        const delta = Math.min(48, Math.max(0, now - previousTime));
-        previousTime = now;
-        const responseTime = targetMultiplier > speedMultiplier ? 420 : 720;
-        speedMultiplier += (targetMultiplier - speedMultiplier) * (1 - Math.exp(-delta / responseTime));
-        angles.outbound = (angles.outbound + delta * .0857 * speedMultiplier) % 360;
-        angles.inbound = (angles.inbound - delta * .0783 * speedMultiplier) % 360;
-        angles.trail = (angles.trail - delta * .0783 * speedMultiplier) % 360;
-        outbound.style.transform = `rotate(${angles.outbound}deg)`;
-        inbound.style.transform = `rotate(${angles.inbound}deg)`;
-        trail.style.transform = `rotate(${angles.trail}deg)`;
-        stage.dataset.orbitSpeed = speedMultiplier.toFixed(3);
-        frame = requestAnimationFrame(tick);
-      };
-      frame = requestAnimationFrame(tick);
-      document.addEventListener('astro:before-swap', () => cancelAnimationFrame(frame), { once: true });
-    });
-  }
-  document.addEventListener('astro:page-load', startDeviceOrbits);
-  startDeviceOrbits();
+            const tick = (now: number) => {
+                const delta = Math.min(48, Math.max(0, now - previousTime));
+                previousTime = now;
+                const responseTime = targetMultiplier > speedMultiplier ? 420 : 720;
+                speedMultiplier += (targetMultiplier - speedMultiplier) * (1 - Math.exp(-delta / responseTime));
+                angles.outbound = (angles.outbound + delta * 0.0857 * speedMultiplier) % 360;
+                angles.inbound = (angles.inbound - delta * 0.0783 * speedMultiplier) % 360;
+                angles.trail = (angles.trail - delta * 0.0783 * speedMultiplier) % 360;
+                outbound.style.transform = `rotate(${angles.outbound}deg)`;
+                inbound.style.transform = `rotate(${angles.inbound}deg)`;
+                trail.style.transform = `rotate(${angles.trail}deg)`;
+                stage.dataset.orbitSpeed = speedMultiplier.toFixed(3);
+                frame = requestAnimationFrame(tick);
+            };
+            frame = requestAnimationFrame(tick);
+            document.addEventListener("astro:before-swap", () => cancelAnimationFrame(frame), { once: true });
+        });
+    }
+    document.addEventListener("astro:page-load", startDeviceOrbits);
+    startDeviceOrbits();
 </script>

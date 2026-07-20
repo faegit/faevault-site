@@ -1,33 +1,180 @@
 ---
-import type { Locale } from '../i18n/config';
-import PageShell from './PageShell.astro';
-interface Props { locale: Locale; }
+import type { Locale } from "../i18n/config";
+import PageShell from "./PageShell.astro";
+interface Props {
+    locale: Locale;
+}
 const { locale } = Astro.props;
-const c = locale === 'zh-cn' ? {
-  kicker:'下载',title:'在你的设备上，继续掌控自己的资料。',intro:'正式版本将通过 GitHub Releases 提供。当前版本号、文件大小与下载地址均为占位，不会触发无效下载。',
-  ready:'下载地址待发布', android:'Android 版本', windows:'Windows 版本', detail:'版本与校验信息占位', note:'未来会在这里显示最新稳定版、更新说明和文件校验值。',
-} : {
-  kicker:'Download',title:'Keep control on every device you use.',intro:'Official builds will be delivered through GitHub Releases. Version numbers, file sizes, and links are placeholders and will not trigger invalid downloads.',
-  ready:'Download link pending',android:'Android build',windows:'Windows build',detail:'Version and checksum placeholder',note:'The latest stable release, release notes, and file checksums will appear here.',
-};
+const c =
+    locale === "zh-cn"
+        ? {
+              kicker: "下载",
+              title: "在你的设备上，继续掌控自己的资料。",
+              intro: "正式版本通过 GitHub Releases 发布。当前页面展示的是占位信息，不会启动下载。",
+              ready: "下载地址待发布",
+              android: "Android 版本",
+              windows: "Windows 版本",
+              detail: "版本与校验信息占位",
+              note: "请从 GitHub Releases 获取最新稳定版、发布说明与文件校验码。",
+          }
+        : {
+              kicker: "Download",
+              title: "Keep control on every device you use.",
+              intro: "Official builds are delivered through GitHub Releases. This page currently shows placeholder information and will not trigger downloads.",
+              ready: "Download link pending",
+              android: "Android build",
+              windows: "Windows build",
+              detail: "Version and checksum placeholder",
+              note: "Get the latest stable release, release notes, and checksums from GitHub Releases.",
+          };
 ---
 
 <PageShell theme="download" kicker={c.kicker} title={c.title} intro={c.intro}>
-  <section class="platform-system">
-    <div class="platform-orbits" aria-hidden="true"><i></i><i></i><b></b></div>
-    <article class="android"><span>ANDROID</span><h2>{c.android}</h2><p>{c.detail}</p><button disabled>{c.ready}</button></article>
-    <article class="windows"><span>WINDOWS</span><h2>{c.windows}</h2><p>{c.detail}</p><button disabled>{c.ready}</button></article>
-    <p class="release-note">{c.note}</p>
-  </section>
+    <section class="platform-system">
+        <div class="platform-orbits" aria-hidden="true"><i></i><i></i><b></b></div>
+        <article class="android"><span>ANDROID</span><h2>{c.android}</h2><p>{c.detail}</p><button disabled>{c.ready}</button></article>
+        <article class="windows"><span>WINDOWS</span><h2>{c.windows}</h2><p>{c.detail}</p><button disabled>{c.ready}</button></article>
+        <p class="release-note">{c.note}</p>
+    </section>
 </PageShell>
 
 <style>
-  .platform-system { position:relative; display:grid; grid-template-columns:1fr 1fr; gap:8rem; align-items:center; min-height:610px; margin-top:5rem; padding:5rem 3rem; }
-  .platform-orbits { position:absolute; left:50%; top:50%; width:560px; height:390px; border:1px solid rgba(52,145,124,.22); border-radius:50%; transform:translate(-50%,-52%) rotate(-8deg); animation:orbit-breathe 5s ease-in-out infinite; }
-  .platform-orbits i { position:absolute; inset:48px -35px; border:1px solid rgba(61,145,174,.2); border-radius:50%; transform:rotate(17deg); } .platform-orbits i:nth-child(2){inset:105px -65px;transform:rotate(-14deg)}
-  .platform-orbits b { position:absolute; left:50%; top:-7px; width:14px;height:14px;border-radius:50%;background:#42a88f;box-shadow:0 0 0 8px rgba(66,168,143,.1),0 0 22px rgba(66,168,143,.55);animation:orbit-dot 6s linear infinite;transform-origin:0 202px; }
-  article { position:relative; z-index:2; padding:3rem; border:1px solid rgba(255,255,255,.65); border-radius:2rem; background:rgba(247,252,251,.65); box-shadow:0 26px 70px rgba(45,82,94,.1); backdrop-filter:blur(18px); transition:transform .35s ease,box-shadow .35s ease; animation:platform-in .7s cubic-bezier(.18,.78,.18,1) both; }
-  article.windows{animation-delay:.14s} article:hover{transform:translateY(-8px) rotate(-.5deg);box-shadow:0 34px 85px rgba(45,82,94,.16)} article>span{color:#39846f;font-size:.65rem;letter-spacing:.16em} h2{margin:1rem 0;color:#284550;font:500 2rem/1.1 Georgia,serif}article p{color:#6b8088;font-size:.82rem}button{margin-top:2rem;padding:.8rem 1rem;border:0;border-radius:99px;background:#dfe9e7;color:#71807e;font-weight:700}.release-note{position:absolute;left:50%;bottom:1.5rem;width:min(560px,90%);color:#6b7f87;text-align:center;font:.9rem/1.7 Georgia,serif;transform:translateX(-50%)}
-  @keyframes platform-in{from{opacity:0;transform:translateY(30px) scale(.97)}}@keyframes orbit-breathe{50%{transform:translate(-50%,-52%) rotate(-3deg) scale(1.035)}}@keyframes orbit-dot{to{transform:rotate(360deg)}}
-  @media(max-width:800px){.platform-system{grid-template-columns:1fr;gap:2rem;padding:4rem 0 7rem}.platform-orbits{width:480px;height:480px;opacity:.55}.platform-orbits b{transform-origin:0 247px}.release-note{bottom:1rem}}
+    .platform-system {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8rem;
+        align-items: center;
+        min-height: 610px;
+        margin-top: 5rem;
+        padding: 5rem 3rem;
+    }
+    .platform-orbits {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 560px;
+        height: 390px;
+        border: 1px solid rgba(52, 145, 124, 0.22);
+        border-radius: 50%;
+        transform: translate(-50%, -52%) rotate(-8deg);
+        animation: orbit-breathe 5s ease-in-out infinite;
+    }
+    .platform-orbits i {
+        position: absolute;
+        inset: 48px -35px;
+        border: 1px solid rgba(61, 145, 174, 0.2);
+        border-radius: 50%;
+        transform: rotate(17deg);
+    }
+    .platform-orbits i:nth-child(2) {
+        inset: 105px -65px;
+        transform: rotate(-14deg);
+    }
+    .platform-orbits b {
+        position: absolute;
+        left: 50%;
+        top: -7px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #42a88f;
+        box-shadow:
+            0 0 0 8px rgba(66, 168, 143, 0.1),
+            0 0 22px rgba(66, 168, 143, 0.55);
+        animation: orbit-dot 6s linear infinite;
+        transform-origin: 0 202px;
+    }
+    article {
+        position: relative;
+        z-index: 2;
+        padding: 3rem;
+        border: 1px solid rgba(255, 255, 255, 0.65);
+        border-radius: 2rem;
+        background: rgba(247, 252, 251, 0.65);
+        box-shadow: 0 26px 70px rgba(45, 82, 94, 0.1);
+        backdrop-filter: blur(18px);
+        transition:
+            transform 0.35s ease,
+            box-shadow 0.35s ease;
+        animation: platform-in 0.7s cubic-bezier(0.18, 0.78, 0.18, 1) both;
+    }
+    article.windows {
+        animation-delay: 0.14s;
+    }
+    article:hover {
+        transform: translateY(-8px) rotate(-0.5deg);
+        box-shadow: 0 34px 85px rgba(45, 82, 94, 0.16);
+    }
+    article > span {
+        color: #39846f;
+        font-size: 0.65rem;
+        letter-spacing: 0.16em;
+    }
+    h2 {
+        margin: 1rem 0;
+        color: #284550;
+        font:
+            500 2rem/1.1 Georgia,
+            serif;
+    }
+    article p {
+        color: #6b8088;
+        font-size: 0.82rem;
+    }
+    button {
+        margin-top: 2rem;
+        padding: 0.8rem 1rem;
+        border: 0;
+        border-radius: 99px;
+        background: #dfe9e7;
+        color: #71807e;
+        font-weight: 700;
+    }
+    .release-note {
+        position: absolute;
+        left: 50%;
+        bottom: 1.5rem;
+        width: min(560px, 90%);
+        color: #6b7f87;
+        text-align: center;
+        font:
+            0.9rem/1.7 Georgia,
+            serif;
+        transform: translateX(-50%);
+    }
+    @keyframes platform-in {
+        from {
+            opacity: 0;
+            transform: translateY(30px) scale(0.97);
+        }
+    }
+    @keyframes orbit-breathe {
+        50% {
+            transform: translate(-50%, -52%) rotate(-3deg) scale(1.035);
+        }
+    }
+    @keyframes orbit-dot {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    @media (max-width: 800px) {
+        .platform-system {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            padding: 4rem 0 7rem;
+        }
+        .platform-orbits {
+            width: 480px;
+            height: 480px;
+            opacity: 0.55;
+        }
+        .platform-orbits b {
+            transform-origin: 0 247px;
+        }
+        .release-note {
+            bottom: 1rem;
+        }
+    }
 </style>

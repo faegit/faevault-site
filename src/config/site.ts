@@ -1,4 +1,5 @@
 export const SITE_NAME = 'FAEVault';
+export const SITE_NAME_CN = '保险库';
 export const SITE_ORIGIN = 'https://faegit.github.io';
 export const SITE_BASE_PATH = '/faevault-site';
 export const DEFAULT_LOCALE = 'zh-cn' as const;

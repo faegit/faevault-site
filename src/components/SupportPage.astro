@@ -1,35 +1,222 @@
 ---
-import type { Locale } from '../i18n/config';
-import PageShell from './PageShell.astro';
-interface Props { locale: Locale; }
+import type { Locale } from "../i18n/config";
+import PageShell from "./PageShell.astro";
+interface Props {
+    locale: Locale;
+}
 const { locale } = Astro.props;
 const img = (name: string) => `${import.meta.env.BASE_URL}images/${name}`;
-const c = locale === 'zh-cn' ? {
-  kicker:'支持 FAEVault',title:'想直接支持，就不必先读完故事。',intro:'支付宝与微信付款码会直接放在页面第一屏。使用 FAEVault 扫描以下二维码即可支持开发。',
-  alipayLabel:'支付宝付款码',wechatLabel:'微信付款码',thanks:'每一份支持，都让独立开发多一点继续打磨的余地。',
-  storyTitle:'支持的不是一张宏大蓝图，而是一次次认真完成的小事。',story:'修复一个不易察觉的问题、重新整理一段让人困惑的流程、让两端数据更可靠地相遇——这些细小工作组成了 FAEVault。后续这里会放入真实的开发故事与照片，而不是编造经历来推动赞助。',
-} : {
-  kicker:'Support FAEVault',title:'If you want to help directly, the story can wait.',intro:'Alipay and WeChat payment codes are right here. Scan with FAEVault to support development directly.',
-  alipayLabel:'Alipay QR Code',wechatLabel:'WeChat QR Code',thanks:'Every contribution gives independent development a little more room to keep refining.',
-  storyTitle:'You are not supporting a grand promise, but many small things finished with care.',story:'Fixing a subtle issue, rewriting a confusing workflow, or helping data meet reliably across two platforms—small pieces of work like these make FAEVault. Real development stories and images will replace this copy later; no invented hardship will be used to pressure support.',
-};
+const c =
+    locale === "zh-cn"
+        ? {
+              kicker: "赞助支持 保险库",
+              title: "感谢你的信任，我会持续修复和优化。",
+              intro: "支付宝与微信扫一扫即可自由赞助 保险库。",
+              alipayLabel: "支付宝付款码",
+              wechatLabel: "微信付款码",
+              thanks: "每一份赞助都让我更有动力持续修复问题、优化体验。",
+              storyLabel: "保险库 · 研发故事",
+              storyTitle: "你支持的是让 保险库更可靠、更好用的每一次迭代。",
+              story: "每次修复、每次优化、每次细节打磨，都是让 保险库更稳健、更顺手的过程。你的赞助让独立开发者有时间把程序做得更贴心，而不是匆忙推送。",
+          }
+        : {
+              kicker: "Support FAEVault",
+              title: "If you want to help directly, the story can wait.",
+              intro: "Alipay and WeChat payment codes are right here. Scan with FAEVault to support development directly.",
+              alipayLabel: "Alipay QR Code",
+              wechatLabel: "WeChat QR Code",
+              thanks: "Every contribution gives independent development a little more room to keep refining.",
+              storyLabel: "FAEVault · Development Story",
+              storyTitle: "You are supporting the careful work that makes FAEVault more reliable and easier to use.",
+              story: "Every fix, every improvement, every detail polished is part of making FAEVault stronger. Your support gives independent development the breathing room to refine the experience rather than rush it out.",
+          };
 ---
 
 <PageShell theme="support" kicker={c.kicker} title={c.title} intro={c.intro}>
-  <section class="payment-stage">
-    <div class="warm-orbit" aria-hidden="true"><i></i><i></i></div>
-    <article><span>ALIPAY</span><img class="qr-real" src={img('alipay-qr.png')} alt={c.alipayLabel} width="270" height="270" loading="lazy" decoding="async" /><h2>{c.alipayLabel}</h2></article>
-    <article><span>WECHAT PAY</span><img class="qr-real" src={img('wechat-qr.png')} alt={c.wechatLabel} width="270" height="270" loading="lazy" decoding="async" /><h2>{c.wechatLabel}</h2></article>
-    <blockquote>{c.thanks}</blockquote>
-  </section>
-  <section class="support-story"><p>FAEVault · STORY PLACEHOLDER</p><h2>{c.storyTitle}</h2><div><i></i><span>{c.story}</span></div></section>
+    <section class="payment-stage">
+        <div class="warm-orbit" aria-hidden="true"><i></i><i></i></div>
+        <article>
+            <span>ALIPAY</span><img
+                class="qr-real"
+                src={img("alipay-qr.png")}
+                alt={c.alipayLabel}
+                width="270"
+                height="270"
+                loading="lazy"
+                decoding="async"
+            /><h2>{c.alipayLabel}</h2>
+        </article>
+        <article>
+            <span>WECHAT PAY</span><img
+                class="qr-real"
+                src={img("wechat-qr.png")}
+                alt={c.wechatLabel}
+                width="270"
+                height="270"
+                loading="lazy"
+                decoding="async"
+            /><h2>{c.wechatLabel}</h2>
+        </article>
+        <blockquote>{c.thanks}</blockquote>
+    </section>
+    <section class="support-story"><p>{c.storyLabel}</p><h2>{c.storyTitle}</h2><div><i></i><span>{c.story}</span></div></section>
 </PageShell>
 
 <style>
-  .payment-stage{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;min-height:690px;margin-top:4rem;padding:4rem 10% 8rem;overflow:hidden}
-  .warm-orbit{position:absolute;left:50%;top:43%;width:720px;height:430px;border-radius:50%;background:radial-gradient(circle,rgba(236,169,151,.14),rgba(128,170,205,.08) 46%,transparent 70%);transform:translate(-50%,-50%);animation:warm-float 7s ease-in-out infinite}.warm-orbit i{position:absolute;inset:20px;border:1px solid rgba(185,108,100,.18);border-radius:50%;transform:rotate(-8deg)}.warm-orbit i:nth-child(2){inset:75px -30px;border-color:rgba(62,157,130,.14);transform:rotate(13deg)}
-  article{position:relative;z-index:2;text-align:center;animation:code-in .72s cubic-bezier(.18,.78,.18,1) both}article:nth-of-type(2){animation-delay:.14s}article>span{display:block;color:#9b6b69;font-size:.65rem;font-weight:800;letter-spacing:.16em;margin-bottom:1.2rem}.qr-real{display:block;width:min(270px,100%);aspect-ratio:1;margin:0 auto;border:18px solid rgba(255,255,255,.85);border-radius:1.7rem;box-shadow:0 28px 70px rgba(81,67,73,.15);transition:transform .35s ease,box-shadow .35s ease;object-fit:contain;background:#fff}article:hover .qr-real{transform:translateY(-7px) rotate(.7deg);box-shadow:0 35px 85px rgba(81,67,73,.22)}article h2{margin:1.3rem 0 .4rem;color:#324d58;font:500 1.35rem/1.2 Georgia,serif}blockquote{position:absolute;left:50%;bottom:2rem;width:min(620px,90%);margin:0;color:#745f63;text-align:center;font:italic 1.15rem/1.6 Georgia,serif;transform:translateX(-50%)}
-  .support-story{display:grid;grid-template-columns:.7fr 1.3fr;gap:7rem;padding:8rem 0;border-top:1px solid rgba(114,87,98,.16)}.support-story>p{color:#a06f70;font-size:.65rem;letter-spacing:.15em}.support-story h2{margin:0;color:#2d414a;font:500 clamp(2.4rem,5vw,4.6rem)/1.07 Georgia,serif;letter-spacing:-.05em}.support-story>div{grid-column:2;display:grid;grid-template-columns:60px 1fr;gap:1rem;color:#64767e;font:1rem/1.9 Georgia,serif}.support-story>div i{height:1px;margin-top:1rem;background:linear-gradient(90deg,#b46b66,transparent)}
-  @keyframes warm-float{50%{transform:translate(-47%,-53%) rotate(4deg) scale(1.08)}}@keyframes code-in{from{opacity:0;filter:blur(8px);transform:translateY(32px)}}
-  @media(max-width:720px){.payment-stage{grid-template-columns:1fr;gap:4rem;padding:3rem 0 10rem}.warm-orbit{width:580px;height:760px}.support-story{grid-template-columns:1fr;gap:2rem;padding:6rem 0}.support-story>div{grid-column:1}}
+    .payment-stage {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        align-items: start;
+        min-height: 690px;
+        margin-top: 4rem;
+        padding: 4rem 10% 8rem;
+        overflow: hidden;
+    }
+    .warm-orbit {
+        position: absolute;
+        left: 50%;
+        top: 43%;
+        width: 720px;
+        height: 430px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(236, 169, 151, 0.14), rgba(128, 170, 205, 0.08) 46%, transparent 70%);
+        transform: translate(-50%, -50%);
+        animation: warm-float 7s ease-in-out infinite;
+    }
+    .warm-orbit i {
+        position: absolute;
+        inset: 20px;
+        border: 1px solid rgba(185, 108, 100, 0.18);
+        border-radius: 50%;
+        transform: rotate(-8deg);
+    }
+    .warm-orbit i:nth-child(2) {
+        inset: 75px -30px;
+        border-color: rgba(62, 157, 130, 0.14);
+        transform: rotate(13deg);
+    }
+    article {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        animation: code-in 0.72s cubic-bezier(0.18, 0.78, 0.18, 1) both;
+    }
+    article:nth-of-type(2) {
+        animation-delay: 0.14s;
+    }
+    article > span {
+        display: block;
+        color: #9b6b69;
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 0.16em;
+        margin-bottom: 1.2rem;
+    }
+    .qr-real {
+        display: block;
+        width: min(270px, 100%);
+        aspect-ratio: 1;
+        margin: 0 auto;
+        border: 18px solid rgba(255, 255, 255, 0.85);
+        border-radius: 1.7rem;
+        box-shadow: 0 28px 70px rgba(81, 67, 73, 0.15);
+        transition:
+            transform 0.35s ease,
+            box-shadow 0.35s ease;
+        object-fit: contain;
+        background: #fff;
+    }
+    article:hover .qr-real {
+        transform: translateY(-7px) rotate(0.7deg);
+        box-shadow: 0 35px 85px rgba(81, 67, 73, 0.22);
+    }
+    article h2 {
+        margin: 1.3rem 0 0.4rem;
+        color: #324d58;
+        font:
+            500 1.35rem/1.2 Georgia,
+            serif;
+    }
+    blockquote {
+        position: absolute;
+        left: 50%;
+        bottom: 2rem;
+        width: min(620px, 90%);
+        margin: 0;
+        color: #745f63;
+        text-align: center;
+        font:
+            italic 1.15rem/1.6 Georgia,
+            serif;
+        transform: translateX(-50%);
+    }
+    .support-story {
+        display: grid;
+        grid-template-columns: 0.7fr 1.3fr;
+        gap: 7rem;
+        padding: 8rem 0;
+        border-top: 1px solid rgba(114, 87, 98, 0.16);
+    }
+    .support-story > p {
+        color: #a06f70;
+        font-size: 0.65rem;
+        letter-spacing: 0.15em;
+    }
+    .support-story h2 {
+        margin: 0;
+        color: #2d414a;
+        font:
+            500 clamp(2.4rem, 5vw, 4.6rem)/1.07 Georgia,
+            serif;
+        letter-spacing: -0.05em;
+    }
+    .support-story > div {
+        grid-column: 2;
+        display: grid;
+        grid-template-columns: 60px 1fr;
+        gap: 1rem;
+        color: #64767e;
+        font:
+            1rem/1.9 Georgia,
+            serif;
+    }
+    .support-story > div i {
+        height: 1px;
+        margin-top: 1rem;
+        background: linear-gradient(90deg, transparent, #b46b66, transparent);
+        transform: scaleY(.5);
+    }
+    @keyframes warm-float {
+        50% {
+            transform: translate(-47%, -53%) rotate(4deg) scale(1.08);
+        }
+    }
+    @keyframes code-in {
+        from {
+            opacity: 0;
+            filter: blur(8px);
+            transform: translateY(32px);
+        }
+    }
+    @media (max-width: 720px) {
+        .payment-stage {
+            grid-template-columns: 1fr;
+            gap: 4rem;
+            padding: 3rem 0 10rem;
+        }
+        .warm-orbit {
+            width: 580px;
+            height: 760px;
+        }
+        .support-story {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            padding: 6rem 0;
+        }
+        .support-story > div {
+            grid-column: 1;
+        }
+    }
 </style>

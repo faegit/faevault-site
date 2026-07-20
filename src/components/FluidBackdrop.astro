@@ -1,6 +1,5 @@
 <div class="fluid-field" data-fluid-field aria-hidden="true">
   <i></i><i></i><i></i><i></i>
-  <span class="pointer-aura"></span>
 </div>
 
 <style>
@@ -10,22 +9,17 @@
   .fluid-field i:nth-child(2) { width: min(50vw, 720px); height: min(40vw, 580px); border-radius: 58% 42% 39% 61% / 44% 57% 43% 56%; transform: translate3d(76vw,5vh,0); }
   .fluid-field i:nth-child(3) { width: min(40vw, 580px); height: min(36vw, 500px); border-radius: 39% 61% 55% 45% / 59% 41% 57% 43%; transform: translate3d(16vw,33vh,0); }
   .fluid-field i:nth-child(4) { width: min(36vw, 520px); height: min(32vw, 450px); border-radius: 62% 38% 47% 53% / 41% 54% 46% 59%; transform: translate3d(48vw,54vh,0); }
-  .pointer-aura { position: absolute; width: 19rem; height: 19rem; margin: -9.5rem 0 0 -9.5rem; border-radius: 50%; background: radial-gradient(circle, rgba(232,253,255,.55), rgba(87,181,214,.13) 43%, transparent 70%); filter: blur(15px); opacity: 0; transition: opacity .3s ease; }
-  :global(.fluid-active) .pointer-aura { opacity: 1; }
   @media (max-width: 760px) { .fluid-field { opacity: .56; inset: -6rem; } .fluid-field i { min-width: 18rem; min-height: 16rem; } }
-  @media (prefers-reduced-motion: reduce) { .fluid-field { opacity: .38; } .pointer-aura { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .fluid-field { opacity: .38; } }
 </style>
 
 <script>
   function startFluidField() {
     const field = document.querySelector('[data-fluid-field]') as HTMLElement | null;
-    const root = field?.closest('[data-fluid-root]') as HTMLElement | null;
-    if (!field || !root || field.dataset.ready) return;
+    if (!field || field.dataset.ready) return;
     field.dataset.ready = 'true';
     const blobs = [...field.querySelectorAll('i')] as HTMLElement[];
-    const aura = field.querySelector('.pointer-aura') as HTMLElement | null;
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const pointer = { x: .5, y: .42, tx: .5, ty: .42, on: false, hover: 0, energy: 0 };
     const initial: [number, number][] = [[.06,.17], [.76,.05], [.16,.33], [.48,.54]];
     const now = performance.now();
     const drift = initial.map(([x, y], index) => ({
@@ -51,19 +45,6 @@
     ];
     let lastPaint = 0;
     let colorTime = 0;
-    const enter = () => { pointer.on = true; root.classList.add('fluid-active'); };
-    const leave = () => { pointer.on = false; root.classList.remove('fluid-active'); };
-    const move = (event: PointerEvent) => {
-      const x = event.clientX / window.innerWidth;
-      const y = event.clientY / window.innerHeight;
-      if (!pointer.on) enter();
-      pointer.energy = Math.min(1, pointer.energy + Math.hypot(x - pointer.tx, y - pointer.ty) * 4);
-      pointer.tx = x; pointer.ty = y;
-    };
-    root.addEventListener('pointerenter', enter);
-    root.addEventListener('pointerleave', leave);
-    root.addEventListener('pointermove', move, { passive: true });
-    if (root.matches(':hover')) enter();
     if (!reduce) {
       let previousTime = performance.now();
       const tick = (now: number) => {
@@ -73,18 +54,8 @@
         previousTime = now;
         lastPaint = now;
         colorTime += delta * .016;
-        const pointerEase = 1 - Math.exp(-delta / 180);
-        const hoverEase = 1 - Math.exp(-delta / 320);
-        pointer.x += (pointer.tx - pointer.x) * pointerEase;
-        pointer.y += (pointer.ty - pointer.y) * pointerEase;
-        pointer.hover += ((pointer.on ? 1 : 0) - pointer.hover) * hoverEase;
-        pointer.energy *= Math.pow(.94, delta / 22);
         const width = window.innerWidth;
         const height = window.innerHeight;
-        if (aura) {
-          const fieldBounds = field.getBoundingClientRect();
-          aura.style.transform = `translate3d(${pointer.x * width - fieldBounds.left}px,${pointer.y * height - fieldBounds.top}px,0) scale(${1 + pointer.energy * .18})`;
-        }
         blobs.forEach((blob, index) => {
           const state = drift[index];
           const pal = blobPalette[index];
@@ -95,19 +66,9 @@
           state.y += (state.targetY - state.y) * positionEase;
           state.scale += (state.targetScale - state.scale) * shapeEase;
           state.rotation += (state.targetRotation - state.rotation) * shapeEase;
-          let x = state.x * width;
-          let y = state.y * height;
-          const dx = pointer.x * width - x;
-          const dy = pointer.y * height - y;
-          const distance = Math.max(100, Math.hypot(dx, dy));
-          const influence = pointer.hover * Math.max(0, 1 - distance / (width * .58));
-          x += dx * influence * (.1 + index * .012);
-          y += dy * influence * (.1 + index * .01);
-          const scale = state.scale + influence * .14 + pointer.energy * .025;
-          const rotation = state.rotation + influence * 10;
           const hue = ((pal.phase + colorTime * pal.speed) * 180 / Math.PI + 360) % 360;
           blob.style.background = `hsla(${hue}, ${pal.sat}%, ${pal.light}%, ${pal.alpha})`;
-          blob.style.transform = `translate3d(${x}px,${y}px,0) rotate(${rotation}deg) scale(${scale})`;
+          blob.style.transform = `translate3d(${state.x * width}px,${state.y * height}px,0) rotate(${state.rotation}deg) scale(${state.scale})`;
         });
       };
       tick(previousTime);
