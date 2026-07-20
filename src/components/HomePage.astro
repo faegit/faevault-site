@@ -21,10 +21,6 @@ const copy =
               storyBody: "保险库不含任何广告，所有核心功能免费使用。数据采用 scrypt + AES-256-GCM 本地加密，不经任何外部服务器；加密方案与安全设计公开透明，经反复审计验证。",
               quote: "好的工具不需要在隐私和便利之间做取舍。",
               whitepaperLink: "查看安全白皮书",
-              journeyKicker: "持续推进的产品理念",
-              journeyTitle: "不是一次性功能展示，\n而是一段持续完善的路径。",
-              journeyBody: "从 Android 到 Windows，保险库会不断把产品体验打磨得更顺手、更可靠。",
-              journeyLink: "查看开发历程",
               guideKicker: "功能展示",
               guideTitle: "保险库具备的\n实用功能。",
               guideBody: "从本地加密存储到系统自动填充，保险库为 Android 和 Windows 提供完整的密码管理能力。",
@@ -46,10 +42,6 @@ const copy =
               storyBody: "FAEVault contains no ads and all core features are free. Data is encrypted locally with scrypt + AES-256-GCM, never touching external servers. The encryption design and security architecture are transparent and regularly reviewed.",
               quote: "A good tool shouldn't make you choose between privacy and convenience.",
               whitepaperLink: "Read the security whitepaper",
-              journeyKicker: "A product in progress",
-              journeyTitle: "Not a one-off feature showcase,\nbut a path that keeps improving.",
-              journeyBody: "From Android to Windows, FAEVault keeps refining the experience into something more dependable.",
-              journeyLink: "See the development journey",
               guideKicker: "Feature showcase",
               guideTitle: "Practical features\nfor everyday use.",
               guideBody: "From local encrypted storage to system-level autofill, FAEVault delivers complete password management for Android and Windows.",
@@ -195,18 +187,6 @@ const features =
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <section class="section journey" id="journey">
-        <div class="journey-inner">
-            <div class="journey-copy section-copy">
-                <p class="eyebrow">{copy.journeyKicker}</p>
-                <h2>{copy.journeyTitle}</h2>
-                <p>{copy.journeyBody}</p>
-                <a class="text-link" href={localePath(locale, "journey")}>{copy.journeyLink}<span>→</span></a>
-            </div>
-            <div class="milestones" aria-hidden="true"><span>01</span><span>Android</span><span>Windows</span><span>Now</span></div>
         </div>
     </section>
 
@@ -696,37 +676,12 @@ const features =
             align-items: flex-start;
         }
     }
-    .journey-inner {
-        display: grid;
-        grid-template-columns: 1fr 0.4fr;
-        gap: 7vw;
-        align-items: center;
-    }
-    .journey-copy {
-        max-width: 660px;
-    }
-    .journey-copy > p,
     .guide-section > p,
     .support-section > p {
         color: #5a727c;
         font:
             1rem/1.9 Georgia,
             serif;
-    }
-    .journey-copy > p {
-        max-width: 580px;
-        margin: 1.4rem 0;
-    }
-    .milestones {
-        display: flex;
-        flex-direction: column;
-        gap: 1.2rem;
-        align-items: flex-end;
-        color: #65808a;
-        font:
-            0.74rem/1 ui-monospace,
-            monospace;
-        letter-spacing: 0.12em;
     }
 
     .guide-section {
@@ -883,15 +838,6 @@ const features =
         .split-inner {
             grid-template-columns: 1fr;
             gap: 2.5rem;
-        }
-        .journey-inner {
-            grid-template-columns: 1fr;
-            gap: 2rem;
-        }
-        .milestones {
-            flex-direction: row;
-            justify-content: flex-end;
-            gap: 2rem;
         }
     }
     @media (max-width: 760px) {
