@@ -794,6 +794,23 @@ const workflowItems =
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 1rem;
     }
+    .workflow-stack {
+        /* reserve height so transforms don't collapse layout */
+        min-height: 12.5rem;
+    }
+    .workflow-card {
+        transition: transform 420ms ease, opacity 420ms ease;
+        will-change: transform, opacity;
+        /* ensure cards appear above following ones when stacked */
+    }
+    .workflow-card.fade-up {
+        transform: translateY(-36px) scale(1.02) !important;
+        opacity: 0 !important;
+    }
+    /* Stacked visual offsets applied by script via inline styles; provide sensible defaults */
+    .workflow-stack[data-stacked="true"] .workflow-card:nth-child(1) { transform: translateY(0) scale(1); z-index: 100; }
+    .workflow-stack[data-stacked="true"] .workflow-card:nth-child(2) { transform: translateY(14px) scale(0.98); z-index: 90; }
+    .workflow-stack[data-stacked="true"] .workflow-card:nth-child(3) { transform: translateY(28px) scale(0.96); z-index: 80; }
     .workflow-card {
         position: relative;
         padding: 1.15rem 1.2rem;
@@ -994,6 +1011,49 @@ const workflowItems =
         }
     }
 </style>
+
+<script>
+    (function () {
+        if (typeof window === "undefined") return;
+        function initWorkflowCarousel() {
+            const stack = document.querySelector('.workflow-stack');
+            if (!stack) return;
+            stack.setAttribute('data-stacked', 'true');
+            function applyOffsets() {
+                const cards = Array.from(stack.children);
+                cards.forEach((card, i) => {
+                    const y = i * 14; // px offset between stacked cards
+                    const scale = 1 - i * 0.02;
+                    card.style.transition = 'transform 420ms ease, opacity 420ms ease';
+                    card.style.transform = `translateY(${y}px) scale(${scale})`;
+                    card.style.zIndex = `${100 - i}`;
+                    card.style.opacity = '1';
+                    card.classList.remove('fade-up');
+                });
+            }
+            applyOffsets();
+            let running = false;
+            const delay = 3500;
+            setInterval(() => {
+                if (running) return;
+                running = true;
+                const first = stack.children[0];
+                if (!first) { running = false; return; }
+                first.classList.add('fade-up');
+                // wait for fade-up transition then move the node to the end
+                setTimeout(() => {
+                    stack.appendChild(first);
+                    applyOffsets();
+                    running = false;
+                }, 480);
+            }, delay);
+            // Re-apply when SPA navigation occurs
+            document.addEventListener('astro:page-load', applyOffsets);
+            window.addEventListener('resize', applyOffsets);
+        }
+        document.addEventListener('DOMContentLoaded', initWorkflowCarousel);
+    })();
+</script>
 
 <script>
     (function () {
