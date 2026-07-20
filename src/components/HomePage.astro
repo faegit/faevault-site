@@ -11,7 +11,7 @@ const copy =
     locale === "zh-cn"
         ? {
               eyebrow: "本地优先 · Android + Windows",
-              title: "你的密码，\n应该真正属于你。",
+              title: "你的密码和数据，\n完全由你掌控。",
               intro: "保险库把密码、通行密钥与重要资料放进一个本地加密库，并为 Windows Hello、浏览器自动填充与多设备同步打基础。",
               support: "直接赞助支持开发",
               storyLink: "了解产品故事",
@@ -115,7 +115,7 @@ const workflowItems =
                 <div class="workflow-stack">
                     {
                         workflowItems.map((item, index) => (
-                            <article class="workflow-card" style={`animation-delay: ${index * 2.5}s`}>
+                            <article class="workflow-card">
                                 <span class={`workflow-dot ${item.accent}`} />
                                 <strong>{item.title}</strong>
                                 <p>{item.body}</p>
@@ -799,7 +799,9 @@ const workflowItems =
         min-height: 12.5rem;
     }
     .workflow-card {
-        transition: transform 420ms ease, opacity 420ms ease;
+        transition:
+            transform 420ms ease,
+            opacity 420ms ease;
         will-change: transform, opacity;
         /* ensure cards appear above following ones when stacked */
     }
@@ -808,9 +810,18 @@ const workflowItems =
         opacity: 0 !important;
     }
     /* Stacked visual offsets applied by script via inline styles; provide sensible defaults */
-    .workflow-stack[data-stacked="true"] .workflow-card:nth-child(1) { transform: translateY(0) scale(1); z-index: 100; }
-    .workflow-stack[data-stacked="true"] .workflow-card:nth-child(2) { transform: translateY(14px) scale(0.98); z-index: 90; }
-    .workflow-stack[data-stacked="true"] .workflow-card:nth-child(3) { transform: translateY(28px) scale(0.96); z-index: 80; }
+    .workflow-stack[data-stacked="true"] .workflow-card:nth-child(1) {
+        transform: translateY(0) scale(1);
+        z-index: 100;
+    }
+    .workflow-stack[data-stacked="true"] .workflow-card:nth-child(2) {
+        transform: translateY(20px) scale(0.96);
+        z-index: 90;
+    }
+    .workflow-stack[data-stacked="true"] .workflow-card:nth-child(3) {
+        transform: translateY(40px) scale(0.92);
+        z-index: 80;
+    }
     /* Desktop: make cards overlap by absolutely positioning them inside the stack */
     @media (min-width: 761px) {
         .workflow-stack {
@@ -838,16 +849,12 @@ const workflowItems =
         box-shadow: 0 20px 40px rgba(41, 81, 95, 0.1);
         transform-origin: center;
         will-change: transform, box-shadow, z-index;
-        animation: carouselPulse 10s ease-in-out infinite both;
     }
-    .workflow-card:nth-child(1) {
-        animation-delay: 0s;
-    }
-    .workflow-card:nth-child(2) {
-        animation-delay: -2.5s;
-    }
-    .workflow-card:nth-child(3) {
-        animation-delay: -5s;
+    .workflow-card.active {
+        box-shadow:
+            0 28px 52px rgba(41, 81, 95, 0.17),
+            0 0 0 1px rgba(63, 143, 175, 0.15);
+        background: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(244, 250, 252, 0.96));
     }
     .workflow-card:hover {
         transform: translateY(-3px) scale(1.01);
@@ -877,50 +884,11 @@ const workflowItems =
         font-size: 0.96rem;
         font-weight: 760;
     }
-        );
-        box-shadow: 0 0 28px rgba(63, 143, 175, 0.16);
-    }
     .workflow-card p {
         margin: 0;
         color: #5d7480;
         font-size: 0.92rem;
         line-height: 1.7;
-    }
-    @keyframes carouselPulse {
-        0%,
-        18%,
-        100% {
-            transform: translateY(0) scale(1);
-            box-shadow: 0 20px 40px rgba(41, 81, 95, 0.1);
-            z-index: 1;
-        }
-        8% {
-            transform: translateY(-6px) scale(1.02);
-            box-shadow: 0 30px 54px rgba(41, 81, 95, 0.16);
-            z-index: 2;
-        }
-        33%,
-        51% {
-            transform: translateY(0) scale(1);
-            box-shadow: 0 20px 40px rgba(41, 81, 95, 0.1);
-            z-index: 1;
-        }
-        41% {
-            transform: translateY(-6px) scale(1.02);
-            box-shadow: 0 30px 54px rgba(41, 81, 95, 0.16);
-            z-index: 2;
-        }
-        66%,
-        84% {
-            transform: translateY(0) scale(1);
-            box-shadow: 0 20px 40px rgba(41, 81, 95, 0.1);
-            z-index: 1;
-        }
-        74% {
-            transform: translateY(-6px) scale(1.02);
-            box-shadow: 0 30px 54px rgba(41, 81, 95, 0.16);
-            z-index: 2;
-        }
     }
 
     .support-section {
@@ -985,12 +953,11 @@ const workflowItems =
         }
         .guide-inner {
             grid-template-columns: 1fr;
-            margin-left: 0 !important;
         }
     }
     @media (max-width: 760px) {
         .hero {
-            padding-top: 2rem;
+            padding-top: clamp(4.2rem, 14vw, 5.5rem);
         }
         .actions {
             flex-direction: column;
@@ -1034,30 +1001,34 @@ const workflowItems =
     (function () {
         if (typeof window === "undefined") return;
         function initWorkflowCarousel() {
-            const stack = document.querySelector('.workflow-stack');
+            const stack = document.querySelector(".workflow-stack");
             if (!stack) return;
-            stack.setAttribute('data-stacked', 'true');
+            stack.setAttribute("data-stacked", "true");
             function applyOffsets() {
                 const cards = Array.from(stack.children);
                 cards.forEach((card, i) => {
-                    const y = i * 14; // px offset between stacked cards
-                    const scale = 1 - i * 0.02;
-                    card.style.transition = 'transform 420ms ease, opacity 420ms ease';
+                    const y = i * 20;
+                    const scale = 1 - i * 0.04;
+                    card.style.transition = "transform 420ms ease, opacity 420ms ease";
                     card.style.transform = `translateY(${y}px) scale(${scale})`;
                     card.style.zIndex = `${100 - i}`;
-                    card.style.opacity = '1';
-                    card.classList.remove('fade-up');
+                    card.style.opacity = "1";
+                    card.classList.remove("fade-up");
+                    card.classList.toggle("active", i === 0);
                 });
             }
             applyOffsets();
             let running = false;
-            const delay = 3500;
+            const delay = 5000;
             setInterval(() => {
                 if (running) return;
                 running = true;
                 const first = stack.children[0];
-                if (!first) { running = false; return; }
-                first.classList.add('fade-up');
+                if (!first) {
+                    running = false;
+                    return;
+                }
+                first.classList.add("fade-up");
                 // wait for fade-up transition then move the node to the end
                 setTimeout(() => {
                     stack.appendChild(first);
@@ -1066,10 +1037,10 @@ const workflowItems =
                 }, 480);
             }, delay);
             // Re-apply when SPA navigation occurs
-            document.addEventListener('astro:page-load', applyOffsets);
-            window.addEventListener('resize', applyOffsets);
+            document.addEventListener("astro:page-load", applyOffsets);
+            window.addEventListener("resize", applyOffsets);
         }
-        document.addEventListener('DOMContentLoaded', initWorkflowCarousel);
+        document.addEventListener("DOMContentLoaded", initWorkflowCarousel);
     })();
 </script>
 
