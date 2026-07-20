@@ -811,6 +811,24 @@ const workflowItems =
     .workflow-stack[data-stacked="true"] .workflow-card:nth-child(1) { transform: translateY(0) scale(1); z-index: 100; }
     .workflow-stack[data-stacked="true"] .workflow-card:nth-child(2) { transform: translateY(14px) scale(0.98); z-index: 90; }
     .workflow-stack[data-stacked="true"] .workflow-card:nth-child(3) { transform: translateY(28px) scale(0.96); z-index: 80; }
+    /* Desktop: make cards overlap by absolutely positioning them inside the stack */
+    @media (min-width: 761px) {
+        .workflow-stack {
+            display: block;
+            position: relative;
+            width: min(720px, 100%);
+            margin: 0 auto;
+            min-height: 12.5rem; /* keep space for absolutely positioned cards */
+        }
+        .workflow-stack .workflow-card {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            margin: 0 auto;
+            width: 100%;
+        }
+    }
     .workflow-card {
         position: relative;
         padding: 1.15rem 1.2rem;
