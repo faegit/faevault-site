@@ -1,0 +1,193 @@
+---
+import type { Locale } from "../i18n/config";
+import PageShell from "./PageShell.astro";
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = locale === "zh-cn"
+  ? {
+    kicker: "安全白皮书",
+    title: "加密设计与安全架构。",
+    intro: "本文档详细说明保险库的加密方案、密钥管理、威胁模型与平台安全机制。",
+    sections: [
+      {
+        id: "encryption",
+        title: "加密架构",
+        items: [
+          { label: "密钥派生", body: "主密码经 scrypt(N=2¹⁶, r=8, p=1) 派生为 256-bit 主密钥。scrypt 是业界广泛采用的 memory-hard 函数，可有效抵御 ASIC/GPU 暴力破解。" },
+          { label: "对称加密", body: "使用 AES-256-GCM（Galois/Counter Mode），在加密同时提供完整性认证，防止密文被篡改。每条加密操作使用独立随机 Nonce。" },
+          { label: "文件格式", body: "布局为 MAGIC(4B) + VERSION(1B) + SALT(16B) + NONCE(12B) + CIPHERTEXT(含 GCM tag)。与桌面端 .pmv 文件格式字节完全对齐，可双向互导。" },
+        ],
+      },
+      {
+        id: "key-management",
+        title: "密钥管理",
+        items: [
+          { label: "主密码", body: "主密码仅用于派生密钥，不落盘、不缓存。每次解锁均需重新输入或通过生物识别验证后从 AndroidKeyStore 安全读取。" },
+          { label: "生物识别", body: "指纹/面部数据由 AndroidKeyStore 用 AES/GCM 包裹主密码持久化存储，密钥材料绑定 TEE/SE 硬件隔离，操作系统也无法提取原始生物特征。" },
+          { label: "会话安全", body: "解锁后明文主密钥仅存于应用进程内存，锁定时立即清空。Android 最近任务卡片通过 FLAG_SECURE 隐藏内容，防止后台快照泄露。" },
+          { label: "恢复口令", body: "通过预设安全问题 + 答案派生恢复密钥，不依赖任何第三方。答案经 scrypt 派生后用于解密存储在本地的主密码恢复包。" },
+        ],
+      },
+      {
+        id: "platform-security",
+        title: "平台安全",
+        items: [
+          { label: "屏幕防护", body: "全局 FLAG_SECURE 禁止截屏、录屏与系统投屏。副作用是将部分设备刷新率限制在 60Hz，应用启动时会主动向系统请求最高刷新率模式。" },
+          { label: "剪贴板防护", body: "复制密码等敏感字段时标记为 is_sensitive（Android 13+ 系统隐藏预览）。剪贴板内容 60 秒后自动清空，低版本使用 Toast 覆盖提示。" },
+          { label: "暴力破解冷却", body: "解锁连续失败 5 次后进入指数后退冷却：30s → 60s → 90s → … 每次失败冷却期翻倍，冷却期内拒绝所有解锁尝试。" },
+          { label: "敏感信息门禁", body: "查看银行卡、身份证、API 密钥等敏感条目的详细字段或图片，以及执行修改主密码、导出等操作前，均需二次输入当前主密码。" },
+        ],
+      },
+      {
+        id: "autofill-security",
+        title: "自动填充安全",
+        items: [
+          { label: "逐次认证", body: "每次填充或保存新凭证均需通过当前保险库的强生物识别或主密码验证。后台不维护明文免验证缓存。" },
+          { label: "来源验证", body: "按关联应用包名或 HTTPS 主机精确匹配来源。拒绝来自本应用、系统设置/权限管理等敏感来源的填充请求。" },
+          { label: "安全边界", body: "不使用无障碍服务、悬浮窗、自启动或电池白名单权限。自动填充仅作用于登录类型条目，不影响其他条目类别。" },
+        ],
+      },
+      {
+        id: "sync-security",
+        title: "同步安全",
+        items: [
+          { label: "传输加密", body: "WebDAV 连接强制 HTTPS，支持 TLS 证书指纹固定（SHA-256）。局域网同步使用 SPAKE2P256 零知识密钥交换建立加密通道。" },
+          { label: "端到端", body: "同步过程中数据始终处于加密状态（AES-256-GCM），传输的仅为密文。服务端、中间人或云盘提供商均无法解密内容。" },
+          { label: "完整性校验", body: "同步完成后读回密文并解密校验，确保数据未在传输或存储过程中损坏。逻辑内容一致时跳过不必要的远端重写。" },
+        ],
+      },
+      {
+        id: "threat-model",
+        title: "威胁模型",
+        items: [
+          { label: "本地攻击者", body: "同一设备上的恶意应用通过 FLAG_SECURE 和应用沙箱隔离被阻止访问保险库数据。主密码或生物识别验证是访问保险库内容的唯一途径。" },
+          { label: "设备丢失", body: "设备锁屏本身是第一道防线。保险库文件使用 scrypt + AES-256-GCM 加密，无主密码无法解密。暴力破解受冷却机制限制。" },
+          { label: "离线攻击", body: "攻击者即使获取到保险库 .pmv 文件，也需要破解 scrypt 派生函数后才能尝试 AES 解密。scrypt 的 memory-hard 特性使大规模并行攻击成本极高。" },
+        ],
+      },
+    ],
+  }
+  : {
+    kicker: "Security Whitepaper",
+    title: "Encryption design\n& security architecture.",
+    intro: "This document details the encryption scheme, key management, threat model, and platform security mechanisms used by FAEVault.",
+    sections: [
+      {
+        id: "encryption",
+        title: "Encryption Architecture",
+        items: [
+          { label: "Key Derivation", body: "The master password is derived into a 256-bit key using scrypt(N=2¹⁶, r=8, p=1). scrypt is a memory-hard function widely adopted to resist ASIC/GPU brute-force attacks." },
+          { label: "Symmetric Encryption", body: "AES-256-GCM (Galois/Counter Mode) provides both confidentiality and authenticated integrity protection. Each encryption operation uses a unique random Nonce." },
+          { label: "File Format", body: "Layout: MAGIC(4B) + VERSION(1B) + SALT(16B) + NONCE(12B) + CIPHERTEXT(with GCM tag). Byte-compatible with the desktop .pmv format for bidirectional exchange." },
+        ],
+      },
+      {
+        id: "key-management",
+        title: "Key Management",
+        items: [
+          { label: "Master Password", body: "The master password is used only for key derivation — never stored or cached. Each unlock requires re-entry or biometric verification via AndroidKeyStore." },
+          { label: "Biometrics", body: "Fingerprint/face data protected by AndroidKeyStore with AES/GCM wrapping. Key material is bound to TEE/SE hardware isolation — even the OS cannot extract raw biometrics." },
+          { label: "Session Security", body: "Decrypted master key exists only in app process memory and is cleared immediately on lock. FLAG_SECURE hides content from recent task screenshots." },
+          { label: "Recovery Phrase", body: "A security question + answer pair derives a recovery key via scrypt, which decrypts a locally stored master password recovery package. No third party involved." },
+        ],
+      },
+      {
+        id: "platform-security",
+        title: "Platform Security",
+        items: [
+          { label: "Screen Protection", body: "Global FLAG_SECURE prevents screenshot, screen recording, and screen mirroring. The app requests the highest refresh rate mode on devices locked to 60Hz by FLAG_SECURE." },
+          { label: "Clipboard Guard", body: "Sensitive fields marked as is_sensitive (Android 13+ system hides previews). Clipboard auto-clears after 60 seconds." },
+          { label: "Brute-force Lockout", body: "After 5 consecutive failed unlock attempts, exponential backoff kicks in: 30s → 60s → 90s → … doubling each time. All attempts are rejected during cooldown." },
+          { label: "Sensitive Data Gate", body: "Viewing credit card, ID, or API key details, modifying the master password, or exporting data requires re-entering the current master password." },
+        ],
+      },
+      {
+        id: "autofill-security",
+        title: "Autofill Security",
+        items: [
+          { label: "Per-action Auth", body: "Every fill or save requires strong biometric or master password authentication. No in-memory plaintext cache is maintained." },
+          { label: "Origin Verification", body: "Exact matching by associated app package name or HTTPS host. Requests from the app itself, system settings, or privileged management apps are rejected." },
+          { label: "Security Boundaries", body: "No accessibility services, floating windows, auto-start, or battery whitelist permissions. Autofill applies to login entries only." },
+        ],
+      },
+      {
+        id: "sync-security",
+        title: "Sync Security",
+        items: [
+          { label: "Transport Encryption", body: "WebDAV connections enforce HTTPS with optional TLS certificate pinning (SHA-256). LAN sync uses SPAKE2P256 zero-knowledge key exchange." },
+          { label: "End-to-End", body: "Data remains encrypted (AES-256-GCM) throughout transit — only ciphertext is transmitted. Servers, intermediaries, and cloud providers cannot decrypt content." },
+          { label: "Integrity Verification", body: "After sync, ciphertext is read back and decrypted to verify integrity. Logically identical content skips unnecessary remote overwrites." },
+        ],
+      },
+      {
+        id: "threat-model",
+        title: "Threat Model",
+        items: [
+          { label: "Local Attacker", body: "Malicious apps on the same device are blocked by FLAG_SECURE and app sandbox isolation. Master password or biometric verification is the only path to vault contents." },
+          { label: "Device Loss", body: "The device lock screen is the first defense. The vault file uses scrypt + AES-256-GCM encryption — without the master password, decryption is infeasible. Brute force is throttled by exponential lockout." },
+          { label: "Offline Attack", body: "Even if an attacker obtains the .pmv file, they must first crack scrypt before attempting AES decryption. scrypt's memory-hard property makes large-scale parallel attacks prohibitively expensive." },
+        ],
+      },
+    ],
+  };
+---
+<PageShell theme="journey" kicker={c.kicker} title={c.title} intro={c.intro}>
+  {
+    c.sections.map((sec) => (
+      <section class="wp-section">
+        <h2 id={sec.id}>{sec.title}</h2>
+        <div class="wp-grid">
+          {sec.items.map((item) => (
+            <article class="wp-card">
+              <strong>{item.label}</strong>
+              <p>{item.body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+    ))
+  }
+</PageShell>
+
+<style>
+  .wp-section {
+    margin-top: 5rem;
+  }
+  .wp-section h2 {
+    color: #173f50;
+    font: 500 clamp(1.6rem, 3vw, 2.4rem)/1.1 Georgia, serif;
+    letter-spacing: -0.04em;
+    margin: 0 0 1.6rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid rgba(43, 124, 154, 0.2);
+  }
+  .wp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.2rem;
+  }
+  .wp-card {
+    padding: 1.4rem 1.3rem;
+    border-radius: 1.2rem;
+    border: 1px solid rgba(71, 106, 122, 0.12);
+    background: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 6px 20px rgba(41, 81, 95, 0.06);
+  }
+  .wp-card strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #173f50;
+    font-size: 0.95rem;
+    font-weight: 760;
+  }
+  .wp-card p {
+    margin: 0;
+    color: #5a727c;
+    font: 0.92rem/1.7 Georgia, serif;
+  }
+  @media (max-width: 760px) {
+    .wp-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
