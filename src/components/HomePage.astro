@@ -24,9 +24,9 @@ const copy =
               journeyTitle: "不是一次性功能展示，\n而是一段持续完善的路径。",
               journeyBody: "从 Android 到 Windows，保险库会不断把产品体验打磨得更顺手、更可靠。",
               journeyLink: "查看开发历程",
-              guideKicker: "快速上手",
-              guideTitle: "从安装到使用，\n每一步都更顺。",
-              guideBody: "从创建保险库开始，了解导入资料、自动填充、通行密钥、Windows Hello 和同步备份。",
+              guideKicker: "功能展示",
+              guideTitle: "保险库具备的\n实用功能。",
+              guideBody: "从本地加密存储到系统自动填充，保险库为 Android 和 Windows 提供完整的密码管理能力。",
               guides: "查看使用指南",
               download: "下载最新版本",
               supportKicker: "赞助支持项目",
@@ -48,9 +48,9 @@ const copy =
               journeyTitle: "Not a one-off feature showcase,\nbut a path that keeps improving.",
               journeyBody: "From Android to Windows, FAEVault keeps refining the experience into something more dependable.",
               journeyLink: "See the development journey",
-              guideKicker: "Get started quickly",
-              guideTitle: "From setup to daily use,\nevery step feels simpler.",
-              guideBody: "Start with a vault, then explore importing data, autofill, passkeys, Windows Hello, and sync backups.",
+              guideKicker: "Feature showcase",
+              guideTitle: "Practical features\nfor everyday use.",
+              guideBody: "From local encrypted storage to system-level autofill, FAEVault delivers complete password management for Android and Windows.",
               guides: "Browse the guides",
               download: "Download the latest version",
               supportKicker: "Support the project",
@@ -58,21 +58,23 @@ const copy =
               supportButton: "Open the support page",
           };
 
-const workflowItems =
+const features =
     locale === "zh-cn"
         ? [
-              { title: "先建立保险库", body: "把最重要的密码与通行密钥放进一个你自己能掌控的本地加密库。", accent: "vault" },
-              { title: "让浏览器自动填充", body: "通过安全的浏览器通信自动完成登录凭证与一次性验证码。", accent: "flow" },
-              { title: "在多设备间同步", body: "WebDAV、本地驱动或局域网加密同步，让数据在设备间保持一致。", accent: "sync" },
+              { title: "本地加密保险库", body: "scrypt + AES-256-GCM 加密，密码与通行密钥离线存储在本地文件中，数据完全由你掌控。", accent: "vault" },
+              { title: "系统自动填充", body: "Android Autofill 框架集成，一键填入登录凭证与一次性验证码，支持关联应用和网页。", accent: "flow" },
+              { title: "通行密钥", body: "Android 14+ Passkey Credential Provider，支持创建和验证通行密钥，实现无密码快速认证。", accent: "passkey" },
+              { title: "OCR 智能识别", body: "摄像头扫描或相册导入银行卡、身份证，自动 OCR 提取卡号、有效期、姓名等信息填入对应字段。", accent: "ocr" },
+              { title: "安全防护", body: "FLAG_SECURE 防截屏录屏，剪贴板 60 秒自动清空，暴力破解指数冷却，敏感信息二次验证。", accent: "security" },
+              { title: "加密同步", body: "WebDAV 连接 NAS 或 Nextcloud、局域网直连同步、加密备份导出，多设备间安全保持数据一致。", accent: "sync" },
           ]
         : [
-              { title: "Start with a vault", body: "Keep passwords and passkeys in a local encrypted vault under your control.", accent: "vault" },
-              { title: "Fill logins automatically", body: "Use secure browser messaging to autofill credentials and one-time codes.", accent: "flow" },
-              {
-                  title: "Keep devices aligned",
-                  body: "Sync via WebDAV, local drives, or LAN with encrypted conflict handling.",
-                  accent: "sync",
-              },
+              { title: "Encrypted Vault", body: "scrypt + AES-256-GCM encryption. Passwords and passkeys stay in a local file, fully under your control.", accent: "vault" },
+              { title: "System Autofill", body: "Integrated with Android Autofill framework. Fill credentials and OTPs with one tap in apps and websites.", accent: "flow" },
+              { title: "Passkeys", body: "Android 14+ Passkey Credential Provider. Create and verify passkeys for passwordless, fast authentication.", accent: "passkey" },
+              { title: "OCR Scanning", body: "Scan credit cards and IDs via camera or gallery. Auto-extract card numbers, expiry dates, and personal details.", accent: "ocr" },
+              { title: "Security Guard", body: "Anti-screenshot with FLAG_SECURE, 60-second auto-clear clipboard, exponential brute-force lockout, sensitive data re-verification.", accent: "security" },
+              { title: "Encrypted Sync", body: "WebDAV for NAS/Nextcloud, LAN direct sync, encrypted backup export. Keep data consistent across devices.", accent: "sync" },
           ];
 ---
 
@@ -109,18 +111,16 @@ const workflowItems =
                 <h2>{copy.guideTitle}</h2>
                 <p>{copy.guideBody}</p>
             </div>
-            <div class="workflow-side">
-                <div class="workflow-stack">
-                    {
-                        workflowItems.map((item) => (
-                            <article class="workflow-card">
-                                <span class={`workflow-dot ${item.accent}`} />
-                                <strong>{item.title}</strong>
-                                <p>{item.body}</p>
-                            </article>
-                        ))
-                    }
-                </div>
+            <div class="feature-grid">
+                {
+                    features.map((item) => (
+                        <article class="feature-card">
+                            <span class={`feature-icon ${item.accent}`} />
+                            <strong>{item.title}</strong>
+                            <p>{item.body}</p>
+                        </article>
+                    ))
+                }
             </div>
         </div>
     </section>
@@ -643,11 +643,6 @@ const workflowItems =
         left: 0.45rem;
     }
 
-    @media (max-width: 1000px) {
-        .carousel-wrap {
-            max-width: 320px;
-        }
-    }
     @media (max-width: 760px) {
         .showcase-wrap {
             max-width: 100%;
@@ -754,13 +749,10 @@ const workflowItems =
     .guide-inner {
         width: 100%;
         margin: 0 auto !important;
-        display: grid;
-        grid-template-columns: 1.05fr 0.9fr;
-        gap: 5vw;
-        align-items: start;
     }
     .guide-head {
-        max-width: 620px;
+        max-width: 760px;
+        margin-bottom: 2.2rem;
     }
     .section-copy {
         max-width: 720px;
@@ -781,71 +773,25 @@ const workflowItems =
         color: #173f50;
         line-height: 1.05;
     }
-    .workflow-side {
+    .feature-grid {
         display: grid;
-        place-items: center;
-    }
-    .workflow-card {
-        transition:
-            transform 420ms ease,
-            opacity 420ms ease;
-        will-change: transform, opacity;
-        /* ensure cards appear above following ones when stacked */
-    }
-    .workflow-card.fade-up {
-        transform: translateY(-36px) scale(1.02) !important;
-        opacity: 0 !important;
-    }
-    /* Stacked visual offsets applied by script via inline styles; provide sensible defaults */
-    .workflow-stack[data-stacked="true"] .workflow-card:nth-child(1) {
-        transform: translateY(0) scale(1);
-        z-index: 100;
-    }
-    .workflow-stack[data-stacked="true"] .workflow-card:nth-child(2) {
-        transform: translateY(20px) scale(0.96);
-        z-index: 90;
-    }
-    .workflow-stack[data-stacked="true"] .workflow-card:nth-child(3) {
-        transform: translateY(40px) scale(0.92);
-        z-index: 80;
-    }
-    /* Make cards overlap by absolutely positioning them inside the stack (all sizes) */
-    .workflow-stack {
-        display: block;
-        position: relative;
-        width: min(720px, 100%);
-        margin: 0 auto;
-        min-height: 12.5rem;
-    }
-    .workflow-stack .workflow-card {
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        margin: 0 auto;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.2rem;
         width: 100%;
     }
-    .workflow-card {
-        position: relative;
-        padding: 1.15rem 1.2rem;
+    .feature-card {
+        padding: 1.4rem 1.3rem;
         border-radius: 1.45rem;
         border: 1px solid rgba(71, 106, 122, 0.14);
         background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(241, 248, 251, 0.92));
         box-shadow: 0 20px 40px rgba(41, 81, 95, 0.1);
-        transform-origin: center;
-        will-change: transform, box-shadow, z-index;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
-    .workflow-card.active {
-        box-shadow:
-            0 28px 52px rgba(41, 81, 95, 0.17),
-            0 0 0 1px rgba(63, 143, 175, 0.15);
-        background: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(244, 250, 252, 0.96));
+    .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 28px 52px rgba(41, 81, 95, 0.16);
     }
-    .workflow-card:hover {
-        transform: translateY(-3px) scale(1.01);
-        box-shadow: 0 28px 48px rgba(41, 81, 95, 0.16);
-    }
-    .workflow-dot {
+    .feature-icon {
         display: inline-block;
         width: 0.72rem;
         height: 0.72rem;
@@ -854,22 +800,34 @@ const workflowItems =
         background: linear-gradient(135deg, #72c3db, #2c7695);
         box-shadow: 0 0 0 4px rgba(42, 118, 149, 0.16);
     }
-    .workflow-dot.flow {
+    .feature-icon.flow {
         background: linear-gradient(135deg, #9bd7ba, #4a8b6c);
         box-shadow: 0 0 0 4px rgba(74, 139, 108, 0.16);
     }
-    .workflow-dot.sync {
+    .feature-icon.sync {
         background: linear-gradient(135deg, #c6b3f4, #7b5fb1);
         box-shadow: 0 0 0 4px rgba(123, 95, 177, 0.16);
     }
-    .workflow-card strong {
+    .feature-icon.passkey {
+        background: linear-gradient(135deg, #f4b37a, #c97d3a);
+        box-shadow: 0 0 0 4px rgba(201, 125, 58, 0.16);
+    }
+    .feature-icon.ocr {
+        background: linear-gradient(135deg, #7ac4e8, #3a8fb0);
+        box-shadow: 0 0 0 4px rgba(58, 143, 176, 0.16);
+    }
+    .feature-icon.security {
+        background: linear-gradient(135deg, #e87a8a, #b03a4a);
+        box-shadow: 0 0 0 4px rgba(176, 58, 74, 0.16);
+    }
+    .feature-card strong {
         display: block;
         margin-bottom: 0.55rem;
         color: #173f50;
         font-size: 0.96rem;
         font-weight: 760;
     }
-    .workflow-card p {
+    .feature-card p {
         margin: 0;
         color: #5d7480;
         font-size: 0.92rem;
@@ -922,9 +880,6 @@ const workflowItems =
             grid-template-columns: 1fr;
             gap: 2.5rem;
         }
-        .carousel-wrap {
-            max-width: 320px;
-        }
         .journey-inner {
             grid-template-columns: 1fr;
             gap: 2rem;
@@ -937,11 +892,14 @@ const workflowItems =
             justify-content: flex-end;
             gap: 2rem;
         }
-        .guide-inner {
-            grid-template-columns: 1fr;
+        .feature-grid {
+            grid-template-columns: repeat(2, 1fr);
         }
     }
     @media (max-width: 760px) {
+        .feature-grid {
+            grid-template-columns: 1fr;
+        }
         .hero {
             padding-top: clamp(4.2rem, 14vw, 5.5rem);
         }
@@ -974,111 +932,7 @@ const workflowItems =
         .split-copy h2 {
             font-size: clamp(1.6rem, 8vw, 2.8rem);
         }
-        .carousel-wrap {
-            max-width: 260px;
-        }
-        .mock-icon {
-            font-size: 2rem;
-        }
     }
 </style>
 
-<script>
-    (function () {
-        if (typeof window === "undefined") return;
-        function initWorkflowCarousel() {
-            const stack = document.querySelector<HTMLElement>(".workflow-stack");
-            if (!stack) return;
-            const el = stack;
-            el.setAttribute("data-stacked", "true");
-            function applyOffsets() {
-                const cards = Array.from(el.children) as HTMLElement[];
-                cards.forEach((card, i) => {
-                    const y = i * 20;
-                    const scale = 1 - i * 0.04;
-                    card.style.transition = "transform 420ms ease, opacity 420ms ease";
-                    card.style.transform = `translateY(${y}px) scale(${scale})`;
-                    card.style.zIndex = `${100 - i}`;
-                    card.style.opacity = "1";
-                    card.classList.remove("fade-up");
-                    card.classList.toggle("active", i === 0);
-                });
-            }
-            applyOffsets();
-            let running = false;
-            const delay = 5000;
-            setInterval(() => {
-                if (running) return;
-                running = true;
-                const first = el.children[0];
-                if (!first) {
-                    running = false;
-                    return;
-                }
-                first.classList.add("fade-up");
-                // wait for fade-up transition then move the node to the end
-                setTimeout(() => {
-                    el.appendChild(first);
-                    applyOffsets();
-                    running = false;
-                }, 480);
-            }, delay);
-            // Re-apply when SPA navigation occurs
-            document.addEventListener("astro:page-load", applyOffsets);
-            window.addEventListener("resize", applyOffsets);
-        }
-        document.addEventListener("DOMContentLoaded", initWorkflowCarousel);
-    })();
-</script>
 
-<script>
-    (function () {
-        const home = document.querySelector(".home") as HTMLElement | null;
-        if (!home) return;
-
-        const carouselEl = home.querySelector("[data-carousel]") as HTMLElement | null;
-        if (!carouselEl) return;
-
-        const track = carouselEl.querySelector("[data-track]") as HTMLElement;
-        const dotsContainer = carouselEl.querySelector("[data-dots]");
-        const slides = [...track.children] as HTMLElement[];
-        let carIndex = 0;
-        const paused = { current: false };
-
-        function renderDots() {
-            dotsContainer!.innerHTML = "";
-            slides.forEach((_, i) => {
-                const btn = document.createElement("button");
-                btn.setAttribute("data-car-dot", String(i));
-                if (i === 0) btn.className = "active";
-                btn.addEventListener("click", () => {
-                    goCar(i);
-                });
-                dotsContainer!.appendChild(btn);
-            });
-        }
-
-        function goCar(i: number) {
-            if (i === carIndex || i < 0 || i >= slides.length) return;
-            carIndex = i;
-            track.style.transform = `translateX(-${i * 100}%)`;
-            dotsContainer!.querySelectorAll("button").forEach((b, idx) => {
-                b.classList.toggle("active", idx === i);
-            });
-        }
-
-        function autoAdvance() {
-            if (!paused.current) goCar((carIndex + 1) % slides.length);
-        }
-
-        renderDots();
-        setInterval(autoAdvance, 4200);
-
-        carouselEl.addEventListener("mouseenter", () => {
-            paused.current = true;
-        });
-        carouselEl.addEventListener("mouseleave", () => {
-            paused.current = false;
-        });
-    })();
-</script>
