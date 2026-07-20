@@ -1,223 +1,145 @@
 ---
 import type { Locale } from "../i18n/config";
 import PageShell from "./PageShell.astro";
-interface Props {
-    locale: Locale;
-}
+interface Props { locale: Locale }
 const { locale } = Astro.props;
-const c =
-    locale === "zh-cn"
-        ? {
-              kicker: "开发历程",
-              title: "一条仍在生长的路。",
-              intro: "这里将记录 Windows 与 Android 的开发历程，展示从本地加密库和浏览器自动填充，到 Windows Hello 与私有同步的演进。",
-              moments: [
-                  ["起点", "为什么要构建一个属于自己的本地保险库"],
-                  ["双端", "让 Android 与 Windows 共用一套可信数据"],
-                  ["重做", "不断打磨自动填充、通行密钥与同步体验"],
-                  ["现在", "继续完善安全、备份与跨设备协作"],
-              ],
-              now: "仍在继续",
-          }
-        : {
-              kicker: "Development journey",
-              title: "A path that is still growing.",
-              intro: "This page will trace the Windows and Android journey from local encrypted vaults and browser autofill to Windows Hello and private sync.",
-              moments: [
-                  ["Beginning", "Why build a local vault of your own"],
-                  ["Two platforms", "One trusted set of data across Android and Windows"],
-                  ["Rebuilding", "Refining autofill, passkeys, and sync workflows"],
-                  ["Now", "Continuing security, backup, and cross-device collaboration"],
-              ],
-              now: "Still evolving",
-          };
+const c = locale === "zh-cn"
+  ? {
+    kicker: "开发历程",
+    title: "从为自己写一个工具\n开始。",
+    story: [
+      {
+        title: "为什么会有保险库",
+        paragraphs: [
+          "市面上的密码管理器并不少，但用了一圈下来总有些地方让人不太舒服：免费版限制设备数量，Pro 功能要订阅，基础的安全同步被划入高级套餐——而这些服务明明只依赖一个加密文件和基本的网络传输。",
+          "更让人在意的是隐私问题。密码数据存在别人的服务器上，服务商声称"加密不可见"，但我始终觉得自己最私密的数字资产不应该默认存放在某个云端，不应让第三方来决定是否安全。",
+          "于是最初的动机很简单：给自己写一个密码管理器。不需要联网，不需要注册账户，不需要纠结该不该续费。一个本地文件，一个主密码，打开就能用。",
+        ],
+      },
+      {
+        title: "从一个人到更多人",
+        paragraphs: [
+          "第一版 Android 客户端功能极其简陋：能输密码、能存下来、能复制。没有自动填充，没有同步，没有好看的界面。但用了一段时间后发现，这个粗糙的工具比那些大而全的商用软件更让我安心——因为数据真的只在我自己手里。",
+          "后来想着既然自己能受益，为什么不把它做得更好一些，让同样在意隐私的人也多个选择？于是开始认真地设计架构：加密方案用 scrypt + AES-256-GCM，文件格式考虑跨平台兼容，UI 开始从能用变得稍微好看一点。",
+          "这个过程远比预想的漫长。自动填充看似简单，实际涉及 Accessibility 框架适配、每个 Android 版本的行为差异、国产 ROM 的各种特殊处理。同步功能涉及 WebDAV 协议、局域网发现、冲突合并策略，每一块都踩过不少坑。",
+        ],
+      },
+      {
+        title: "那些被反复重写的地方",
+        paragraphs: [
+          "自动填充是重写次数最多的模块，前后经历了至少三次架构变更。第一次勉强能用但兼容性差，第二次改善了框架适配但仍然不稳定，直到第三次才找到一个兼顾兼容性和安全性的平衡方案。",
+          "UI 上的打磨同样耗费了大量精力。过渡动画的曲线调整、列表滚动的帧率优化、深色模式下的色彩适配——每一个细节都反复调整过很多次。有时候一个转场动画的卡顿问题可能需要排查好几天，最后发现是某个图层合成方式不对。",
+          "密码泄露检测功能需要查询 Have I Been Pwned 的 API，但又不希望把用户的密码哈希发送出去。最终用 k-anonymity 模型实现：只发送哈希的前五位，服务端返回匹配的完整哈希列表，本地再做比对。这个方案本身不复杂，但集成到应用的异步流程里花了不少功夫来保证体验流畅。",
+        ],
+      },
+      {
+        title: "关于收费的思考",
+        paragraphs: [
+          "开发过程中不止一次想过定价的问题。逐年的服务器费用、代码签名证书、开发者账号续费——这些都是真实成本。市场上同类产品要么收订阅费，要么用免费版引流然后引导购买 Pro。",
+          "但我始终觉得密码管理工具不应该有"免费版"和"Pro 版"的区别。保护隐私是每个人的基本需求，不是应该付费才能享有的高级功能。广告的模式更不合适——在密码管理器里放广告，这本身就是对安全产品的一种讽刺。",
+          "所以保险库会一直保持免费，核心功能没有限制。如果你觉得它有用，可以通过赞助的方式支持后续开发——仅此而已，不设任何付费墙，不影响任何功能的使用。",
+        ],
+      },
+      {
+        title: "现在与未来",
+        paragraphs: [
+          "当前的版本已经具备了密码管理器的核心能力：本地加密存储、系统自动填充、通行密钥支持、多端同步。但这些远远不够。浏览器扩展、更流畅的跨平台体验、更完善的备份机制——每一样都在计划中，每一样也需要时间来打磨。",
+          "这个项目从一开始就不是为了做一款"爆款产品"。它的存在是因为我认为密码管理这件事应该更简单、更透明、更尊重用户。未来也会继续朝着这个方向走：不接入广告、不收订阅费、不收集任何数据。",
+          "如果你正在阅读这些文字，感谢你花时间了解这个项目的故事。也希望它能成为你日常工具中安心的一部分。",
+        ],
+      },
+    ],
+  }
+  : {
+    kicker: "Development journey",
+    title: "It started with\nbuilding for myself.",
+    story: [
+      {
+        title: "Why FAEVault exists",
+        paragraphs: [
+          "There's no shortage of password managers on the market. But after trying most of them, I kept running into the same frustrations: free tiers limited to a single device, Pro subscriptions for basic features like sync, and everything behind a paywall — even though the underlying technology is just an encrypted file and basic network transfer.",
+          "Privacy was an even bigger concern. Storing passwords on someone else's server, trusting their encryption claims, hoping their security never gets breached. The most intimate digital asset we own — our keys to everything — should not default to living on a third-party server.",
+          "So the motivation was simple at first: build a password manager for myself. No network required. No account registration. No subscription to worry about. Just a local file, one master password, and it works.",
+        ],
+      },
+      {
+        title: "From personal tool to something more",
+        paragraphs: [
+          "The very first Android build was bare-bones: type a password, save it, copy it. No autofill, no sync, no polished UI. But after using it for a while, I realized this rough tool gave me something the big commercial apps couldn't — the certainty that my data truly belonged to me.",
+          "If I benefited from it, maybe others who care about privacy would too. So I started taking it seriously: scrypt + AES-256-GCM for encryption, cross-platform file format compatibility, and a UI that went from functional to actually pleasant to use.",
+          "The journey took far longer than expected. Autofill alone required navigating Android's Accessibility framework, device-by-device behavior quirks, and special handling for Chinese ROMs. Sync meant WebDAV protocol support, LAN discovery, conflict resolution strategies — each component brought its own surprises.",
+        ],
+      },
+      {
+        title: "The parts I rewrote (and rewrote again)",
+        paragraphs: [
+          "Autofill was rewritten at least three times. The first version barely worked across devices. The second improved compat but was still unreliable under edge cases. Only the third iteration struck the right balance between broad compatibility and solid security.",
+          "UI polish was just as time-consuming. Transition animation curves, list scrolling frame rates, dark mode color harmony — every detail went through many rounds of tweaking. A single stutter in a transition animation could take days to trace down, often ending with a subtle compositing issue in the rendering pipeline.",
+          "The leaked password check feature needed to query Have I Been Pwned without sending user password hashes. The k-anonymity model solves this elegantly — send only the first five hash characters, get back full matching hashes, compare locally. Simple in concept, but integrating it into the app's async flow while keeping the UX smooth took significant effort.",
+        ],
+      },
+      {
+        title: "On pricing and principles",
+        paragraphs: [
+          "The thought of charging for this crossed my mind more than once. Developer account renewals, code signing certificates, server costs — they're real. Most apps in this space either charge a subscription or use a free tier to funnel users into a Pro plan.",
+          "But I've always believed a password manager shouldn't have a free version and a Pro version. Privacy is a basic need, not a premium feature. And ads in a security app? That feels fundamentally wrong — the very presence of ad trackers contradicts what the app stands for.",
+          "FAEVault will stay free, with no artificial limits on core features. If you find it useful, you can support development through sponsorship — nothing more. No paywalls, no feature gating, no data collection.",
+        ],
+      },
+      {
+        title: "Now and ahead",
+        paragraphs: [
+          "Today FAEVault covers the core capabilities: local encrypted storage, system-level autofill, passkey support, and multi-device sync. But there's still a long way to go — browser extension, smoother cross-platform experience, better backup mechanisms. Each one is on the roadmap, each one needs time to get right.",
+          "This project was never about building a viral product. It exists because I believe password management should be simpler, more transparent, and more respectful of the user. That direction won't change: no ads, no subscriptions, no data collection — ever.",
+          "If you're reading this, thank you for taking the time to learn about the story behind this project. I hope it becomes a quiet, dependable part of your daily toolkit.",
+        ],
+      },
+    ],
+  };
 ---
-
-<PageShell theme="journey" kicker={c.kicker} title={c.title} intro={c.intro}>
-    <section class="time-field">
-        <div class="time-current"><i></i><span>{c.now}</span></div>
-        <div class="time-flow" aria-hidden="true"></div>
-        {
-            c.moments.map(([title, body], index) => (
-                <article style={`--i:${index}`}>
-                    <>
-                        <b>0{index + 1}</b>
-                        <div>
-                            <>
-                                <h2>{title}</h2>
-                                <p>{body}</p>
-                            </>
-                        </div>
-                        <i />
-                    </>
-                </article>
-            ))
-        }
-    </section>
+<PageShell theme="journey" kicker={c.kicker} title={c.title} intro="">
+  <section class="story-field">
+    {
+      c.story.map((chapter, idx) => (
+        <article class="story-chapter" style={`--i:${idx}`}>
+          <h2>{chapter.title}</h2>
+          {chapter.paragraphs.map((p) => (
+            <p>{p}</p>
+          ))}
+        </article>
+      ))
+    }
+  </section>
 </PageShell>
 
 <style>
-    .time-field {
-        position: relative;
-        display: grid;
-        gap: 5rem;
-        margin-top: 7rem;
-        padding: 2rem 4rem 5rem;
-    }
-    .time-flow {
-        position: absolute;
-        left: 50%;
-        top: 0;
-        bottom: 0;
-        width: 4px;
-        border-radius: 99px;
-        background: linear-gradient(#0000, #8680cd 12%, #5aafd0 54%, #62b79b 88%, #0000);
-        box-shadow: 0 0 30px rgba(104, 100, 186, 0.26);
-        transform: translateX(-50%);
-        overflow: hidden;
-    }
-    .time-flow::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: -18%;
-        width: 100%;
-        height: 18%;
-        background: #eefcff;
-        box-shadow: 0 0 18px #fff;
-        animation: flow-down 4s linear infinite;
-    }
-    article {
-        position: relative;
-        display: grid;
-        grid-template-columns: 70px minmax(0, 460px);
-        gap: 1.5rem;
-        width: 47%;
-        animation: moment-in 0.7s calc(0.12s + var(--i) * 0.11s) cubic-bezier(0.18, 0.78, 0.18, 1) both;
-    }
-    article:nth-of-type(even) {
-        justify-self: end;
-        grid-template-columns: minmax(0, 460px) 70px;
-        text-align: right;
-    }
-    article:nth-of-type(even) b {
-        grid-column: 2;
-        grid-row: 1;
-    }
-    article:nth-of-type(even) div {
-        grid-column: 1;
-        grid-row: 1;
-    }
-    article > i {
-        position: absolute;
-        top: 1rem;
-        width: 15px;
-        height: 15px;
-        border: 3px solid #f4f2ff;
-        border-radius: 50%;
-        background: #7772bd;
-        box-shadow:
-            0 0 0 9px rgba(119, 114, 189, 0.1),
-            0 0 20px rgba(119, 114, 189, 0.4);
-    }
-    article:nth-of-type(odd) > i {
-        right: -7.3%;
-    }
-    article:nth-of-type(even) > i {
-        left: -7.3%;
-        background: #4a9ebb;
-    }
-    article b {
-        color: #777796;
-        font:
-            1rem/1 ui-monospace,
-            monospace;
-    }
-    h2 {
-        margin: 0;
-        color: #2a4050;
-        font:
-            500 2rem/1.1 Georgia,
-            serif;
-    }
-    p {
-        color: #667984;
-        font:
-            0.95rem/1.75 Georgia,
-            serif;
-    }
-    .time-current {
-        position: absolute;
-        z-index: 2;
-        left: 50%;
-        bottom: 0;
-        display: flex;
-        align-items: center;
-        gap: 0.7rem;
-        padding: 0.6rem 0.8rem;
-        border-radius: 99px;
-        background: rgba(244, 250, 249, 0.88);
-        color: #4e8478;
-        font-size: 0.7rem;
-        letter-spacing: 0.1em;
-        transform: translateX(-50%);
-    }
-    .time-current i {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #4eac91;
-        box-shadow: 0 0 0 6px rgba(78, 172, 145, 0.13);
-        animation: now-pulse 1.8s ease-in-out infinite;
-    }
-    @keyframes flow-down {
-        to {
-            top: 100%;
-        }
-    }
-    @keyframes now-pulse {
-        50% {
-            transform: scale(1.35);
-        }
-    }
-    @keyframes moment-in {
-        from {
-            opacity: 0;
-            filter: blur(7px);
-            transform: translateY(28px);
-        }
-    }
-    @media (max-width: 760px) {
-        .time-field {
-            gap: 4rem;
-            padding: 2rem 0 5rem;
-        }
-        .time-flow {
-            left: 12px;
-        }
-        .time-current {
-            left: 12px;
-            transform: translateX(-35%);
-        }
-        article,
-        article:nth-of-type(even) {
-            justify-self: stretch;
-            grid-template-columns: 42px 1fr;
-            width: calc(100% - 38px);
-            margin-left: 38px;
-            text-align: left;
-        }
-        article:nth-of-type(even) b {
-            grid-column: 1;
-        }
-        article:nth-of-type(even) div {
-            grid-column: 2;
-        }
-        article > i,
-        article:nth-of-type(odd) > i,
-        article:nth-of-type(even) > i {
-            left: -33px;
-            right: auto;
-        }
-    }
+  .story-field {
+    max-width: 800px;
+    margin: 5rem auto 0;
+    display: grid;
+    gap: 4.5rem;
+  }
+  .story-chapter {
+    animation: fadeIn 0.7s calc(0.08s + var(--i) * 0.1s) cubic-bezier(0.18, 0.78, 0.18, 1) both;
+  }
+  .story-chapter h2 {
+    margin: 0 0 1.2rem;
+    color: #173f50;
+    font: 500 clamp(1.4rem, 3vw, 2rem)/1.15 Georgia, serif;
+    letter-spacing: -0.03em;
+  }
+  .story-chapter p {
+    color: #4f6974;
+    font: 0.98rem/1.85 Georgia, serif;
+    margin: 0 0 1rem;
+  }
+  .story-chapter p:last-child {
+    margin-bottom: 0;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+  }
+  @media (max-width: 760px) {
+    .story-field { gap: 3rem; margin-top: 3rem; }
+  }
 </style>
