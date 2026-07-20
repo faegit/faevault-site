@@ -10,7 +10,7 @@ export const localeMeta: Record<Locale, { label: string; htmlLang: string }> = {
 
 export const uiText = {
   'zh-cn': {
-    nav: { home: '首页', guides: '使用指南', journey: '开发历程', download: '下载', support: '支持' },
+    nav: { home: '首页', guides: '使用指南', journey: '开发历程', download: '下载', support: '赞助支持' },
     switchLanguage: 'English',
     skipToContent: '跳到正文',
   },

@@ -1,37 +1,223 @@
 ---
-import type { Locale } from '../i18n/config';
-import PageShell from './PageShell.astro';
-interface Props { locale: Locale; }
+import type { Locale } from "../i18n/config";
+import PageShell from "./PageShell.astro";
+interface Props {
+    locale: Locale;
+}
 const { locale } = Astro.props;
-const c = locale === 'zh-cn' ? {
-  kicker:'开发历程', title:'一条仍在生长的路。', intro:'这里将记录 Android 与 Windows 两端如何从想法走向可用产品。当前节点是内容占位，后续会用真实版本、截图与开发故事替换。',
-  moments:[['起点','为什么想做一座属于自己的数字保险库'],['双端','让 Android 与 Windows 使用同一套可信数据'],['重做','一次次重新审视界面、安全和日常体验'],['现在','继续补齐自动填充、通行密钥、同步与说明']], now:'仍在继续',
-} : {
-  kicker:'Development journey', title:'A path that is still growing.', intro:'This page will document how the Android and Windows apps moved from an idea to a usable product. Real versions, screenshots, and development stories will replace these placeholders.',
-  moments:[['Beginning','Why build a digital vault of your own'],['Two platforms','One trusted set of data across Android and Windows'],['Rebuilding','Reconsidering interface, security, and everyday use'],['Now','Continuing autofill, passkeys, sync, and documentation']], now:'Still moving',
-};
+const c =
+    locale === "zh-cn"
+        ? {
+              kicker: "开发历程",
+              title: "一条仍在生长的路。",
+              intro: "这里将记录 Windows 与 Android 的开发历程，展示从本地加密库和浏览器自动填充，到 Windows Hello 与私有同步的演进。",
+              moments: [
+                  ["起点", "为什么要构建一个属于自己的本地保险库"],
+                  ["双端", "让 Android 与 Windows 共用一套可信数据"],
+                  ["重做", "不断打磨自动填充、通行密钥与同步体验"],
+                  ["现在", "继续完善安全、备份与跨设备协作"],
+              ],
+              now: "仍在继续",
+          }
+        : {
+              kicker: "Development journey",
+              title: "A path that is still growing.",
+              intro: "This page will trace the Windows and Android journey from local encrypted vaults and browser autofill to Windows Hello and private sync.",
+              moments: [
+                  ["Beginning", "Why build a local vault of your own"],
+                  ["Two platforms", "One trusted set of data across Android and Windows"],
+                  ["Rebuilding", "Refining autofill, passkeys, and sync workflows"],
+                  ["Now", "Continuing security, backup, and cross-device collaboration"],
+              ],
+              now: "Still evolving",
+          };
 ---
 
 <PageShell theme="journey" kicker={c.kicker} title={c.title} intro={c.intro}>
-  <section class="time-field">
-    <div class="time-current"><i></i><span>{c.now}</span></div>
-    <div class="time-flow" aria-hidden="true"></div>
-    {c.moments.map(([title,body],index) => <article style={`--i:${index}`}><b>0{index+1}</b><div><h2>{title}</h2><p>{body}</p></div><i></i></article>)}
-  </section>
+    <section class="time-field">
+        <div class="time-current"><i></i><span>{c.now}</span></div>
+        <div class="time-flow" aria-hidden="true"></div>
+        {
+            c.moments.map(([title, body], index) => (
+                <article style={`--i:${index}`}>
+                    <>
+                        <b>0{index + 1}</b>
+                        <div>
+                            <>
+                                <h2>{title}</h2>
+                                <p>{body}</p>
+                            </>
+                        </div>
+                        <i />
+                    </>
+                </article>
+            ))
+        }
+    </section>
 </PageShell>
 
 <style>
-  .time-field { position: relative; display: grid; gap: 5rem; margin-top: 7rem; padding: 2rem 4rem 5rem; }
-  .time-flow { position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; border-radius: 99px; background: linear-gradient(#0000,#8680cd 12%,#5aafd0 54%,#62b79b 88%,#0000); box-shadow: 0 0 30px rgba(104,100,186,.26); transform: translateX(-50%); overflow: hidden; }
-  .time-flow::after { content:''; position:absolute; left:0; top:-18%; width:100%; height:18%; background:#eefcff; box-shadow:0 0 18px #fff; animation: flow-down 4s linear infinite; }
-  article { position: relative; display: grid; grid-template-columns: 70px minmax(0,460px); gap: 1.5rem; width: 47%; animation: moment-in .7s calc(.12s + var(--i)*.11s) cubic-bezier(.18,.78,.18,1) both; }
-  article:nth-of-type(even) { justify-self: end; grid-template-columns: minmax(0,460px) 70px; text-align: right; }
-  article:nth-of-type(even) b { grid-column: 2; grid-row: 1; } article:nth-of-type(even) div { grid-column: 1; grid-row: 1; }
-  article > i { position: absolute; top: 1rem; width: 15px; height: 15px; border: 3px solid #f4f2ff; border-radius: 50%; background: #7772bd; box-shadow: 0 0 0 9px rgba(119,114,189,.1),0 0 20px rgba(119,114,189,.4); }
-  article:nth-of-type(odd) > i { right: -7.3%; } article:nth-of-type(even) > i { left: -7.3%; background:#4a9ebb; }
-  article b { color:#777796; font: 1rem/1 ui-monospace,monospace; } h2 { margin:0; color:#2a4050; font:500 2rem/1.1 Georgia,serif; } p { color:#667984; font: .95rem/1.75 Georgia,serif; }
-  .time-current { position:absolute; z-index:2; left:50%; bottom:0; display:flex; align-items:center; gap:.7rem; padding:.6rem .8rem; border-radius:99px; background:rgba(244,250,249,.88); color:#4e8478; font-size:.7rem; letter-spacing:.1em; transform:translateX(-50%); }
-  .time-current i { width:8px;height:8px;border-radius:50%;background:#4eac91;box-shadow:0 0 0 6px rgba(78,172,145,.13);animation:now-pulse 1.8s ease-in-out infinite; }
-  @keyframes flow-down { to { top:100%; } } @keyframes now-pulse { 50%{transform:scale(1.35)} } @keyframes moment-in { from{opacity:0;filter:blur(7px);transform:translateY(28px)} }
-  @media(max-width:760px){.time-field{gap:4rem;padding:2rem 0 5rem}.time-flow{left:12px}.time-current{left:12px;transform:translateX(-35%)}article,article:nth-of-type(even){justify-self:stretch;grid-template-columns:42px 1fr;width:calc(100% - 38px);margin-left:38px;text-align:left}article:nth-of-type(even) b{grid-column:1}article:nth-of-type(even) div{grid-column:2}article>i,article:nth-of-type(odd)>i,article:nth-of-type(even)>i{left:-33px;right:auto}}
+    .time-field {
+        position: relative;
+        display: grid;
+        gap: 5rem;
+        margin-top: 7rem;
+        padding: 2rem 4rem 5rem;
+    }
+    .time-flow {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        border-radius: 99px;
+        background: linear-gradient(#0000, #8680cd 12%, #5aafd0 54%, #62b79b 88%, #0000);
+        box-shadow: 0 0 30px rgba(104, 100, 186, 0.26);
+        transform: translateX(-50%);
+        overflow: hidden;
+    }
+    .time-flow::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: -18%;
+        width: 100%;
+        height: 18%;
+        background: #eefcff;
+        box-shadow: 0 0 18px #fff;
+        animation: flow-down 4s linear infinite;
+    }
+    article {
+        position: relative;
+        display: grid;
+        grid-template-columns: 70px minmax(0, 460px);
+        gap: 1.5rem;
+        width: 47%;
+        animation: moment-in 0.7s calc(0.12s + var(--i) * 0.11s) cubic-bezier(0.18, 0.78, 0.18, 1) both;
+    }
+    article:nth-of-type(even) {
+        justify-self: end;
+        grid-template-columns: minmax(0, 460px) 70px;
+        text-align: right;
+    }
+    article:nth-of-type(even) b {
+        grid-column: 2;
+        grid-row: 1;
+    }
+    article:nth-of-type(even) div {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    article > i {
+        position: absolute;
+        top: 1rem;
+        width: 15px;
+        height: 15px;
+        border: 3px solid #f4f2ff;
+        border-radius: 50%;
+        background: #7772bd;
+        box-shadow:
+            0 0 0 9px rgba(119, 114, 189, 0.1),
+            0 0 20px rgba(119, 114, 189, 0.4);
+    }
+    article:nth-of-type(odd) > i {
+        right: -7.3%;
+    }
+    article:nth-of-type(even) > i {
+        left: -7.3%;
+        background: #4a9ebb;
+    }
+    article b {
+        color: #777796;
+        font:
+            1rem/1 ui-monospace,
+            monospace;
+    }
+    h2 {
+        margin: 0;
+        color: #2a4050;
+        font:
+            500 2rem/1.1 Georgia,
+            serif;
+    }
+    p {
+        color: #667984;
+        font:
+            0.95rem/1.75 Georgia,
+            serif;
+    }
+    .time-current {
+        position: absolute;
+        z-index: 2;
+        left: 50%;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        padding: 0.6rem 0.8rem;
+        border-radius: 99px;
+        background: rgba(244, 250, 249, 0.88);
+        color: #4e8478;
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+        transform: translateX(-50%);
+    }
+    .time-current i {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #4eac91;
+        box-shadow: 0 0 0 6px rgba(78, 172, 145, 0.13);
+        animation: now-pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes flow-down {
+        to {
+            top: 100%;
+        }
+    }
+    @keyframes now-pulse {
+        50% {
+            transform: scale(1.35);
+        }
+    }
+    @keyframes moment-in {
+        from {
+            opacity: 0;
+            filter: blur(7px);
+            transform: translateY(28px);
+        }
+    }
+    @media (max-width: 760px) {
+        .time-field {
+            gap: 4rem;
+            padding: 2rem 0 5rem;
+        }
+        .time-flow {
+            left: 12px;
+        }
+        .time-current {
+            left: 12px;
+            transform: translateX(-35%);
+        }
+        article,
+        article:nth-of-type(even) {
+            justify-self: stretch;
+            grid-template-columns: 42px 1fr;
+            width: calc(100% - 38px);
+            margin-left: 38px;
+            text-align: left;
+        }
+        article:nth-of-type(even) b {
+            grid-column: 1;
+        }
+        article:nth-of-type(even) div {
+            grid-column: 2;
+        }
+        article > i,
+        article:nth-of-type(odd) > i,
+        article:nth-of-type(even) > i {
+            left: -33px;
+            right: auto;
+        }
+    }
 </style>

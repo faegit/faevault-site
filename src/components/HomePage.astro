@@ -1,399 +1,1040 @@
 ---
-import type { Locale } from '../i18n/config';
-import { localePath } from '../i18n/config';
-import DeviceSync from './DeviceSync.astro';
+import type { Locale } from "../i18n/config";
+import { localePath } from "../i18n/config";
+import DeviceSync from "./DeviceSync.astro";
 
-interface Props { locale: Locale; }
+interface Props {
+    locale: Locale;
+}
 const { locale } = Astro.props;
-const copy = locale === 'zh-cn' ? {
-  eyebrow: '本地优先 · Android + Windows',
-  title: '你的密码，\n应该真正属于你。',
-  intro: 'FAEVault 把密码、通行密钥与重要资料留在你掌控的保险库中。它认真对待隐私，也认真对待每一次日常使用。',
-  support: '直接支持开发',
-  storyLink: '阅读开发故事',
-  syncLabel: '桌面端与手机端之间的加密数据同步',
-  storyKicker: '为什么继续做下去',
-  storyTitle: '工具可以很冷静，\n但它保护的是人的生活。',
-  storyBody: '一串密码背后，可能是一段工作、一份回忆，或一个不想失去的账号。FAEVault 的故事不会用虚构的苦难催促赞助，而会如实记录那些反复打磨、推倒重来，以及终于让某件事变得更可靠的时刻。',
-  quote: '如果它恰好替你省下一次焦虑，那份价值就已经发生了。',
-  journeyKicker: '持续发生的开发历程',
-  journeyTitle: '不是版本陈列，而是一条仍在生长的路。',
-  journeyBody: '这里会连接 Android 与 Windows 两端的关键节点、设计取舍和真实问题。沿着时间向下阅读，而不是翻过一张张像演示文稿的卡片。',
-  journeyLink: '进入完整历程',
-  guideKicker: '需要时，答案应该很近',
-  guideTitle: '从第一次打开，到双端安心使用。',
-  guideBody: '教程将按真实操作组织：创建保险库、导入资料、自动填充、通行密钥、同步与备份。每种语言独立呈现，步骤不会混排。',
-  guides: '查看使用指南',
-  download: '下载最新版本',
-  supportKicker: '支持 FAEVault',
-  supportTitle: '想直接支持？\n付款码就在下一页最前面。',
-  supportBody: '不需要先读完整故事，也不会被长篇内容挡住。你可以直接看到支付宝与微信付款码；如果愿意停留，再继续读开发背后的故事。',
-  supportButton: '打开支持页面',
-} : {
-  eyebrow: 'Local-first · Android + Windows',
-  title: 'Your passwords\nshould truly be yours.',
-  intro: 'FAEVault keeps passwords, passkeys, and important details inside a vault you control. It takes privacy seriously—and everyday usability just as seriously.',
-  support: 'Support development',
-  storyLink: 'Read the development story',
-  syncLabel: 'Encrypted data moving between desktop and phone',
-  storyKicker: 'Why keep building',
-  storyTitle: 'Tools can be quiet.\nWhat they protect is human.',
-  storyBody: 'Behind a password may be someone\'s work, a memory, or an account they cannot afford to lose. FAEVault will not invent hardship to pressure people into donating. Its story will honestly document the rebuilding, the difficult choices, and the moments when something finally became more dependable.',
-  quote: 'If it saves you one moment of anxiety, its value has already become real.',
-  journeyKicker: 'An ongoing development journey',
-  journeyTitle: 'Not a version showcase, but a path that is still growing.',
-  journeyBody: 'This timeline will connect important moments, design tradeoffs, and real problems across Android and Windows. It reads as an unfolding story, not a stack of presentation slides.',
-  journeyLink: 'Explore the full journey',
-  guideKicker: 'Answers should be close when needed',
-  guideTitle: 'From the first launch to confident use across devices.',
-  guideBody: 'Guides will follow real workflows: creating a vault, importing data, autofill, passkeys, sync, and backup. Each language stands on its own, with no mixed-language instructions.',
-  guides: 'Browse the guides',
-  download: 'Download the latest version',
-  supportKicker: 'Support FAEVault',
-  supportTitle: 'Want to help directly?\nThe payment codes come first.',
-  supportBody: 'You will not have to read the entire story first. Alipay and WeChat codes appear immediately; if you want to stay, the story continues below them.',
-  supportButton: 'Open the support page',
-};
+const copy =
+    locale === "zh-cn"
+        ? {
+              eyebrow: "本地优先 · Android + Windows",
+              title: "你的密码，\n应该真正属于你。",
+              intro: "保险库把密码、通行密钥与重要资料放进一个本地加密库，并为 Windows Hello、浏览器自动填充与多设备同步打基础。",
+              support: "直接赞助支持开发",
+              storyLink: "了解产品故事",
+              syncLabel: "桌面端与手机端之间的加密数据同步",
+              storyKicker: "为什么值得信赖",
+              storyTitle: "简洁的体验，\n来自对隐私的认真。",
+              storyBody: "基于本地加密库文件，保险库在 Windows 与 Android 之间保持一致体验，兼顾离线安全与智能填充。",
+              quote: "一个更安心的日常习惯，往往从一次更清晰的选择开始。",
+              journeyKicker: "持续推进的产品理念",
+              journeyTitle: "不是一次性功能展示，\n而是一段持续完善的路径。",
+              journeyBody: "从 Android 到 Windows，保险库会不断把产品体验打磨得更顺手、更可靠。",
+              journeyLink: "查看开发历程",
+              guideKicker: "快速上手",
+              guideTitle: "从安装到使用，\n每一步都更顺。",
+              guideBody: "从创建保险库开始，了解导入资料、自动填充、通行密钥、Windows Hello 和同步备份。",
+              guides: "查看使用指南",
+              download: "下载最新版本",
+              supportKicker: "赞助支持项目",
+              supportTitle: "如果你愿意赞助支持，\n付款码就在这里。",
+              supportBody: "看完后可直接通过此处赞助支持。",
+              supportButton: "打开赞助页面",
+          }
+        : {
+              eyebrow: "Local-first · Android + Windows",
+              title: "Your passwords\nshould truly be yours.",
+              intro: "FAEVault keeps passwords, passkeys, and important details inside a vault you can truly control.",
+              support: "Support development",
+              storyLink: "Learn the story",
+              syncLabel: "Encrypted data moving between desktop and phone",
+              storyKicker: "Why it feels trustworthy",
+              storyTitle: "A calm experience,\nbuilt around privacy.",
+              storyBody: "Built around a local encrypted vault file, FAEVault brings browser autofill, Windows Hello unlock, and private sync across devices.",
+              quote: "A calmer daily routine often begins with one clearer decision.",
+              journeyKicker: "A product in progress",
+              journeyTitle: "Not a one-off feature showcase,\nbut a path that keeps improving.",
+              journeyBody: "From Android to Windows, FAEVault keeps refining the experience into something more dependable.",
+              journeyLink: "See the development journey",
+              guideKicker: "Get started quickly",
+              guideTitle: "From setup to daily use,\nevery step feels simpler.",
+              guideBody: "Start with a vault, then explore importing data, autofill, passkeys, Windows Hello, and sync backups.",
+              guides: "Browse the guides",
+              download: "Download the latest version",
+              supportKicker: "Support the project",
+              supportTitle: "If you want to help,\nthe payment options are here.",
+              supportBody: "After reading, you can support us directly from here.",
+              supportButton: "Open the support page",
+          };
 
-const sections = [
-  { id: 'opening', labelZH: '首页', labelEN: 'Home' },
-  { id: 'why', labelZH: '故事', labelEN: 'Story' },
-  { id: 'journey', labelZH: '历程', labelEN: 'Journey' },
-  { id: 'guides', labelZH: '指南', labelEN: 'Guides' },
-  { id: 'support', labelZH: '支持', labelEN: 'Support' },
-];
-const navLabels = locale === 'zh-cn'
-  ? sections.map(s => s.labelZH)
-  : sections.map(s => s.labelEN);
+const workflowItems =
+    locale === "zh-cn"
+        ? [
+              { title: "先建立保险库", body: "把最重要的密码与通行密钥放进一个你自己能掌控的本地加密库。", accent: "vault" },
+              { title: "让浏览器自动填充", body: "通过安全的浏览器通信自动完成登录凭证与一次性验证码。", accent: "flow" },
+              { title: "在多设备间同步", body: "WebDAV、本地驱动或局域网加密同步，让数据在设备间保持一致。", accent: "sync" },
+          ]
+        : [
+              { title: "Start with a vault", body: "Keep passwords and passkeys in a local encrypted vault under your control.", accent: "vault" },
+              { title: "Fill logins automatically", body: "Use secure browser messaging to autofill credentials and one-time codes.", accent: "flow" },
+              {
+                  title: "Keep devices aligned",
+                  body: "Sync via WebDAV, local drives, or LAN with encrypted conflict handling.",
+                  accent: "sync",
+              },
+          ];
 ---
 
-<div class="home" data-snap-container>
-  <div class="snap-nav-zone"><nav class="snap-nav" aria-label="Section navigation">
-    {sections.map((s, i) => (
-      <a href={`#${s.id}`} data-snap-dot={i} aria-label={navLabels[i]}><span>{navLabels[i]}</span></a>
-    ))}
-  </nav></div>
-
-  <section class="snap-section hero active" id="opening">
-    <div class="hero-inner">
-      <div class="hero-copy">
-        <p class="eyebrow">{copy.eyebrow}</p>
-        <h1>{copy.title.split('\n').map((line) => <>{line}<br /></>)}</h1>
-        <p class="intro">{copy.intro}</p>
-        <div class="actions">
-          <a class="primary" href={localePath(locale, 'support')}>{copy.support}</a>
-          <a class="text-link" href={localePath(locale, 'journey')}>{copy.storyLink}<span>→</span></a>
+<div class="home">
+    <section class="section hero" id="opening">
+        <div class="hero-inner">
+            <div class="hero-copy">
+                <p class="eyebrow">{copy.eyebrow}</p>
+                <h1>
+                    {
+                        copy.title.split("\n").map((line) => (
+                            <>
+                                {line}
+                                <br />
+                            </>
+                        ))
+                    }
+                </h1>
+                <p class="intro">{copy.intro}</p>
+                <div class="actions">
+                    <a class="primary" href={localePath(locale, "download")}>{copy.download}<span aria-hidden="true">→</span></a>
+                    <a class="secondary" href={localePath(locale, "guides")}>{copy.guides}<span aria-hidden="true">→</span></a>
+                    <a class="text-link" href={localePath(locale, "journey")}>{copy.storyLink}<span aria-hidden="true">→</span></a>
+                </div>
+            </div>
+            <div class="device-wrap"><DeviceSync label={copy.syncLabel} /></div>
         </div>
-      </div>
-      <div class="device-wrap"><DeviceSync label={copy.syncLabel} /></div>
-    </div>
-    <div class="scroll-hint" aria-hidden="true"><i></i><i></i><i></i></div>
-  </section>
+    </section>
 
-  <section class="snap-section split" id="why">
-    <div class="split-inner">
-      <div class="split-copy">
-        <p class="eyebrow">{copy.storyKicker}</p>
-        <h2>{copy.storyTitle.split('\n').map((line) => <>{line}<br /></>)}</h2>
-        <blockquote class="slide-quote">{copy.quote.split('，').length > 1 ? copy.quote : copy.quote}</blockquote>
-      </div>
-      <div class="carousel-wrap">
-        <div class="carousel" data-carousel>
-          <div class="carousel-track" data-track>
-            <div class="carousel-slide" style="background:linear-gradient(145deg,#0b3a48 0%,#1a7a8a 60%,#2a9aaa 100%)"><div class="mock-phone"><div class="mock-status"><span class="mock-time">9:41</span><span class="mock-icons"><i></i><i></i><i></i></span></div><div class="mock-body"><div class="mock-icon">🔐</div><p class="mock-label">{locale === 'zh-cn' ? '保险库' : 'Vault'}</p><div class="mock-card"><i class="mc-row"></i><i class="mc-row thin"></i></div><div class="mock-card"><i class="mc-row"></i><i class="mc-row thin"></i></div></div><div class="mock-home"></div></div></div>
-            <div class="carousel-slide" style="background:linear-gradient(145deg,#122d5a 0%,#2a7aaa 60%,#3a9aba 100%)"><div class="mock-phone"><div class="mock-status"><span class="mock-time">9:41</span><span class="mock-icons"><i></i><i></i><i></i></span></div><div class="mock-body"><div class="mock-icon">🔑</div><p class="mock-label">{locale === 'zh-cn' ? '密码列表' : 'Passwords'}</p><div class="mock-card"><i class="mc-row"></i><i class="mc-row thin"></i></div><div class="mock-card"><i class="mc-row"></i><i class="mc-row thin"></i></div></div><div class="mock-home"></div></div></div>
-            <div class="carousel-slide" style="background:linear-gradient(145deg,#2a1a5a 0%,#5a4a9a 60%,#7a5aaa 100%)"><div class="mock-phone"><div class="mock-status"><span class="mock-time">9:41</span><span class="mock-icons"><i></i><i></i><i></i></span></div><div class="mock-body"><div class="mock-icon">🔄</div><p class="mock-label">{locale === 'zh-cn' ? '同步' : 'Sync'}</p><div class="mock-card"><i class="mc-row"></i><i class="mc-row thin"></i></div><div class="mock-card"><i class="mc-row"></i><i class="mc-row thin"></i></div></div><div class="mock-home"></div></div></div>
-            <div class="carousel-slide" style="background:linear-gradient(145deg,#0a4a2a 0%,#2a8a5a 60%,#3a9a6a 100%)"><div class="mock-phone"><div class="mock-status"><span class="mock-time">9:41</span><span class="mock-icons"><i></i><i></i><i></i></span></div><div class="mock-body"><div class="mock-icon">⚙️</div><p class="mock-label">{locale === 'zh-cn' ? '设置' : 'Settings'}</p><div class="mock-card"><i class="mc-row"></i><i class="mc-row thin"></i></div><div class="mock-card"><i class="mc-row"></i><i class="mc-row thin"></i></div></div><div class="mock-home"></div></div></div>
-          </div>
-          <div class="carousel-dots" data-dots></div>
+    <section class="section guide-section" id="guides">
+        <div class="guide-inner">
+            <div class="guide-head section-copy">
+                <p class="eyebrow">{copy.guideKicker}</p>
+                <h2>{copy.guideTitle}</h2>
+                <p>{copy.guideBody}</p>
+            </div>
+            <div class="workflow-side">
+                <div class="workflow-stack">
+                    {
+                        workflowItems.map((item, index) => (
+                            <article class="workflow-card" style={`animation-delay: ${index * 2.5}s`}>
+                                <span class={`workflow-dot ${item.accent}`} />
+                                <strong>{item.title}</strong>
+                                <p>{item.body}</p>
+                            </article>
+                        ))
+                    }
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="snap-section journey" id="journey">
-    <div class="journey-line" aria-hidden="true"><i></i><i></i><i></i></div>
-    <div class="journey-inner">
-      <div class="journey-copy"><p class="eyebrow">{copy.journeyKicker}</p><h2>{copy.journeyTitle}</h2><p>{copy.journeyBody}</p><a class="text-link" href={localePath(locale, 'journey')}>{copy.journeyLink}<span>→</span></a></div>
-      <div class="milestones" aria-hidden="true"><span>01</span><span>Android</span><span>Windows</span><span>Now</span></div>
-    </div>
-  </section>
+    <section class="section split" id="why">
+        <div class="split-inner">
+            <div class="split-copy section-copy">
+                <p class="eyebrow">{copy.storyKicker}</p>
+                <h2>{copy.storyTitle}</h2>
+                <blockquote class="slide-quote">{copy.quote}</blockquote>
+            </div>
+            <div class="showcase-wrap" aria-label={locale === "zh-cn" ? "保险库 产品展示" : "FAEVault product showcase"}>
+                <div class="showcase-shell">
+                    <div class="showcase-glow"></div>
+                    <div class="showcase-card">
+                        <div class="showcase-topbar">
+                            <div class="topbar-dots"><span></span><span></span><span></span></div>
+                            <div class="topbar-label">{locale === "zh-cn" ? "本地优先 · 私有同步" : "Local-first · Private sync"}</div>
+                        </div>
+                        <div class="showcase-grid">
+                            <div class="showcase-panel panel-left">
+                                <div class="feature-pill">{locale === "zh-cn" ? "保险库" : "Vault"}</div>
+                                <div class="panel-stack">
+                                    <div class="panel-row active">
+                                        <span class="panel-icon"></span>
+                                        <span class="panel-text">
+                                            <strong>{locale === "zh-cn" ? "通行密钥" : "Passkeys"}</strong>
+                                            <em>{locale === "zh-cn" ? "离线可用" : "Offline ready"}</em>
+                                        </span>
+                                    </div>
+                                    <div class="panel-row">
+                                        <span class="panel-icon muted"></span>
+                                        <span class="panel-text">
+                                            <strong>{locale === "zh-cn" ? "密码列表" : "Passwords"}</strong>
+                                            <em>{locale === "zh-cn" ? "一键整理" : "Cleanly grouped"}</em>
+                                        </span>
+                                    </div>
+                                    <div class="panel-row">
+                                        <span class="panel-icon accent"></span>
+                                        <span class="panel-text">
+                                            <strong>{locale === "zh-cn" ? "设备同步" : "Device sync"}</strong>
+                                            <em>{locale === "zh-cn" ? "安心备份" : "Peaceful backups"}</em>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="showcase-panel panel-right">
+                                <div class="phone-card">
+                                    <div class="phone-screen">
+                                        <div class="phone-nav"></div>
+                                        <div class="phone-stat">
+                                            <span class="stat-chip"></span>
+                                            <span class="stat-chip short"></span>
+                                        </div>
+                                        <div class="phone-list">
+                                            <div class="phone-item"></div>
+                                            <div class="phone-item short"></div>
+                                            <div class="phone-item tiny"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="floating-badge badge-one">{locale === "zh-cn" ? "隐私" : "Privacy"}</div>
+                                <div class="floating-badge badge-two">{locale === "zh-cn" ? "同步" : "Sync"}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  <section class="snap-section guide-section" id="guides">
-    <div class="guide-inner">
-      <p class="eyebrow">{copy.guideKicker}</p><h2>{copy.guideTitle}</h2><p>{copy.guideBody}</p>
-      <div class="actions"><a class="primary muted" href={localePath(locale, 'guides')}>{copy.guides}</a><a class="text-link" href={localePath(locale, 'download')}>{copy.download}<span>↓</span></a></div>
-    </div>
-  </section>
+    <section class="section journey" id="journey">
+        <div class="journey-line" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="journey-inner">
+            <div class="journey-copy section-copy">
+                <p class="eyebrow">{copy.journeyKicker}</p>
+                <h2>{copy.journeyTitle}</h2>
+                <p>{copy.journeyBody}</p>
+                <a class="text-link" href={localePath(locale, "journey")}>{copy.journeyLink}<span>→</span></a>
+            </div>
+            <div class="milestones" aria-hidden="true"><span>01</span><span>Android</span><span>Windows</span><span>Now</span></div>
+        </div>
+    </section>
 
-  <section class="snap-section support-section" id="support">
-    <div class="support-inner">
-      <p class="eyebrow">{copy.supportKicker}</p><h2>{copy.supportTitle.split('\n').map((line) => <>{line}<br /></>)}</h2><p>{copy.supportBody}</p>
-      <a class="support-button" href={localePath(locale, 'support')}>{copy.supportButton}<span>→</span></a>
-    </div>
-  </section>
+    <section class="section support-section" id="support">
+        <div class="support-inner section-copy">
+            <p class="eyebrow">{copy.supportKicker}</p>
+            <h2>{copy.supportTitle}</h2>
+            <p>{copy.supportBody}</p>
+            <a class="support-button" href={localePath(locale, "support")}>{copy.supportButton}<span>→</span></a>
+        </div>
+    </section>
 </div>
 
 <style>
-  :root { --card-duration: .72s; }
-  .home { height: 100vh; overflow: hidden; perspective: 1100px; perspective-origin: 50% 40%; position: relative; }
+    .home {
+        position: relative;
+    }
 
-  .snap-section {
-    position: absolute; inset: 0; z-index: 1;
-    display: flex; flex-direction: column; justify-content: center;
-    overflow-y: auto; -webkit-overflow-scrolling: touch;
-    opacity: 0; pointer-events: none;
-    clip-path: circle(0% at 50% 50%);
-    transform: translateY(30px) scale(.96);
-  }
-  .snap-section.active, .snap-section.leaving, .snap-section.entering {
-    will-change: transform, opacity, clip-path;
-  }
-  .snap-section.active {
-    z-index: 2; opacity: 1; pointer-events: auto;
-    clip-path: circle(150% at 50% 50%);
-    transform: translateY(0) scale(1);
-  }
-  .snap-section.leaving {
-    z-index: 3; pointer-events: none;
-    animation: card-leave var(--card-duration) cubic-bezier(.55,0,.45,1) both;
-  }
-  .snap-section.entering {
-    z-index: 2;
-    animation: card-enter var(--card-duration) cubic-bezier(.18,.78,.18,1) both;
-  }
+    .section {
+        padding: clamp(3.6rem, 7vw, 6rem) 0;
+    }
+    .section > * {
+        width: min(1180px, calc(100% - 6rem));
+        margin: 0 auto;
+    }
+    .hero {
+        padding-top: clamp(4.4rem, 8vw, 7rem);
+        padding-bottom: clamp(3.2rem, 6vw, 4.8rem);
+    }
 
-  @keyframes card-leave {
-    0% { opacity: 1; clip-path: circle(150% at 50% 50%); transform: rotateX(0deg) translateY(0) scale(1); }
-    100% { opacity: 0; clip-path: circle(0% at 50% 50%); transform: rotateX(7deg) translateY(-35px) scale(.9); }
-  }
-  @keyframes card-enter {
-    0% { opacity: 0; clip-path: circle(0% at 50% 50%); transform: rotateX(-4deg) translateY(55px) scale(.92); }
-    100% { opacity: 1; clip-path: circle(150% at 50% 50%); transform: rotateX(0deg) translateY(0) scale(1); }
-  }
+    .hero-inner {
+        display: grid;
+        grid-template-columns: minmax(340px, 580px) minmax(420px, 1fr);
+        gap: 3vw;
+        align-items: center;
+    }
+    .hero-copy {
+        padding: 0 0.5rem;
+    }
+    .eyebrow {
+        margin: 0 0 1rem;
+        color: #287795;
+        font-size: 0.72rem;
+        font-weight: 820;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+    }
+    h1,
+    h2 {
+        font-family: Georgia, "Times New Roman", serif;
+        font-weight: 500;
+        letter-spacing: -0.052em;
+    }
+    h1 {
+        margin: 0;
+        font-size: clamp(3rem, 5.5vw, 5.2rem);
+        line-height: 1.01;
+    }
+    h2 {
+        margin: 0;
+        font-size: clamp(2.2rem, 4.5vw, 4.2rem);
+        line-height: 1.06;
+    }
+    .intro {
+        max-width: 520px;
+        margin: 1.2rem 0 0;
+        color: #4f6974;
+        font:
+            1rem/1.8 Georgia,
+            serif;
+    }
+    .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.3rem;
+        align-items: center;
+        margin-top: 1.8rem;
+        position: relative;
+        z-index: 1;
+    }
+    .primary,
+    .secondary,
+    .tertiary,
+    .support-button,
+    .text-link {
+        cursor: pointer;
+    }
+    .primary,
+    .secondary,
+    .tertiary,
+    .support-button {
+        display: inline-flex;
+        gap: 0.6rem;
+        align-items: center;
+        padding: 0.85rem 1.2rem;
+        border-radius: 999px;
+        background: #173f50;
+        color: #fff;
+        font-size: 0.85rem;
+        font-weight: 750;
+        box-shadow: 0 13px 30px rgba(23, 63, 80, 0.17);
+        transition:
+            transform 0.18s ease,
+            box-shadow 0.18s ease,
+            background 0.18s ease;
+        pointer-events: auto;
+        position: relative;
+        z-index: 1;
+    }
+    .primary:hover,
+    .secondary:hover,
+    .tertiary:hover,
+    .support-button:hover {
+        transform: translateY(-3px);
+        background: #20596f;
+        box-shadow: 0 18px 36px rgba(23, 63, 80, 0.24);
+    }
+    .primary:active,
+    .secondary:active,
+    .tertiary:active,
+    .support-button:active {
+        transform: translateY(0);
+        box-shadow: 0 8px 18px rgba(23, 63, 80, 0.12);
+        transition:
+            transform 0.08s ease,
+            box-shadow 0.12s ease;
+    }
+    .primary:focus,
+    .secondary:focus,
+    .tertiary:focus,
+    .support-button:focus,
+    .text-link:focus {
+        outline: 3px solid rgba(25, 128, 164, 0.16);
+        outline-offset: 3px;
+        border-radius: 999px;
+    }
+    .text-link span,
+    .primary span,
+    .secondary span,
+    .support-button span {
+        display: inline-block;
+        transition: transform 0.18s ease;
+    }
+    .primary:hover span,
+    .secondary:hover span,
+    .support-button:hover span,
+    .text-link:hover span {
+        transform: translateX(2px);
+    }
+    .primary.muted {
+        background: #315f72;
+    }
+    .secondary {
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(23, 63, 80, 0.16);
+        color: #173f50;
+        box-shadow: 0 10px 24px rgba(11, 42, 56, 0.08);
+    }
+    .secondary:hover {
+        background: rgba(255, 255, 255, 1);
+    }
+    .tertiary {
+        background: transparent;
+        border: 1px solid rgba(23, 63, 80, 0.16);
+        color: #173f50;
+        box-shadow: none;
+    }
+    .tertiary:hover {
+        background: rgba(23, 63, 80, 0.05);
+        box-shadow: none;
+    }
+    .text-link {
+        display: inline-flex;
+        gap: 0.6rem;
+        align-items: center;
+        padding-bottom: 0.2rem;
+        border-bottom: 1px solid rgba(46, 110, 134, 0.45);
+        color: #245e75;
+        font-size: 0.83rem;
+        font-weight: 760;
+        transition:
+            gap 0.25s ease,
+            color 0.25s ease;
+    }
+    .text-link:hover {
+        gap: 0.9rem;
+        color: #1980a4;
+    }
+    .text-link:active {
+        transform: translateY(0);
+        color: #156f8f;
+    }
+    .hero-copy h1,
+    .split-copy h2,
+    .support-inner h2 {
+        white-space: pre-line;
+    }
+    .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+        margin-top: 1.8rem;
+        position: relative;
+        z-index: 1;
+    }
+    .device-wrap {
+        justify-self: end;
+        transform: scale(0.88);
+        transform-origin: right center;
+    }
+    .device-wrap :global(.device-stage) {
+        width: 520px;
+        height: 400px;
+    }
 
-  .snap-section > * { width: min(1180px, calc(100% - 6rem)); margin: 0 auto; }
+    .split-inner {
+        display: grid;
+        grid-template-columns: 1.05fr 0.9fr;
+        gap: 5vw;
+        align-items: center;
+    }
+    .slide-quote {
+        margin: 2rem 0 0;
+        padding: 0 0 0 1.2rem;
+        border-left: 2px solid rgba(43, 124, 154, 0.4);
+        color: #254c5d;
+        font:
+            italic 0.95rem/1.6 Georgia,
+            serif;
+        max-width: 400px;
+    }
 
-  .hero-inner { display: grid; grid-template-columns: minmax(340px, 580px) minmax(420px, 1fr); gap: 3vw; align-items: center; }
-  .hero-copy { padding: 0 .5rem; }
-  .eyebrow { margin: 0 0 1rem; color: #287795; font-size: .72rem; font-weight: 820; letter-spacing: .16em; text-transform: uppercase; }
-  h1, h2 { font-family: Georgia, 'Times New Roman', serif; font-weight: 500; letter-spacing: -.052em; }
-  h1 { margin: 0; font-size: clamp(3rem, 5.5vw, 5.2rem); line-height: 1.01; }
-  h2 { margin: 0; font-size: clamp(2.2rem, 4.5vw, 4.2rem); line-height: 1.06; }
-  .intro { max-width: 520px; margin: 1.4rem 0 0; color: #4f6974; font: 1rem/1.8 Georgia, serif; }
-  .actions { display: flex; flex-wrap: wrap; gap: 1.3rem; align-items: center; margin-top: 1.8rem; }
-  .primary, .support-button { padding: .85rem 1.2rem; border-radius: 999px; background: #173f50; color: #fff; font-size: .85rem; font-weight: 750; box-shadow: 0 13px 30px rgba(23,63,80,.17); transition: transform .25s ease, box-shadow .25s ease, background .25s ease; }
-  .primary:hover, .support-button:hover { transform: translateY(-3px); background: #20596f; box-shadow: 0 18px 36px rgba(23,63,80,.24); }
-  .primary.muted { background: #315f72; }
-  .text-link { display: inline-flex; gap: .6rem; align-items: center; padding-bottom: .2rem; border-bottom: 1px solid rgba(46,110,134,.45); color: #245e75; font-size: .83rem; font-weight: 760; transition: gap .25s ease, color .25s ease; }
-  .text-link:hover { gap: .9rem; color: #1980a4; }
-  .device-wrap { justify-self: end; transform: scale(.88); transform-origin: right center; }
-  .device-wrap :global(.device-stage) { width: 520px; height: 400px; }
+    .showcase-wrap {
+        width: 100%;
+        max-width: 430px;
+        margin: 0 auto;
+    }
+    .showcase-shell {
+        position: relative;
+        overflow: hidden;
+        border-radius: 2rem;
+        padding: 0.8rem;
+        background: linear-gradient(135deg, rgba(248, 251, 255, 0.98), rgba(239, 247, 248, 0.95));
+        box-shadow:
+            0 22px 80px rgba(42, 83, 99, 0.16),
+            inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+    .showcase-glow {
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(circle at top left, rgba(63, 155, 181, 0.16), transparent 42%),
+            radial-gradient(circle at 85% 0%, rgba(131, 106, 181, 0.18), transparent 34%);
+        pointer-events: none;
+    }
+    .showcase-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 1.4rem;
+        border: 1px solid rgba(81, 125, 142, 0.16);
+        background: rgba(255, 255, 255, 0.78);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+        backdrop-filter: blur(18px);
+        padding: 1rem;
+    }
+    .showcase-topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.2rem 0.2rem 0.85rem;
+    }
+    .topbar-dots {
+        display: flex;
+        gap: 0.35rem;
+    }
+    .topbar-dots span {
+        width: 0.58rem;
+        height: 0.58rem;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #8fc8d9, #4b8fa3);
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+    }
+    .topbar-label {
+        color: #4e6973;
+        font-size: 0.7rem;
+        font-weight: 760;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+    .showcase-grid {
+        display: grid;
+        grid-template-columns: 1.02fr 0.98fr;
+        gap: 0.9rem;
+    }
+    .showcase-panel {
+        position: relative;
+        border-radius: 1.15rem;
+        padding: 1rem;
+        min-height: 240px;
+    }
+    .panel-left {
+        background: linear-gradient(145deg, rgba(14, 73, 95, 0.96), rgba(31, 115, 140, 0.92));
+        color: #f4fbff;
+    }
+    .panel-right {
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(239, 247, 250, 0.95));
+        border: 1px solid rgba(82, 126, 141, 0.12);
+    }
+    .feature-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.42rem 0.64rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.18);
+        color: #f7fdff;
+        font-size: 0.7rem;
+        font-weight: 760;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+    .panel-stack {
+        display: grid;
+        gap: 0.6rem;
+        margin-top: 0.95rem;
+    }
+    .panel-row {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.7rem 0.75rem;
+        border-radius: 0.9rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.13);
+    }
+    .panel-row.active {
+        background: rgba(255, 255, 255, 0.16);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+    }
+    .panel-icon {
+        width: 0.85rem;
+        height: 0.85rem;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #7dd2e6, #2d7c95);
+        box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.16);
+    }
+    .panel-icon.muted {
+        background: linear-gradient(135deg, #b9d4de, #7a95a1);
+    }
+    .panel-icon.accent {
+        background: linear-gradient(135deg, #c4adff, #7a5db5);
+    }
+    .panel-text {
+        display: flex;
+        flex-direction: column;
+        gap: 0.08rem;
+    }
+    .panel-text strong {
+        font-size: 0.8rem;
+        font-weight: 760;
+    }
+    .panel-text em {
+        color: rgba(247, 253, 255, 0.74);
+        font-size: 0.68rem;
+        font-style: normal;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+    .phone-card {
+        position: relative;
+        width: min(220px, 100%);
+        margin: 1rem auto 0;
+        padding: 0.8rem;
+        border-radius: 1.45rem;
+        background: linear-gradient(135deg, #153f50 0%, #2f6c82 55%, #4f9bb0 100%);
+        box-shadow: 0 18px 38px rgba(24, 61, 74, 0.22);
+    }
+    .phone-screen {
+        border-radius: 1.1rem;
+        padding: 0.85rem;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(223, 240, 245, 0.9));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    }
+    .phone-nav {
+        width: 42%;
+        height: 0.4rem;
+        border-radius: 999px;
+        background: rgba(62, 95, 107, 0.2);
+        margin-bottom: 0.8rem;
+    }
+    .phone-stat {
+        display: flex;
+        gap: 0.45rem;
+        margin-bottom: 0.7rem;
+    }
+    .stat-chip {
+        width: 70px;
+        height: 0.6rem;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #3f8197, #62b6d1);
+    }
+    .stat-chip.short {
+        width: 44px;
+    }
+    .phone-list {
+        display: grid;
+        gap: 0.45rem;
+    }
+    .phone-item {
+        height: 0.72rem;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(44, 91, 112, 0.34), rgba(44, 91, 112, 0.12));
+    }
+    .phone-item.short {
+        width: 72%;
+    }
+    .phone-item.tiny {
+        width: 48%;
+    }
+    .floating-badge {
+        position: absolute;
+        padding: 0.4rem 0.56rem;
+        border-radius: 999px;
+        border: 1px solid rgba(70, 111, 128, 0.16);
+        background: rgba(255, 255, 255, 0.9);
+        color: #2f5564;
+        font-size: 0.68rem;
+        font-weight: 760;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        box-shadow: 0 10px 24px rgba(37, 82, 95, 0.12);
+    }
+    .badge-one {
+        top: 0.5rem;
+        right: 0.55rem;
+    }
+    .badge-two {
+        bottom: 0.6rem;
+        left: 0.45rem;
+    }
 
-  .scroll-hint { position: absolute; bottom: 2.5rem; left: 50%; z-index: 4; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; opacity: .4; transition: opacity .4s ease; pointer-events: none; }
-  .scroll-hint i { width: 2px; height: 14px; border-radius: 99px; background: #3d7d93; animation: scroll-bounce 2.2s ease-in-out infinite; }
-  .scroll-hint i:nth-child(2) { animation-delay: .25s; } .scroll-hint i:nth-child(3) { animation-delay: .5s; }
-  @keyframes scroll-bounce { 0%, 60%, 100% { transform: translateY(0); opacity: .3; } 30% { transform: translateY(6px); opacity: .9; } }
+    @media (max-width: 1000px) {
+        .carousel-wrap {
+            max-width: 320px;
+        }
+    }
+    @media (max-width: 760px) {
+        .showcase-wrap {
+            max-width: 100%;
+        }
+        .showcase-grid {
+            grid-template-columns: 1fr;
+        }
+        .showcase-panel {
+            min-height: auto;
+        }
+        .panel-right {
+            min-height: 230px;
+        }
+        .phone-card {
+            margin-top: 0.7rem;
+        }
+        .floating-badge {
+            position: static;
+            display: inline-flex;
+            margin-top: 0.55rem;
+            margin-right: 0.45rem;
+        }
+        .panel-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+    .journey-inner {
+        display: grid;
+        grid-template-columns: 1fr 0.4fr;
+        gap: 7vw;
+        align-items: center;
+    }
+    .journey-copy {
+        max-width: 660px;
+    }
+    .journey-copy > p,
+    .guide-section > p,
+    .support-section > p {
+        color: #5a727c;
+        font:
+            1rem/1.9 Georgia,
+            serif;
+    }
+    .journey-copy > p {
+        max-width: 580px;
+        margin: 1.4rem 0;
+    }
+    .journey-line {
+        position: absolute;
+        right: 23%;
+        top: 14%;
+        bottom: 14%;
+        width: 70px;
+        border-left: 1px dashed rgba(42, 113, 140, 0.27);
+        transform: rotate(4deg);
+    }
+    .journey-line i {
+        position: absolute;
+        left: -5px;
+        width: 10px;
+        height: 10px;
+        border: 2px solid #3c8eaa;
+        border-radius: 50%;
+        background: #eef7f5;
+        box-shadow: 0 0 0 7px rgba(60, 142, 170, 0.08);
+    }
+    .journey-line i:nth-child(1) {
+        top: 7%;
+    }
+    .journey-line i:nth-child(2) {
+        top: 46%;
+        left: 3px;
+    }
+    .journey-line i:nth-child(3) {
+        top: 87%;
+        left: -9px;
+    }
+    .milestones {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+        align-items: flex-end;
+        color: #65808a;
+        font:
+            0.74rem/1 ui-monospace,
+            monospace;
+        letter-spacing: 0.12em;
+    }
 
-  .split-inner { display: grid; grid-template-columns: 1.05fr .9fr; gap: 5vw; align-items: center; }
-  .slide-quote { margin: 2rem 0 0; padding: 0 0 0 1.2rem; border-left: 2px solid rgba(43,124,154,.4); color: #254c5d; font: italic .95rem/1.6 Georgia, serif; max-width: 400px; }
+    .guide-section {
+        justify-content: center;
+    }
+    .guide-inner {
+        width: 100%;
+        margin: 0 auto !important;
+        display: grid;
+        grid-template-columns: 1.05fr 0.9fr;
+        gap: 5vw;
+        align-items: start;
+    }
+    .guide-head {
+        max-width: 620px;
+    }
+    .section-copy {
+        max-width: 720px;
+    }
+    .section-copy > p {
+        max-width: 640px;
+        margin: 1.2rem 0 0;
+        color: #5a727c;
+        font:
+            1rem/1.9 Georgia,
+            serif;
+    }
+    .section-copy h2 {
+        margin: 0.8rem 0 0;
+    }
+    .section-copy h2,
+    .section-copy h1 {
+        color: #173f50;
+        line-height: 1.05;
+    }
+    .workflow-side {
+        display: grid;
+        place-items: center;
+    }
+    .workflow-stack {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+    }
+    .workflow-card {
+        position: relative;
+        padding: 1.15rem 1.2rem;
+        border-radius: 1.45rem;
+        border: 1px solid rgba(71, 106, 122, 0.14);
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(241, 248, 251, 0.92));
+        box-shadow: 0 20px 40px rgba(41, 81, 95, 0.1);
+        transform-origin: center;
+        will-change: transform, box-shadow, z-index;
+        animation: carouselPulse 10s ease-in-out infinite both;
+    }
+    .workflow-card:nth-child(1) {
+        animation-delay: 0s;
+    }
+    .workflow-card:nth-child(2) {
+        animation-delay: -2.5s;
+    }
+    .workflow-card:nth-child(3) {
+        animation-delay: -5s;
+    }
+    .workflow-card:hover {
+        transform: translateY(-3px) scale(1.01);
+        box-shadow: 0 28px 48px rgba(41, 81, 95, 0.16);
+    }
+    .workflow-dot {
+        display: inline-block;
+        width: 0.72rem;
+        height: 0.72rem;
+        margin-bottom: 0.95rem;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #72c3db, #2c7695);
+        box-shadow: 0 0 0 4px rgba(42, 118, 149, 0.16);
+    }
+    .workflow-dot.flow {
+        background: linear-gradient(135deg, #9bd7ba, #4a8b6c);
+        box-shadow: 0 0 0 4px rgba(74, 139, 108, 0.16);
+    }
+    .workflow-dot.sync {
+        background: linear-gradient(135deg, #c6b3f4, #7b5fb1);
+        box-shadow: 0 0 0 4px rgba(123, 95, 177, 0.16);
+    }
+    .workflow-card strong {
+        display: block;
+        margin-bottom: 0.55rem;
+        color: #173f50;
+        font-size: 0.96rem;
+        font-weight: 760;
+    }
+        );
+        box-shadow: 0 0 28px rgba(63, 143, 175, 0.16);
+    }
+    .workflow-card p {
+        margin: 0;
+        color: #5d7480;
+        font-size: 0.92rem;
+        line-height: 1.7;
+    }
+    @keyframes carouselPulse {
+        0%,
+        18%,
+        100% {
+            transform: translateY(0) scale(1);
+            box-shadow: 0 20px 40px rgba(41, 81, 95, 0.1);
+            z-index: 1;
+        }
+        8% {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 30px 54px rgba(41, 81, 95, 0.16);
+            z-index: 2;
+        }
+        33%,
+        51% {
+            transform: translateY(0) scale(1);
+            box-shadow: 0 20px 40px rgba(41, 81, 95, 0.1);
+            z-index: 1;
+        }
+        41% {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 30px 54px rgba(41, 81, 95, 0.16);
+            z-index: 2;
+        }
+        66%,
+        84% {
+            transform: translateY(0) scale(1);
+            box-shadow: 0 20px 40px rgba(41, 81, 95, 0.1);
+            z-index: 1;
+        }
+        74% {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 30px 54px rgba(41, 81, 95, 0.16);
+            z-index: 2;
+        }
+    }
 
-  .carousel-wrap { width: 100%; max-width: 380px; margin: 0 auto; }
-  .carousel { position: relative; overflow: hidden; border-radius: 1.5rem; box-shadow: 0 28px 80px rgba(42,83,99,.16), 0 2px 0 rgba(255,255,255,.3) inset; background: #fff; }
-  .carousel-track { display: flex; transition: transform .52s cubic-bezier(.22,.72,.28,1); }
-  .carousel-slide { flex: 0 0 100%; aspect-ratio: 9/16; display: flex; align-items: center; justify-content: center; position: relative; }
-  .carousel-slide::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 0%, rgba(255,255,255,.08) 0%, transparent 60%); pointer-events: none; }
+    .support-section {
+        justify-content: center;
+    }
+    .support-inner {
+        width: min(900px, calc(100% - 3rem)) !important;
+        margin: 0 auto !important;
+        padding: clamp(3.5rem, 7vw, 6rem);
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        border-radius: 2.5rem;
+        background: linear-gradient(135deg, rgba(229, 248, 247, 0.82), rgba(229, 237, 251, 0.68));
+        box-shadow: 0 28px 90px rgba(42, 83, 99, 0.12);
+        backdrop-filter: blur(22px);
+    }
+    .support-inner h2 {
+        max-width: 700px;
+    }
+    .support-inner > p {
+        max-width: 580px;
+        margin: 1.4rem 0 2rem;
+    }
+    .support-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.7rem;
+    }
+    .support-button:hover {
+        gap: 1rem;
+    }
 
-  .mock-phone { width: 78%; display: flex; flex-direction: column; background: rgba(0,0,0,.22); border-radius: 1.4rem; padding: .45rem .45rem .55rem; backdrop-filter: blur(8px); box-shadow: 0 2px 0 rgba(255,255,255,.08) inset, 0 8px 32px rgba(0,0,0,.18); }
-  .mock-status { display: flex; justify-content: space-between; align-items: center; padding: 0 .35rem .35rem; }
-  .mock-time { color: rgba(255,255,255,.7); font-size: .6rem; font-weight: 620; letter-spacing: .02em; }
-  .mock-icons { display: flex; gap: 3px; align-items: center; }
-  .mock-icons i { display: block; border-radius: 1px; background: rgba(255,255,255,.5); }
-  .mock-icons i:nth-child(1) { width: 10px; height: 6px; border: 1px solid rgba(255,255,255,.3); border-radius: 1px; background: none; }
-  .mock-icons i:nth-child(2) { width: 3px; height: 3px; border-radius: 50%; } .mock-icons i:nth-child(3) { width: 8px; height: 4px; border-radius: 1px; }
-  .mock-body { display: flex; flex-direction: column; align-items: center; padding: .6rem .5rem .8rem; background: rgba(255,255,255,.06); border-radius: .8rem; }
-  .mock-icon { font-size: 2.2rem; line-height: 1; margin-bottom: .15rem; filter: drop-shadow(0 2px 8px rgba(0,0,0,.1)); }
-  .mock-label { margin: 0 0 .6rem; color: #fff; font-size: .85rem; font-weight: 720; letter-spacing: .06em; text-shadow: 0 1px 6px rgba(0,0,0,.12); text-transform: uppercase; }
-  .mock-card { width: 100%; background: rgba(255,255,255,.1); border-radius: .45rem; padding: .45rem; margin-bottom: .35rem; display: flex; flex-direction: column; gap: .3rem; }
-  .mc-row { display: block; height: 4px; border-radius: 99px; background: rgba(255,255,255,.18); width: 70%; }
-  .mc-row.thin { height: 3px; width: 50%; background: rgba(255,255,255,.1); }
-  .mock-home { width: 26%; height: 3px; margin: .45rem auto .15rem; border-radius: 99px; background: rgba(255,255,255,.25); }
-
-  .carousel-dots { display: flex; justify-content: center; gap: .5rem; padding: .65rem 0 .2rem; }
-  .carousel-dots button { width: 6px; height: 6px; padding: 0; border: none; border-radius: 50%; background: rgba(60,112,130,.22); cursor: pointer; transition: background .35s ease, transform .35s cubic-bezier(.2,.75,.2,1), box-shadow .35s ease; }
-  .carousel-dots button.active { background: #287795; transform: scale(1.5); box-shadow: 0 0 0 4px rgba(40,119,149,.12); }
-
-  .journey-inner { display: grid; grid-template-columns: 1fr .4fr; gap: 7vw; align-items: center; }
-  .journey-copy { max-width: 660px; }
-  .journey-copy > p, .guide-section > p, .support-section > p { color: #5a727c; font: 1rem/1.9 Georgia, serif; }
-  .journey-copy > p { max-width: 580px; margin: 1.4rem 0; }
-  .journey-line { position: absolute; right: 23%; top: 14%; bottom: 14%; width: 70px; border-left: 1px dashed rgba(42,113,140,.27); transform: rotate(4deg); }
-  .journey-line i { position: absolute; left: -5px; width: 10px; height: 10px; border: 2px solid #3c8eaa; border-radius: 50%; background: #eef7f5; box-shadow: 0 0 0 7px rgba(60,142,170,.08); }
-  .journey-line i:nth-child(1) { top: 7%; } .journey-line i:nth-child(2) { top: 46%; left: 3px; } .journey-line i:nth-child(3) { top: 87%; left: -9px; }
-  .milestones { display: flex; flex-direction: column; gap: 1.2rem; align-items: flex-end; color: #65808a; font: .74rem/1 ui-monospace, monospace; letter-spacing: .12em; }
-
-  .guide-section { justify-content: center; }
-  .guide-inner { max-width: 720px; margin-left: max(6vw, calc((100vw - 1180px)/2)) !important; }
-  .guide-inner > p { max-width: 600px; margin: 1.2rem 0 0; }
-
-  .support-section { justify-content: center; }
-  .support-inner { width: min(900px, calc(100% - 3rem)) !important; margin: 0 auto !important; padding: clamp(3.5rem, 7vw, 6rem); border: 1px solid rgba(255,255,255,.7); border-radius: 2.5rem; background: linear-gradient(135deg, rgba(229,248,247,.82), rgba(229,237,251,.68)); box-shadow: 0 28px 90px rgba(42,83,99,.12); backdrop-filter: blur(22px); }
-  .support-inner h2 { max-width: 700px; }
-  .support-inner > p { max-width: 580px; margin: 1.4rem 0 2rem; }
-  .support-button { display: inline-flex; align-items: center; gap: .7rem; }
-  .support-button:hover { gap: 1rem; }
-
-  .snap-nav-zone { position: fixed; right: 0; top: 0; bottom: 0; z-index: 20; width: 4rem; display: flex; align-items: center; justify-content: flex-end; padding-right: .5rem; }
-  .snap-nav { display: flex; flex-direction: column; gap: .65rem; opacity: 0; transform: translateX(100%); transition: opacity .32s ease, transform .32s cubic-bezier(.2,.75,.2,1); pointer-events: none; }
-  .snap-nav-zone:hover .snap-nav, .snap-nav-zone:focus-within .snap-nav { opacity: 1; transform: translateX(0); pointer-events: auto; }
-  .snap-nav a { position: relative; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; text-decoration: none; }
-  .snap-nav a::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: rgba(60,112,130,.3); transition: transform .4s cubic-bezier(.2,.75,.2,1), background .4s ease, box-shadow .4s ease; }
-  .snap-nav a:hover::before { transform: scale(1.5); background: rgba(60,112,130,.55); }
-  .snap-nav a.active::before { transform: scale(1.6); background: #287795; box-shadow: 0 0 0 5px rgba(40,119,149,.15); }
-  .snap-nav a span { position: absolute; right: calc(100% + 12px); top: 50%; transform: translateY(-50%); padding: 2px 8px; border-radius: 4px; background: rgba(40,50,60,.75); color: #fff; font-size: .68rem; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .2s ease, transform .2s ease; }
-  .snap-nav a:hover span, .snap-nav a.active span { opacity: 1; }
-
-  @media (max-width: 1000px) {
-    .hero-inner { grid-template-columns: minmax(0,1fr); }
-    .device-wrap { justify-self: center; transform: scale(.78); transform-origin: center; }
-    .hero-inner > * { min-width: 0; }
-    .split-inner { grid-template-columns: 1fr; gap: 2.5rem; }
-    .carousel-wrap { max-width: 320px; }
-    .journey-inner { grid-template-columns: 1fr; gap: 2rem; }
-    .journey-line { right: 2rem; }
-    .milestones { flex-direction: row; justify-content: flex-end; gap: 2rem; }
-    .guide-inner { margin-left: 0 !important; }
-  }
-  @media (max-width: 760px) {
-    .hero-inner { padding-top: 2rem; }
-    .device-wrap { transform: scale(.6); transform-origin: center; margin-bottom: -2rem; }
-    .scroll-hint { display: none; }
-    .snap-nav-zone { width: 2.5rem; padding-right: .25rem; }
-    .journey-line { display: none; }
-    .milestones { display: none; }
-    .support-inner { border-radius: 1.7rem; padding: 3rem 1.5rem; }
-    .snap-section > * { width: calc(100% - 2.5rem); }
-    .split-copy h2 { font-size: clamp(1.6rem, 8vw, 2.8rem); }
-    .carousel-wrap { max-width: 260px; }
-    .mock-icon { font-size: 2rem; }
-  }
+    @media (max-width: 1000px) {
+        .hero-inner {
+            grid-template-columns: minmax(0, 1fr);
+        }
+        .device-wrap {
+            justify-self: center;
+            transform: scale(0.78);
+            transform-origin: center;
+        }
+        .hero-inner > * {
+            min-width: 0;
+        }
+        .split-inner {
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
+        }
+        .carousel-wrap {
+            max-width: 320px;
+        }
+        .journey-inner {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        .journey-line {
+            right: 2rem;
+        }
+        .milestones {
+            flex-direction: row;
+            justify-content: flex-end;
+            gap: 2rem;
+        }
+        .guide-inner {
+            grid-template-columns: 1fr;
+            margin-left: 0 !important;
+        }
+    }
+    @media (max-width: 760px) {
+        .hero {
+            padding-top: 2rem;
+        }
+        .actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .actions a {
+            width: 100%;
+            justify-content: center;
+        }
+        .device-wrap {
+            transform: scale(0.6);
+            transform-origin: center;
+            margin-bottom: -2rem;
+        }
+        .journey-line {
+            display: none;
+        }
+        .milestones {
+            display: none;
+        }
+        .support-inner {
+            border-radius: 1.7rem;
+            padding: 3rem 1.5rem;
+        }
+        .section > * {
+            width: calc(100% - 2.5rem);
+        }
+        .split-copy h2 {
+            font-size: clamp(1.6rem, 8vw, 2.8rem);
+        }
+        .carousel-wrap {
+            max-width: 260px;
+        }
+        .mock-icon {
+            font-size: 2rem;
+        }
+    }
 </style>
 
 <script>
-  (function() {
-    const home = document.querySelector('.home') as HTMLElement | null;
-    if (!home) return;
+    (function () {
+        const home = document.querySelector(".home") as HTMLElement | null;
+        if (!home) return;
 
-    const sections = [...home.querySelectorAll('.snap-section')] as HTMLElement[];
-    const dots = home.querySelectorAll('[data-snap-dot]');
-    const scrollHint = home.querySelector('.scroll-hint') as HTMLElement | null;
+        const carouselEl = home.querySelector("[data-carousel]") as HTMLElement | null;
+        if (!carouselEl) return;
 
-    let current = 0;
-    let busy = false;
+        const track = carouselEl.querySelector("[data-track]") as HTMLElement;
+        const dotsContainer = carouselEl.querySelector("[data-dots]");
+        const slides = [...track.children] as HTMLElement[];
+        let carIndex = 0;
+        let carTimer: ReturnType<typeof setInterval>;
+        const paused = { current: false };
 
-    function updateNav(index: number) {
-      dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
-      if (scrollHint) scrollHint.style.opacity = index === 0 ? '.4' : '0';
-    }
+        function renderDots() {
+            dotsContainer!.innerHTML = "";
+            slides.forEach((_, i) => {
+                const btn = document.createElement("button");
+                btn.setAttribute("data-car-dot", String(i));
+                if (i === 0) btn.className = "active";
+                btn.addEventListener("click", () => {
+                    goCar(i);
+                });
+                dotsContainer!.appendChild(btn);
+            });
+        }
 
-    function goTo(index: number) {
-      if (busy || index === current || index < 0 || index >= sections.length) return;
-      busy = true;
+        function goCar(i: number) {
+            if (i === carIndex || i < 0 || i >= slides.length) return;
+            carIndex = i;
+            track.style.transform = `translateX(-${i * 100}%)`;
+            dotsContainer!.querySelectorAll("button").forEach((b, idx) => {
+                b.classList.toggle("active", idx === i);
+            });
+        }
 
-      const cur = sections[current];
-      const next = sections[index];
+        function autoAdvance() {
+            if (!paused.current) goCar((carIndex + 1) % slides.length);
+        }
 
-      next.style.display = 'flex';
-      void next.offsetHeight;
-      next.classList.add('entering');
-      cur.classList.add('leaving');
+        renderDots();
+        carTimer = setInterval(autoAdvance, 4200);
 
-      const DURATION = 780;
-      setTimeout(() => {
-        cur.classList.remove('active', 'leaving');
-        cur.style.display = 'none';
-        next.classList.remove('entering');
-        next.classList.add('active');
-        current = index;
-        busy = false;
-        updateNav(index);
-      }, DURATION);
-    }
-
-    sections[0].style.display = 'flex';
-    void sections[0].offsetHeight;
-    sections[0].classList.add('active');
-    updateNav(0);
-
-    home.addEventListener('wheel', (e) => {
-      if (busy) return;
-      if (e.deltaY > 0) goTo(current + 1);
-      else if (e.deltaY < 0) goTo(current - 1);
-    }, { passive: true });
-
-    {
-      let touchY = 0;
-      home.addEventListener('touchstart', (e) => { touchY = e.touches[0].clientY; }, { passive: true });
-      home.addEventListener('touchend', (e) => {
-        const dy = e.changedTouches[0].clientY - touchY;
-        if (Math.abs(dy) > 40) goTo(dy < 0 ? current + 1 : current - 1);
-      }, { passive: true });
-    }
-
-    dots.forEach((dot) => {
-      dot.addEventListener('click', (e) => {
-        e.preventDefault();
-        const href = dot.getAttribute('href');
-        if (!href) return;
-        const idx = sections.findIndex((s) => s.id === href.slice(1));
-        if (idx >= 0) goTo(idx);
-      });
-    });
-
-    document.addEventListener('astro:before-swap', () => {
-      busy = true;
-      sections.forEach((s, i) => {
-        if (i !== current) s.style.display = 'none';
-      });
-    });
-
-    { /* carousel */ }
-    const carouselEl = home.querySelector('[data-carousel]') as HTMLElement | null;
-    if (carouselEl) {
-      const track = carouselEl.querySelector('[data-track]') as HTMLElement;
-      const dotsContainer = carouselEl.querySelector('[data-dots]');
-      const slides = [...track.children] as HTMLElement[];
-      let carIndex = 0;
-      let carTimer: ReturnType<typeof setInterval>;
-      const paused = { current: false };
-
-      function renderDots() {
-        dotsContainer!.innerHTML = '';
-        slides.forEach((_, i) => {
-          const btn = document.createElement('button');
-          btn.setAttribute('data-car-dot', String(i));
-          if (i === 0) btn.className = 'active';
-          btn.addEventListener('click', () => { goCar(i); });
-          dotsContainer!.appendChild(btn);
+        carouselEl.addEventListener("mouseenter", () => {
+            paused.current = true;
         });
-      }
-
-      function goCar(i: number) {
-        if (i === carIndex || i < 0 || i >= slides.length) return;
-        carIndex = i;
-        track.style.transform = `translateX(-${i * 100}%)`;
-        dotsContainer!.querySelectorAll('button').forEach((b, idx) => {
-          b.classList.toggle('active', idx === i);
+        carouselEl.addEventListener("mouseleave", () => {
+            paused.current = false;
         });
-      }
-
-      function autoAdvance() { if (!paused.current) goCar((carIndex + 1) % slides.length); }
-
-      renderDots();
-      carTimer = setInterval(autoAdvance, 4200);
-
-      carouselEl.addEventListener('mouseenter', () => { paused.current = true; });
-      carouselEl.addEventListener('mouseleave', () => { paused.current = false; });
-    }
-  })();
+    })();
 </script>
