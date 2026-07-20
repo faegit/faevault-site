@@ -112,7 +112,7 @@ const workflowItems =
             <div class="workflow-side">
                 <div class="workflow-stack">
                     {
-                        workflowItems.map((item, index) => (
+                        workflowItems.map((item) => (
                             <article class="workflow-card">
                                 <span class={`workflow-dot ${item.accent}`} />
                                 <strong>{item.title}</strong>
@@ -209,7 +209,6 @@ const workflowItems =
         <div class="support-inner section-copy">
             <p class="eyebrow">{copy.supportKicker}</p>
             <h2>{copy.supportTitle}</h2>
-            <p>{copy.supportBody}</p>
             <a class="support-button" href={localePath(locale, "support")}>{copy.supportButton}<span>→</span></a>
         </div>
     </section>
@@ -999,11 +998,11 @@ const workflowItems =
     (function () {
         if (typeof window === "undefined") return;
         function initWorkflowCarousel() {
-            const stack = document.querySelector(".workflow-stack");
+            const stack = document.querySelector<HTMLElement>(".workflow-stack");
             if (!stack) return;
             stack.setAttribute("data-stacked", "true");
             function applyOffsets() {
-                const cards = Array.from(stack.children);
+                const cards = Array.from(stack.children) as HTMLElement[];
                 cards.forEach((card, i) => {
                     const y = i * 20;
                     const scale = 1 - i * 0.04;
