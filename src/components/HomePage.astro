@@ -89,9 +89,9 @@ const features =
                 </h1>
                 <p class="intro">{copy.intro}</p>
                 <div class="actions">
-                    <a class="primary" href={localePath(locale, "download")}>{copy.download}<span aria-hidden="true">→</span></a>
-                    <a class="secondary" href={localePath(locale, "guides")}>{copy.guides}<span aria-hidden="true">→</span></a>
-                    <a class="text-link" href={localePath(locale, "journey")}>{copy.storyLink}<span aria-hidden="true">→</span></a>
+                    <a class="primary" href={localePath(locale, "download")}>{copy.download}</a>
+                    <a class="secondary" href={localePath(locale, "guides")}>{copy.guides}</a>
+                    <a class="text-link" href={localePath(locale, "journey")}>{copy.storyLink}</a>
                 </div>
             </div>
             <div class="device-wrap"><DeviceSync label={copy.syncLabel} /></div>
@@ -128,7 +128,7 @@ const features =
                 <h2>{copy.storyTitle}</h2>
                 <p class="story-body">{copy.storyBody}</p>
                 <blockquote class="slide-quote">{copy.quote}</blockquote>
-                <a class="text-link whitepaper-link" href={localePath(locale, "security")}>{copy.whitepaperLink}<span aria-hidden="true">→</span></a>
+                <a class="text-link whitepaper-link" href={localePath(locale, "security")}>{copy.whitepaperLink}</a>
             </div>
             <div class="showcase-wrap" aria-label={locale === "zh-cn" ? "保险库 产品展示" : "FAEVault product showcase"}>
                 <div class="showcase-shell">
@@ -194,7 +194,7 @@ const features =
         <div class="support-inner section-copy">
             <p class="eyebrow">{copy.supportKicker}</p>
             <h2>{copy.supportTitle}</h2>
-            <a class="support-button" href={localePath(locale, "support")}>{copy.supportButton}<span>→</span></a>
+            <a class="support-button" href={localePath(locale, "support")}>{copy.supportButton}</a>
         </div>
     </section>
 </div>
@@ -321,19 +321,6 @@ const features =
         outline: 3px solid rgba(25, 128, 164, 0.16);
         outline-offset: 3px;
         border-radius: 999px;
-    }
-    .text-link span,
-    .primary span,
-    .secondary span,
-    .support-button span {
-        display: inline-block;
-        transition: transform 0.18s ease;
-    }
-    .primary:hover span,
-    .secondary:hover span,
-    .support-button:hover span,
-    .text-link:hover span {
-        transform: translateX(2px);
     }
     .primary.muted {
         background: #315f72;
