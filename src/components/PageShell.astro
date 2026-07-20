@@ -13,7 +13,7 @@ const { theme, kicker, title, intro } = Astro.props;
 </div>
 
 <style>
-  .inner-page { position: relative; width: min(1160px, calc(100% - 3rem)); min-height: 100vh; margin: 0 auto; padding: 10rem 0 7rem; }
+  .inner-page { position: relative; width: min(1160px, calc(100% - 3rem)); min-height: 100vh; margin: 0 auto; padding: 10rem 0 7rem; overflow-x: clip; }
   .page-intro { max-width: 900px; opacity: 1; animation: intro-reveal .75s .08s cubic-bezier(.18,.78,.18,1); }
   .page-intro > p { margin: 0 0 1.2rem; color: var(--page-accent, #277a98); font-size: .72rem; font-weight: 820; letter-spacing: .17em; text-transform: uppercase; }
   h1 { max-width: 980px; margin: 0; color: #17303b; font: 500 clamp(3.2rem, 7vw, 6.7rem)/.99 Georgia, serif; letter-spacing: -.065em; }
