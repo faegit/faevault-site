@@ -2,6 +2,13 @@
 
 保险库 的公开官网、使用指南、开发历程、版本下载与赞助入口。
 
+## 下载与安装
+
+- [FAEVault 3.6.2 发布页](https://github.com/faegit/faevault-site/releases/tag/v3.6.2)
+- [Windows、Android 与浏览器扩展安装教程](./INSTALLATION.md)
+- [3.6.2 更新日志](./RELEASE_NOTES_3.6.2.md)
+- [3.6.2 SHA-256 校验值](./SHA256SUMS-3.6.2.txt)
+
 ## 本地运行
 
 ```powershell
