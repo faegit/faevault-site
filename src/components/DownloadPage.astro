@@ -10,10 +10,10 @@ const tag = latest.tag;
 const ver = latest.version;
 const releaseUrl = `https://github.com/faegit/faevault-site/releases/tag/${tag}`;
 const dlBase = `https://github.com/faegit/faevault-site/releases/download/${tag}`;
-const androidApk =
-    latest.assets["app-arm64-v8a-release.apk"] ?? `${dlBase}/app-arm64-v8a-release.apk`;
-const windowsSetup =
-    latest.assets[`FAEVault_v${ver}_Setup.exe`] ?? `${dlBase}/FAEVault_v${ver}_Setup.exe`;
+const assets = latest.assets as Record<string, string>;
+const androidApk = assets["app-arm64-v8a-release.apk"] ?? `${dlBase}/app-arm64-v8a-release.apk`;
+const setupKey = `FAEVault_v${ver}_Setup.exe`;
+const windowsSetup = assets[setupKey] ?? `${dlBase}/${setupKey}`;
 const c =
     locale === "zh-cn"
         ? {
