@@ -1,0 +1,1107 @@
+{"message":"connected.","label":"vite","level":"info"}
+{"message":"Generated 1ms","label":"types","level":"info"}
+{"message":"connected.","label":"vite","level":"info"}
+{"message":"Syncing content","label":"content","level":"info"}
+{"message":"Astro config changed","label":"content","level":"info"}
+{"message":"Clearing content store","label":"content","level":"info"}
+{"message":"No files found matching \"**/*.{md,mdx}\" in directory \"src\\content\\guides\"","label":"glob-loader","level":"warn"}
+{"message":"No files found matching \"**/*.{md,mdx}\" in directory \"src\\content\\releases\"","label":"glob-loader","level":"warn"}
+{"message":"No files found matching \"**/*.{md,mdx}\" in directory \"src\\content\\stories\"","label":"glob-loader","level":"warn"}
+{"message":"No files found matching \"**/*.{md,mdx}\" in directory \"src\\content\\legal\"","label":"glob-loader","level":"warn"}
+{"message":"Synced content","label":"content","level":"info"}
+{"message":"Re-optimizing dependencies because vite config has changed","label":"vite","level":"info"}
+{"message":" astro  v7.1.1 ready in 1967 ms\n┃ Local    http://localhost:4321/faevault-site/\n┃ Network  http://10.36.104.67:4321/faevault-site/","label":"SKIP_FORMAT","level":"info"}
+{"message":"watching for file changes...","label":null,"level":"info"}
+{"message":"Request URLs for public/ assets must also include your base. \"/faevault-site//favicon.ico\" expected, but received \"/favicon.ico\".","label":"router","level":"error"}
+{"message":"[200] /zh-cn/download/ 29ms","label":null,"level":"info"}
+{"message":"dependencies optimized: astro/virtual-modules/transitions-events.js, astro/virtual-modules/transitions-router.js, astro/virtual-modules/transitions-swap-functions.js, astro/virtual-modules/transitions-types.js","label":"vite","level":"info"}
+{"message":"[200] /zh-cn/download/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 13ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 40ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 21ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 19ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 27ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 19ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 18ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 14ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 12ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 8ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 34ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 24ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 11ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 21ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 47ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 14ms","label":null,"level":"info"}
+{"message":"src/components/FluidBackdrop.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 28ms","label":null,"level":"info"}
+{"message":"/src/components/FluidBackdrop.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/FluidBackdrop.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 10ms","label":null,"level":"info"}
+{"message":"src/components/FluidBackdrop.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 27ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 12ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 10ms","label":null,"level":"info"}
+{"message":"src/layouts/BaseLayout.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 24ms","label":null,"level":"info"}
+{"message":"/src/layouts/BaseLayout.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 9ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 9ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 11ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 9ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 9ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"src/layouts/BaseLayout.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 21ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 15ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 19ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 6ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 24ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 31ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 43ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 611ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 7ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 34ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 26ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 27ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 48ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 48ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 26ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 24ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 39ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 6ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 36ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 27ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 27ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 6ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 2ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 2ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 2ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 25ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 30ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 18ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 6ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 51ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/guides/ 10ms","label":null,"level":"info"}
+{"message":"/src/components/GuidesPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/GuidesPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 12ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 13ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"/src/components/GuidesPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/GuidesPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/GuidesPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 9ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 50ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 14ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 8ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 81ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 26ms","label":null,"level":"info"}
+{"message":"[200] /en/ 26ms","label":null,"level":"info"}
+{"message":"[200] /en/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 6ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 9ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 29ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 13ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 52ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 2ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 27ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 78ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 42ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 2ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /en/ 37ms","label":null,"level":"info"}
+{"message":"[200] /en/ 5ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"/src/components/SupportPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/SupportPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /en/ 124ms","label":null,"level":"info"}
+{"message":"[200] /en/ 94ms","label":null,"level":"info"}
+{"message":"[200] /en/ 6ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 28ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /en/ 4ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 69ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 69ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 14ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 27ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/support/ 17ms","label":null,"level":"info"}
+{"message":"/src/components/SupportPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/support/ 27ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 27ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/support/ 13ms","label":null,"level":"info"}
+{"message":"/src/components/SupportPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/support/ 19ms","label":null,"level":"info"}
+{"message":"/src/components/SupportPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/support/ 15ms","label":null,"level":"info"}
+{"message":"/src/components/SupportPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/support/ 21ms","label":null,"level":"info"}
+{"message":"[CompilerError] Expected `>` but found `<`\n  Stack trace:\n    at D:/Mine/Projects/demo/faevault-site/src/pages/zh-cn/support.astro\n    [...] See full stack trace in the browser, or rerun with --verbose.","label":null,"level":"error"}
+{"message":"Request URLs for public/ assets must also include your base. \"/faevault-site//favicon.ico\" expected, but received \"/favicon.ico\".","label":"router","level":"error"}
+{"message":"[CompilerError] Expected `>` but found `<`\n  Stack trace:\n    at D:/Mine/Projects/demo/faevault-site/src/pages/zh-cn/support.astro\n    [...] See full stack trace in the browser, or rerun with --verbose.","label":null,"level":"error"}
+{"message":"[CompilerError] Expected `>` but found `<`\n  Stack trace:\n    at handleCompileResultErrors (D:\\Mine\\Projects\\demo\\faevault-site\\node_modules\\astro\\dist\\core\\compile\\compile.js:57:8)\n    [...] See full stack trace in the browser, or rerun with --verbose.","label":null,"level":"error"}
+{"message":"[CompilerError] Expected `>` but found `<`\n  Stack trace:\n    at D:/Mine/Projects/demo/faevault-site/src/pages/zh-cn/support.astro\n    [...] See full stack trace in the browser, or rerun with --verbose.","label":null,"level":"error"}
+{"message":"[200] /zh-cn/support/ 17ms","label":null,"level":"info"}
+{"message":"/src/components/SupportPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/support/ 25ms","label":null,"level":"info"}
+{"message":"/src/components/SupportPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/support/ 16ms","label":null,"level":"info"}
+{"message":"[200] /en/support/ 15ms","label":null,"level":"info"}
+{"message":"[200] /en/support/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 4ms","label":null,"level":"info"}
+{"message":"/src/components/SupportPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/support/ 22ms","label":null,"level":"info"}
+{"message":"/src/components/SupportPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/support/ 18ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 24ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"/src/components/SupportPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 23ms","label":null,"level":"info"}
+{"message":"[200] /en/ 13ms","label":null,"level":"info"}
+{"message":"[200] /en/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /en/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"src/components/DeviceSync.astro","label":"watch","level":"info"}
+{"message":"src/components/DeviceSync.astro","label":"watch","level":"info"}
+{"message":"/src/components/SupportPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 43ms","label":null,"level":"info"}
+{"message":"/src/components/SupportPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 22ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 16ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 112ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 43ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 31ms","label":null,"level":"info"}
+{"message":"/src/components/SupportPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 14ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 41ms","label":null,"level":"info"}
+{"message":"src/components/DeviceSync.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 59ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 59ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 20ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 86ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 75ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 48ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 25ms","label":null,"level":"info"}
+{"message":"[200] /en/ 37ms","label":null,"level":"info"}
+{"message":"[200] /en/ 7ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 7ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 18ms","label":null,"level":"info"}
+{"message":"[200] /en/ 6ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /en/ 63ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 14ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"src/layouts/BaseLayout.astro","label":"watch","level":"info"}
+{"message":"src/layouts/BaseLayout.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 41ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 41ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 30ms","label":null,"level":"info"}
+{"message":"src/layouts/BaseLayout.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 31ms","label":null,"level":"info"}
+{"message":"[200] /en/ 13ms","label":null,"level":"info"}
+{"message":"[200] /en/ 6ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 102ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 24ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 9ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 17ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 21ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 15ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"/src/components/SupportPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 15ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 38ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 11ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 40ms","label":null,"level":"info"}
+{"message":"/src/components/SupportPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 26ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 36ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 25ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 5ms","label":null,"level":"info"}
+{"message":"[200] /en/support/ 13ms","label":null,"level":"info"}
+{"message":"[200] /en/support/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 4ms","label":null,"level":"info"}
+{"message":"[200] /en/support/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 6ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 22ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 7ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 34ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 10ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 64ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 8ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 30ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 5ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 18ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 11ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"/src/components/GuidesPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/JourneyPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 100ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 101ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 101ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 85ms","label":null,"level":"info"}
+{"message":"/src/components/GuidesPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/JourneyPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 306ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 53ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 21ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 6ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 16ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 6ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 16ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 5ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/journey/ 33ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 6ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 43ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"/src/components/SupportPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 268ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 146ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 40ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 5ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/guides/ 14ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 33ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 11ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 95ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 6ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 6ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 74ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 6ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 6ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 21ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 47ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 164ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/journey/ 13ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 5ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/download/ 25ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/download/ 13ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 26ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"src/layouts/BaseLayout.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 117ms","label":null,"level":"info"}
+{"message":"src/layouts/BaseLayout.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 47ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 211ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 228ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 74ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 48ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 73ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 101ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 47ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 25ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 75ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 44ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 42ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 38ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/guides/ 16ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 10ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 14ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 14ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 28ms","label":null,"level":"info"}
+{"message":"[200] /en/ 40ms","label":null,"level":"info"}
+{"message":"[200] /en/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 26ms","label":null,"level":"info"}
+{"message":"[200] /en/ 31ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 49ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 29ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 57ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 5ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/download/ 9ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 41ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/guides/ 9ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 23ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 16ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 4ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/support/ 10ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 26ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 26ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 71ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 31ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/support/ 10ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/support/ 10ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 14ms","label":null,"level":"info"}
+{"message":"src/layouts/BaseLayout.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 30ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 11ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 28ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 33ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 40ms","label":null,"level":"info"}
+{"message":"workflowItems is not defined\n  Stack trace:\n    at eval (D:\\Mine\\Projects\\demo\\faevault-site\\src\\components\\HomePage.astro:117:25)\n    [...] See full stack trace in the browser, or rerun with --verbose.","label":null,"level":"error"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 28ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 24ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 24ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/support/ 24ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 16ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/download/ 11ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/download/ 11ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 18ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 9ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 11ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 36ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 9ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 27ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 23ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 33ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 24ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 34ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 22ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 5ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 31ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 25ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 9ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 13ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /en/ 17ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /en/ 3ms","label":null,"level":"info"}
+{"message":"[200] /en/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /en/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 31ms","label":null,"level":"info"}
+{"message":"[200] /en/ 33ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /en/ 14ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /en/ 27ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 23ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /en/ 3ms","label":null,"level":"info"}
+{"message":"[200] /en/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /en/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 2ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 6ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 37ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 27ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 32ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 26ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 11ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 24ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 12ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 10ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"src/layouts/BaseLayout.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/journey/ 22ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 33ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 16ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 10ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/security/ 21ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/security/ 2ms","label":null,"level":"info"}
+{"message":"/src/components/SecurityPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/security/ 26ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 15ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"src/layouts/BaseLayout.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 29ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 21ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 30ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 42ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 26ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/security/ 15ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 23ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 39ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/security/ 9ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 27ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/security/ 17ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/security/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 16ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"/src/components/JourneyPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[CompilerError] Expected `,` or `]` but found `Identifier`\n  Stack trace:\n    at handleCompileResultErrors (D:\\Mine\\Projects\\demo\\faevault-site\\node_modules\\astro\\dist\\core\\compile\\compile.js:57:8)\n    [...] See full stack trace in the browser, or rerun with --verbose.","label":null,"level":"error"}
+{"message":"[CompilerError] Expected `,` or `]` but found `Identifier`\n  Stack trace:\n    at D:/Mine/Projects/demo/faevault-site/src/components/JourneyPage.astro:15:43\n    [...] See full stack trace in the browser, or rerun with --verbose.","label":null,"level":"error"}
+{"message":"[CompilerError] Expected `,` or `]` but found `Identifier`\n  Stack trace:\n    at handleCompileResultErrors (D:\\Mine\\Projects\\demo\\faevault-site\\node_modules\\astro\\dist\\core\\compile\\compile.js:57:8)\n    [...] See full stack trace in the browser, or rerun with --verbose.","label":null,"level":"error"}
+{"message":"[CompilerError] Expected `,` or `]` but found `Identifier`\n  Stack trace:\n    at D:/Mine/Projects/demo/faevault-site/src/components/JourneyPage.astro:15:43\n    [...] See full stack trace in the browser, or rerun with --verbose.","label":null,"level":"error"}
+{"message":"/src/components/JourneyPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[CompilerError] Expected `,` or `]` but found `Identifier`\n  Stack trace:\n    at handleCompileResultErrors (D:\\Mine\\Projects\\demo\\faevault-site\\node_modules\\astro\\dist\\core\\compile\\compile.js:57:8)\n    [...] See full stack trace in the browser, or rerun with --verbose.","label":null,"level":"error"}
+{"message":"[CompilerError] Expected `,` or `]` but found `Identifier`\n  Stack trace:\n    at D:/Mine/Projects/demo/faevault-site/src/components/JourneyPage.astro:39:28\n    [...] See full stack trace in the browser, or rerun with --verbose.","label":null,"level":"error"}
+{"message":"/src/components/JourneyPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[CompilerError] Expected `,` or `]` but found `Identifier`\n  Stack trace:\n    at handleCompileResultErrors (D:\\Mine\\Projects\\demo\\faevault-site\\node_modules\\astro\\dist\\core\\compile\\compile.js:57:8)\n    [...] See full stack trace in the browser, or rerun with --verbose.","label":null,"level":"error"}
+{"message":"[CompilerError] Expected `,` or `]` but found `Identifier`\n  Stack trace:\n    at D:/Mine/Projects/demo/faevault-site/src/components/JourneyPage.astro:47:28\n    [...] See full stack trace in the browser, or rerun with --verbose.","label":null,"level":"error"}
+{"message":"/src/components/JourneyPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/journey/ 17ms","label":null,"level":"info"}
+{"message":"/src/components/JourneyPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/journey/ 20ms","label":null,"level":"info"}
+{"message":"/src/components/JourneyPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/journey/ 22ms","label":null,"level":"info"}
+{"message":"/src/components/JourneyPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/journey/ 18ms","label":null,"level":"info"}
+{"message":"/src/components/JourneyPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/journey/ 16ms","label":null,"level":"info"}
+{"message":"/src/components/JourneyPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/journey/ 14ms","label":null,"level":"info"}
+{"message":"/src/components/JourneyPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/journey/ 15ms","label":null,"level":"info"}
+{"message":"/src/components/JourneyPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/journey/ 21ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 26ms","label":null,"level":"info"}
+{"message":"/src/components/JourneyPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/journey/ 19ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 21ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 10ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"/src/components/JourneyPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 12ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/security/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/security/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"/src/components/JourneyPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/journey/ 7ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"/src/components/PageShell.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/download/ 11ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"/src/components/JourneyPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/guides/ 9ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 11ms","label":null,"level":"info"}
+{"message":"src/layouts/BaseLayout.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 24ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 19ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 12ms","label":null,"level":"info"}
+{"message":"[404] /zh-cn/journey/ 8ms","label":null,"level":"info"}
+{"message":"[404] /zh-cn/journey/ 0ms","label":null,"level":"info"}
+{"message":"[404] /zh-cn/journey/ 1ms","label":null,"level":"info"}
+{"message":"src/layouts/BaseLayout.astro","label":"watch","level":"info"}
+{"message":"/src/components/JourneyPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 32ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[404] /zh-cn/journey/ 0ms","label":null,"level":"info"}
+{"message":"[404] /zh-cn/journey/ 1ms","label":null,"level":"info"}
+{"message":"[404] /zh-cn/journey/ 1ms","label":null,"level":"info"}
+{"message":"[404] /zh-cn/journey/ 1ms","label":null,"level":"info"}
+{"message":"[404] /zh-cn/journey/ 1ms","label":null,"level":"info"}
+{"message":"[404] /zh-cn/journey/ 1ms","label":null,"level":"info"}
+{"message":"[404] /zh-cn/journey/ 0ms","label":null,"level":"info"}
+{"message":"[404] /zh-cn/journey/ 0ms","label":null,"level":"info"}
+{"message":"[404] /zh-cn/journey/ 0ms","label":null,"level":"info"}
+{"message":"[404] /zh-cn/journey/ 1ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 14ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/security/ 12ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/journey/ 14ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 25ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 45ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 28ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 10ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 13ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 11ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 2ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 11ms","label":null,"level":"info"}
+{"message":"src/layouts/BaseLayout.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 25ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 19ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 10ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 11ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 11ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /en/ 18ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 47ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 39ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 2ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 38ms","label":null,"level":"info"}
+{"message":"src/components/HomePage.astro","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 67ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 8ms","label":null,"level":"info"}
+{"message":"/src/components/HomePage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 8ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/security/ 10ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/security/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 5ms","label":null,"level":"info"}
+{"message":"[200] /en/support/ 20ms","label":null,"level":"info"}
+{"message":"[200] /en/support/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 4ms","label":null,"level":"info"}
+{"message":"/src/components/SupportPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/support/ 20ms","label":null,"level":"info"}
+{"message":"[200] /en/support/ 13ms","label":null,"level":"info"}
+{"message":"[200] /en/support/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 2ms","label":null,"level":"info"}
+{"message":"/src/components/SupportPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/support/ 21ms","label":null,"level":"info"}
+{"message":"/src/components/SupportPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/support/ 18ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 7ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 2ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 2ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 3ms","label":null,"level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/download/ 21ms","label":null,"level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/download/ 14ms","label":null,"level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/download/ 15ms","label":null,"level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 10ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/download/ 22ms","label":null,"level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/download/ 24ms","label":null,"level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/download/ 20ms","label":null,"level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/download/ 15ms","label":null,"level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/download/ 18ms","label":null,"level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/download/ 18ms","label":null,"level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /en/download/ 17ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 19ms","label":null,"level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 15ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 6ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 6ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/layouts/BaseLayout.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/PageShell.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/download/ 15ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 3ms","label":null,"level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/download/ 14ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 6ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 6ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 6ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/journey/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/support/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 5ms","label":null,"level":"info"}
+{"message":"[200] /en/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /en/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 6ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/download/ 30ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 14ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 5ms","label":null,"level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/download/ 21ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 10ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"/src/layouts/BaseLayout.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 11ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 7ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 5ms","label":null,"level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"[200] /zh-cn/ 13ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/ 4ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/guides/ 3ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 26ms","label":null,"level":"info"}
+{"message":"[200] /zh-cn/download/ 4ms","label":null,"level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
+{"message":"/src/components/DownloadPage.astro?astro&type=style&index=0&lang.css","label":"watch","level":"info"}
