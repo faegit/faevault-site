@@ -37,14 +37,14 @@
       state.nextTargetAt = time + 3400 + Math.random() * 5200;
     };
     drift.forEach((state, index) => chooseTarget(state, now + index * 430));
+    const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
     const blobPalette = [
-      { phase: 0, speed: .032, sat: 84, light: 58, alpha: .62 },
-      { phase: 2.1, speed: -.028, sat: 88, light: 55, alpha: .56 },
-      { phase: 4.0, speed: .036, sat: 86, light: 56, alpha: .52 },
-      { phase: 5.8, speed: -.024, sat: 82, light: 54, alpha: .48 },
+      { hue: 190, targetHue: 190, sat: isDark ? 42 : 84, light: isDark ? 38 : 58, alpha: isDark ? .35 : .62 },
+      { hue: 220, targetHue: 220, sat: isDark ? 38 : 88, light: isDark ? 35 : 55, alpha: isDark ? .30 : .56 },
+      { hue: 260, targetHue: 260, sat: isDark ? 36 : 86, light: isDark ? 36 : 56, alpha: isDark ? .28 : .52 },
+      { hue: 170, targetHue: 170, sat: isDark ? 34 : 82, light: isDark ? 34 : 54, alpha: isDark ? .26 : .48 },
     ];
     let lastPaint = 0;
-    let colorTime = 0;
     if (!reduce) {
       let previousTime = performance.now();
       const tick = (now: number) => {
@@ -53,21 +53,28 @@
         const delta = Math.min(48, Math.max(0, now - previousTime));
         previousTime = now;
         lastPaint = now;
-        colorTime += delta * .016;
         const width = window.innerWidth;
         const height = window.innerHeight;
         blobs.forEach((blob, index) => {
           const state = drift[index];
           const pal = blobPalette[index];
-          if (now >= state.nextTargetAt) chooseTarget(state, now);
+          if (now >= state.nextTargetAt) {
+            chooseTarget(state, now);
+            pal.targetHue = Math.random() * 360;
+          }
           const positionEase = 1 - Math.exp(-delta / 3100);
           const shapeEase = 1 - Math.exp(-delta / 2400);
+          const colorEase = 1 - Math.exp(-delta / 2800);
           state.x += (state.targetX - state.x) * positionEase;
           state.y += (state.targetY - state.y) * positionEase;
           state.scale += (state.targetScale - state.scale) * shapeEase;
           state.rotation += (state.targetRotation - state.rotation) * shapeEase;
-          const hue = ((pal.phase + colorTime * pal.speed) * 180 / Math.PI + 360) % 360;
-          blob.style.background = `hsla(${hue}, ${pal.sat}%, ${pal.light}%, ${pal.alpha})`;
+          // Smooth hue interpolation (shortest path, no wrap jump)
+          let diff = pal.targetHue - pal.hue;
+          if (diff > 180) diff -= 360;
+          if (diff < -180) diff += 360;
+          pal.hue += diff * colorEase;
+          blob.style.background = `hsla(${(pal.hue + 360) % 360}, ${pal.sat}%, ${pal.light}%, ${pal.alpha})`;
           blob.style.transform = `translate3d(${state.x * width}px,${state.y * height}px,0) rotate(${state.rotation}deg) scale(${state.scale})`;
         });
       };
