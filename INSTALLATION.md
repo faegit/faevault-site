@@ -1,8 +1,8 @@
-# FAEVault 3.6.2 安装与升级指南
+# FAEVault 安装与升级指南
 
 ## Windows
 
-1. 在 [v3.6.2 发布页](https://github.com/faegit/faevault-site/releases/tag/v3.6.2) 下载 `FAEVault_v3.6.2_Setup.exe`。
+1. 在 [最新发布页](https://faegit.github.io/faevault-site/zh-cn/download/) 下载 Windows 安装包。
 2. 双击安装包，按中文向导安装。默认目录为 `C:\Program Files\vault`，需要管理员权限。
 3. 安装器检测到旧版本时会提示先卸载旧程序。确认后会替换程序文件，但不会删除用户保险库数据。
 4. 如果提示程序正在运行，请关闭保险库和浏览器自动填充宿主后重试。
@@ -32,4 +32,4 @@
 3. 点击“临时载入附加组件”，选择扩展目录中的 `manifest.firefox.json`。
 4. Firefox 重启后临时扩展会失效，需要再次载入。
 
-如果应用提示“未找到组件”，请安装 v3.6.2 完整 Windows 安装包；旧版安装包或只复制主程序 EXE 的目录不包含完整的浏览器宿主和扩展资源。
+如果应用提示“未找到组件”，请安装完整 Windows 安装包；只复制主程序 EXE 的目录不包含完整的浏览器宿主和扩展资源。

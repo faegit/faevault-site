@@ -5,6 +5,8 @@ on:
     branches: [main, codex/faevault-site-foundation]
   pull_request:
     branches: [main]
+  release:
+    types: [published]
   workflow_dispatch:
 
 permissions:
