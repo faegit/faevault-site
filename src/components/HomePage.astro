@@ -72,7 +72,6 @@ const features =
           ];
 ---
 
-<canvas id="dot-grid" aria-hidden="true"></canvas>
 <div class="home">
     <section class="section hero" id="opening">
         <div class="hero-inner">
@@ -192,17 +191,8 @@ const features =
 </div>
 
 <style>
-    #dot-grid {
-        position: fixed;
-        inset: 0;
-        z-index: 0;
-        pointer-events: none;
-        width: 100vw;
-        height: 100vh;
-    }
     .home {
         position: relative;
-        z-index: 1;
     }
 
     .section {
@@ -976,93 +966,6 @@ const features =
     document.addEventListener("astro:page-load", initTilt);
 })();
 </script>
-<script>
-(function() {
-    const canvas = document.getElementById("dot-grid");
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    const ambient = document.querySelector(".ambient-layer");
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    let w, h, dots = [];
-    let mx = -9999, my = -9999;
-    const SPACING = 32;
-    const BASE = 1;
-    const MAX_R = 3.2;
-    const INFLUENCE = 200;
-
-    function resize() {
-        w = canvas.width = window.innerWidth;
-        h = canvas.height = window.innerHeight;
-        dots = [];
-        for (let y = SPACING; y < h; y += SPACING) {
-            for (let x = SPACING; x < w; x += SPACING) {
-                dots.push({ x, y, r: BASE });
-            }
-        }
-    }
-
-    function draw() {
-        ctx.clearRect(0, 0, w, h);
-        const r2 = INFLUENCE * INFLUENCE;
-
-        for (const d of dots) {
-            const dx = mx - d.x, dy = my - d.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            let t = 1 - dist / INFLUENCE;
-            if (t < 0) t = 0;
-            const target = BASE + (MAX_R - BASE) * t * t;
-            d.r += (target - d.r) * (prefersReduced ? 1 : 0.12);
-
-            ctx.beginPath();
-            ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-            ctx.fillStyle = "rgba(155, 175, 190, 0.28)";
-            ctx.fill();
-        }
-
-        if (!prefersReduced) requestAnimationFrame(draw);
-    }
-
-    const onMove = (e) => { mx = e.clientX; my = e.clientY; };
-    const onLeave = () => { mx = -9999; my = -9999; };
-
-    let resizeTimer;
-    const onResize = () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(resize, 80);
-    };
-
-    function drawStatic() {
-        ctx.clearRect(0, 0, w, h);
-        for (const d of dots) {
-            ctx.beginPath();
-            ctx.arc(d.x, d.y, BASE, 0, Math.PI * 2);
-            ctx.fillStyle = "rgba(155, 175, 190, 0.28)";
-            ctx.fill();
-        }
-    }
-
-    function onPage() {
-        if (ambient) ambient.style.display = "none";
-        resize();
-        prefersReduced ? drawStatic() : draw();
-    }
-
-    window.addEventListener("resize", onResize);
-    document.addEventListener("mousemove", onMove);
-    document.addEventListener("mouseleave", onLeave);
-    document.addEventListener("astro:page-load", onPage);
-
-    onPage();
-
-    document.addEventListener("astro:before-swap", () => {
-        window.removeEventListener("resize", onResize);
-        document.removeEventListener("mousemove", onMove);
-        document.removeEventListener("mouseleave", onLeave);
-        document.removeEventListener("astro:page-load", onPage);
-        if (ambient) ambient.style.display = "";
-    });
-})();
-</script>
 
  
