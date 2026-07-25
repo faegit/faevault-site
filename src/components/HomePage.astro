@@ -11,18 +11,18 @@ const copy =
     locale === "zh-cn"
         ? {
               eyebrow: "本地优先 · Android + Windows",
-              title: "你的密码和数据，\n完全由你掌控。",
+              title: "你的密码和数据，完全由你掌控。",
               intro: "保险库把密码、通行密钥与重要资料放进一个本地加密库，并为 Windows Hello、浏览器自动填充与多设备同步打基础。",
               support: "直接赞助支持开发",
               storyLink: "了解产品故事",
               syncLabel: "桌面端与手机端之间的加密数据同步",
               storyKicker: "为什么值得信赖",
-              storyTitle: "无广告 · 免费 ·\n安全透明。",
+              storyTitle: "无广告 · 免费 · 安全透明。",
               storyBody: "保险库不含任何广告，所有核心功能免费使用。数据采用 scrypt + AES-256-GCM 本地加密，不经任何外部服务器；加密方案与安全设计公开透明，经反复审计验证。",
               quote: "好的工具不需要在隐私和便利之间做取舍。",
               whitepaperLink: "查看安全白皮书",
               guideKicker: "功能展示",
-              guideTitle: "保险库具备的\n实用功能。",
+              guideTitle: "保险库具备的实用功能。",
               guideBody: "从本地加密存储到系统自动填充，保险库为 Android 和 Windows 提供完整的密码管理能力。",
               guides: "查看使用指南",
               download: "下载最新版本",
@@ -32,18 +32,18 @@ const copy =
           }
         : {
               eyebrow: "Local-first · Android + Windows",
-              title: "Your passwords\nshould truly be yours.",
+              title: "Your passwords should truly be yours.",
               intro: "FAEVault keeps passwords, passkeys, and important details inside a vault you can truly control.",
               support: "Support development",
               storyLink: "Learn the story",
               syncLabel: "Encrypted data moving between desktop and phone",
               storyKicker: "Why it feels trustworthy",
-              storyTitle: "No ads · Free ·\nSecurity you can see.",
+              storyTitle: "No ads · Free · Security you can see.",
               storyBody: "FAEVault contains no ads and all core features are free. Data is encrypted locally with scrypt + AES-256-GCM, never touching external servers. The encryption design and security architecture are transparent and regularly reviewed.",
               quote: "A good tool shouldn't make you choose between privacy and convenience.",
               whitepaperLink: "Read the security whitepaper",
               guideKicker: "Feature showcase",
-              guideTitle: "Practical features\nfor everyday use.",
+              guideTitle: "Practical features for everyday use.",
               guideBody: "From local encrypted storage to system-level autofill, FAEVault delivers complete password management for Android and Windows.",
               guides: "Browse the guides",
               download: "Download the latest version",
@@ -78,16 +78,7 @@ const features =
         <div class="hero-inner">
             <div class="hero-copy">
                 <p class="eyebrow">{copy.eyebrow}</p>
-                <h1>
-                    {
-                        copy.title.split("\n").map((line) => (
-                            <>
-                                {line}
-                                <br />
-                            </>
-                        ))
-                    }
-                </h1>
+                <h1>{copy.title}</h1>
                 <p class="intro">{copy.intro}</p>
                 <div class="actions">
                     <a class="primary" href={localePath(locale, "download")}>{copy.download}</a>
@@ -219,7 +210,6 @@ const features =
     }
     .section > * {
         width: calc(100% - 4rem);
-        max-width: 1600px;
         margin: 0 auto;
     }
     .hero {
@@ -379,7 +369,7 @@ const features =
     .hero-copy h1,
     .split-copy h2,
     .support-inner h2 {
-        white-space: pre-line;
+        max-width: 900px;
     }
     .actions {
         display: flex;
