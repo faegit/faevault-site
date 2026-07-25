@@ -397,13 +397,13 @@ const features =
         z-index: 1;
     }
     .device-wrap {
-        justify-self: end;
-        transform: scale(0.92);
-        transform-origin: right center;
+        display: flex;
+        justify-content: center;
     }
     .device-wrap :global(.device-stage) {
-        width: 520px;
-        height: 400px;
+        width: min(520px, calc(100vw - 4rem));
+        height: auto;
+        aspect-ratio: 520 / 400;
     }
 
     .split-inner {
@@ -860,13 +860,8 @@ const features =
         .hero-inner {
             grid-template-columns: minmax(0, 1fr);
         }
-        .device-wrap {
-            justify-self: center;
-            transform: scale(0.78);
-            transform-origin: center;
-        }
-        .hero-inner > * {
-            min-width: 0;
+        .device-wrap :global(.device-stage) {
+            width: min(480px, calc(100vw - 4rem));
         }
         .split-inner {
             grid-template-columns: 1fr;
@@ -888,10 +883,8 @@ const features =
             width: 100%;
             justify-content: center;
         }
-        .device-wrap {
-            transform: scale(0.6);
-            transform-origin: center;
-            margin-bottom: -2rem;
+        .device-wrap :global(.device-stage) {
+            width: min(360px, calc(100vw - 3rem));
         }
         .support-inner {
             border-radius: 1.7rem;
