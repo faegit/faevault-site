@@ -10,7 +10,7 @@ const { locale } = Astro.props;
 const copy =
     locale === "zh-cn"
         ? {
-                eyebrow: "本地优先",
+                eyebrow: "",
               title: "你的密码和数据，完全由你掌控。",
               intro: "保险库把密码、通行密钥与重要资料放进一个本地加密库，并为 Windows Hello、浏览器自动填充与多设备同步打基础。",
               storyLink: "了解产品故事",
@@ -32,7 +32,7 @@ const copy =
               supportButton: "了解赞助方式",
           }
         : {
-                eyebrow: "Local-first",
+                eyebrow: "",
               title: "Your passwords should truly be yours.",
               intro: "FAEVault keeps passwords, passkeys, and important details inside a vault you can truly control.",
               storyLink: "Learn the story",
@@ -78,7 +78,6 @@ const features =
     <section class="section hero" id="opening">
         <div class="hero-inner">
             <div class="hero-copy">
-                <p class="eyebrow">{copy.eyebrow}</p>
                 <h1>{copy.title}</h1>
                 <p class="intro">{copy.intro}</p>
                 <div class="actions">
