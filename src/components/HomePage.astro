@@ -806,6 +806,9 @@ const features =
         background: linear-gradient(135deg, rgba(229, 248, 247, 0.62), rgba(229, 237, 251, 0.48));
         box-shadow: 0 28px 90px rgba(42, 83, 99, 0.12);
         backdrop-filter: blur(22px);
+        transform-style: preserve-3d;
+        will-change: transform;
+        transition: transform 0.15s ease;
     }
     .support-card::before {
         content: "";
@@ -935,6 +938,24 @@ const features =
 
 <script>
 (function() {
+    const MAX = 6;
+    function initTilt() {
+        const card = document.querySelector<HTMLElement>(".support-card");
+        if (!card) return;
+        card.addEventListener("mousemove", (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width;
+            const y = (e.clientY - rect.top) / rect.height;
+            card.style.transform = `perspective(800px) rotateX(${(y - 0.5) * -MAX}deg) rotateY(${(x - 0.5) * MAX}deg)`;
+        });
+        card.addEventListener("mouseleave", () => {
+            card.style.transform = "perspective(800px) rotateX(0) rotateY(0)";
+        });
+    }
+    document.addEventListener("astro:page-load", initTilt);
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initTilt);
+    else initTilt();
+
     let timer: ReturnType<typeof setInterval>;
 
     function initStack() {
