@@ -1254,12 +1254,14 @@ const showcaseFeatures =
             if (cards.length < 2) return;
 
             let prev = 0;
+            let lock = false;
 
             function unit() {
                 return cards[0].offsetWidth + (parseFloat(getComputedStyle(track).gap) || 0);
             }
 
             track.addEventListener("scroll", () => {
+                if (lock) return;
                 const u = unit();
                 const sl = track.scrollLeft;
                 const dir = sl - prev;
@@ -1274,12 +1276,20 @@ const showcaseFeatures =
                         track.scrollLeft -= u;
                     }
                 } else if (dir < 0 && track.scrollLeft < 1) {
-                    const el = track.lastElementChild;
-                    const first = track.firstElementChild;
-                    if (!el || !first) return;
-                    track.insertBefore(el, first);
-                    cards.unshift(cards.pop()!);
-                    track.scrollLeft += u;
+                    lock = true;
+                    track.style.scrollSnapType = "none";
+                    const count = Math.min(3, cards.length);
+                    for (let i = 0; i < count; i++) {
+                        const el = track.lastElementChild;
+                        if (!el) break;
+                        track.insertBefore(el, track.firstElementChild!);
+                        cards.unshift(cards.pop()!);
+                    }
+                    track.scrollLeft = count * u;
+                    requestAnimationFrame(() => {
+                        track.style.scrollSnapType = "";
+                        lock = false;
+                    });
                 }
             });
         }
