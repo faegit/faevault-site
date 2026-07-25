@@ -17,7 +17,7 @@ const copy =
 
 
               storyKicker: "为什么值得信赖",
-              storyTitle: "无广告 · 免费 · 安全透明。",
+                storyTitle: "开源 · 本地 · 无服务器",
               storyBody: "保险库不含任何广告，所有核心功能免费使用。数据采用 scrypt + AES-256-GCM 本地加密，不经任何外部服务器；加密方案与安全设计公开透明，经反复审计验证。",
               quote: "好的工具不需要在隐私和便利之间做取舍。",
               whitepaperLink: "查看安全白皮书",
@@ -39,7 +39,7 @@ const copy =
 
 
               storyKicker: "Why it feels trustworthy",
-              storyTitle: "No ads · Free · Security you can see.",
+                storyTitle: "Open · Local · Serverless",
               storyBody: "FAEVault contains no ads and all core features are free. Data is encrypted locally with scrypt + AES-256-GCM, never touching external servers. The encryption design and security architecture are transparent and regularly reviewed.",
               quote: "A good tool shouldn't make you choose between privacy and convenience.",
               whitepaperLink: "Read the security whitepaper",
@@ -129,7 +129,7 @@ const features =
                     <div class="showcase-card">
                         <div class="showcase-topbar">
                             <div class="topbar-dots"><span></span><span></span><span></span></div>
-                            <div class="topbar-label">{locale === "zh-cn" ? "无广告 · 免费 · 安全" : "No ads · Free · Secure"}</div>
+                            <div class="topbar-label">{locale === "zh-cn" ? "开源 · 本地 · 无服务器" : "Open · Local · Serverless"}</div>
                         </div>
                         <div class="showcase-grid">
                             <div class="showcase-panel panel-left">
@@ -138,22 +138,43 @@ const features =
                                     <div class="panel-row active">
                                         <span class="panel-icon"></span>
                                         <span class="panel-text">
-                                            <strong>{locale === "zh-cn" ? "无广告" : "No ads"}</strong>
-                                            <em>{locale === "zh-cn" ? "纯净体验" : "Clean experience"}</em>
+                                            <strong>{locale === "zh-cn" ? "开源代码" : "Open source"}</strong>
+                                            <em>{locale === "zh-cn" ? "代码公开可审计" : "Publicly auditable"}</em>
                                         </span>
                                     </div>
                                     <div class="panel-row">
                                         <span class="panel-icon muted"></span>
                                         <span class="panel-text">
-                                            <strong>{locale === "zh-cn" ? "完全免费" : "Completely free"}</strong>
-                                            <em>{locale === "zh-cn" ? "核心功能零费用" : "All core features"}</em>
+                                            <strong>{locale === "zh-cn" ? "本地加密" : "Local encryption"}</strong>
+                                            <em>{locale === "zh-cn" ? "数据不出设备" : "Data never leaves"}</em>
                                         </span>
                                     </div>
                                     <div class="panel-row">
                                         <span class="panel-icon accent"></span>
                                         <span class="panel-text">
-                                            <strong>{locale === "zh-cn" ? "加密方案公开" : "Open encryption"}</strong>
-                                            <em>{locale === "zh-cn" ? "scrypt + AES-256-GCM" : "scrypt + AES-256-GCM"}</em>
+                                            <strong>{locale === "zh-cn" ? "无账号体系" : "No accounts"}</strong>
+                                            <em>{locale === "zh-cn" ? "打开即用" : "Open and use"}</em>
+                                        </span>
+                                    </div>
+                                    <div class="panel-row active">
+                                        <span class="panel-icon"></span>
+                                        <span class="panel-text">
+                                            <strong>{locale === "zh-cn" ? "无服务器存储" : "No cloud storage"}</strong>
+                                            <em>{locale === "zh-cn" ? "数据由你掌控" : "You control it"}</em>
+                                        </span>
+                                    </div>
+                                    <div class="panel-row">
+                                        <span class="panel-icon muted"></span>
+                                        <span class="panel-text">
+                                            <strong>{locale === "zh-cn" ? "数据格式透明" : "Transparent format"}</strong>
+                                            <em>{locale === "zh-cn" ? "JSON 明文可读" : "Plain JSON"}</em>
+                                        </span>
+                                    </div>
+                                    <div class="panel-row">
+                                        <span class="panel-icon accent"></span>
+                                        <span class="panel-text">
+                                            <strong>{locale === "zh-cn" ? "可自行备份" : "Bring your own backup"}</strong>
+                                            <em>{locale === "zh-cn" ? "文件级自由备份" : "File-level freedom"}</em>
                                         </span>
                                     </div>
                                 </div>
@@ -408,9 +429,15 @@ const features =
 
 
     .split-inner {
-        display: grid;
-        grid-template-columns: 1.05fr 0.9fr;
-        gap: 5vw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2.5rem;
+    }
+    .split-inner .split-copy {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
         align-items: center;
     }
     .story-body {
@@ -437,7 +464,7 @@ const features =
 
     .showcase-wrap {
         width: 100%;
-        max-width: 430px;
+        max-width: 500px;
         margin: 0 auto;
     }
     .showcase-shell {
@@ -696,7 +723,8 @@ const features =
     }
     .guide-head {
         max-width: 1000px;
-        margin-bottom: 2.2rem;
+        margin: 0 auto 2.2rem;
+        text-align: center;
     }
     .section-copy {
         max-width: 720px;
@@ -902,12 +930,6 @@ const features =
         transform: translateY(-1px);
     }
 
-    @media (max-width: 1000px) {
-        .split-inner {
-            grid-template-columns: 1fr;
-            gap: 2.5rem;
-        }
-    }
     @media (max-width: 760px) {
         .feature-grid {
             grid-template-columns: 1fr;
