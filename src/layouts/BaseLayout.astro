@@ -253,6 +253,7 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
                 dots.push({ x, y, r: BASE });
     }
 
+    let raf = 0;
     function draw() {
         ctx.clearRect(0, 0, w, h);
         for (const d of dots) {
@@ -268,7 +269,7 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
             ctx.fillStyle = "rgba(155, 175, 190, 0.28)";
             ctx.fill();
         }
-        if (!prefersReduced) requestAnimationFrame(draw);
+        if (!prefersReduced) raf = requestAnimationFrame(draw);
     }
 
     function drawStatic() {
@@ -287,6 +288,7 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
     let resizeTimer;
     const onResize = () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(resize, 80); };
 
+    function stop() { cancelAnimationFrame(raf); }
     function init() { resize(); prefersReduced ? drawStatic() : draw(); }
 
     window.addEventListener("resize", onResize);
@@ -296,6 +298,7 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
     init();
 
     document.addEventListener("astro:before-swap", () => {
+        stop();
         window.removeEventListener("resize", onResize);
         document.removeEventListener("mousemove", onMove);
         document.removeEventListener("mouseleave", onLeave);
