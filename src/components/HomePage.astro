@@ -72,6 +72,7 @@ const features =
           ];
 ---
 
+<canvas id="dot-grid" aria-hidden="true"></canvas>
 <div class="home">
     <section class="section hero" id="opening">
         <div class="hero-inner">
@@ -200,8 +201,17 @@ const features =
 </div>
 
 <style>
+    #dot-grid {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        width: 100vw;
+        height: 100vh;
+    }
     .home {
         position: relative;
+        z-index: 1;
     }
 
     .section {
@@ -427,10 +437,11 @@ const features =
         overflow: hidden;
         border-radius: 2rem;
         padding: 0.8rem;
-        background: linear-gradient(135deg, rgba(248, 251, 255, 0.98), rgba(239, 247, 248, 0.95));
+        background: linear-gradient(135deg, rgba(248, 251, 255, 0.85), rgba(239, 247, 248, 0.78));
         box-shadow:
             0 22px 80px rgba(42, 83, 99, 0.16),
             inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
     }
     .showcase-glow {
         position: absolute;
@@ -722,8 +733,9 @@ const features =
         padding: 1.15rem 1.2rem;
         border-radius: 1.45rem;
         border: 1px solid rgba(71, 106, 122, 0.14);
-        background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(241, 248, 251, 0.92));
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.78), rgba(241, 248, 251, 0.7));
         box-shadow: 0 20px 40px rgba(41, 81, 95, 0.1);
+        backdrop-filter: blur(8px);
         transform-origin: center;
         will-change: transform, box-shadow, z-index;
         cursor: pointer;
@@ -731,7 +743,7 @@ const features =
     }
     .workflow-card.active {
         box-shadow: 0 28px 52px rgba(41, 81, 95, 0.17), 0 0 0 1px rgba(63, 143, 175, 0.15);
-        background: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(244, 250, 252, 0.96));
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.85), rgba(244, 250, 252, 0.78));
     }
     .workflow-card.fade-up {
         transform: translateY(-36px) scale(1.02) !important;
@@ -791,7 +803,7 @@ const features =
         padding: clamp(3.5rem, 7vw, 6rem);
         border: 1px solid rgba(255, 255, 255, 0.7);
         border-radius: 2.5rem;
-        background: linear-gradient(135deg, rgba(229, 248, 247, 0.82), rgba(229, 237, 251, 0.68));
+        background: linear-gradient(135deg, rgba(229, 248, 247, 0.62), rgba(229, 237, 251, 0.48));
         box-shadow: 0 28px 90px rgba(42, 83, 99, 0.12);
         backdrop-filter: blur(22px);
         transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -973,5 +985,93 @@ const features =
     document.addEventListener("astro:page-load", initTilt);
 })();
 </script>
+<script>
+(function() {
+    const canvas = document.getElementById("dot-grid");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const ambient = document.querySelector(".ambient-layer");
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+    let w, h, dots = [];
+    let mx = -9999, my = -9999;
+    const SPACING = 32;
+    const BASE = 1;
+    const MAX_R = 3.2;
+    const INFLUENCE = 200;
 
+    function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+        dots = [];
+        for (let y = SPACING; y < h; y += SPACING) {
+            for (let x = SPACING; x < w; x += SPACING) {
+                dots.push({ x, y, r: BASE });
+            }
+        }
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, w, h);
+        const r2 = INFLUENCE * INFLUENCE;
+
+        for (const d of dots) {
+            const dx = mx - d.x, dy = my - d.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            let t = 1 - dist / INFLUENCE;
+            if (t < 0) t = 0;
+            const target = BASE + (MAX_R - BASE) * t * t;
+            d.r += (target - d.r) * (prefersReduced ? 1 : 0.12);
+
+            ctx.beginPath();
+            ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(155, 175, 190, 0.28)";
+            ctx.fill();
+        }
+
+        if (!prefersReduced) requestAnimationFrame(draw);
+    }
+
+    const onMove = (e) => { mx = e.clientX; my = e.clientY; };
+    const onLeave = () => { mx = -9999; my = -9999; };
+
+    let resizeTimer;
+    const onResize = () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(resize, 80);
+    };
+
+    function drawStatic() {
+        ctx.clearRect(0, 0, w, h);
+        for (const d of dots) {
+            ctx.beginPath();
+            ctx.arc(d.x, d.y, BASE, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(155, 175, 190, 0.28)";
+            ctx.fill();
+        }
+    }
+
+    function onPage() {
+        if (ambient) ambient.style.display = "none";
+        resize();
+        prefersReduced ? drawStatic() : draw();
+    }
+
+    window.addEventListener("resize", onResize);
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseleave", onLeave);
+    document.addEventListener("astro:page-load", onPage);
+
+    onPage();
+
+    document.addEventListener("astro:before-swap", () => {
+        window.removeEventListener("resize", onResize);
+        document.removeEventListener("mousemove", onMove);
+        document.removeEventListener("mouseleave", onLeave);
+        document.removeEventListener("astro:page-load", onPage);
+        if (ambient) ambient.style.display = "";
+    });
+})();
+</script>
+
+ 
