@@ -203,18 +203,29 @@ const features =
         margin: 0 auto;
     }
     .hero {
+        min-height: 100dvh;
+        display: flex;
+        align-items: center;
         padding-top: clamp(4.4rem, 8vw, 7rem);
         padding-bottom: clamp(3.2rem, 6vw, 4.8rem);
     }
 
     .hero-inner {
-        display: grid;
-        grid-template-columns: minmax(280px, 560px) minmax(320px, 1fr);
-        gap: 3vw;
+        display: flex;
+        flex-direction: column;
         align-items: center;
+        gap: clamp(2rem, 5vw, 4rem);
+        width: 100%;
     }
     .hero-copy {
-        padding: 0 0.5rem;
+        max-width: 640px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .hero-copy .actions {
+        justify-content: center;
     }
     .eyebrow {
         margin: 0 0 1rem;
@@ -336,17 +347,32 @@ const features =
         box-shadow: none;
     }
     .text-link {
+        position: relative;
         display: inline-flex;
         gap: 0.6rem;
         align-items: center;
         padding-bottom: 0.2rem;
-        border-bottom: 1px solid rgba(46, 110, 134, 0.45);
         color: #245e75;
         font-size: 0.83rem;
         font-weight: 760;
         transition:
             gap 0.25s ease,
             color 0.25s ease;
+    }
+    .text-link::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: 1px;
+        background: rgba(46, 110, 134, 0.45);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.32s ease;
+    }
+    .text-link:hover::after {
+        transform: scaleX(1);
     }
     .text-link:hover {
         gap: 0.9rem;
