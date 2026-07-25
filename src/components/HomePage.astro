@@ -221,13 +221,20 @@ const features =
     }
 
     .hero-inner {
-        display: grid;
-        grid-template-columns: minmax(280px, 1000px) minmax(320px, 1fr);
-        gap: 3vw;
+        display: flex;
+        flex-direction: column;
         align-items: center;
+        gap: 2rem;
     }
     .hero-copy {
-        padding: 0 0.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        max-width: 900px;
+    }
+    .hero-copy .actions {
+        justify-content: center;
     }
     .eyebrow {
         margin: 0 0 1rem;
@@ -896,12 +903,6 @@ const features =
     }
 
     @media (max-width: 1000px) {
-        .hero-inner {
-            grid-template-columns: minmax(0, 1fr);
-        }
-        .hero-inner > * {
-            min-width: 0;
-        }
         .split-inner {
             grid-template-columns: 1fr;
             gap: 2.5rem;
