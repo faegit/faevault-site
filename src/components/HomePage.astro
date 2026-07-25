@@ -514,13 +514,13 @@ const showcaseFeatures =
     /* ── Card Carousel ── */
     .card-carousel {
         width: 100%;
-        overflow: hidden;
         position: relative;
     }
     .card-track {
         display: flex;
         gap: 1.2rem;
         overflow-x: auto;
+        scroll-snap-type: x mandatory;
         padding: 0.5rem 0 1.5rem;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
@@ -528,19 +528,27 @@ const showcaseFeatures =
     .card-track::-webkit-scrollbar { display: none; }
     .content-card {
         flex: 0 0 260px;
+        scroll-snap-align: center;
         border-radius: 1.4rem;
         background: #fff;
         border: 1px solid rgba(81, 125, 142, 0.1);
         box-shadow: 0 12px 40px rgba(42, 83, 99, 0.08);
         overflow: hidden;
         transition:
-            transform 0.3s ease,
-            box-shadow 0.3s ease;
+            transform 0.4s cubic-bezier(0.34,1.56,0.64,1),
+            box-shadow 0.4s ease;
         cursor: pointer;
+    }
+    .content-card.active {
+        transform: scale(1.08);
+        box-shadow: 0 20px 60px rgba(42, 83, 99, 0.16);
     }
     .content-card:hover {
         transform: translateY(-4px);
         box-shadow: 0 18px 56px rgba(42, 83, 99, 0.12);
+    }
+    .content-card.active:hover {
+        transform: scale(1.08) translateY(-2px);
     }
     .cc-image {
         width: 100%;
@@ -1256,6 +1264,7 @@ const showcaseFeatures =
                 return cards[0].offsetWidth + (parseFloat(getComputedStyle(track).gap) || 0);
             }
 
+            /* Infinite DOM reordering */
             track.addEventListener("scroll", () => {
                 if (lock) return;
                 const u = unit();
@@ -1267,7 +1276,7 @@ const showcaseFeatures =
                     while (track.scrollLeft >= u) {
                         const el = track.firstElementChild;
                         if (!el) break;
-                        track.appendChild(el);
+                        track.appendChild(el as Node);
                         cards.push(cards.shift()!);
                         track.scrollLeft -= u;
                     }
@@ -1280,7 +1289,7 @@ const showcaseFeatures =
                         for (let i = 0; i < count; i++) {
                             const el = track.lastElementChild;
                             if (!el) break;
-                            track.insertBefore(el, track.firstElementChild!);
+                            track.insertBefore(el as Node, track.firstElementChild! as Node);
                             cards.unshift(cards.pop()!);
                         }
                         track.scrollLeft = count * u;
@@ -1290,6 +1299,45 @@ const showcaseFeatures =
                 } else {
                     prev = sl;
                 }
+            });
+
+            /* Active card detection */
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((e) => {
+                    if (e.isIntersecting) {
+                        cards.forEach((c) => c.classList.remove("active"));
+                        (e.target as HTMLElement).classList.add("active");
+                    }
+                });
+            }, { root: track, rootMargin: "-30% 0px", threshold: 0 });
+
+            cards.forEach((c) => observer.observe(c));
+
+            /* Auto-play */
+            let timer: ReturnType<typeof setInterval>;
+            let paused = false;
+
+            function advance() {
+                if (paused) return;
+                const active = track.querySelector<HTMLElement>(".content-card.active");
+                if (active) {
+                    const next = (active.nextElementSibling || track.firstElementChild) as HTMLElement;
+                    next.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+                }
+            }
+
+            timer = setInterval(advance, 3500);
+
+            track.addEventListener("pointerdown", () => { paused = true; clearInterval(timer); });
+            track.addEventListener("pointerup", () => {
+                setTimeout(() => {
+                    paused = false;
+                    clearInterval(timer);
+                    timer = setInterval(advance, 3500);
+                }, 4000);
+            });
+            track.addEventListener("scrollend", () => {
+                if (!paused) { clearInterval(timer); timer = setInterval(advance, 3500); }
             });
         }
 
