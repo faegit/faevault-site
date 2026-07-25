@@ -288,8 +288,8 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
     let resizeTimer;
     const onResize = () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(resize, 80); };
 
-    function stop() { cancelAnimationFrame(raf); }
     function init() { resize(); prefersReduced ? drawStatic() : draw(); }
+    function stop() { cancelAnimationFrame(raf); raf = 0; }
 
     window.addEventListener("resize", onResize);
     document.addEventListener("mousemove", onMove);
@@ -297,13 +297,7 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
     document.addEventListener("astro:page-load", init);
     init();
 
-    document.addEventListener("astro:before-swap", () => {
-        stop();
-        window.removeEventListener("resize", onResize);
-        document.removeEventListener("mousemove", onMove);
-        document.removeEventListener("mouseleave", onLeave);
-        document.removeEventListener("astro:page-load", init);
-    });
+    document.addEventListener("astro:before-swap", stop);
 })();
 </script>
 
