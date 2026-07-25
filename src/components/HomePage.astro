@@ -521,17 +521,13 @@ const showcaseFeatures =
         display: flex;
         gap: 1.2rem;
         overflow-x: auto;
-        scroll-snap-type: x mandatory;
         padding: 0.5rem 0 1.5rem;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
     }
-    .card-track::-webkit-scrollbar {
-        display: none;
-    }
+    .card-track::-webkit-scrollbar { display: none; }
     .content-card {
         flex: 0 0 260px;
-        scroll-snap-align: start;
         border-radius: 1.4rem;
         background: #fff;
         border: 1px solid rgba(81, 125, 142, 0.1);
@@ -1277,7 +1273,6 @@ const showcaseFeatures =
                     }
                 } else if (dir < 0 && track.scrollLeft < 1) {
                     lock = true;
-                    track.style.scrollSnapType = "none";
                     const count = Math.min(3, cards.length);
                     for (let i = 0; i < count; i++) {
                         const el = track.lastElementChild;
@@ -1286,10 +1281,7 @@ const showcaseFeatures =
                         cards.unshift(cards.pop()!);
                     }
                     track.scrollLeft = count * u;
-                    requestAnimationFrame(() => {
-                        track.style.scrollSnapType = "";
-                        lock = false;
-                    });
+                    requestAnimationFrame(() => { lock = false; });
                 }
             });
         }
