@@ -1251,8 +1251,7 @@ const showcaseFeatures =
             const track = document.querySelector<HTMLElement>(".card-track");
             if (!track) return;
             const cards = Array.from(track.children) as HTMLElement[];
-            const N = cards.length;
-            if (N < 2) return;
+            if (cards.length < 2) return;
 
             let prev = 0;
 
@@ -1268,16 +1267,19 @@ const showcaseFeatures =
 
                 if (dir > 0) {
                     while (track.scrollLeft >= u) {
-                        track.appendChild(track.firstElementChild);
+                        const el = track.firstElementChild;
+                        if (!el) break;
+                        track.appendChild(el);
                         cards.push(cards.shift()!);
                         track.scrollLeft -= u;
                     }
-                } else if (dir < 0) {
-                    if (track.scrollLeft < 1) {
-                        track.insertBefore(track.lastElementChild, track.firstElementChild);
-                        cards.unshift(cards.pop()!);
-                        track.scrollLeft += u;
-                    }
+                } else if (dir < 0 && track.scrollLeft < 1) {
+                    const el = track.lastElementChild;
+                    const first = track.firstElementChild;
+                    if (!el || !first) return;
+                    track.insertBefore(el, first);
+                    cards.unshift(cards.pop()!);
+                    track.scrollLeft += u;
                 }
             });
         }
