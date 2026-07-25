@@ -72,6 +72,18 @@ const features =
               { title: "Security Guard", body: "Anti-screenshot with FLAG_SECURE, 60-second auto-clear clipboard, exponential brute-force lockout, sensitive data re-verification.", accent: "security" },
               { title: "Encrypted Sync", body: "WebDAV for NAS/Nextcloud, LAN direct sync, encrypted backup export. Keep data consistent across devices.", accent: "sync" },
           ];
+
+const showcaseFeatures = locale === "zh-cn" ? [
+    { title: "本地加密保险库", body: "密码与通行密钥离线存储，scrypt + AES-256-GCM 加密。" },
+    { title: "系统自动填充", body: "Android Autofill 框架，一键填入登录凭证与验证码。" },
+    { title: "通行密钥", body: "支持 Android 14+ Passkey，无密码快速认证。" },
+    { title: "加密同步", body: "WebDAV / 局域网直连，多设备间安全同步。" },
+] : [
+    { title: "Encrypted Vault", body: "Passwords & passkeys stored offline with scrypt + AES-256-GCM." },
+    { title: "System Autofill", body: "Android Autofill framework, one-tap credential & OTP fill." },
+    { title: "Passkeys", body: "Android 14+ Passkey support for passwordless auth." },
+    { title: "Encrypted Sync", body: "WebDAV / LAN direct sync across your devices." },
+];
 ---
 
 <div class="home">
@@ -90,61 +102,122 @@ const features =
         </div>
     </section>
 
-    <section class="carousel-section" id="products">
-        <div class="carousel-card">
-            <div class="card-top">
-                <div class="card-pill"></div>
+    <section class="showcase-section" id="showcase">
+        <div class="showcase-sticky">
+            <div class="showcase-inner">
+                <div class="phone-mockup">
+                    <div class="phone-frame">
+                        <div class="phone-screen">
+                            <div class="phone-notch"></div>
+                            <div class="phone-status">
+                                <span class="status-time">9:41</span>
+                                <div class="status-icons">
+                                    <span class="status-bar"></span>
+                                    <span class="status-battery"></span>
+                                </div>
+                            </div>
+                            <div class="screen-content">
+                                <div class="screen-view active" data-feature="0">
+                                    <div class="sv-header">保险库</div>
+                                    <div class="sv-search"></div>
+                                    <div class="sv-list">
+                                        <div class="sv-item">
+                                            <span class="sv-icon accent"></span>
+                                            <div class="sv-detail">
+                                                <strong>github.com</strong>
+                                                <em>user@github.com</em>
+                                            </div>
+                                        </div>
+                                        <div class="sv-item">
+                                            <span class="sv-icon blue"></span>
+                                            <div class="sv-detail">
+                                                <strong>google.com</strong>
+                                                <em>user@gmail.com</em>
+                                            </div>
+                                        </div>
+                                        <div class="sv-item">
+                                            <span class="sv-icon green"></span>
+                                            <div class="sv-detail">
+                                                <strong>dropbox.com</strong>
+                                                <em>user@dropbox.com</em>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="sv-fab">+</div>
+                                </div>
+                                <div class="screen-view" data-feature="1">
+                                    <div class="sv-browser">
+                                        <span class="sv-url">example.com/login</span>
+                                    </div>
+                                    <div class="sv-form">
+                                        <div class="sv-field filled"><span class="sv-label">Email</span><span class="sv-value">user@example.com</span></div>
+                                        <div class="sv-field filled"><span class="sv-label">Password</span><span class="sv-value">••••••••</span></div>
+                                        <div class="sv-btn">Sign In</div>
+                                    </div>
+                                    <div class="sv-autofill">
+                                        <span class="sv-af-icon"></span>
+                                        <span>Fill from FAEVault</span>
+                                    </div>
+                                </div>
+                                <div class="screen-view" data-feature="2">
+                                    <div class="sv-header">通行密钥</div>
+                                    <div class="sv-passkey-card">
+                                        <div class="sv-pk-icon"></div>
+                                        <strong>验证通行密钥</strong>
+                                        <em>使用设备屏幕锁确认身份</em>
+                                        <div class="sv-pk-fingerprint"></div>
+                                    </div>
+                                    <div class="sv-pk-status">
+                                        <span class="sv-check"></span>
+                                        <span>验证成功</span>
+                                    </div>
+                                </div>
+                                <div class="screen-view" data-feature="3">
+                                    <div class="sv-header">同步</div>
+                                    <div class="sv-devices">
+                                        <div class="sv-device active">
+                                            <span class="sv-dev-icon phone"></span>
+                                            <div class="sv-dev-info">
+                                                <strong>Pixel 8 Pro</strong>
+                                                <em>已同步 · 刚刚</em>
+                                            </div>
+                                            <span class="sv-dev-check"></span>
+                                        </div>
+                                        <div class="sv-device">
+                                            <span class="sv-dev-icon pc"></span>
+                                            <div class="sv-dev-info">
+                                                <strong>Windows PC</strong>
+                                                <em>已同步 · 2 分钟前</em>
+                                            </div>
+                                            <span class="sv-dev-check"></span>
+                                        </div>
+                                    </div>
+                                    <div class="sv-sync-progress">
+                                        <div class="sv-progress-bar"><div class="sv-progress-fill"></div></div>
+                                        <span>数据已同步</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="phone-nav">
+                                <span class="nav-dot"></span>
+                                <span class="nav-pill"></span>
+                                <span class="nav-dot"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="feature-strip">
+                    {showcaseFeatures.map((item, i) => (
+                        <article class="feature-card" data-feature={i}>
+                            <div class="fc-index">0{i + 1}</div>
+                            <div class="fc-body">
+                                <h3>{item.title}</h3>
+                                <p>{item.body}</p>
+                            </div>
+                        </article>
+                    ))}
+                </div>
             </div>
-            <div class="card-body">
-                <div class="card-bar w40"></div>
-                <div class="card-bar w70"></div>
-                <div class="card-bar w55"></div>
-            </div>
-            <div class="card-block"></div>
-        </div>
-        <div class="carousel-card">
-            <div class="card-top">
-                <div class="card-pill"></div>
-            </div>
-            <div class="card-body">
-                <div class="card-bar w40"></div>
-                <div class="card-bar w70"></div>
-                <div class="card-bar w55"></div>
-            </div>
-            <div class="card-block"></div>
-        </div>
-        <div class="carousel-card">
-            <div class="card-top">
-                <div class="card-pill"></div>
-            </div>
-            <div class="card-body">
-                <div class="card-bar w40"></div>
-                <div class="card-bar w70"></div>
-                <div class="card-bar w55"></div>
-            </div>
-            <div class="card-block"></div>
-        </div>
-        <div class="carousel-card">
-            <div class="card-top">
-                <div class="card-pill"></div>
-            </div>
-            <div class="card-body">
-                <div class="card-bar w40"></div>
-                <div class="card-bar w70"></div>
-                <div class="card-bar w55"></div>
-            </div>
-            <div class="card-block"></div>
-        </div>
-        <div class="carousel-card">
-            <div class="card-top">
-                <div class="card-pill"></div>
-            </div>
-            <div class="card-body">
-                <div class="card-bar w40"></div>
-                <div class="card-bar w70"></div>
-                <div class="card-bar w55"></div>
-            </div>
-            <div class="card-block"></div>
         </div>
     </section>
 
@@ -484,71 +557,469 @@ const features =
         z-index: 1;
     }
 
-    .carousel-section {
+    /* ── Product Showcase ── */
+    .showcase-section {
+        position: relative;
+        height: 400vh;
+    }
+    .showcase-sticky {
+        position: sticky;
+        top: 0;
+        height: 100vh;
         display: flex;
-        gap: 1.2rem;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        padding: 1.5rem 2rem;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
+        align-items: center;
+        z-index: 1;
+    }
+    .showcase-inner {
+        width: calc(100% - 4rem);
+        max-width: 1340px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4rem;
+    }
+
+    /* ── Phone Mockup ── */
+    .phone-mockup {
+        flex: 0 0 340px;
+        perspective: 1200px;
+    }
+    .phone-frame {
+        width: 340px;
+        height: 700px;
+        border-radius: 48px;
+        background: #1a1a1e;
+        padding: 12px;
+        box-shadow:
+            0 30px 120px rgba(0,0,0,0.20),
+            0 8px 32px rgba(0,0,0,0.10),
+            inset 0 0 0 1px rgba(255,255,255,0.08);
+    }
+    .phone-screen {
+        width: 100%;
+        height: 100%;
+        border-radius: 38px;
+        background: #f5f7fa;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+    .phone-notch {
+        width: 120px;
+        height: 28px;
+        background: #1a1a1e;
+        border-radius: 0 0 18px 18px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+    }
+    .phone-status {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.6rem 1.2rem 0.4rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #1a1a1e;
+    }
+    .status-icons {
+        display: flex;
+        gap: 0.4rem;
+        align-items: center;
+    }
+    .status-bar {
+        width: 1.2rem;
+        height: 0.35rem;
+        border-radius: 2px;
+        background: #1a1a1e;
+    }
+    .status-battery {
+        width: 0.8rem;
+        height: 0.4rem;
+        border: 1px solid #1a1a1e;
+        border-radius: 1px;
+    }
+
+    /* ── Screen Views ── */
+    .screen-content {
+        flex: 1;
+        position: relative;
+    }
+    .screen-view {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 0.6rem 1rem;
+        opacity: 0;
+        transition: opacity 0.5s cubic-bezier(0.4,0,0.2,1);
+        pointer-events: none;
+    }
+    .screen-view.active {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .sv-header {
+        font-size: 1.1rem;
+        font-weight: 750;
+        padding: 0.2rem 0 0.6rem;
+        color: #173f50;
+    }
+    .sv-search {
+        height: 2rem;
+        border-radius: 999px;
+        background: rgba(0,0,0,0.05);
+        margin-bottom: 0.8rem;
+    }
+    .sv-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        flex: 1;
+    }
+    .sv-item {
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        padding: 0.6rem 0.7rem;
+        border-radius: 0.8rem;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .sv-icon {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 0.5rem;
+        flex-shrink: 0;
+    }
+    .sv-icon.accent { background: #287795; }
+    .sv-icon.blue { background: #4a90d9; }
+    .sv-icon.green { background: #34a853; }
+    .sv-detail {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+    }
+    .sv-detail strong {
+        font-size: 0.78rem;
+        font-weight: 660;
+        color: #173f50;
+    }
+    .sv-detail em {
+        font-size: 0.65rem;
+        color: #7a929b;
+        font-style: normal;
+    }
+    .sv-fab {
+        position: absolute;
+        right: 0.8rem;
+        bottom: 0.8rem;
+        width: 2.4rem;
+        height: 2.4rem;
+        border-radius: 50%;
+        background: #287795;
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-size: 1.3rem;
+        font-weight: 300;
+        box-shadow: 0 4px 12px rgba(40,119,149,0.30);
+    }
+
+    /* Autofill */
+    .sv-browser {
+        padding: 0.2rem 0.5rem 0.5rem;
+        display: flex;
         justify-content: center;
     }
-    .carousel-section::-webkit-scrollbar {
-        display: none;
-    }
-    .carousel-card {
-        flex: 0 0 280px;
-        height: 380px;
-        border-radius: 1.8rem;
-        background: #fff;
-        border: 1px solid rgba(81, 125, 142, 0.12);
-        box-shadow:
-            0 16px 60px rgba(42, 83, 99, 0.10),
-            inset 0 1px 0 rgba(255, 255, 255, 0.7);
-        scroll-snap-align: start;
-        position: relative;
+    .sv-url {
+        display: block;
+        padding: 0.3rem 0.8rem;
+        border-radius: 999px;
+        background: rgba(0,0,0,0.05);
+        font-size: 0.6rem;
+        color: #7a929b;
+        max-width: 70%;
+        white-space: nowrap;
         overflow: hidden;
+        text-overflow: ellipsis;
     }
-    .carousel-card::before {
+    .sv-form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        padding: 0.4rem 0;
+    }
+    .sv-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        padding: 0.5rem 0.7rem;
+        border-radius: 0.6rem;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .sv-label {
+        font-size: 0.6rem;
+        color: #7a929b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .sv-value {
+        font-size: 0.78rem;
+        color: #173f50;
+        font-weight: 500;
+    }
+    .sv-btn {
+        padding: 0.6rem;
+        border-radius: 0.6rem;
+        background: #287795;
+        color: #fff;
+        text-align: center;
+        font-size: 0.78rem;
+        font-weight: 660;
+        margin-top: 0.3rem;
+    }
+    .sv-autofill {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 0.7rem;
+        margin-top: 0.5rem;
+        border-radius: 0.8rem;
+        background: rgba(40,119,149,0.08);
+        border: 1px solid rgba(40,119,149,0.15);
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: #287795;
+    }
+    .sv-af-icon {
+        width: 1.2rem;
+        height: 1.2rem;
+        border-radius: 0.3rem;
+        background: #287795;
+        flex-shrink: 0;
+    }
+
+    /* Passkey */
+    .sv-passkey-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 1.6rem 1rem;
+        margin-top: 0.6rem;
+        border-radius: 1.2rem;
+        background: #fff;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+        text-align: center;
+    }
+    .sv-passkey-card strong {
+        font-size: 0.85rem;
+        color: #173f50;
+    }
+    .sv-passkey-card em {
+        font-size: 0.68rem;
+        color: #7a929b;
+        font-style: normal;
+    }
+    .sv-pk-icon {
+        width: 2.8rem;
+        height: 2.8rem;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #287795, #1a5068);
+        margin-bottom: 0.3rem;
+    }
+    .sv-pk-fingerprint {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+        border: 2px solid rgba(40,119,149,0.20);
+        margin-top: 0.5rem;
+    }
+    .sv-pk-status {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.5rem 0.8rem;
+        margin-top: 0.6rem;
+        border-radius: 0.6rem;
+        background: rgba(52,168,83,0.08);
+        color: #34a853;
+        font-size: 0.72rem;
+        font-weight: 600;
+    }
+    .sv-check {
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        background: #34a853;
+        position: relative;
+    }
+    .sv-check::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0.3rem;
+        height: 0.5rem;
+        border: solid #fff;
+        border-width: 0 0.12rem 0.12rem 0;
+        transform: translate(-50%,-60%) rotate(45deg);
+    }
+
+    /* Sync */
+    .sv-devices {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.4rem 0;
+    }
+    .sv-device {
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        padding: 0.7rem;
+        border-radius: 0.8rem;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .sv-device.active {
+        border: 1px solid rgba(40,119,149,0.15);
+        background: rgba(40,119,149,0.03);
+    }
+    .sv-dev-icon {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 0.5rem;
+        background: rgba(0,0,0,0.04);
+        flex-shrink: 0;
+    }
+    .sv-dev-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+        flex: 1;
+    }
+    .sv-dev-info strong {
+        font-size: 0.78rem;
+        font-weight: 660;
+        color: #173f50;
+    }
+    .sv-dev-info em {
+        font-size: 0.65rem;
+        color: #7a929b;
+        font-style: normal;
+    }
+    .sv-dev-check {
+        width: 0.8rem;
+        height: 0.8rem;
+        border-radius: 50%;
+        background: #34a853;
+    }
+    .sv-sync-progress {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        padding: 0.6rem 0;
+    }
+    .sv-progress-bar {
+        width: 100%;
+        height: 0.35rem;
+        border-radius: 999px;
+        background: rgba(0,0,0,0.05);
+    }
+    .sv-progress-fill {
+        width: 100%;
+        height: 100%;
+        border-radius: 999px;
+        background: #34a853;
+    }
+    .sv-sync-progress span {
+        font-size: 0.65rem;
+        color: #34a853;
+        font-weight: 600;
+    }
+
+    .phone-nav {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.7rem;
+        padding: 0.5rem 0 0.6rem;
+    }
+    .nav-dot {
+        width: 0.35rem;
+        height: 0.35rem;
+        border-radius: 50%;
+        background: rgba(0,0,0,0.12);
+    }
+    .nav-pill {
+        width: 2.6rem;
+        height: 0.2rem;
+        border-radius: 999px;
+        background: rgba(0,0,0,0.25);
+    }
+
+    /* ── Feature Strip ── */
+    .feature-strip {
+        flex: 1;
+        max-width: 520px;
+        position: relative;
+        perspective: 1200px;
+        min-height: 360px;
+    }
+    .feature-card {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        transform-origin: center center;
+        will-change: transform, opacity, filter;
+        backface-visibility: hidden;
+        display: flex;
+        gap: 1.5rem;
+        padding: 1.6rem 1.8rem;
+        border-radius: 1.6rem;
+        background: #fff;
+        border: 1px solid rgba(81,125,142,0.10);
+        box-shadow:
+            0 20px 60px rgba(42,83,99,0.08),
+            inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+    .feature-card::before {
         content: "";
         position: absolute;
         inset: 0;
-        background:
-            radial-gradient(ellipse at 30% 20%, rgba(63, 155, 181, 0.06), transparent 60%),
-            radial-gradient(ellipse at 80% 80%, rgba(131, 106, 181, 0.06), transparent 50%);
+        border-radius: 1.6rem;
         pointer-events: none;
+        background: radial-gradient(ellipse at 0% 100%, rgba(63,155,181,0.04), transparent 60%);
     }
-    .card-top {
-        padding: 1rem 1.2rem 0;
-        display: flex;
-        gap: 0.5rem;
+    .fc-index {
+        font-size: 0.72rem;
+        font-weight: 800;
+        color: rgba(40,119,149,0.30);
+        letter-spacing: 0.08em;
+        white-space: nowrap;
     }
-    .card-pill {
-        width: 3.6rem;
-        height: 0.6rem;
-        border-radius: 999px;
-        border: 1px solid rgba(81, 125, 142, 0.10);
+    .fc-body {
+        flex: 1;
     }
-    .card-body {
-        padding: 1.4rem 1.2rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.7rem;
+    .fc-body h3 {
+        margin: 0 0 0.4rem;
+        font-size: 1.2rem;
+        font-weight: 650;
+        color: #173f50;
+        font-family: Georgia, "Times New Roman", serif;
+        letter-spacing: -0.02em;
     }
-    .card-bar {
-        height: 0.55rem;
-        border-radius: 999px;
-        border: 1px solid rgba(81, 125, 142, 0.08);
-    }
-    .card-bar.w40 { width: 40%; }
-    .card-bar.w55 { width: 55%; }
-    .card-bar.w70 { width: 70%; }
-    .card-block {
-        margin: 0 1.2rem;
-        height: 5rem;
-        border-radius: 1rem;
-        border: 1px solid rgba(81, 125, 142, 0.08);
+    .fc-body p {
+        margin: 0;
+        font-size: 0.88rem;
+        line-height: 1.6;
+        color: #5a727c;
     }
 
     .split-inner {
@@ -1068,14 +1539,29 @@ const features =
             justify-content: center;
         }
 
-        .carousel-card {
-            flex: 0 0 220px;
-            height: 300px;
+        .showcase-inner {
+            flex-direction: column;
+            gap: 2rem;
         }
-        .carousel-section {
-            padding: 1rem 1.25rem;
-            justify-content: flex-start;
+        .phone-mockup {
+            flex: none;
+            transform: scale(0.65);
+            transform-origin: center top;
+            margin: -2.5rem 0 -3rem;
         }
+        .phone-frame {
+            height: 600px;
+        }
+        .feature-strip {
+            min-height: 260px;
+            max-width: 100%;
+            width: 100%;
+        }
+        .feature-card {
+            padding: 1.2rem 1.4rem;
+        }
+        .fc-body h3 { font-size: 1rem; }
+        .fc-body p { font-size: 0.8rem; }
 
         .section > * {
             width: calc(100% - 2.5rem);
@@ -1172,6 +1658,94 @@ const features =
     document.addEventListener("astro:page-load", initStack);
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initStack);
     else initStack();
+
+    /* ── Product Showcase Scroll Animation ── */
+    function initShowcase() {
+        const section = document.querySelector<HTMLElement>(".showcase-section");
+        const cards = document.querySelectorAll<HTMLElement>(".feature-card");
+        const screens = document.querySelectorAll<HTMLElement>(".screen-view");
+        if (!section || !cards.length) return;
+        const total = cards.length;
+        let ticking = false;
+
+        function update() {
+            const rect = section.getBoundingClientRect();
+            const viewH = window.innerHeight;
+            if (rect.bottom < 0 || rect.top > viewH) return;
+            const scrollable = section.offsetHeight - viewH;
+            const scrolled = -rect.top;
+            const progress = Math.max(0, Math.min(1, scrolled / scrollable));
+            const cardProgress = progress * (total - 1);
+            const activeIndex = Math.min(Math.floor(cardProgress), total - 2);
+            const p = cardProgress - activeIndex;
+
+            cards.forEach((card, i) => {
+                let transform = "", opacity = "1", filter = "", zIndex = "0";
+                if (i === activeIndex) {
+                    if (p < 0.35) {
+                        const t = p / 0.35;
+                        const s = 0.85 + 0.15 * t;
+                        const y = 80 * (1 - t);
+                        transform = `scale(${s}) translateY(${y}px)`;
+                        opacity = String(0.5 + 0.5 * t);
+                    } else {
+                        transform = "scale(1) translateY(0)";
+                        opacity = "1";
+                    }
+                    zIndex = "3";
+                } else if (i === activeIndex + 1) {
+                    if (p > 0.55) {
+                        const t = (p - 0.55) / 0.45;
+                        const s = 0.85 + 0.15 * t;
+                        const y = 80 * (1 - t);
+                        transform = `scale(${s}) translateY(${y}px)`;
+                        opacity = String(0.5 + 0.5 * t);
+                    } else {
+                        transform = "scale(0.85) translateY(80px)";
+                        opacity = "0.5";
+                    }
+                    zIndex = "2";
+                } else if (i === activeIndex - 1) {
+                    const t = p;
+                    const s = 1 - 0.3 * t;
+                    const y = -50 * t;
+                    transform = `scale(${s}) translateY(${y}px)`;
+                    opacity = String(1 - t);
+                    filter = `blur(${2 * t}px)`;
+                    zIndex = "1";
+                } else if (i < activeIndex) {
+                    transform = "scale(0.7) translateY(-60px)";
+                    opacity = "0";
+                    filter = "blur(2px)";
+                    zIndex = "0";
+                } else {
+                    transform = "scale(0.85) translateY(80px)";
+                    opacity = "0.5";
+                    zIndex = "0";
+                }
+                card.style.transform = transform;
+                card.style.opacity = opacity;
+                card.style.filter = filter;
+                card.style.zIndex = zIndex;
+            });
+
+            screens.forEach((screen, i) => {
+                screen.classList.toggle("active", i === activeIndex);
+            });
+        }
+
+        window.addEventListener("scroll", () => {
+            if (!ticking) {
+                requestAnimationFrame(() => { ticking = false; update(); });
+                ticking = true;
+            }
+        });
+        update();
+    }
+
+    document.addEventListener("astro:page-load", initShowcase);
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initShowcase);
+    else initShowcase();
 })();
 </script>
 
