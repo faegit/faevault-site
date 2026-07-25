@@ -281,7 +281,7 @@ const features =
     }
     .section > * {
         width: calc(100% - 4rem);
-        max-width: 1200px;
+        max-width: 1700px;
         margin: 0 auto;
     }
     .hero {
@@ -495,12 +495,10 @@ const features =
         flex: 0 0 280px;
         height: 380px;
         border-radius: 1.8rem;
-        background: linear-gradient(145deg, rgba(248, 251, 255, 0.8), rgba(239, 247, 248, 0.72));
+        border: 1px solid rgba(81, 125, 142, 0.12);
         box-shadow:
             0 16px 60px rgba(42, 83, 99, 0.10),
             inset 0 1px 0 rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(8px);
-        border: 1px solid rgba(81, 125, 142, 0.12);
         scroll-snap-align: start;
         position: relative;
         overflow: hidden;
@@ -510,8 +508,8 @@ const features =
         position: absolute;
         inset: 0;
         background:
-            radial-gradient(ellipse at 30% 20%, rgba(63, 155, 181, 0.08), transparent 60%),
-            radial-gradient(ellipse at 80% 80%, rgba(131, 106, 181, 0.08), transparent 50%);
+            radial-gradient(ellipse at 30% 20%, rgba(63, 155, 181, 0.06), transparent 60%),
+            radial-gradient(ellipse at 80% 80%, rgba(131, 106, 181, 0.06), transparent 50%);
         pointer-events: none;
     }
     .card-top {
@@ -523,7 +521,7 @@ const features =
         width: 3.6rem;
         height: 0.6rem;
         border-radius: 999px;
-        background: rgba(46, 110, 134, 0.10);
+        border: 1px solid rgba(81, 125, 142, 0.10);
     }
     .card-body {
         padding: 1.4rem 1.2rem;
@@ -534,7 +532,7 @@ const features =
     .card-bar {
         height: 0.55rem;
         border-radius: 999px;
-        background: rgba(46, 110, 134, 0.08);
+        border: 1px solid rgba(81, 125, 142, 0.08);
     }
     .card-bar.w40 { width: 40%; }
     .card-bar.w55 { width: 55%; }
@@ -543,7 +541,6 @@ const features =
         margin: 0 1.2rem;
         height: 5rem;
         border-radius: 1rem;
-        background: rgba(46, 110, 134, 0.05);
         border: 1px solid rgba(81, 125, 142, 0.08);
     }
 
