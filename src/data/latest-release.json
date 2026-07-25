@@ -1,0 +1,14 @@
+{
+  "tag": "v3.6.3",
+  "version": "3.6.3",
+  "assets": {
+    "app-arm64-v8a-release.apk": "https://github.com/faegit/faevault-site/releases/download/v3.6.3/app-arm64-v8a-release.apk",
+    "app-armeabi-v7a-release.apk": "https://github.com/faegit/faevault-site/releases/download/v3.6.3/app-armeabi-v7a-release.apk",
+    "app-universal-release.apk": "https://github.com/faegit/faevault-site/releases/download/v3.6.3/app-universal-release.apk",
+    "app-x86-release.apk": "https://github.com/faegit/faevault-site/releases/download/v3.6.3/app-x86-release.apk",
+    "app-x86_64-release.apk": "https://github.com/faegit/faevault-site/releases/download/v3.6.3/app-x86_64-release.apk",
+    "FAEVault-Windows-x64-Portable.zip": "https://github.com/faegit/faevault-site/releases/download/v3.6.3/FAEVault-Windows-x64-Portable.zip",
+    "FAEVault_v3.6.3_Setup.exe": "https://github.com/faegit/faevault-site/releases/download/v3.6.3/FAEVault_v3.6.3_Setup.exe",
+    "SHA256SUMS.txt": "https://github.com/faegit/faevault-site/releases/download/v3.6.3/SHA256SUMS.txt"
+  }
+}
