@@ -13,7 +13,6 @@ const copy =
               eyebrow: "本地优先 · Android + Windows",
               title: "你的密码和数据，完全由你掌控。",
               intro: "保险库把密码、通行密钥与重要资料放进一个本地加密库，并为 Windows Hello、浏览器自动填充与多设备同步打基础。",
-              support: "直接赞助支持开发",
               storyLink: "了解产品故事",
 
 
@@ -27,15 +26,15 @@ const copy =
               guideBody: "从本地加密存储到系统自动填充，保险库为 Android 和 Windows 提供完整的密码管理能力。",
               guides: "查看使用指南",
               download: "下载最新版本",
-              supportKicker: "赞助支持项目",
-              supportTitle: "如果你愿意赞助支持，付款码就在这里。",
-              supportButton: "打开赞助页面",
+              supportKicker: "支持独立开发",
+              supportTitle: "Support independent development",
+              supportPoints: ["独立开发者维护", "持续更新迭代", "长期安全维护"],
+              supportButton: "了解赞助方式",
           }
         : {
               eyebrow: "Local-first · Android + Windows",
               title: "Your passwords should truly be yours.",
               intro: "FAEVault keeps passwords, passkeys, and important details inside a vault you can truly control.",
-              support: "Support development",
               storyLink: "Learn the story",
 
 
@@ -50,8 +49,9 @@ const copy =
               guides: "Browse the guides",
               download: "Download the latest version",
               supportKicker: "Support the project",
-              supportTitle: "If you want to help, the payment options are here.",
-              supportButton: "Open the support page",
+              supportTitle: "Support independent development",
+              supportPoints: ["Maintained by independent developer", "Continuous updates", "Long-term security upkeep"],
+              supportButton: "See sponsorship options",
           };
 
 const features =
@@ -184,10 +184,18 @@ const features =
     </section>
 
     <section class="section support-section" id="support">
-        <div class="support-inner section-copy">
+        <div class="support-wrap">
             <p class="eyebrow">{copy.supportKicker}</p>
             <h2>{copy.supportTitle}</h2>
-            <a class="support-button" href={localePath(locale, "support")}>{copy.supportButton}</a>
+            <div class="support-pillars">
+                {copy.supportPoints.map((pt) => (
+                    <div class="pillar-card">
+                        <span class="pillar-icon"></span>
+                        <span>{pt}</span>
+                    </div>
+                ))}
+            </div>
+            <a class="support-cta" href={localePath(locale, "support")}>{copy.supportButton}</a>
         </div>
     </section>
 </div>
@@ -781,60 +789,69 @@ const features =
     }
 
     .support-section {
+        display: flex;
         justify-content: center;
+        padding-bottom: clamp(4rem, 8vw, 7rem) !important;
     }
-    .support-inner {
-        position: relative;
-        overflow: hidden;
-        width: min(900px, calc(100% - 3rem)) !important;
-        margin: 0 auto !important;
-        padding: clamp(3.5rem, 7vw, 6rem);
-        border: 1px solid rgba(255, 255, 255, 0.7);
-        border-radius: 2.5rem;
-        background: linear-gradient(135deg, rgba(229, 248, 247, 0.62), rgba(229, 237, 251, 0.48));
-        box-shadow: 0 28px 90px rgba(42, 83, 99, 0.12);
-        backdrop-filter: blur(22px);
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-        transform-style: preserve-3d;
-        will-change: transform;
+    .support-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 2.5rem;
     }
-    .support-inner::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(
-            105deg,
-            transparent 30%,
-            rgba(255, 255, 255, 0.5) 45%,
-            rgba(255, 255, 255, 0.65) 50%,
-            rgba(255, 255, 255, 0.5) 55%,
-            transparent 70%
-        );
-        background-size: 300% 100%;
-        background-position: 100% 0;
-        pointer-events: none;
-        animation: shimmer 5s ease-in-out infinite;
-    }
-    @keyframes shimmer {
-        0%, 60% { background-position: 100% 0; }
-        70% { background-position: 0 0; }
-        100% { background-position: 0 0; }
-    }
-    .support-inner h2 {
+    .support-wrap h2 {
         max-width: 700px;
     }
-    .support-inner > p {
-        max-width: 580px;
-        margin: 1.4rem 0 2rem;
+    .support-pillars {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 0.5rem;
     }
-    .support-button {
-        display: inline-flex;
+    .pillar-card {
+        display: flex;
         align-items: center;
         gap: 0.7rem;
-        margin-top: 2rem;
+        padding: 0.7rem 1.2rem 0.7rem 1rem;
+        border: 1px solid rgba(42, 83, 99, 0.12);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.5);
+        color: #2d5567;
+        font-size: 0.88rem;
+        font-weight: 520;
+        transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
     }
-    .support-button:hover {
-        gap: 1rem;
+    .pillar-card:hover {
+        background: rgba(255, 255, 255, 0.8);
+        border-color: rgba(42, 83, 99, 0.22);
+        transform: translateY(-1px);
+    }
+    .pillar-icon {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #3f8aa8;
+        flex-shrink: 0;
+    }
+    .support-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding: 0.7rem 1.6rem;
+        border: 1px solid rgba(42, 83, 99, 0.15);
+        border-radius: 999px;
+        color: #2d5567;
+        font-size: 0.88rem;
+        font-weight: 600;
+        transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+    .support-cta:hover {
+        background: rgba(255, 255, 255, 0.7);
+        border-color: rgba(42, 83, 99, 0.25);
+        transform: translateY(-1px);
     }
 
     @media (max-width: 1000px) {
@@ -864,10 +881,7 @@ const features =
             width: 100%;
             justify-content: center;
         }
-        .support-inner {
-            border-radius: 1.7rem;
-            padding: 3rem 1.5rem;
-        }
+
         .section > * {
             width: calc(100% - 2.5rem);
         }
@@ -943,26 +957,7 @@ const features =
     else initStack();
 })();
 </script>
-<script>
-(function() {
-    const MAX = 6;
-    function initTilt() {
-        const card = document.querySelector<HTMLElement>(".support-inner");
-        if (!card) return;
-        card.addEventListener("mousemove", (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = (e.clientX - rect.left) / rect.width;
-            const y = (e.clientY - rect.top) / rect.height;
-            card.style.transform = `perspective(800px) rotateX(${(y - 0.5) * -MAX}deg) rotateY(${(x - 0.5) * MAX}deg)`;
-        });
-        card.addEventListener("mouseleave", () => {
-            card.style.transform = "perspective(800px) rotateX(0) rotateY(0)";
-        });
-    }
-    initTilt();
-    document.addEventListener("astro:page-load", initTilt);
-})();
-</script>
+
 
 
  
