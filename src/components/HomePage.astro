@@ -112,109 +112,10 @@ const showcaseFeatures = locale === "zh-cn" ? [
 
     <section class="showcase-section" id="showcase">
         <div class="showcase-inner">
-            <div class="phone-mockup">
-                <div class="phone-frame">
-                    <div class="phone-screen">
-                        <div class="phone-notch"></div>
-                        <div class="phone-status">
-                            <span class="status-time">9:41</span>
-                            <div class="status-icons">
-                                <span class="status-bar"></span>
-                                <span class="status-battery"></span>
-                            </div>
-                        </div>
-                        <div class="screen-content">
-                            <div class="screen-view active" data-feature="0">
-                                <div class="sv-header">保险库</div>
-                                <div class="sv-search"></div>
-                                <div class="sv-list">
-                                    <div class="sv-item">
-                                        <span class="sv-icon accent"></span>
-                                        <div class="sv-detail">
-                                            <strong>github.com</strong>
-                                            <em>user@github.com</em>
-                                        </div>
-                                    </div>
-                                    <div class="sv-item">
-                                        <span class="sv-icon blue"></span>
-                                        <div class="sv-detail">
-                                            <strong>google.com</strong>
-                                            <em>user@gmail.com</em>
-                                        </div>
-                                    </div>
-                                    <div class="sv-item">
-                                        <span class="sv-icon green"></span>
-                                        <div class="sv-detail">
-                                            <strong>dropbox.com</strong>
-                                            <em>user@dropbox.com</em>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="sv-fab">+</div>
-                            </div>
-                            <div class="screen-view" data-feature="1">
-                                <div class="sv-browser"><span class="sv-url">example.com/login</span></div>
-                                <div class="sv-form">
-                                    <div class="sv-field filled"><span class="sv-label">Email</span><span class="sv-value">user@example.com</span></div>
-                                    <div class="sv-field filled"><span class="sv-label">Password</span><span class="sv-value">••••••••</span></div>
-                                    <div class="sv-btn">Sign In</div>
-                                </div>
-                                <div class="sv-autofill">
-                                    <span class="sv-af-icon"></span>
-                                    <span>Fill from FAEVault</span>
-                                </div>
-                            </div>
-                            <div class="screen-view" data-feature="2">
-                                <div class="sv-header">通行密钥</div>
-                                <div class="sv-passkey-card">
-                                    <div class="sv-pk-icon"></div>
-                                    <strong>验证通行密钥</strong>
-                                    <em>使用设备屏幕锁确认身份</em>
-                                    <div class="sv-pk-fingerprint"></div>
-                                </div>
-                                <div class="sv-pk-status">
-                                    <span class="sv-check"></span>
-                                    <span>验证成功</span>
-                                </div>
-                            </div>
-                            <div class="screen-view" data-feature="3">
-                                <div class="sv-header">同步</div>
-                                <div class="sv-devices">
-                                    <div class="sv-device active">
-                                        <span class="sv-dev-icon phone"></span>
-                                        <div class="sv-dev-info">
-                                            <strong>Pixel 8 Pro</strong>
-                                            <em>已同步 · 刚刚</em>
-                                        </div>
-                                        <span class="sv-dev-check"></span>
-                                    </div>
-                                    <div class="sv-device">
-                                        <span class="sv-dev-icon pc"></span>
-                                        <div class="sv-dev-info">
-                                            <strong>Windows PC</strong>
-                                            <em>已同步 · 2 分钟前</em>
-                                        </div>
-                                        <span class="sv-dev-check"></span>
-                                    </div>
-                                </div>
-                                <div class="sv-sync-progress">
-                                    <div class="sv-progress-bar"><div class="sv-progress-fill"></div></div>
-                                    <span>数据已同步</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="phone-nav">
-                            <span class="nav-dot"></span>
-                            <span class="nav-pill"></span>
-                            <span class="nav-dot"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="card-carousel">
                 <div class="card-track">
                     {showcaseFeatures.map((item, i) => (
-                        <div class="content-card" data-feature={i % 4}>
+                        <div class="content-card">
                             <div class="cc-image" style={`background:${["linear-gradient(135deg,#287795,#1a5068)","linear-gradient(135deg,#4a90d9,#2d6cb5)","linear-gradient(135deg,#7c5cbf,#5a3d99)","linear-gradient(135deg,#34a853,#1e7e34)","linear-gradient(135deg,#e88d3a,#c46d28)","linear-gradient(135deg,#d9544a,#b33b32)","linear-gradient(135deg,#1a73e8,#0d47a1)","linear-gradient(135deg,#00acc1,#00838f)"][i % 8]}`}>
                                 <div class="cc-shape"></div>
                             </div>
@@ -578,220 +479,25 @@ const showcaseFeatures = locale === "zh-cn" ? [
         gap: 2.5rem;
     }
 
-    /* ── Phone Mockup ── */
-    .phone-mockup {
-        flex: 0 0 340px;
-    }
-    .phone-frame {
-        width: 340px;
-        height: 700px;
-        border-radius: 48px;
-        background: #1a1a1e;
-        padding: 12px;
-        box-shadow:
-            0 30px 120px rgba(0,0,0,0.20),
-            0 8px 32px rgba(0,0,0,0.10),
-            inset 0 0 0 1px rgba(255,255,255,0.08);
-    }
-    .phone-screen {
-        width: 100%;
-        height: 100%;
-        border-radius: 38px;
-        background: #f5f7fa;
-        overflow: hidden;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-    }
-    .phone-notch {
-        width: 120px;
-        height: 28px;
-        background: #1a1a1e;
-        border-radius: 0 0 18px 18px;
-        margin: 0 auto;
-        position: relative;
-        z-index: 2;
-    }
-    .phone-status {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.6rem 1.2rem 0.4rem;
-        font-size: 0.7rem;
-        font-weight: 600;
-        color: #1a1a1e;
-    }
-    .status-icons {
-        display: flex;
-        gap: 0.4rem;
-        align-items: center;
-    }
-    .status-bar {
-        width: 1.2rem;
-        height: 0.35rem;
-        border-radius: 2px;
-        background: #1a1a1e;
-    }
-    .status-battery {
-        width: 0.8rem;
-        height: 0.4rem;
-        border: 1px solid #1a1a1e;
-        border-radius: 1px;
-    }
-    .screen-content {
-        flex: 1;
-        position: relative;
-    }
-    .screen-view {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        flex-direction: column;
-        padding: 0.6rem 1rem;
-        opacity: 0;
-        transition: opacity 0.5s cubic-bezier(0.4,0,0.2,1);
-        pointer-events: none;
-    }
-    .screen-view.active {
-        opacity: 1;
-        pointer-events: auto;
-    }
-    .sv-header {
-        font-size: 1.1rem;
-        font-weight: 750;
-        padding: 0.2rem 0 0.6rem;
-        color: #173f50;
-    }
-    .sv-search {
-        height: 2rem;
-        border-radius: 999px;
-        background: rgba(0,0,0,0.05);
-        margin-bottom: 0.8rem;
-    }
-    .sv-list {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        flex: 1;
-    }
-    .sv-item {
-        display: flex;
-        align-items: center;
-        gap: 0.7rem;
-        padding: 0.6rem 0.7rem;
-        border-radius: 0.8rem;
-        background: #fff;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    }
-    .sv-icon { width: 2rem; height: 2rem; border-radius: 0.5rem; flex-shrink: 0; }
-    .sv-icon.accent { background: #287795; }
-    .sv-icon.blue { background: #4a90d9; }
-    .sv-icon.green { background: #34a853; }
-    .sv-detail { display: flex; flex-direction: column; gap: 0.1rem; }
-    .sv-detail strong { font-size: 0.78rem; font-weight: 660; color: #173f50; }
-    .sv-detail em { font-size: 0.65rem; color: #7a929b; font-style: normal; }
-    .sv-fab {
-        position: absolute; right: 0.8rem; bottom: 0.8rem;
-        width: 2.4rem; height: 2.4rem; border-radius: 50%;
-        background: #287795; color: #fff;
-        display: grid; place-items: center;
-        font-size: 1.3rem; font-weight: 300;
-        box-shadow: 0 4px 12px rgba(40,119,149,0.30);
-    }
-    .sv-browser { padding: 0.2rem 0.5rem 0.5rem; display: flex; justify-content: center; }
-    .sv-url {
-        padding: 0.3rem 0.8rem; border-radius: 999px;
-        background: rgba(0,0,0,0.05); font-size: 0.6rem; color: #7a929b;
-        max-width: 70%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .sv-form { display: flex; flex-direction: column; gap: 0.6rem; padding: 0.4rem 0; }
-    .sv-field {
-        display: flex; flex-direction: column; gap: 0.15rem;
-        padding: 0.5rem 0.7rem; border-radius: 0.6rem;
-        background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    }
-    .sv-label { font-size: 0.6rem; color: #7a929b; text-transform: uppercase; letter-spacing: 0.05em; }
-    .sv-value { font-size: 0.78rem; color: #173f50; font-weight: 500; }
-    .sv-btn {
-        padding: 0.6rem; border-radius: 0.6rem; background: #287795; color: #fff;
-        text-align: center; font-size: 0.78rem; font-weight: 660; margin-top: 0.3rem;
-    }
-    .sv-autofill {
-        display: flex; align-items: center; gap: 0.5rem;
-        padding: 0.6rem 0.7rem; margin-top: 0.5rem; border-radius: 0.8rem;
-        background: rgba(40,119,149,0.08); border: 1px solid rgba(40,119,149,0.15);
-        font-size: 0.72rem; font-weight: 600; color: #287795;
-    }
-    .sv-af-icon { width: 1.2rem; height: 1.2rem; border-radius: 0.3rem; background: #287795; flex-shrink: 0; }
-    .sv-passkey-card {
-        display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
-        padding: 1.6rem 1rem; margin-top: 0.6rem; border-radius: 1.2rem;
-        background: #fff; box-shadow: 0 2px 16px rgba(0,0,0,0.04); text-align: center;
-    }
-    .sv-passkey-card strong { font-size: 0.85rem; color: #173f50; }
-    .sv-passkey-card em { font-size: 0.68rem; color: #7a929b; font-style: normal; }
-    .sv-pk-icon {
-        width: 2.8rem; height: 2.8rem; border-radius: 50%;
-        background: linear-gradient(135deg, #287795, #1a5068); margin-bottom: 0.3rem;
-    }
-    .sv-pk-fingerprint {
-        width: 3rem; height: 3rem; border-radius: 50%;
-        border: 2px solid rgba(40,119,149,0.20); margin-top: 0.5rem;
-    }
-    .sv-pk-status {
-        display: flex; align-items: center; gap: 0.4rem;
-        padding: 0.5rem 0.8rem; margin-top: 0.6rem; border-radius: 0.6rem;
-        background: rgba(52,168,83,0.08); color: #34a853; font-size: 0.72rem; font-weight: 600;
-    }
-    .sv-check {
-        width: 1rem; height: 1rem; border-radius: 50%; background: #34a853; position: relative;
-    }
-    .sv-check::after {
-        content: ""; position: absolute; top: 50%; left: 50%;
-        width: 0.3rem; height: 0.5rem;
-        border: solid #fff; border-width: 0 0.12rem 0.12rem 0;
-        transform: translate(-50%,-60%) rotate(45deg);
-    }
-    .sv-devices { display: flex; flex-direction: column; gap: 0.5rem; padding: 0.4rem 0; }
-    .sv-device {
-        display: flex; align-items: center; gap: 0.7rem;
-        padding: 0.7rem; border-radius: 0.8rem;
-        background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    }
-    .sv-device.active { border: 1px solid rgba(40,119,149,0.15); background: rgba(40,119,149,0.03); }
-    .sv-dev-icon { width: 2rem; height: 2rem; border-radius: 0.5rem; background: rgba(0,0,0,0.04); flex-shrink: 0; }
-    .sv-dev-info { display: flex; flex-direction: column; gap: 0.1rem; flex: 1; }
-    .sv-dev-info strong { font-size: 0.78rem; font-weight: 660; color: #173f50; }
-    .sv-dev-info em { font-size: 0.65rem; color: #7a929b; font-style: normal; }
-    .sv-dev-check { width: 0.8rem; height: 0.8rem; border-radius: 50%; background: #34a853; }
-    .sv-sync-progress { display: flex; flex-direction: column; gap: 0.3rem; padding: 0.6rem 0; }
-    .sv-progress-bar { width: 100%; height: 0.35rem; border-radius: 999px; background: rgba(0,0,0,0.05); }
-    .sv-progress-fill { width: 100%; height: 100%; border-radius: 999px; background: #34a853; }
-    .sv-sync-progress span { font-size: 0.65rem; color: #34a853; font-weight: 600; }
-    .phone-nav {
-        display: flex; justify-content: center; align-items: center; gap: 0.7rem; padding: 0.5rem 0 0.6rem;
-    }
-    .nav-dot { width: 0.35rem; height: 0.35rem; border-radius: 50%; background: rgba(0,0,0,0.12); }
-    .nav-pill { width: 2.6rem; height: 0.2rem; border-radius: 999px; background: rgba(0,0,0,0.25); }
 
     /* ── Card Carousel ── */
     .card-carousel {
-        flex: 1;
+        width: 100%;
         overflow: hidden;
         position: relative;
     }
     .card-track {
         display: flex;
-        gap: 1rem;
+        gap: 1.2rem;
         overflow-x: auto;
         scroll-snap-type: x mandatory;
-        padding: 0.5rem 0 1.2rem;
+        padding: 0.5rem 0 1.5rem;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
     }
     .card-track::-webkit-scrollbar { display: none; }
     .content-card {
-        flex: 0 0 210px;
+        flex: 0 0 260px;
         scroll-snap-align: start;
         border-radius: 1.4rem;
         background: #fff;
@@ -805,13 +511,9 @@ const showcaseFeatures = locale === "zh-cn" ? [
         transform: translateY(-4px);
         box-shadow: 0 18px 56px rgba(42,83,99,0.12);
     }
-    .content-card.active {
-        border-color: rgba(40,119,149,0.25);
-        box-shadow: 0 0 0 1px rgba(40,119,149,0.08), 0 12px 40px rgba(42,83,99,0.10);
-    }
     .cc-image {
         width: 100%;
-        height: 180px;
+        height: 240px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1368,26 +1070,16 @@ const showcaseFeatures = locale === "zh-cn" ? [
         }
 
         .showcase-inner {
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-        .phone-mockup {
-            flex: none;
-            transform: scale(0.65);
-            transform-origin: center top;
-            margin: -2.5rem 0 -3rem;
-        }
-        .phone-frame {
-            height: 600px;
+            gap: 1rem;
         }
         .card-carousel {
             width: 100%;
         }
         .content-card {
-            flex: 0 0 170px;
+            flex: 0 0 200px;
         }
         .cc-image {
-            height: 140px;
+            height: 170px;
         }
         .cc-meta {
             padding: 0.6rem 0.8rem 0.8rem;
@@ -1492,27 +1184,60 @@ const showcaseFeatures = locale === "zh-cn" ? [
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initStack);
     else initStack();
 
-    /* ── Card Carousel Phone Sync ── */
+    /* ── Infinite Carousel ── */
     function initCarousel() {
-        const cards = document.querySelectorAll<HTMLElement>(".content-card");
-        const screens = document.querySelectorAll<HTMLElement>(".screen-view");
-        if (!cards.length || !screens.length) return;
+        const track = document.querySelector<HTMLElement>(".card-track");
+        if (!track) return;
+        const orig = Array.from(track.children) as HTMLElement[];
+        const N = orig.length;
+        if (N < 1) return;
 
-        const observer = new IntersectionObserver((entries) => {
-            let best = { ratio: 0, feature: 0 };
-            entries.forEach(e => {
-                const r = e.intersectionRatio;
-                if (r > best.ratio) {
-                    best = { ratio: r, feature: Number((e.target as HTMLElement).dataset.feature) };
-                }
+        const CLONES = 3;
+        for (let i = CLONES; i > 0; i--) {
+            const c = orig[N - i].cloneNode(true) as HTMLElement;
+            c.dataset.clone = "1";
+            track.insertBefore(c, track.firstChild);
+        }
+        for (let i = 0; i < CLONES; i++) {
+            const c = orig[i].cloneNode(true) as HTMLElement;
+            c.dataset.clone = "1";
+            track.appendChild(c);
+        }
+
+        const all = Array.from(track.children) as HTMLElement[];
+        const firstReal = CLONES;
+        const lastReal = CLONES + N - 1;
+        let jumping = false;
+
+        function cardUnit() {
+            const g = parseFloat(getComputedStyle(track).gap) || 0;
+            return (all[0]?.offsetWidth ?? 200) + g;
+        }
+
+        function jumpTo(index: number) {
+            jumping = true;
+            track.style.scrollSnapType = "none";
+            track.scrollLeft = index * cardUnit();
+            requestAnimationFrame(() => {
+                track.style.scrollSnapType = "";
+                jumping = false;
             });
-            if (best.ratio > 0) {
-                cards.forEach(c => c.classList.toggle("active", Number(c.dataset.feature) === best.feature));
-                screens.forEach(s => s.classList.toggle("active", Number(s.dataset.feature) === best.feature));
-            }
-        }, { threshold: [0, 0.2, 0.4, 0.6, 0.8, 1] });
+        }
 
-        cards.forEach(c => observer.observe(c));
+        jumpTo(firstReal);
+
+        track.addEventListener("scroll", () => {
+            if (jumping) return;
+            const u = cardUnit();
+            const vw = track.clientWidth;
+            const sl = track.scrollLeft;
+
+            if (sl + vw >= (lastReal + 1) * u) {
+                jumpTo(firstReal);
+            } else if (sl < firstReal * u) {
+                jumpTo(lastReal);
+            }
+        });
     }
 
     document.addEventListener("astro:page-load", initCarousel);
