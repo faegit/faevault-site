@@ -1,7 +1,7 @@
 ---
 import type { Locale } from "../i18n/config";
 import { localePath } from "../i18n/config";
-import DeviceSync from "./DeviceSync.astro";
+
 
 interface Props {
     locale: Locale;
@@ -15,7 +15,8 @@ const copy =
               intro: "保险库把密码、通行密钥与重要资料放进一个本地加密库，并为 Windows Hello、浏览器自动填充与多设备同步打基础。",
               support: "直接赞助支持开发",
               storyLink: "了解产品故事",
-              syncLabel: "桌面端与手机端之间的加密数据同步",
+
+
               storyKicker: "为什么值得信赖",
               storyTitle: "无广告 · 免费 · 安全透明。",
               storyBody: "保险库不含任何广告，所有核心功能免费使用。数据采用 scrypt + AES-256-GCM 本地加密，不经任何外部服务器；加密方案与安全设计公开透明，经反复审计验证。",
@@ -36,7 +37,8 @@ const copy =
               intro: "FAEVault keeps passwords, passkeys, and important details inside a vault you can truly control.",
               support: "Support development",
               storyLink: "Learn the story",
-              syncLabel: "Encrypted data moving between desktop and phone",
+
+
               storyKicker: "Why it feels trustworthy",
               storyTitle: "No ads · Free · Security you can see.",
               storyBody: "FAEVault contains no ads and all core features are free. Data is encrypted locally with scrypt + AES-256-GCM, never touching external servers. The encryption design and security architecture are transparent and regularly reviewed.",
@@ -85,7 +87,7 @@ const features =
                     <a class="text-link" href={localePath(locale, "journey")}>{copy.storyLink}</a>
                 </div>
             </div>
-            <div class="device-wrap"><DeviceSync label={copy.syncLabel} /></div>
+
         </div>
     </section>
 
@@ -386,15 +388,7 @@ const features =
         position: relative;
         z-index: 1;
     }
-    .device-wrap {
-        justify-self: end;
-        transform: scale(0.92);
-        transform-origin: right center;
-    }
-    .device-wrap :global(.device-stage) {
-        width: 520px;
-        height: 400px;
-    }
+
 
     .split-inner {
         display: grid;
@@ -643,10 +637,6 @@ const features =
             gap: 1.25rem;
             align-items: start;
         }
-        .device-wrap {
-            justify-self: center;
-            transform: scale(0.95);
-        }
         .showcase-grid {
             grid-template-columns: 1fr;
         }
@@ -851,11 +841,6 @@ const features =
         .hero-inner {
             grid-template-columns: minmax(0, 1fr);
         }
-        .device-wrap {
-            justify-self: center;
-            transform: scale(0.78);
-            transform-origin: center;
-        }
         .hero-inner > * {
             min-width: 0;
         }
@@ -878,11 +863,6 @@ const features =
         .actions a {
             width: 100%;
             justify-content: center;
-        }
-        .device-wrap {
-            transform: scale(0.6);
-            transform-origin: center;
-            margin-bottom: -2rem;
         }
         .support-inner {
             border-radius: 1.7rem;
