@@ -90,63 +90,61 @@ const features =
         </div>
     </section>
 
-    <section class="section carousel-section" id="products">
-        <div class="carousel-track">
-            <div class="carousel-card">
-                <div class="card-top">
-                    <div class="card-pill"></div>
-                </div>
-                <div class="card-body">
-                    <div class="card-bar w40"></div>
-                    <div class="card-bar w70"></div>
-                    <div class="card-bar w55"></div>
-                </div>
-                <div class="card-block"></div>
+    <section class="carousel-section" id="products">
+        <div class="carousel-card">
+            <div class="card-top">
+                <div class="card-pill"></div>
             </div>
-            <div class="carousel-card">
-                <div class="card-top">
-                    <div class="card-pill"></div>
-                </div>
-                <div class="card-body">
-                    <div class="card-bar w40"></div>
-                    <div class="card-bar w70"></div>
-                    <div class="card-bar w55"></div>
-                </div>
-                <div class="card-block"></div>
+            <div class="card-body">
+                <div class="card-bar w40"></div>
+                <div class="card-bar w70"></div>
+                <div class="card-bar w55"></div>
             </div>
-            <div class="carousel-card">
-                <div class="card-top">
-                    <div class="card-pill"></div>
-                </div>
-                <div class="card-body">
-                    <div class="card-bar w40"></div>
-                    <div class="card-bar w70"></div>
-                    <div class="card-bar w55"></div>
-                </div>
-                <div class="card-block"></div>
+            <div class="card-block"></div>
+        </div>
+        <div class="carousel-card">
+            <div class="card-top">
+                <div class="card-pill"></div>
             </div>
-            <div class="carousel-card">
-                <div class="card-top">
-                    <div class="card-pill"></div>
-                </div>
-                <div class="card-body">
-                    <div class="card-bar w40"></div>
-                    <div class="card-bar w70"></div>
-                    <div class="card-bar w55"></div>
-                </div>
-                <div class="card-block"></div>
+            <div class="card-body">
+                <div class="card-bar w40"></div>
+                <div class="card-bar w70"></div>
+                <div class="card-bar w55"></div>
             </div>
-            <div class="carousel-card">
-                <div class="card-top">
-                    <div class="card-pill"></div>
-                </div>
-                <div class="card-body">
-                    <div class="card-bar w40"></div>
-                    <div class="card-bar w70"></div>
-                    <div class="card-bar w55"></div>
-                </div>
-                <div class="card-block"></div>
+            <div class="card-block"></div>
+        </div>
+        <div class="carousel-card">
+            <div class="card-top">
+                <div class="card-pill"></div>
             </div>
+            <div class="card-body">
+                <div class="card-bar w40"></div>
+                <div class="card-bar w70"></div>
+                <div class="card-bar w55"></div>
+            </div>
+            <div class="card-block"></div>
+        </div>
+        <div class="carousel-card">
+            <div class="card-top">
+                <div class="card-pill"></div>
+            </div>
+            <div class="card-body">
+                <div class="card-bar w40"></div>
+                <div class="card-bar w70"></div>
+                <div class="card-bar w55"></div>
+            </div>
+            <div class="card-block"></div>
+        </div>
+        <div class="carousel-card">
+            <div class="card-top">
+                <div class="card-pill"></div>
+            </div>
+            <div class="card-body">
+                <div class="card-bar w40"></div>
+                <div class="card-bar w70"></div>
+                <div class="card-bar w55"></div>
+            </div>
+            <div class="card-block"></div>
         </div>
     </section>
 
@@ -487,20 +485,16 @@ const features =
     }
 
     .carousel-section {
-        padding: 1.5rem 0 2rem;
-        overflow: hidden;
-    }
-    .carousel-track {
         display: flex;
         gap: 1.2rem;
         overflow-x: auto;
         scroll-snap-type: x mandatory;
-        padding: 0.5rem 2rem;
+        padding: 1.5rem 2rem;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
         justify-content: center;
     }
-    .carousel-track::-webkit-scrollbar {
+    .carousel-section::-webkit-scrollbar {
         display: none;
     }
     .carousel-card {
@@ -1078,7 +1072,8 @@ const features =
             flex: 0 0 220px;
             height: 300px;
         }
-        .carousel-track {
+        .carousel-section {
+            padding: 1rem 1.25rem;
             justify-content: flex-start;
         }
 
