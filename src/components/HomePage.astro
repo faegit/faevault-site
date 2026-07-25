@@ -136,6 +136,17 @@ const features =
                 </div>
                 <div class="card-block"></div>
             </div>
+            <div class="carousel-card">
+                <div class="card-top">
+                    <div class="card-pill"></div>
+                </div>
+                <div class="card-body">
+                    <div class="card-bar w40"></div>
+                    <div class="card-bar w70"></div>
+                    <div class="card-bar w55"></div>
+                </div>
+                <div class="card-block"></div>
+            </div>
         </div>
     </section>
 
@@ -487,6 +498,7 @@ const features =
         padding: 0.5rem 2rem;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
+        justify-content: center;
     }
     .carousel-track::-webkit-scrollbar {
         display: none;
@@ -495,6 +507,7 @@ const features =
         flex: 0 0 280px;
         height: 380px;
         border-radius: 1.8rem;
+        background: #fff;
         border: 1px solid rgba(81, 125, 142, 0.12);
         box-shadow:
             0 16px 60px rgba(42, 83, 99, 0.10),
@@ -1064,6 +1077,9 @@ const features =
         .carousel-card {
             flex: 0 0 220px;
             height: 300px;
+        }
+        .carousel-track {
+            justify-content: flex-start;
         }
 
         .section > * {
