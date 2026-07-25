@@ -2,7 +2,6 @@
 import type { Locale } from "../i18n/config";
 import { localePath } from "../i18n/config";
 
-
 interface Props {
     locale: Locale;
 }
@@ -10,15 +9,15 @@ const { locale } = Astro.props;
 const copy =
     locale === "zh-cn"
         ? {
-                eyebrow: "",
+              eyebrow: "",
               title: "你的密码和数据，完全由你掌控。",
               intro: "保险库把密码、通行密钥与重要资料放进一个本地加密库，并为 Windows Hello、浏览器自动填充与多设备同步打基础。",
               storyLink: "了解产品故事",
 
-
               storyKicker: "为什么值得信赖",
-                storyTitle: "离线 · 本地 · 无服务器",
-              storyBody: "保险库不含任何广告，所有核心功能免费使用。数据采用 scrypt + AES-256-GCM 本地加密，不经任何外部服务器；加密方案与安全设计公开透明，经反复审计验证。",
+              storyTitle: "离线 · 本地 · 无服务器",
+              storyBody:
+                  "保险库不含任何广告，所有核心功能免费使用。数据采用 scrypt + AES-256-GCM 本地加密，不经任何外部服务器；加密方案与安全设计公开透明，经反复审计验证。",
               quote: "好的工具不需要在隐私和便利之间做取舍。",
               whitepaperLink: "查看安全白皮书",
               guideKicker: "功能展示",
@@ -32,15 +31,15 @@ const copy =
               supportButton: "了解赞助方式",
           }
         : {
-                eyebrow: "",
+              eyebrow: "",
               title: "Your passwords should truly be yours.",
               intro: "FAEVault keeps passwords, passkeys, and important details inside a vault you can truly control.",
               storyLink: "Learn the story",
 
-
               storyKicker: "Why it feels trustworthy",
-                storyTitle: "Offline · Private · Transparent",
-              storyBody: "FAEVault contains no ads and all core features are free. Data is encrypted locally with scrypt + AES-256-GCM, never touching external servers. The encryption design and security architecture are transparent and regularly reviewed.",
+              storyTitle: "Offline · Private · Transparent",
+              storyBody:
+                  "FAEVault contains no ads and all core features are free. Data is encrypted locally with scrypt + AES-256-GCM, never touching external servers. The encryption design and security architecture are transparent and regularly reviewed.",
               quote: "A good tool shouldn't make you choose between privacy and convenience.",
               whitepaperLink: "Read the security whitepaper",
               guideKicker: "Feature showcase",
@@ -65,33 +64,60 @@ const features =
               { title: "加密同步", body: "WebDAV 连接 NAS 或 Nextcloud、局域网直连同步、加密备份导出，多设备间安全保持数据一致。", accent: "sync" },
           ]
         : [
-              { title: "Encrypted Vault", body: "scrypt + AES-256-GCM encryption. Passwords and passkeys stay in a local file, fully under your control.", accent: "vault" },
-              { title: "System Autofill", body: "Integrated with Android Autofill framework. Fill credentials and OTPs with one tap in apps and websites.", accent: "flow" },
-              { title: "Passkeys", body: "Android 14+ Passkey Credential Provider. Create and verify passkeys for passwordless, fast authentication.", accent: "passkey" },
-              { title: "OCR Scanning", body: "Scan credit cards and IDs via camera or gallery. Auto-extract card numbers, expiry dates, and personal details.", accent: "ocr" },
-              { title: "Security Guard", body: "Anti-screenshot with FLAG_SECURE, 60-second auto-clear clipboard, exponential brute-force lockout, sensitive data re-verification.", accent: "security" },
-              { title: "Encrypted Sync", body: "WebDAV for NAS/Nextcloud, LAN direct sync, encrypted backup export. Keep data consistent across devices.", accent: "sync" },
+              {
+                  title: "Encrypted Vault",
+                  body: "scrypt + AES-256-GCM encryption. Passwords and passkeys stay in a local file, fully under your control.",
+                  accent: "vault",
+              },
+              {
+                  title: "System Autofill",
+                  body: "Integrated with Android Autofill framework. Fill credentials and OTPs with one tap in apps and websites.",
+                  accent: "flow",
+              },
+              {
+                  title: "Passkeys",
+                  body: "Android 14+ Passkey Credential Provider. Create and verify passkeys for passwordless, fast authentication.",
+                  accent: "passkey",
+              },
+              {
+                  title: "OCR Scanning",
+                  body: "Scan credit cards and IDs via camera or gallery. Auto-extract card numbers, expiry dates, and personal details.",
+                  accent: "ocr",
+              },
+              {
+                  title: "Security Guard",
+                  body: "Anti-screenshot with FLAG_SECURE, 60-second auto-clear clipboard, exponential brute-force lockout, sensitive data re-verification.",
+                  accent: "security",
+              },
+              {
+                  title: "Encrypted Sync",
+                  body: "WebDAV for NAS/Nextcloud, LAN direct sync, encrypted backup export. Keep data consistent across devices.",
+                  accent: "sync",
+              },
           ];
 
-const showcaseFeatures = locale === "zh-cn" ? [
-    { title: "本地加密保险库", body: "密码与通行密钥离线存储，scrypt + AES-256-GCM 加密。" },
-    { title: "系统自动填充", body: "Android Autofill 框架，一键填入登录凭证与验证码。" },
-    { title: "通行密钥", body: "支持 Android 14+ Passkey，无密码快速认证。" },
-    { title: "加密同步", body: "WebDAV / 局域网直连，多设备间安全同步。" },
-    { title: "OCR 智能识别", body: "摄像头扫描，自动提取银行卡与身份证信息。" },
-    { title: "安全防护", body: "防截屏、剪贴板自动清空、暴力破解保护。" },
-    { title: "Windows Hello", body: "支持 Windows Hello 生物识别快速解锁。" },
-    { title: "浏览器扩展", body: "桌面端浏览器自动填充，无缝衔接。" },
-] : [
-    { title: "Encrypted Vault", body: "Passwords & passkeys stored offline with scrypt + AES-256-GCM." },
-    { title: "System Autofill", body: "Android Autofill framework, one-tap credential & OTP fill." },
-    { title: "Passkeys", body: "Android 14+ Passkey support for passwordless auth." },
-    { title: "Encrypted Sync", body: "WebDAV / LAN direct sync across your devices." },
-    { title: "OCR Scanning", body: "Camera scan credit cards & IDs, auto-extract details." },
-    { title: "Security Guard", body: "Anti-screenshot, auto-clear clipboard, brute-force lockout." },
-    { title: "Windows Hello", body: "Biometric unlock with Windows Hello." },
-    { title: "Browser Extension", body: "Desktop browser autofill for seamless flow." },
-];
+const showcaseFeatures =
+    locale === "zh-cn"
+        ? [
+              { title: "本地加密保险库", body: "密码与通行密钥离线存储，scrypt + AES-256-GCM 加密。" },
+              { title: "系统自动填充", body: "Android Autofill 框架，一键填入登录凭证与验证码。" },
+              { title: "通行密钥", body: "支持 Android 14+ Passkey，无密码快速认证。" },
+              { title: "加密同步", body: "WebDAV / 局域网直连，多设备间安全同步。" },
+              { title: "OCR 智能识别", body: "摄像头扫描，自动提取银行卡与身份证信息。" },
+              { title: "安全防护", body: "防截屏、剪贴板自动清空、暴力破解保护。" },
+              { title: "Windows Hello", body: "支持 Windows Hello 生物识别快速解锁。" },
+              { title: "浏览器扩展", body: "桌面端浏览器自动填充，无缝衔接。" },
+          ]
+        : [
+              { title: "Encrypted Vault", body: "Passwords & passkeys stored offline with scrypt + AES-256-GCM." },
+              { title: "System Autofill", body: "Android Autofill framework, one-tap credential & OTP fill." },
+              { title: "Passkeys", body: "Android 14+ Passkey support for passwordless auth." },
+              { title: "Encrypted Sync", body: "WebDAV / LAN direct sync across your devices." },
+              { title: "OCR Scanning", body: "Camera scan credit cards & IDs, auto-extract details." },
+              { title: "Security Guard", body: "Anti-screenshot, auto-clear clipboard, brute-force lockout." },
+              { title: "Windows Hello", body: "Biometric unlock with Windows Hello." },
+              { title: "Browser Extension", body: "Desktop browser autofill for seamless flow." },
+          ];
 ---
 
 <div class="home">
@@ -106,7 +132,6 @@ const showcaseFeatures = locale === "zh-cn" ? [
                     <a class="text-link" href={localePath(locale, "journey")}>{copy.storyLink}</a>
                 </div>
             </div>
-
         </div>
     </section>
 
@@ -114,17 +139,22 @@ const showcaseFeatures = locale === "zh-cn" ? [
         <div class="showcase-inner">
             <div class="card-carousel">
                 <div class="card-track">
-                    {showcaseFeatures.map((item, i) => (
-                        <div class="content-card">
-                            <div class="cc-image" style={`background:${["linear-gradient(135deg,#287795,#1a5068)","linear-gradient(135deg,#4a90d9,#2d6cb5)","linear-gradient(135deg,#7c5cbf,#5a3d99)","linear-gradient(135deg,#34a853,#1e7e34)","linear-gradient(135deg,#e88d3a,#c46d28)","linear-gradient(135deg,#d9544a,#b33b32)","linear-gradient(135deg,#1a73e8,#0d47a1)","linear-gradient(135deg,#00acc1,#00838f)"][i % 8]}`}>
-                                <div class="cc-shape"></div>
+                    {
+                        showcaseFeatures.map((item, i) => (
+                            <div class="content-card">
+                                <div
+                                    class="cc-image"
+                                    style={`background:${["linear-gradient(135deg,#287795,#1a5068)", "linear-gradient(135deg,#4a90d9,#2d6cb5)", "linear-gradient(135deg,#7c5cbf,#5a3d99)", "linear-gradient(135deg,#34a853,#1e7e34)", "linear-gradient(135deg,#e88d3a,#c46d28)", "linear-gradient(135deg,#d9544a,#b33b32)", "linear-gradient(135deg,#1a73e8,#0d47a1)", "linear-gradient(135deg,#00acc1,#00838f)"][i % 8]}`}
+                                >
+                                    <div class="cc-shape" />
+                                </div>
+                                <div class="cc-meta">
+                                    <span class="cc-num">0{i + 1}</span>
+                                    <span class="cc-label">{item.title}</span>
+                                </div>
                             </div>
-                            <div class="cc-meta">
-                                <span class="cc-num">0{i + 1}</span>
-                                <span class="cc-label">{item.title}</span>
-                            </div>
-                        </div>
-                    ))}
+                        ))
+                    }
                 </div>
             </div>
         </div>
@@ -249,12 +279,14 @@ const showcaseFeatures = locale === "zh-cn" ? [
                 <p class="eyebrow">{copy.supportKicker}</p>
                 <h2>{copy.supportTitle}</h2>
                 <div class="support-pillars">
-                    {copy.supportPoints.map((pt) => (
-                        <div class="pillar-card">
-                            <span class="pillar-icon"></span>
-                            <span>{pt}</span>
-                        </div>
-                    ))}
+                    {
+                        copy.supportPoints.map((pt) => (
+                            <div class="pillar-card">
+                                <span class="pillar-icon" />
+                                <span>{pt}</span>
+                            </div>
+                        ))
+                    }
                 </div>
                 <a class="support-cta" href={localePath(locale, "support")}>{copy.supportButton}</a>
             </div>
@@ -479,7 +511,6 @@ const showcaseFeatures = locale === "zh-cn" ? [
         gap: 2.5rem;
     }
 
-
     /* ── Card Carousel ── */
     .card-carousel {
         width: 100%;
@@ -495,21 +526,25 @@ const showcaseFeatures = locale === "zh-cn" ? [
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
     }
-    .card-track::-webkit-scrollbar { display: none; }
+    .card-track::-webkit-scrollbar {
+        display: none;
+    }
     .content-card {
         flex: 0 0 260px;
         scroll-snap-align: start;
         border-radius: 1.4rem;
         background: #fff;
-        border: 1px solid rgba(81,125,142,0.10);
-        box-shadow: 0 12px 40px rgba(42,83,99,0.08);
+        border: 1px solid rgba(81, 125, 142, 0.1);
+        box-shadow: 0 12px 40px rgba(42, 83, 99, 0.08);
         overflow: hidden;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transition:
+            transform 0.3s ease,
+            box-shadow 0.3s ease;
         cursor: pointer;
     }
     .content-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 18px 56px rgba(42,83,99,0.12);
+        box-shadow: 0 18px 56px rgba(42, 83, 99, 0.12);
     }
     .cc-image {
         width: 100%;
@@ -523,7 +558,7 @@ const showcaseFeatures = locale === "zh-cn" ? [
         width: 60px;
         height: 60px;
         border-radius: 50%;
-        background: rgba(255,255,255,0.20);
+        background: rgba(255, 255, 255, 0.2);
     }
     .cc-shape::after {
         content: "";
@@ -531,7 +566,7 @@ const showcaseFeatures = locale === "zh-cn" ? [
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: rgba(255,255,255,0.15);
+        background: rgba(255, 255, 255, 0.15);
         transform: translate(8px, 8px);
     }
     .cc-meta {
@@ -543,7 +578,7 @@ const showcaseFeatures = locale === "zh-cn" ? [
     .cc-num {
         font-size: 0.65rem;
         font-weight: 800;
-        color: rgba(40,119,149,0.30);
+        color: rgba(40, 119, 149, 0.3);
         letter-spacing: 0.06em;
     }
     .cc-label {
@@ -895,10 +930,14 @@ const showcaseFeatures = locale === "zh-cn" ? [
         transform-origin: center;
         will-change: transform, box-shadow, z-index;
         cursor: pointer;
-        transition: transform 420ms ease, opacity 420ms ease;
+        transition:
+            transform 420ms ease,
+            opacity 420ms ease;
     }
     .workflow-card.active {
-        box-shadow: 0 28px 52px rgba(41, 81, 95, 0.17), 0 0 0 1px rgba(63, 143, 175, 0.15);
+        box-shadow:
+            0 28px 52px rgba(41, 81, 95, 0.17),
+            0 0 0 1px rgba(63, 143, 175, 0.15);
         background: linear-gradient(145deg, rgba(255, 255, 255, 0.85), rgba(244, 250, 252, 0.78));
     }
     .workflow-card.fade-up {
@@ -986,9 +1025,16 @@ const showcaseFeatures = locale === "zh-cn" ? [
         animation: shimmer 5s ease-in-out infinite;
     }
     @keyframes shimmer {
-        0%, 60% { background-position: 100% 0; }
-        70% { background-position: 0 0; }
-        100% { background-position: 0 0; }
+        0%,
+        60% {
+            background-position: 100% 0;
+        }
+        70% {
+            background-position: 0 0;
+        }
+        100% {
+            background-position: 0 0;
+        }
     }
     .support-card-inner {
         position: relative;
@@ -1020,7 +1066,10 @@ const showcaseFeatures = locale === "zh-cn" ? [
         color: #2d5567;
         font-size: 0.88rem;
         font-weight: 520;
-        transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        transition:
+            background 0.2s ease,
+            border-color 0.2s ease,
+            transform 0.2s ease;
     }
     .pillar-card:hover {
         background: rgba(255, 255, 255, 0.8);
@@ -1045,7 +1094,10 @@ const showcaseFeatures = locale === "zh-cn" ? [
         color: #2d5567;
         font-size: 0.88rem;
         font-weight: 600;
-        transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        transition:
+            background 0.2s ease,
+            border-color 0.2s ease,
+            transform 0.2s ease;
     }
     .support-cta:hover {
         background: rgba(255, 255, 255, 0.7);
@@ -1102,150 +1154,136 @@ const showcaseFeatures = locale === "zh-cn" ? [
 </style>
 
 <script>
-(function() {
-    const MAX = 6;
-    function initTilt() {
-        const card = document.querySelector<HTMLElement>(".support-card");
-        if (!card) return;
-        card.addEventListener("mousemove", (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = (e.clientX - rect.left) / rect.width;
-            const y = (e.clientY - rect.top) / rect.height;
-            card.style.transform = `perspective(800px) rotateX(${(y - 0.5) * -MAX}deg) rotateY(${(x - 0.5) * MAX}deg)`;
-        });
-        card.addEventListener("mouseleave", () => {
-            card.style.transform = "perspective(800px) rotateX(0) rotateY(0)";
-        });
-    }
-    document.addEventListener("astro:page-load", initTilt);
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initTilt);
-    else initTilt();
-
-    let timer: ReturnType<typeof setInterval>;
-
-    function initStack() {
-        const stack = document.querySelector<HTMLElement>(".workflow-stack");
-        if (!stack) return;
-        const CARDS = Array.from(stack.children) as HTMLElement[];
-        const COUNT = CARDS.length;
-        if (COUNT < 2) return;
-
-        function equalizeHeights() {
-            let maxH = 0;
-            CARDS.forEach(c => { c.style.height = "auto"; maxH = Math.max(maxH, c.offsetHeight); });
-            if (maxH > 0) CARDS.forEach(c => { c.style.height = `${maxH}px`; });
-        }
-
-        function applyOffsets(activeIndex: number) {
-            CARDS.forEach((card, i) => {
-                const offset = (i - activeIndex + COUNT) % COUNT;
-                const y = offset * 18;
-                const scale = 1 - offset * 0.035;
-                card.style.transition = "transform 420ms ease, opacity 420ms ease";
-                card.style.transform = `translateY(${y}px) scale(${scale})`;
-                card.style.zIndex = `${COUNT - offset}`;
-                card.style.opacity = String(1 - offset * 0.06);
-                card.classList.toggle("active", offset === 0);
+    (function () {
+        const MAX = 6;
+        function initTilt() {
+            const card = document.querySelector<HTMLElement>(".support-card");
+            if (!card) return;
+            card.addEventListener("mousemove", (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = (e.clientX - rect.left) / rect.width;
+                const y = (e.clientY - rect.top) / rect.height;
+                card.style.transform = `perspective(800px) rotateX(${(y - 0.5) * -MAX}deg) rotateY(${(x - 0.5) * MAX}deg)`;
+            });
+            card.addEventListener("mouseleave", () => {
+                card.style.transform = "perspective(800px) rotateX(0) rotateY(0)";
             });
         }
+        document.addEventListener("astro:page-load", initTilt);
+        if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initTilt);
+        else initTilt();
 
-        let current = 0;
-        let running = false;
-        equalizeHeights();
-        applyOffsets(0);
+        let timer: ReturnType<typeof setInterval>;
 
-        function advance() {
-            if (running) return;
-            running = true;
-            const oldCard = CARDS[current];
-            oldCard.classList.add("fade-up");
-            setTimeout(() => {
-                current = (current + 1) % COUNT;
-                oldCard.classList.remove("fade-up");
-                applyOffsets(current);
-                running = false;
-            }, 440);
-        }
+        function initStack() {
+            const stack = document.querySelector<HTMLElement>(".workflow-stack");
+            if (!stack) return;
+            const CARDS = Array.from(stack.children) as HTMLElement[];
+            const COUNT = CARDS.length;
+            if (COUNT < 2) return;
 
-        CARDS.forEach((card) => { card.addEventListener("click", advance); });
+            function equalizeHeights() {
+                let maxH = 0;
+                CARDS.forEach((c) => {
+                    c.style.height = "auto";
+                    maxH = Math.max(maxH, c.offsetHeight);
+                });
+                if (maxH > 0)
+                    CARDS.forEach((c) => {
+                        c.style.height = `${maxH}px`;
+                    });
+            }
 
-        const DELAY = 4500;
-        clearInterval(timer);
-        timer = setInterval(advance, DELAY);
+            function applyOffsets(activeIndex: number) {
+                CARDS.forEach((card, i) => {
+                    const offset = (i - activeIndex + COUNT) % COUNT;
+                    const y = offset * 18;
+                    const scale = 1 - offset * 0.035;
+                    card.style.transition = "transform 420ms ease, opacity 420ms ease";
+                    card.style.transform = `translateY(${y}px) scale(${scale})`;
+                    card.style.zIndex = `${COUNT - offset}`;
+                    card.style.opacity = String(1 - offset * 0.06);
+                    card.classList.toggle("active", offset === 0);
+                });
+            }
 
-        stack.addEventListener("mouseenter", () => { clearInterval(timer); });
-        stack.addEventListener("mouseleave", () => {
+            let current = 0;
+            let running = false;
+            equalizeHeights();
+            applyOffsets(0);
+
+            function advance() {
+                if (running) return;
+                running = true;
+                const oldCard = CARDS[current];
+                oldCard.classList.add("fade-up");
+                setTimeout(() => {
+                    current = (current + 1) % COUNT;
+                    oldCard.classList.remove("fade-up");
+                    applyOffsets(current);
+                    running = false;
+                }, 440);
+            }
+
+            CARDS.forEach((card) => {
+                card.addEventListener("click", advance);
+            });
+
+            const DELAY = 4500;
             clearInterval(timer);
             timer = setInterval(advance, DELAY);
-        });
-    }
 
-    document.addEventListener("astro:page-load", initStack);
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initStack);
-    else initStack();
-
-    /* ── Infinite Carousel ── */
-    function initCarousel() {
-        const track = document.querySelector<HTMLElement>(".card-track");
-        if (!track) return;
-        const orig = Array.from(track.children) as HTMLElement[];
-        const N = orig.length;
-        if (N < 1) return;
-
-        const CLONES = 3;
-        for (let i = CLONES; i > 0; i--) {
-            const c = orig[N - i].cloneNode(true) as HTMLElement;
-            c.dataset.clone = "1";
-            track.insertBefore(c, track.firstChild);
-        }
-        for (let i = 0; i < CLONES; i++) {
-            const c = orig[i].cloneNode(true) as HTMLElement;
-            c.dataset.clone = "1";
-            track.appendChild(c);
-        }
-
-        const all = Array.from(track.children) as HTMLElement[];
-        const firstReal = CLONES;
-        const lastReal = CLONES + N - 1;
-        let jumping = false;
-
-        function cardUnit() {
-            const g = parseFloat(getComputedStyle(track).gap) || 0;
-            return (all[0]?.offsetWidth ?? 200) + g;
-        }
-
-        function jumpTo(index: number) {
-            jumping = true;
-            track.style.scrollSnapType = "none";
-            track.scrollLeft = index * cardUnit();
-            requestAnimationFrame(() => {
-                track.style.scrollSnapType = "";
-                jumping = false;
+            stack.addEventListener("mouseenter", () => {
+                clearInterval(timer);
+            });
+            stack.addEventListener("mouseleave", () => {
+                clearInterval(timer);
+                timer = setInterval(advance, DELAY);
             });
         }
 
-        jumpTo(firstReal);
+        document.addEventListener("astro:page-load", initStack);
+        if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initStack);
+        else initStack();
 
-        track.addEventListener("scroll", () => {
-            if (jumping) return;
-            const u = cardUnit();
-            const vw = track.clientWidth;
-            const sl = track.scrollLeft;
+        /* ── Infinite Carousel ── */
+        function initCarousel() {
+            const track = document.querySelector<HTMLElement>(".card-track");
+            if (!track) return;
+            const cards = Array.from(track.children) as HTMLElement[];
+            const N = cards.length;
+            if (N < 2) return;
 
-            if (sl + vw >= (lastReal + 1) * u) {
-                jumpTo(firstReal);
-            } else if (sl < firstReal * u) {
-                jumpTo(lastReal);
+            let prev = 0;
+
+            function unit() {
+                return cards[0].offsetWidth + (parseFloat(getComputedStyle(track).gap) || 0);
             }
-        });
-    }
 
-    document.addEventListener("astro:page-load", initCarousel);
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initCarousel);
-    else initCarousel();
-})();
+            track.addEventListener("scroll", () => {
+                const u = unit();
+                const sl = track.scrollLeft;
+                const dir = sl - prev;
+                prev = sl;
+
+                if (dir > 0) {
+                    while (track.scrollLeft >= u) {
+                        track.appendChild(track.firstElementChild);
+                        cards.push(cards.shift()!);
+                        track.scrollLeft -= u;
+                    }
+                } else if (dir < 0) {
+                    if (track.scrollLeft < 1) {
+                        track.insertBefore(track.lastElementChild, track.firstElementChild);
+                        cards.unshift(cards.pop()!);
+                        track.scrollLeft += u;
+                    }
+                }
+            });
+        }
+
+        document.addEventListener("astro:page-load", initCarousel);
+        if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initCarousel);
+        else initCarousel();
+    })();
 </script>
-
-
-
- 
