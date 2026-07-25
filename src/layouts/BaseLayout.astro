@@ -289,15 +289,11 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
     const onResize = () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(resize, 80); };
 
     function init() { resize(); prefersReduced ? drawStatic() : draw(); }
-    function stop() { cancelAnimationFrame(raf); raf = 0; }
 
     window.addEventListener("resize", onResize);
     document.addEventListener("mousemove", onMove);
     document.addEventListener("mouseleave", onLeave);
-    document.addEventListener("astro:page-load", init);
     init();
-
-    document.addEventListener("astro:before-swap", stop);
 })();
 </script>
 
