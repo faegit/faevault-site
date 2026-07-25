@@ -33,7 +33,7 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
         <ClientRouter />
     </head>
     <body>
-        <canvas id="dot-grid" aria-hidden="true"></canvas>
+        <canvas id="dot-grid" aria-hidden="true" transition:persist="dot-grid"></canvas>
         <a class="skip-link" href="#main">{text.skipToContent}</a>
         <header class="site-header">
             <a class="brand" href={localePath(locale)} aria-label={`${brandName} ${text.nav.home}`}>{brandName}</a>
@@ -233,7 +233,8 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
 <script>
 (function() {
     const canvas = document.getElementById("dot-grid");
-    if (!canvas) return;
+    if (!canvas || canvas.dataset.gridReady) return;
+    canvas.dataset.gridReady = "true";
     const ctx = canvas.getContext("2d");
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
