@@ -1261,9 +1261,9 @@ const showcaseFeatures =
                 const u = unit();
                 const sl = track.scrollLeft;
                 const dir = sl - prev;
-                prev = sl;
 
                 if (dir > 0) {
+                    lock = true;
                     while (track.scrollLeft >= u) {
                         const el = track.firstElementChild;
                         if (!el) break;
@@ -1271,17 +1271,24 @@ const showcaseFeatures =
                         cards.push(cards.shift()!);
                         track.scrollLeft -= u;
                     }
-                } else if (dir < 0 && track.scrollLeft < 1) {
-                    lock = true;
-                    const count = Math.min(3, cards.length);
-                    for (let i = 0; i < count; i++) {
-                        const el = track.lastElementChild;
-                        if (!el) break;
-                        track.insertBefore(el, track.firstElementChild!);
-                        cards.unshift(cards.pop()!);
+                    prev = track.scrollLeft;
+                    lock = false;
+                } else if (dir < 0) {
+                    if (track.scrollLeft < 1) {
+                        lock = true;
+                        const count = Math.min(3, cards.length);
+                        for (let i = 0; i < count; i++) {
+                            const el = track.lastElementChild;
+                            if (!el) break;
+                            track.insertBefore(el, track.firstElementChild!);
+                            cards.unshift(cards.pop()!);
+                        }
+                        track.scrollLeft = count * u;
+                        requestAnimationFrame(() => { lock = false; });
                     }
-                    track.scrollLeft = count * u;
-                    requestAnimationFrame(() => { lock = false; });
+                    prev = track.scrollLeft;
+                } else {
+                    prev = sl;
                 }
             });
         }
