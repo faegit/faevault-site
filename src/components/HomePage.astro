@@ -28,7 +28,7 @@ const copy =
               download: "下载最新版本",
               supportKicker: "支持独立开发",
               supportTitle: "Support independent development",
-              supportPoints: ["独立开发者维护", "持续更新迭代", "长期安全维护"],
+              supportPoints: ["独立开发者维护", "持续功能更新", "长期安全维护"],
               supportButton: "了解赞助方式",
           }
         : {
@@ -184,18 +184,20 @@ const features =
     </section>
 
     <section class="section support-section" id="support">
-        <div class="support-wrap">
-            <p class="eyebrow">{copy.supportKicker}</p>
-            <h2>{copy.supportTitle}</h2>
-            <div class="support-pillars">
-                {copy.supportPoints.map((pt) => (
-                    <div class="pillar-card">
-                        <span class="pillar-icon"></span>
-                        <span>{pt}</span>
-                    </div>
-                ))}
+        <div class="support-card">
+            <div class="support-card-inner">
+                <p class="eyebrow">{copy.supportKicker}</p>
+                <h2>{copy.supportTitle}</h2>
+                <div class="support-pillars">
+                    {copy.supportPoints.map((pt) => (
+                        <div class="pillar-card">
+                            <span class="pillar-icon"></span>
+                            <span>{pt}</span>
+                        </div>
+                    ))}
+                </div>
+                <a class="support-cta" href={localePath(locale, "support")}>{copy.supportButton}</a>
             </div>
-            <a class="support-cta" href={localePath(locale, "support")}>{copy.supportButton}</a>
         </div>
     </section>
 </div>
@@ -793,14 +795,50 @@ const features =
         justify-content: center;
         padding-bottom: clamp(4rem, 8vw, 7rem) !important;
     }
-    .support-wrap {
+    .support-card {
+        position: relative;
+        overflow: hidden;
+        width: min(900px, calc(100% - 3rem)) !important;
+        margin: 0 auto !important;
+        padding: clamp(3.5rem, 7vw, 6rem);
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        border-radius: 2.5rem;
+        background: linear-gradient(135deg, rgba(229, 248, 247, 0.62), rgba(229, 237, 251, 0.48));
+        box-shadow: 0 28px 90px rgba(42, 83, 99, 0.12);
+        backdrop-filter: blur(22px);
+    }
+    .support-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            105deg,
+            transparent 30%,
+            rgba(255, 255, 255, 0.5) 45%,
+            rgba(255, 255, 255, 0.65) 50%,
+            rgba(255, 255, 255, 0.5) 55%,
+            transparent 70%
+        );
+        background-size: 300% 100%;
+        background-position: 100% 0;
+        pointer-events: none;
+        animation: shimmer 5s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+        0%, 60% { background-position: 100% 0; }
+        70% { background-position: 0 0; }
+        100% { background-position: 0 0; }
+    }
+    .support-card-inner {
+        position: relative;
+        z-index: 1;
         display: flex;
         flex-direction: column;
         align-items: center;
         text-align: center;
         gap: 2.5rem;
     }
-    .support-wrap h2 {
+    .support-card-inner h2 {
         max-width: 700px;
     }
     .support-pillars {
@@ -839,7 +877,7 @@ const features =
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        margin-top: 1rem;
+        margin-top: 0.5rem;
         padding: 0.7rem 1.6rem;
         border: 1px solid rgba(42, 83, 99, 0.15);
         border-radius: 999px;
@@ -887,6 +925,10 @@ const features =
         }
         .split-copy h2 {
             font-size: clamp(1.6rem, 8vw, 2.8rem);
+        }
+        .support-card {
+            border-radius: 1.7rem;
+            padding: 3rem 1.5rem;
         }
     }
 </style>
