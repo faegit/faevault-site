@@ -90,6 +90,55 @@ const features =
         </div>
     </section>
 
+    <section class="section carousel-section" id="products">
+        <div class="carousel-track">
+            <div class="carousel-card">
+                <div class="card-top">
+                    <div class="card-pill"></div>
+                </div>
+                <div class="card-body">
+                    <div class="card-bar w40"></div>
+                    <div class="card-bar w70"></div>
+                    <div class="card-bar w55"></div>
+                </div>
+                <div class="card-block"></div>
+            </div>
+            <div class="carousel-card">
+                <div class="card-top">
+                    <div class="card-pill"></div>
+                </div>
+                <div class="card-body">
+                    <div class="card-bar w40"></div>
+                    <div class="card-bar w70"></div>
+                    <div class="card-bar w55"></div>
+                </div>
+                <div class="card-block"></div>
+            </div>
+            <div class="carousel-card">
+                <div class="card-top">
+                    <div class="card-pill"></div>
+                </div>
+                <div class="card-body">
+                    <div class="card-bar w40"></div>
+                    <div class="card-bar w70"></div>
+                    <div class="card-bar w55"></div>
+                </div>
+                <div class="card-block"></div>
+            </div>
+            <div class="carousel-card">
+                <div class="card-top">
+                    <div class="card-pill"></div>
+                </div>
+                <div class="card-body">
+                    <div class="card-bar w40"></div>
+                    <div class="card-bar w70"></div>
+                    <div class="card-bar w55"></div>
+                </div>
+                <div class="card-block"></div>
+            </div>
+        </div>
+    </section>
+
     <section class="section guide-section" id="guides">
         <div class="guide-inner">
             <div class="guide-head section-copy">
@@ -426,6 +475,77 @@ const features =
         z-index: 1;
     }
 
+    .carousel-section {
+        padding: 1.5rem 0 2rem;
+        overflow: hidden;
+    }
+    .carousel-track {
+        display: flex;
+        gap: 1.2rem;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        padding: 0.5rem 2rem;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    .carousel-track::-webkit-scrollbar {
+        display: none;
+    }
+    .carousel-card {
+        flex: 0 0 280px;
+        height: 380px;
+        border-radius: 1.8rem;
+        background: linear-gradient(145deg, rgba(248, 251, 255, 0.8), rgba(239, 247, 248, 0.72));
+        box-shadow:
+            0 16px 60px rgba(42, 83, 99, 0.10),
+            inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(81, 125, 142, 0.12);
+        scroll-snap-align: start;
+        position: relative;
+        overflow: hidden;
+    }
+    .carousel-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(ellipse at 30% 20%, rgba(63, 155, 181, 0.08), transparent 60%),
+            radial-gradient(ellipse at 80% 80%, rgba(131, 106, 181, 0.08), transparent 50%);
+        pointer-events: none;
+    }
+    .card-top {
+        padding: 1rem 1.2rem 0;
+        display: flex;
+        gap: 0.5rem;
+    }
+    .card-pill {
+        width: 3.6rem;
+        height: 0.6rem;
+        border-radius: 999px;
+        background: rgba(46, 110, 134, 0.10);
+    }
+    .card-body {
+        padding: 1.4rem 1.2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.7rem;
+    }
+    .card-bar {
+        height: 0.55rem;
+        border-radius: 999px;
+        background: rgba(46, 110, 134, 0.08);
+    }
+    .card-bar.w40 { width: 40%; }
+    .card-bar.w55 { width: 55%; }
+    .card-bar.w70 { width: 70%; }
+    .card-block {
+        margin: 0 1.2rem;
+        height: 5rem;
+        border-radius: 1rem;
+        background: rgba(46, 110, 134, 0.05);
+        border: 1px solid rgba(81, 125, 142, 0.08);
+    }
 
     .split-inner {
         display: flex;
@@ -676,7 +796,6 @@ const features =
             max-width: 100%;
         }
         .hero-inner {
-            grid-template-columns: 1fr;
             gap: 1.25rem;
             align-items: start;
         }
@@ -943,6 +1062,11 @@ const features =
         .actions a {
             width: 100%;
             justify-content: center;
+        }
+
+        .carousel-card {
+            flex: 0 0 220px;
+            height: 300px;
         }
 
         .section > * {
