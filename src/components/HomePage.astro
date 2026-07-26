@@ -36,28 +36,28 @@ const copy =
           }
         : {
               eyebrow: "",
-              title: "Your passwords should truly be yours.",
-              intro: "FAEVault manages logins, cards, IDs, Wi-Fi details, and API keys on Android, storing them in a locally encrypted .pmv file.",
-              storyLink: "Learn the story",
+              title: "Your passwords and data, entirely under your control.",
+              intro: "On Android, FAEVault manages logins, bank cards, IDs, Wi-Fi details, and API keys, storing everything in a locally encrypted .pmv file.",
+              storyLink: "Discover the product story",
 
               storyKicker: "How data is stored",
-              storyTitle: "Local-first · Encrypted at rest",
+              storyTitle: "Local-first · Encrypted on disk",
               storyBody:
-                  "FAEVault stores its vault in an encrypted file on the device by default and does not provide a developer-hosted account. Network access occurs only when you use features such as WebDAV, LAN sync, or breach checking.",
-              quote: "Local storage is the default; network features are your choice.",
-              whitepaperLink: "Read the security whitepaper",
+                  "By default, FAEVault keeps your data in an encrypted file on your device and provides no developer-hosted account. It makes the corresponding network requests only when you actively use WebDAV, LAN sync, or password breach checking.",
+              quote: "Local storage is the default. You decide when to use network features.",
+              whitepaperLink: "View the security whitepaper",
               productKicker: "Product showcase",
-              productTitle: "Explore the main product screens.",
-              productBody: "Compare the main PC and Android screens, from the vault home page to sync and settings.",
+              productTitle: "Browse FAEVault's main screens.",
+              productBody: "From the vault home page through sync and settings, compare the structure of the main PC and Android screens.",
               guideKicker: "Feature showcase",
-              guideTitle: "Practical features for everyday use.",
-              guideBody: "Each capability below maps to an implemented Android encryption, autofill, credential, scanning, or sync module.",
-              guides: "Browse the guides",
+              guideTitle: "Practical features built into FAEVault.",
+              guideBody: "Every capability below has a corresponding implementation in the Android encryption, autofill, credential, scanning, or sync modules.",
+              guides: "View the user guides",
               download: "Download the latest version",
               supportKicker: "Support the project",
-              supportTitle: "If FAEVault is useful to you, consider sponsoring to keep it maintained.",
-              supportPoints: ["Maintained by a solo developer", "Regular feature updates", "Bug fixes and release maintenance"],
-              supportButton: "See sponsorship options",
+              supportTitle: "If FAEVault has helped you, you can sponsor the project to support its ongoing maintenance.",
+              supportPoints: ["Maintained by an independent developer", "Ongoing feature updates and refinements", "Bug fixes and release maintenance"],
+              supportButton: "Learn how to sponsor",
           };
 
 const features =
@@ -72,13 +72,13 @@ const features =
           ]
         : [
               {
-                  title: "Encrypted Vault",
-                  body: "scrypt + AES-256-GCM encryption. Passwords and passkeys stay in a local file, fully under your control.",
+                  title: "Locally Encrypted Vault",
+                  body: "With scrypt + AES-256-GCM encryption, passwords and passkeys are stored offline in a local file, keeping your data entirely under your control.",
                   accent: "vault",
               },
               {
                   title: "System Autofill",
-                  body: "Android Autofill support for login entries, matched by app package or verified HTTPS host.",
+                  body: "Android Autofill fills and saves login entries, matching each source by app package name or HTTPS host.",
                   accent: "flow",
               },
               {
@@ -87,18 +87,18 @@ const features =
                   accent: "passkey",
               },
               {
-                  title: "OCR Scanning",
-                  body: "Scan or import card and ID images, then extract supported fields with on-device OCR and parsers.",
+                  title: "OCR Recognition",
+                  body: "Scan or import bank card and ID images, then use on-device OCR and field parsers to extract card numbers, expiry dates, names, and other supported details.",
                   accent: "ocr",
               },
               {
-                  title: "Security Guard",
-                  body: "FLAG_SECURE, sensitive clipboard handling, unlock cooldowns, and master-password gates for selected sensitive actions.",
+                  title: "Security Protection",
+                  body: "FLAG_SECURE, sensitive clipboard marking and timed clearing, unlock-failure cooldowns, and master-password verification for selected sensitive actions.",
                   accent: "security",
               },
               {
                   title: "Sync & Backup",
-                  body: "WebDAV, LAN sync with the desktop app, plus .pmbak, .pmv, and CSV import or export.",
+                  body: "Supports WebDAV, sync with the desktop app on the same LAN, and import or export in .pmbak, .pmv, and CSV formats.",
                   accent: "sync",
               },
           ];
@@ -133,22 +133,22 @@ const productScreensBase =
         : [
               { title: "Home", body: "Search, browse categories, and quickly add local entries.", pages: [{ image: productImage("home.png"), label: "Vault home" }] },
               { title: "Trash", body: "Review deleted entries, restore them, or remove them permanently.", pages: [{ image: productImage("trash.png"), label: "Trash" }] },
-              { title: "Database maintenance", body: "Compare duplicates, handle entries for the same service, and manage automatic Trash cleanup.", pages: [{ image: productImage("maintenance.png"), label: "Vault maintenance" }] },
-              { title: "Password security check", body: "Review password health, risks, and improvements, with optional breach checks.", pages: [{ image: productImage("password-security.png"), label: "Password security" }] },
+              { title: "Database maintenance", body: "Compare duplicate entries, handle entries for the same service, and manage automatic Trash cleanup.", pages: [{ image: productImage("maintenance.png"), label: "Vault maintenance" }] },
+              { title: "Password security check", body: "View password health, high-risk entries, and improvement suggestions, and run breach checks when needed.", pages: [{ image: productImage("password-security.png"), label: "Password security" }] },
               {
                   title: "Data export and sync",
-                  body: "Local backup and export, cross-device LAN sync, plus cloud file and WebDAV sync.",
+                  body: "See local backup and export, cross-device LAN sync, and cloud-file and WebDAV sync.",
                   pages: [
                       { image: productImage("local-export.png"), label: "Local data export" },
                       { image: productImage("lan-sync.png"), label: "Cross-device LAN sync" },
                       { image: productImage("cloud-sync.png"), label: "Cloud sync" },
                   ],
               },
-              { title: "Detail page", body: "Review entry data and access copy, edit, or move-to-Trash actions.", pages: [{ image: productImage("entry-detail.png"), label: "Entry details" }] },
-              { title: "Edit page", body: "Edit core fields and combine image, attachment, and other content modules.", pages: [{ image: productImage("entry-edit.png"), label: "Entry editor" }] },
+              { title: "Detail page", body: "View entry data in one place, then copy, edit, or move the entry to Trash.", pages: [{ image: productImage("entry-detail.png"), label: "Entry details" }] },
+              { title: "Edit page", body: "Edit basic fields and add images, attachments, and other content modules as needed.", pages: [{ image: productImage("entry-edit.png"), label: "Entry editor" }] },
               {
                   title: "Custom modules",
-                  body: "A focused module view alongside the complete custom module composition.",
+                  body: "See both a focused view and the complete module composition of a custom entry.",
                   pages: [
                       { image: productImage("modules-partial.png"), label: "Module detail" },
                       { image: productImage("modules-all.png"), label: "All modules" },
@@ -174,7 +174,7 @@ const pcPages =
         : [
               [{ image: productImage("pc-home.png"), label: "PC home" }],
               [{ image: productImage("pc-trash.png"), label: "PC Trash" }],
-              [{ image: productImage("pc-maintenance.png"), label: "PC data maintenance" }],
+              [{ image: productImage("pc-maintenance.png"), label: "PC data organization" }],
               [{ image: productImage("pc-password-security.png"), label: "PC password security" }],
               [{ image: productImage("pc-data-export-sync.png"), label: "PC data export and sync" }],
               [{ image: productImage("pc-entry-detail.png"), label: "PC entry details" }],

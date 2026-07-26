@@ -58,8 +58,8 @@ const c = locale === "zh-cn"
         title: "Why FAEVault exists",
         paragraphs: [
           "There's no shortage of password managers on the market. But after trying most of them, I kept running into the same frustrations: free tiers limited to a single device, Pro subscriptions for basic features like sync, and everything behind a paywall — even though the underlying technology is just an encrypted file and basic network transfer.",
-          "Privacy was an even bigger concern. Storing passwords on someone else's server, trusting their encryption claims, hoping their security never gets breached. The most intimate digital asset we own — our keys to everything — should not default to living on a third-party server.",
-          "So the motivation was simple at first: build a password manager for myself. No network required. No account registration. No subscription to worry about. Just a local file, one master password, and it works.",
+          "Privacy was an even bigger concern. Providers may say that encrypted data is invisible to them, but I still believe our most private digital assets should not live on someone else's cloud by default, with a third party deciding whether they are safe.",
+          "So the motivation was simple at first: build a password manager for myself. No network required. No account registration. No subscription to worry about. One local file, one master password, and it is ready to use.",
         ],
       },
       {
@@ -67,7 +67,7 @@ const c = locale === "zh-cn"
         paragraphs: [
           "The very first Android build was bare-bones: type a password, save it, copy it. No autofill, no sync, no polished UI. But after using it for a while, I realized this rough tool gave me something the big commercial apps couldn't — the certainty that my data truly belonged to me.",
           "If I benefited from it, maybe others who care about privacy would too. So I started taking it seriously: scrypt + AES-256-GCM for encryption, cross-platform file format compatibility, and a UI that went from functional to actually pleasant to use.",
-          "The journey took far longer than expected. Autofill alone required adapting to Android's Autofill framework, system-version differences, and behavior variations across device environments. Sync meant WebDAV support, LAN connections, and conflict-resolution strategies — each component brought its own surprises.",
+          "The journey took far longer than expected. Autofill alone required adapting to Android's Autofill framework, differences between system versions, and varying behavior across device environments. Sync involved the WebDAV protocol, LAN connections, and conflict-merging strategies — each part brought its share of hard-earned lessons.",
         ],
       },
       {
@@ -75,7 +75,7 @@ const c = locale === "zh-cn"
         paragraphs: [
           "Autofill was rewritten at least three times. The first version barely worked across devices. The second improved compatibility but was still unreliable in edge cases. Only the third iteration struck the right balance between broad compatibility and solid security.",
           "UI polish was just as time-consuming. Transition animation curves, list scrolling frame rates, dark mode color harmony — every detail went through many rounds of tweaking. A single stutter in a transition animation could take days to trace down, often ending with a subtle compositing issue in the rendering pipeline.",
-          "The leaked password check feature needed to query Have I Been Pwned without sending user password hashes. The k-anonymity model solves this elegantly — send only the first five hash characters, get back full matching hashes, compare locally. Simple in concept, but integrating it into the app's async flow while keeping the UX smooth took significant effort.",
+          "Password breach checking needed to query the Have I Been Pwned API without sending a user's complete password hash. The final k-anonymity design sends only the first five hash characters, receives the full matching hashes, and compares them locally. The idea is simple, but integrating it into the app's asynchronous flow while keeping the experience smooth took considerable effort.",
         ],
       },
       {
@@ -89,7 +89,7 @@ const c = locale === "zh-cn"
       {
         title: "Now and ahead",
         paragraphs: [
-          "Today FAEVault covers the core capabilities of a password manager: local encrypted storage, system-level autofill, passkey support, plus LAN and WebDAV sync. The project will keep improving: a smoother cross-platform experience, more reliable sync and backups, and broader compatibility — each one needs time to get right.",
+          "Today FAEVault covers the core capabilities of a password manager: local encrypted storage, system autofill, passkey support, and both LAN and WebDAV sync. The project will keep improving toward a smoother cross-platform experience, more reliable sync and backups, and broader compatibility — each one needs time and care.",
           "This project was never about building a viral product. It exists because I believe password management should be simpler, more transparent, and more respectful of the user. That direction won't change: no ads, no subscriptions, no data collection — ever.",
           "If you're reading this, thank you for taking the time to learn about the story behind this project. I hope it becomes a quiet, dependable part of your daily toolkit.",
         ],

@@ -88,7 +88,7 @@ const c = locale === "zh-cn"
           { label: "Master Password", body: "The master password unlocks the vault and selected sensitive actions. It is not written in plaintext to the vault file; unlocked session material remains in app-process memory." },
           { label: "Biometrics", body: "When enabled, an AndroidKeyStore AES-GCM key wraps the 32-byte data key and requires BIOMETRIC_STRONG. The app does not read or store raw fingerprint or face data." },
           { label: "Session Security", body: "SessionSecret and SessionBytes hold session keys in memory and zero temporary plaintext byte arrays after use. Locking clears session state." },
-          { label: "Recovery Phrase", body: "A security question + answer pair derives a recovery key via scrypt, which decrypts a locally stored master password recovery package. No third party involved." },
+          { label: "Recovery Credential", body: "A preset security question and answer derive a recovery key via scrypt, which decrypts the locally stored master-password recovery package without relying on any third party." },
         ],
       },
       {
@@ -98,15 +98,15 @@ const c = locale === "zh-cn"
           { label: "Screen Protection", body: "FLAG_SECURE is enabled by default and can be disabled only after master-password verification and a risk confirmation. Sensitive autofill, passkey, and sync-scanning windows remain protected." },
           { label: "Clipboard Guard", body: "Copied secrets use the system sensitive flag. Auto-clear is configurable from 0 to 600 seconds and defaults to 60; zero disables automatic clearing." },
           { label: "Unlock Cooldown", body: "The first four failures add retry delays of 0.25, 0.5, 1, and 2 seconds. The fifth triggers a 30-second cooldown; later rounds rise to 60 and 90 seconds. Success clears the state." },
-          { label: "Sensitive Data Gate", body: "Viewing credit card, ID, or API key details, modifying the master password, or exporting data requires re-entering the current master password." },
+          { label: "Sensitive Data Gate", body: "Viewing detailed fields or images for bank card, ID, and API key entries, as well as changing the master password or exporting data, requires re-entering the current master password." },
         ],
       },
       {
         id: "autofill-security",
         title: "Autofill Security",
         items: [
-          { label: "Per-action Auth", body: "Every fill or save requires strong biometric or master password authentication. No in-memory plaintext cache is maintained." },
-          { label: "Origin Verification", body: "Exact matching by associated app package name or HTTPS host. Requests from the app itself, system settings, or privileged management apps are rejected." },
+          { label: "Per-action Authentication", body: "Every fill or new-credential save requires strong biometric or master-password authentication for the current vault. No unauthenticated plaintext cache is kept in the background." },
+          { label: "Origin Verification", body: "Sources are matched exactly by associated app package name or HTTPS host. Fill requests from FAEVault itself, system settings, permission managers, and other sensitive sources are rejected." },
           { label: "Security Boundaries", body: "No accessibility services, floating windows, auto-start, or battery whitelist permissions. Autofill applies to login entries only." },
         ],
       },
