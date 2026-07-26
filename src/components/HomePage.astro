@@ -106,52 +106,52 @@ const features =
 const productScreensBase =
     locale === "zh-cn"
         ? [
-              { title: "主页", body: "搜索、分类查看并快速新增本地条目。", pages: [{ image: productImage("home.jpg"), label: "保险库主页" }] },
-              { title: "回收站", body: "查看已删除条目，并选择恢复或彻底删除。", pages: [{ image: productImage("trash.jpg"), label: "回收站" }] },
-              { title: "数据库维护", body: "对比重复条目、处理相同服务，并管理回收站自动清理。", pages: [{ image: productImage("maintenance.jpg"), label: "保险库维护" }] },
-              { title: "密码安全检查", body: "查看密码健康状态、高风险项目与改进建议，并按需执行泄露检查。", pages: [{ image: productImage("password-security.jpg"), label: "密码安全" }] },
+              { title: "主页", body: "搜索、分类查看并快速新增本地条目。", pages: [{ image: productImage("home.png"), label: "保险库主页" }] },
+              { title: "回收站", body: "查看已删除条目，并选择恢复或彻底删除。", pages: [{ image: productImage("trash.png"), label: "回收站" }] },
+              { title: "数据库维护", body: "对比重复条目、处理相同服务，并管理回收站自动清理。", pages: [{ image: productImage("maintenance.png"), label: "保险库维护" }] },
+              { title: "密码安全检查", body: "查看密码健康状态、高风险项目与改进建议，并按需执行泄露检查。", pages: [{ image: productImage("password-security.png"), label: "密码安全" }] },
               {
                   title: "数据导出和同步",
                   body: "展示本地备份与导出、局域网跨端同步，以及云端文件与 WebDAV 同步。",
                   pages: [
-                      { image: productImage("local-export.jpg"), label: "本地数据导出" },
-                      { image: productImage("lan-sync.jpg"), label: "局域网跨端同步" },
-                      { image: productImage("cloud-sync.jpg"), label: "云端同步" },
+                      { image: productImage("local-export.png"), label: "本地数据导出" },
+                      { image: productImage("lan-sync.png"), label: "局域网跨端同步" },
+                      { image: productImage("cloud-sync.png"), label: "云端同步" },
                   ],
               },
-              { title: "详情页展示", body: "集中查看条目资料，并执行复制、编辑和移入回收站等操作。", pages: [{ image: productImage("entry-detail.jpg"), label: "条目详情" }] },
-              { title: "编辑页展示", body: "编辑基础字段，并按需组合图片、附件及其他内容模块。", pages: [{ image: productImage("entry-edit.jpg"), label: "条目编辑" }] },
+              { title: "详情页展示", body: "集中查看条目资料，并执行复制、编辑和移入回收站等操作。", pages: [{ image: productImage("entry-detail.png"), label: "条目详情" }] },
+              { title: "编辑页展示", body: "编辑基础字段，并按需组合图片、附件及其他内容模块。", pages: [{ image: productImage("entry-edit.png"), label: "条目编辑" }] },
               {
                   title: "自定义模块展示",
                   body: "分别展示自定义条目的局部内容与完整模块组合。",
                   pages: [
-                      { image: productImage("modules-partial.jpg"), label: "模块局部" },
-                      { image: productImage("modules-all.jpg"), label: "全部模块" },
+                      { image: productImage("modules-partial.png"), label: "模块局部" },
+                      { image: productImage("modules-all.png"), label: "全部模块" },
                   ],
               },
           ]
         : [
-              { title: "Home", body: "Search, browse categories, and quickly add local entries.", pages: [{ image: productImage("home.jpg"), label: "Vault home" }] },
-              { title: "Trash", body: "Review deleted entries, restore them, or remove them permanently.", pages: [{ image: productImage("trash.jpg"), label: "Trash" }] },
-              { title: "Database maintenance", body: "Compare duplicates, handle entries for the same service, and manage automatic Trash cleanup.", pages: [{ image: productImage("maintenance.jpg"), label: "Vault maintenance" }] },
-              { title: "Password security check", body: "Review password health, risks, and improvements, with optional breach checks.", pages: [{ image: productImage("password-security.jpg"), label: "Password security" }] },
+              { title: "Home", body: "Search, browse categories, and quickly add local entries.", pages: [{ image: productImage("home.png"), label: "Vault home" }] },
+              { title: "Trash", body: "Review deleted entries, restore them, or remove them permanently.", pages: [{ image: productImage("trash.png"), label: "Trash" }] },
+              { title: "Database maintenance", body: "Compare duplicates, handle entries for the same service, and manage automatic Trash cleanup.", pages: [{ image: productImage("maintenance.png"), label: "Vault maintenance" }] },
+              { title: "Password security check", body: "Review password health, risks, and improvements, with optional breach checks.", pages: [{ image: productImage("password-security.png"), label: "Password security" }] },
               {
                   title: "Data export and sync",
                   body: "Local backup and export, cross-device LAN sync, plus cloud file and WebDAV sync.",
                   pages: [
-                      { image: productImage("local-export.jpg"), label: "Local data export" },
-                      { image: productImage("lan-sync.jpg"), label: "Cross-device LAN sync" },
-                      { image: productImage("cloud-sync.jpg"), label: "Cloud sync" },
+                      { image: productImage("local-export.png"), label: "Local data export" },
+                      { image: productImage("lan-sync.png"), label: "Cross-device LAN sync" },
+                      { image: productImage("cloud-sync.png"), label: "Cloud sync" },
                   ],
               },
-              { title: "Detail page", body: "Review entry data and access copy, edit, or move-to-Trash actions.", pages: [{ image: productImage("entry-detail.jpg"), label: "Entry details" }] },
-              { title: "Edit page", body: "Edit core fields and combine image, attachment, and other content modules.", pages: [{ image: productImage("entry-edit.jpg"), label: "Entry editor" }] },
+              { title: "Detail page", body: "Review entry data and access copy, edit, or move-to-Trash actions.", pages: [{ image: productImage("entry-detail.png"), label: "Entry details" }] },
+              { title: "Edit page", body: "Edit core fields and combine image, attachment, and other content modules.", pages: [{ image: productImage("entry-edit.png"), label: "Entry editor" }] },
               {
                   title: "Custom modules",
                   body: "A focused module view alongside the complete custom module composition.",
                   pages: [
-                      { image: productImage("modules-partial.jpg"), label: "Module detail" },
-                      { image: productImage("modules-all.jpg"), label: "All modules" },
+                      { image: productImage("modules-partial.png"), label: "Module detail" },
+                      { image: productImage("modules-all.png"), label: "All modules" },
                   ],
               },
           ];
