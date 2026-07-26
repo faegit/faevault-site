@@ -180,10 +180,7 @@ const productScreens =
                 <p>{copy.productBody}</p>
             </div>
             <div class="carousel-shell">
-                <button class="carousel-button previous" type="button" aria-label={locale === "zh-cn" ? "上一项" : "Previous item"}>
-                    <span aria-hidden="true">←</span>
-                </button>
-                <div class="card-carousel" aria-roledescription="carousel" aria-label={locale === "zh-cn" ? "产品页面轮播" : "Product screen carousel"}>
+                <div class="card-carousel" tabindex="0" aria-roledescription="carousel" aria-label={locale === "zh-cn" ? "产品页面轮播，可左右滑动切换" : "Product screen carousel, swipe horizontally to navigate"}>
                     <div class="card-track">
                     {
                         productScreens.map((item, i) => (
@@ -202,6 +199,7 @@ const productScreens =
                                                 src={screen.image}
                                                 alt={screen.label}
                                                 loading="lazy"
+                                                draggable="false"
                                                 data-screen-image={screenIndex}
                                                 hidden={screenIndex !== 0}
                                             />
@@ -229,10 +227,9 @@ const productScreens =
                         ))
                     }
                     </div>
+                    <button class="carousel-edge-hit previous" type="button" tabindex="-1" aria-hidden="true" data-carousel-edge="-1"></button>
+                    <button class="carousel-edge-hit next" type="button" tabindex="-1" aria-hidden="true" data-carousel-edge="1"></button>
                 </div>
-                <button class="carousel-button next" type="button" aria-label={locale === "zh-cn" ? "下一项" : "Next item"}>
-                    <span aria-hidden="true">→</span>
-                </button>
             </div>
             <div class="carousel-footer">
                 <div class="carousel-dots" role="group" aria-label={locale === "zh-cn" ? "选择轮播项目" : "Choose carousel item"}>
@@ -383,7 +380,10 @@ const productScreens =
                         ))
                     }
                 </div>
-                <a class="support-cta" href={localePath(locale, "support")}>{copy.supportButton}</a>
+                <a class="support-cta" href={localePath(locale, "support")}>
+                    <span>{copy.supportButton}</span>
+                    <span class="support-cta-arrow" aria-hidden="true">→</span>
+                </a>
             </div>
         </div>
     </section>
@@ -630,10 +630,7 @@ const productScreens =
         font: 1rem/1.8 Georgia, serif;
     }
     .carousel-shell {
-        display: grid;
-        grid-template-columns: 2.75rem minmax(0, 1fr) 2.75rem;
-        align-items: center;
-        gap: 1rem;
+        display: block;
         width: min(1120px, 100%);
     }
 
@@ -643,6 +640,29 @@ const productScreens =
         position: relative;
         overflow: hidden;
         padding: 1.2rem 0;
+        cursor: grab;
+        touch-action: pan-y;
+        user-select: none;
+    }
+    .card-carousel:active {
+        cursor: grabbing;
+    }
+    .carousel-edge-hit {
+        position: absolute;
+        top: 1.2rem;
+        bottom: 1.2rem;
+        z-index: 4;
+        width: 12%;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+    }
+    .carousel-edge-hit.previous {
+        left: 0;
+    }
+    .carousel-edge-hit.next {
+        right: 0;
     }
     .card-track {
         display: flex;
@@ -710,6 +730,7 @@ const productScreens =
         border-radius: 1rem;
         background: #fff;
         box-shadow: 0 18px 44px rgba(18, 55, 72, 0.14);
+        pointer-events: none;
     }
     .cc-page-image[hidden] {
         display: none;
@@ -763,25 +784,7 @@ const productScreens =
         font-size: 0.72rem;
         line-height: 1.45;
     }
-    .carousel-button {
-        display: grid;
-        place-items: center;
-        width: 2.75rem;
-        height: 2.75rem;
-        padding: 0;
-        border: 1px solid rgba(42, 83, 99, 0.16);
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.82);
-        color: #173f50;
-        font-size: 1.1rem;
-        cursor: pointer;
-        transition: transform 0.2s ease, background 0.2s ease;
-    }
-    .carousel-button:hover {
-        transform: translateY(-2px);
-        background: #fff;
-    }
-    .carousel-button:focus-visible,
+    .card-carousel:focus-visible,
     .carousel-dots button:focus-visible {
         outline: 3px solid rgba(25, 128, 164, 0.2);
         outline-offset: 3px;
@@ -1433,21 +1436,40 @@ const productScreens =
         align-items: center;
         gap: 0.5rem;
         margin-top: 0.5rem;
-        padding: 0.7rem 1.6rem;
-        border: 1px solid rgba(42, 83, 99, 0.15);
+        min-width: 10rem;
+        padding: 0.85rem 1.2rem 0.85rem 1.5rem;
+        justify-content: space-between;
+        border: 1px solid #174f65;
         border-radius: 999px;
-        color: #2d5567;
-        font-size: 0.88rem;
-        font-weight: 600;
+        background: #174f65;
+        box-shadow: 0 12px 28px rgba(23, 79, 101, 0.22);
+        color: #fff;
+        font-size: 0.9rem;
+        font-weight: 720;
         transition:
             background 0.2s ease,
+            box-shadow 0.2s ease,
             border-color 0.2s ease,
             transform 0.2s ease;
     }
     .support-cta:hover {
-        background: rgba(255, 255, 255, 0.7);
-        border-color: rgba(42, 83, 99, 0.25);
-        transform: translateY(-1px);
+        background: #0f4053;
+        border-color: #0f4053;
+        box-shadow: 0 16px 34px rgba(23, 79, 101, 0.3);
+        transform: translateY(-2px);
+    }
+    .support-cta-arrow {
+        display: grid;
+        width: 1.6rem;
+        height: 1.6rem;
+        place-items: center;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.16);
+        font-size: 0.9rem;
+        transition: transform 0.2s ease;
+    }
+    .support-cta:hover .support-cta-arrow {
+        transform: translateX(0.2rem);
     }
 
     @media (max-width: 760px) {
@@ -1477,25 +1499,11 @@ const productScreens =
         .card-carousel {
             width: 100%;
         }
+        .card-track {
+            gap: 0.75rem;
+        }
         .content-card {
-            flex: 0 0 86%;
-        }
-        .carousel-button {
-            position: absolute;
-            top: 46%;
-            z-index: 5;
-            width: 2.5rem;
-            height: 2.5rem;
-            transform: translateY(-50%);
-        }
-        .carousel-button.previous {
-            left: -0.75rem;
-        }
-        .carousel-button.next {
-            right: -0.75rem;
-        }
-        .carousel-button:hover {
-            transform: translateY(calc(-50% - 2px));
+            flex: 0 0 76%;
         }
         .cc-media {
             min-height: 530px;
@@ -1693,9 +1701,8 @@ const productScreens =
             const shell = track.closest<HTMLElement>(".carousel-shell");
             const viewport = track.parentElement;
             const dots = Array.from(document.querySelectorAll<HTMLButtonElement>(".carousel-dots button"));
+            const edgeHits = Array.from(viewport?.querySelectorAll<HTMLButtonElement>("[data-carousel-edge]") ?? []);
             const status = document.querySelector<HTMLElement>(".carousel-status span");
-            const previous = shell?.querySelector<HTMLButtonElement>(".previous");
-            const next = shell?.querySelector<HTMLButtonElement>(".next");
             const before = cards[cards.length - 1].cloneNode(true) as HTMLElement;
             const after = cards[0].cloneNode(true) as HTMLElement;
             before.dataset.clone = "true";
@@ -1711,7 +1718,12 @@ const productScreens =
             let current = 0;
             let position = 1;
             let moving = false;
+            let queuedMove: (() => void) | null = null;
             let hovered = false;
+            let dragPointer: number | null = null;
+            let dragStartX = 0;
+            let dragStartY = 0;
+            let suppressClickUntil = 0;
             let autoTimer: ReturnType<typeof setTimeout>;
 
             function scheduleAuto() {
@@ -1731,7 +1743,7 @@ const productScreens =
             function manualMove(move: () => void) {
                 clearTimeout(autoTimer);
                 if (moving) {
-                    scheduleAuto();
+                    queuedMove = move;
                     return;
                 }
                 moving = true;
@@ -1755,25 +1767,26 @@ const productScreens =
                 }
             }
 
-            displayCards.forEach((card) => {
-                card.querySelectorAll<HTMLButtonElement>("[data-screen-select]").forEach((selector) => {
-                    selector.addEventListener("click", (event) => {
-                        if (!card.classList.contains("active")) return;
-                        event.stopPropagation();
-                        selectScreen(card, Number(selector.dataset.screenSelect ?? 0));
-                        scheduleAuto();
-                    });
-                });
-                card.querySelector<HTMLButtonElement>("[data-open-product-image]")?.addEventListener("click", (event) => {
-                    if (!card.classList.contains("active")) return;
+            carouselTrack.addEventListener("click", (event) => {
+                const target = event.target as Element;
+                const card = target.closest<HTMLElement>(".content-card");
+                if (!card?.classList.contains("active")) return;
+                const selector = target.closest<HTMLButtonElement>("[data-screen-select]");
+                if (selector) {
                     event.stopPropagation();
-                    const activeImage = card.querySelector<HTMLImageElement>("[data-screen-image]:not([hidden])");
-                    if (!activeImage || !imageDialog || !dialogImage) return;
-                    dialogImage.src = activeImage.src;
-                    dialogImage.alt = activeImage.alt;
-                    clearTimeout(autoTimer);
-                    imageDialog.showModal();
-                });
+                    selectScreen(card, Number(selector.dataset.screenSelect ?? 0));
+                    scheduleAuto();
+                    return;
+                }
+                const openButton = target.closest<HTMLButtonElement>("[data-open-product-image]");
+                if (!openButton) return;
+                event.stopPropagation();
+                const activeImage = card.querySelector<HTMLImageElement>("[data-screen-image]:not([hidden])");
+                if (!activeImage || !imageDialog || !dialogImage) return;
+                dialogImage.src = activeImage.src;
+                dialogImage.alt = activeImage.alt;
+                clearTimeout(autoTimer);
+                imageDialog.showModal();
             });
             dialogClose?.addEventListener("click", () => {
                 imageDialog?.close();
@@ -1820,14 +1833,17 @@ const productScreens =
                 render();
             }
 
-            previous?.addEventListener("click", () => manualMove(() => stepBy(-1)));
-            next?.addEventListener("click", () => manualMove(() => stepBy(1)));
             dots.forEach((dot, index) => dot.addEventListener("click", () => {
                 if (index === current) {
                     scheduleAuto();
                     return;
                 }
                 manualMove(() => goTo(index));
+            }));
+            edgeHits.forEach((edge) => edge.addEventListener("click", (event) => {
+                event.preventDefault();
+                if (performance.now() < suppressClickUntil) return;
+                manualMove(() => stepBy(Number(edge.dataset.carouselEdge) < 0 ? -1 : 1));
             }));
             displayCards.forEach((card, index) => {
                 card.addEventListener("click", () => {
@@ -1842,6 +1858,7 @@ const productScreens =
                 });
             });
             carouselTrack.addEventListener("transitionend", (event) => {
+                if (event.target !== carouselTrack) return;
                 if (event.propertyName !== "transform") return;
                 if (position === 0) {
                     position = cards.length;
@@ -1851,6 +1868,56 @@ const productScreens =
                     render(false);
                 }
                 moving = false;
+                if (queuedMove) {
+                    const move = queuedMove;
+                    queuedMove = null;
+                    moving = true;
+                    move();
+                    scheduleAuto();
+                }
+            });
+            viewport?.addEventListener("pointerdown", (event) => {
+                if (event.pointerType === "mouse" && event.button !== 0) return;
+                dragPointer = event.pointerId;
+                dragStartX = event.clientX;
+                dragStartY = event.clientY;
+                clearTimeout(autoTimer);
+            });
+            viewport?.addEventListener("pointermove", (event) => {
+                if (event.pointerId !== dragPointer) return;
+                const dx = event.clientX - dragStartX;
+                const dy = event.clientY - dragStartY;
+                if (Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy) && event.cancelable) {
+                    event.preventDefault();
+                }
+            });
+            const finishSwipe = (event: PointerEvent) => {
+                if (event.pointerId !== dragPointer) return;
+                const dx = event.clientX - dragStartX;
+                const dy = event.clientY - dragStartY;
+                dragPointer = null;
+                if (Math.abs(dx) >= 48 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+                    suppressClickUntil = performance.now() + 400;
+                    manualMove(() => stepBy(dx < 0 ? 1 : -1));
+                } else {
+                    scheduleAuto();
+                }
+            };
+            viewport?.addEventListener("pointerup", finishSwipe);
+            viewport?.addEventListener("pointercancel", (event) => {
+                if (event.pointerId !== dragPointer) return;
+                dragPointer = null;
+                scheduleAuto();
+            });
+            carouselTrack.addEventListener("click", (event) => {
+                if (performance.now() >= suppressClickUntil) return;
+                event.preventDefault();
+                event.stopImmediatePropagation();
+            }, true);
+            viewport?.addEventListener("keydown", (event) => {
+                if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+                event.preventDefault();
+                manualMove(() => stepBy(event.key === "ArrowRight" ? 1 : -1));
             });
             shell?.addEventListener("mouseenter", () => {
                 hovered = true;
