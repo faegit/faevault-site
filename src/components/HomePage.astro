@@ -6,50 +6,57 @@ interface Props {
     locale: Locale;
 }
 const { locale } = Astro.props;
+const productImage = (name: string) => `${import.meta.env.BASE_URL}images/product/${name}`;
 const copy =
     locale === "zh-cn"
         ? {
               eyebrow: "",
               title: "你的密码和数据，完全由你掌控。",
-              intro: "保险库把密码、通行密钥与重要资料放进一个本地加密库，并为 Windows Hello、浏览器自动填充与多设备同步打基础。",
+              intro: "保险库在 Android 设备上管理登录、银行卡、身份证、Wi-Fi 与 API 密钥，并将数据保存到本地加密的 .pmv 文件。",
               storyLink: "了解产品故事",
 
-              storyKicker: "为什么值得信赖",
-              storyTitle: "离线 · 本地 · 无服务器",
+              storyKicker: "数据如何保存",
+              storyTitle: "本地优先 · 加密落盘",
               storyBody:
-                  "保险库不含任何广告，所有核心功能免费使用。数据采用 scrypt + AES-256-GCM 本地加密，不经任何外部服务器；加密方案与安全设计公开透明，经反复审计验证。",
-              quote: "好的工具不需要在隐私和便利之间做取舍。",
+                  "保险库默认把数据保存在设备内的加密文件中，不提供开发者托管账户。只有在你主动使用 WebDAV、局域网同步或密码泄露检测时，应用才会发起对应的网络请求。",
+              quote: "本地保存是默认方式，联网能力由你主动选择。",
               whitepaperLink: "查看安全白皮书",
+              productKicker: "产品展示",
+              productTitle: "浏览保险库的主要页面。",
+              productBody: "从保险库主页到同步与设置，快速了解 Android 客户端的主要页面结构。",
               guideKicker: "功能展示",
               guideTitle: "保险库具备的实用功能。",
-              guideBody: "从本地加密存储到系统自动填充，保险库为 Android 和 Windows 提供完整的密码管理能力。",
+              guideBody: "以下能力均可在 Android 工程的加密、自动填充、凭据、扫描与同步模块中找到对应实现。",
               guides: "查看使用指南",
               download: "下载最新版本",
               supportKicker: "赞助支持项目",
               supportTitle: "如果保险库对你有帮助，可以赞助支持项目以持续维护。",
-              supportPoints: ["由独立开发者全职维护", "持续的功能更新与优化", "长期的安全维护与审计"],
+              supportPoints: ["由独立开发者维护", "持续的功能更新与优化", "问题修复与版本维护"],
               supportButton: "了解赞助方式",
           }
         : {
               eyebrow: "",
               title: "Your passwords should truly be yours.",
-              intro: "FAEVault keeps passwords, passkeys, and important details inside a vault you can truly control.",
+              intro: "FAEVault manages logins, cards, IDs, Wi-Fi details, and API keys on Android, storing them in a locally encrypted .pmv file.",
               storyLink: "Learn the story",
 
-              storyKicker: "Why it feels trustworthy",
-              storyTitle: "Offline · Private · Transparent",
+              storyKicker: "How data is stored",
+              storyTitle: "Local-first · Encrypted at rest",
               storyBody:
-                  "FAEVault contains no ads and all core features are free. Data is encrypted locally with scrypt + AES-256-GCM, never touching external servers. The encryption design and security architecture are transparent and regularly reviewed.",
-              quote: "A good tool shouldn't make you choose between privacy and convenience.",
+                  "FAEVault stores its vault in an encrypted file on the device by default and does not provide a developer-hosted account. Network access occurs only when you use features such as WebDAV, LAN sync, or breach checking.",
+              quote: "Local storage is the default; network features are your choice.",
               whitepaperLink: "Read the security whitepaper",
+              productKicker: "Product showcase",
+              productTitle: "Explore the main product screens.",
+              productBody: "A quick tour of the Android app, from the vault home screen to sync and settings.",
               guideKicker: "Feature showcase",
               guideTitle: "Practical features for everyday use.",
-              guideBody: "From local encrypted storage to system-level autofill, FAEVault delivers complete password management for Android and Windows.",
+              guideBody: "Each capability below maps to an implemented Android encryption, autofill, credential, scanning, or sync module.",
               guides: "Browse the guides",
               download: "Download the latest version",
               supportKicker: "Support the project",
               supportTitle: "If FAEVault is useful to you, consider sponsoring to keep it maintained.",
-              supportPoints: ["Maintained by a solo developer", "Regular feature updates", "Long-term security maintenance"],
+              supportPoints: ["Maintained by a solo developer", "Regular feature updates", "Bug fixes and release maintenance"],
               supportButton: "See sponsorship options",
           };
 
@@ -57,11 +64,11 @@ const features =
     locale === "zh-cn"
         ? [
               { title: "本地加密保险库", body: "scrypt + AES-256-GCM 加密，密码与通行密钥离线存储在本地文件中，数据完全由你掌控。", accent: "vault" },
-              { title: "系统自动填充", body: "Android Autofill 框架集成，一键填入登录凭证与一次性验证码，支持关联应用和网页。", accent: "flow" },
-              { title: "通行密钥", body: "Android 14+ Passkey Credential Provider，支持创建和验证通行密钥，实现无密码快速认证。", accent: "passkey" },
-              { title: "OCR 智能识别", body: "摄像头扫描或相册导入银行卡、身份证，自动 OCR 提取卡号、有效期、姓名等信息填入对应字段。", accent: "ocr" },
-              { title: "安全防护", body: "FLAG_SECURE 防截屏录屏，剪贴板 60 秒自动清空，暴力破解指数冷却，敏感信息二次验证。", accent: "security" },
-              { title: "加密同步", body: "WebDAV 连接 NAS 或 Nextcloud、局域网直连同步、加密备份导出，多设备间安全保持数据一致。", accent: "sync" },
+              { title: "系统自动填充", body: "通过 Android Autofill 服务为登录条目提供填充与保存，并按应用包名或 HTTPS 主机匹配来源。", accent: "flow" },
+              { title: "通行密钥", body: "在 Android 14 及以上注册 Credential Provider，处理 Passkey 的创建与凭据查询；可用性取决于系统选择和调用方兼容性。", accent: "passkey" },
+              { title: "OCR 智能识别", body: "扫描或导入银行卡、身份证图像，使用端上 OCR 与字段解析器提取卡号、有效期、姓名等信息。", accent: "ocr" },
+              { title: "安全防护", body: "使用 FLAG_SECURE、敏感剪贴板标记与定时清理、解锁失败冷却，并为部分敏感操作增加主密码验证。", accent: "security" },
+              { title: "同步与备份", body: "支持 WebDAV、与同一局域网内电脑端同步，以及 .pmbak、.pmv 和 CSV 的导入导出。", accent: "sync" },
           ]
         : [
               {
@@ -71,52 +78,82 @@ const features =
               },
               {
                   title: "System Autofill",
-                  body: "Integrated with Android Autofill framework. Fill credentials and OTPs with one tap in apps and websites.",
+                  body: "Android Autofill support for login entries, matched by app package or verified HTTPS host.",
                   accent: "flow",
               },
               {
                   title: "Passkeys",
-                  body: "Android 14+ Passkey Credential Provider. Create and verify passkeys for passwordless, fast authentication.",
+                  body: "A Credential Provider on Android 14+ for passkey creation and credential queries, subject to system selection and caller compatibility.",
                   accent: "passkey",
               },
               {
                   title: "OCR Scanning",
-                  body: "Scan credit cards and IDs via camera or gallery. Auto-extract card numbers, expiry dates, and personal details.",
+                  body: "Scan or import card and ID images, then extract supported fields with on-device OCR and parsers.",
                   accent: "ocr",
               },
               {
                   title: "Security Guard",
-                  body: "Anti-screenshot with FLAG_SECURE, 60-second auto-clear clipboard, exponential brute-force lockout, sensitive data re-verification.",
+                  body: "FLAG_SECURE, sensitive clipboard handling, unlock cooldowns, and master-password gates for selected sensitive actions.",
                   accent: "security",
               },
               {
-                  title: "Encrypted Sync",
-                  body: "WebDAV for NAS/Nextcloud, LAN direct sync, encrypted backup export. Keep data consistent across devices.",
+                  title: "Sync & Backup",
+                  body: "WebDAV, LAN sync with the desktop app, plus .pmbak, .pmv, and CSV import or export.",
                   accent: "sync",
               },
           ];
 
-const showcaseFeatures =
+const productScreens =
     locale === "zh-cn"
         ? [
-              { title: "本地加密保险库", body: "密码与通行密钥离线存储，scrypt + AES-256-GCM 加密。" },
-              { title: "系统自动填充", body: "Android Autofill 框架，一键填入登录凭证与验证码。" },
-              { title: "通行密钥", body: "支持 Android 14+ Passkey，无密码快速认证。" },
-              { title: "加密同步", body: "WebDAV / 局域网直连，多设备间安全同步。" },
-              { title: "OCR 智能识别", body: "摄像头扫描，自动提取银行卡与身份证信息。" },
-              { title: "安全防护", body: "防截屏、剪贴板自动清空、暴力破解保护。" },
-              { title: "Windows Hello", body: "支持 Windows Hello 生物识别快速解锁。" },
-              { title: "浏览器扩展", body: "桌面端浏览器自动填充，无缝衔接。" },
+              { title: "主页", body: "搜索、分类查看并快速新增本地条目。", pages: [{ image: productImage("home.jpg"), label: "保险库主页" }] },
+              { title: "回收站", body: "查看已删除条目，并选择恢复或彻底删除。", pages: [{ image: productImage("trash.jpg"), label: "回收站" }] },
+              { title: "数据库维护", body: "对比重复条目、处理相同服务，并管理回收站自动清理。", pages: [{ image: productImage("maintenance.jpg"), label: "保险库维护" }] },
+              { title: "密码安全检查", body: "查看密码健康状态、高风险项目与改进建议，并按需执行泄露检查。", pages: [{ image: productImage("password-security.jpg"), label: "密码安全" }] },
+              {
+                  title: "数据导出和同步",
+                  body: "展示本地备份与导出、局域网跨端同步，以及云端文件与 WebDAV 同步。",
+                  pages: [
+                      { image: productImage("local-export.jpg"), label: "本地数据导出" },
+                      { image: productImage("lan-sync.jpg"), label: "局域网跨端同步" },
+                      { image: productImage("cloud-sync.jpg"), label: "云端同步" },
+                  ],
+              },
+              { title: "详情页展示", body: "集中查看条目资料，并执行复制、编辑和移入回收站等操作。", pages: [{ image: productImage("entry-detail.jpg"), label: "条目详情" }] },
+              { title: "编辑页展示", body: "编辑基础字段，并按需组合图片、附件及其他内容模块。", pages: [{ image: productImage("entry-edit.jpg"), label: "条目编辑" }] },
+              {
+                  title: "自定义模块展示",
+                  body: "分别展示自定义条目的局部内容与完整模块组合。",
+                  pages: [
+                      { image: productImage("modules-partial.jpg"), label: "模块局部" },
+                      { image: productImage("modules-all.jpg"), label: "全部模块" },
+                  ],
+              },
           ]
         : [
-              { title: "Encrypted Vault", body: "Passwords & passkeys stored offline with scrypt + AES-256-GCM." },
-              { title: "System Autofill", body: "Android Autofill framework, one-tap credential & OTP fill." },
-              { title: "Passkeys", body: "Android 14+ Passkey support for passwordless auth." },
-              { title: "Encrypted Sync", body: "WebDAV / LAN direct sync across your devices." },
-              { title: "OCR Scanning", body: "Camera scan credit cards & IDs, auto-extract details." },
-              { title: "Security Guard", body: "Anti-screenshot, auto-clear clipboard, brute-force lockout." },
-              { title: "Windows Hello", body: "Biometric unlock with Windows Hello." },
-              { title: "Browser Extension", body: "Desktop browser autofill for seamless flow." },
+              { title: "Home", body: "Search, browse categories, and quickly add local entries.", pages: [{ image: productImage("home.jpg"), label: "Vault home" }] },
+              { title: "Trash", body: "Review deleted entries, restore them, or remove them permanently.", pages: [{ image: productImage("trash.jpg"), label: "Trash" }] },
+              { title: "Database maintenance", body: "Compare duplicates, handle entries for the same service, and manage automatic Trash cleanup.", pages: [{ image: productImage("maintenance.jpg"), label: "Vault maintenance" }] },
+              { title: "Password security check", body: "Review password health, risks, and improvements, with optional breach checks.", pages: [{ image: productImage("password-security.jpg"), label: "Password security" }] },
+              {
+                  title: "Data export and sync",
+                  body: "Local backup and export, cross-device LAN sync, plus cloud file and WebDAV sync.",
+                  pages: [
+                      { image: productImage("local-export.jpg"), label: "Local data export" },
+                      { image: productImage("lan-sync.jpg"), label: "Cross-device LAN sync" },
+                      { image: productImage("cloud-sync.jpg"), label: "Cloud sync" },
+                  ],
+              },
+              { title: "Detail page", body: "Review entry data and access copy, edit, or move-to-Trash actions.", pages: [{ image: productImage("entry-detail.jpg"), label: "Entry details" }] },
+              { title: "Edit page", body: "Edit core fields and combine image, attachment, and other content modules.", pages: [{ image: productImage("entry-edit.jpg"), label: "Entry editor" }] },
+              {
+                  title: "Custom modules",
+                  body: "A focused module view alongside the complete custom module composition.",
+                  pages: [
+                      { image: productImage("modules-partial.jpg"), label: "Module detail" },
+                      { image: productImage("modules-all.jpg"), label: "All modules" },
+                  ],
+              },
           ];
 ---
 
@@ -137,26 +174,78 @@ const showcaseFeatures =
 
     <section class="showcase-section" id="showcase">
         <div class="showcase-inner">
-            <div class="card-carousel">
-                <div class="card-track">
+            <div class="showcase-heading">
+                <p class="eyebrow">{copy.productKicker}</p>
+                <h2>{copy.productTitle}</h2>
+                <p>{copy.productBody}</p>
+            </div>
+            <div class="carousel-shell">
+                <button class="carousel-button previous" type="button" aria-label={locale === "zh-cn" ? "上一项" : "Previous item"}>
+                    <span aria-hidden="true">←</span>
+                </button>
+                <div class="card-carousel" aria-roledescription="carousel" aria-label={locale === "zh-cn" ? "产品页面轮播" : "Product screen carousel"}>
+                    <div class="card-track">
                     {
-                        showcaseFeatures.map((item, i) => (
-                            <div class="content-card">
-                                <div
-                                    class="cc-image"
-                                    style={`background:${["linear-gradient(135deg,#287795,#1a5068)", "linear-gradient(135deg,#4a90d9,#2d6cb5)", "linear-gradient(135deg,#7c5cbf,#5a3d99)", "linear-gradient(135deg,#34a853,#1e7e34)", "linear-gradient(135deg,#e88d3a,#c46d28)", "linear-gradient(135deg,#d9544a,#b33b32)", "linear-gradient(135deg,#1a73e8,#0d47a1)", "linear-gradient(135deg,#00acc1,#00838f)"][i % 8]}`}
-                                >
-                                    <div class="cc-shape" />
+                        productScreens.map((item, i) => (
+                            <article class="content-card" aria-label={`${i + 1} / ${productScreens.length}: ${item.title}`}>
+                                <div class="cc-media">
+                                    <button
+                                        class="cc-image-button"
+                                        type="button"
+                                        data-open-product-image
+                                        data-open-label={locale === "zh-cn" ? "查看大图：" : "View full image: "}
+                                        aria-label={`${locale === "zh-cn" ? "查看大图：" : "View full image: "}${item.pages[0].label}`}
+                                    >
+                                        {item.pages.map((screen, screenIndex) => (
+                                            <img
+                                                class="cc-page-image"
+                                                src={screen.image}
+                                                alt={screen.label}
+                                                loading="lazy"
+                                                data-screen-image={screenIndex}
+                                                hidden={screenIndex !== 0}
+                                            />
+                                        ))}
+                                    </button>
+                                    {item.pages.length > 1 && (
+                                        <div class="cc-screen-tabs" role="group" aria-label={locale === "zh-cn" ? "切换页面截图" : "Choose screen image"}>
+                                            {item.pages.map((screen, screenIndex) => (
+                                                <button
+                                                    type="button"
+                                                    data-screen-select={screenIndex}
+                                                    aria-pressed={screenIndex === 0 ? "true" : "false"}
+                                                >
+                                                    {screen.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                                 <div class="cc-meta">
                                     <span class="cc-num">0{i + 1}</span>
-                                    <span class="cc-label">{item.title}</span>
+                                    <span class="cc-copy"><strong>{item.title}</strong><small>{item.body}</small></span>
                                 </div>
-                            </div>
+                            </article>
                         ))
                     }
+                    </div>
                 </div>
+                <button class="carousel-button next" type="button" aria-label={locale === "zh-cn" ? "下一项" : "Next item"}>
+                    <span aria-hidden="true">→</span>
+                </button>
             </div>
+            <div class="carousel-footer">
+                <div class="carousel-dots" role="group" aria-label={locale === "zh-cn" ? "选择轮播项目" : "Choose carousel item"}>
+                    {productScreens.map((item, i) => (
+                        <button type="button" aria-label={`${locale === "zh-cn" ? "显示" : "Show"} ${item.title}`} data-slide={i}></button>
+                    ))}
+                </div>
+                <p class="carousel-status" aria-live="polite"><span>01</span> / 0{productScreens.length}</p>
+            </div>
+            <dialog class="product-image-dialog" aria-label={locale === "zh-cn" ? "产品截图大图" : "Full product screenshot"}>
+                <button class="product-image-dialog-close" type="button" aria-label={locale === "zh-cn" ? "关闭大图" : "Close full image"}>×</button>
+                <img alt="" />
+            </dialog>
         </div>
     </section>
 
@@ -171,7 +260,13 @@ const showcaseFeatures =
                 <div class="workflow-stack">
                     {
                         features.map((item) => (
-                            <article class="workflow-card" data-feature>
+                            <article
+                                class="workflow-card"
+                                data-feature
+                                role="button"
+                                tabindex="-1"
+                                aria-label={item.title}
+                            >
                                 <span class={`workflow-dot ${item.accent}`} />
                                 <strong>{item.title}</strong>
                                 <p>{item.body}</p>
@@ -198,7 +293,7 @@ const showcaseFeatures =
                     <div class="showcase-card">
                         <div class="showcase-topbar">
                             <div class="topbar-dots"><span></span><span></span><span></span></div>
-                            <div class="topbar-label">{locale === "zh-cn" ? "离线 · 私密 · 透明" : "Offline · Private · Transparent"}</div>
+                            <div class="topbar-label">{locale === "zh-cn" ? "本地优先 · 加密保存" : "Local-first · Encrypted"}</div>
                         </div>
                         <div class="showcase-grid">
                             <div class="showcase-panel panel-left">
@@ -228,15 +323,15 @@ const showcaseFeatures =
                                     <div class="panel-row active">
                                         <span class="panel-icon"></span>
                                         <span class="panel-text">
-                                            <strong>{locale === "zh-cn" ? "无服务器存储" : "No cloud storage"}</strong>
-                                            <em>{locale === "zh-cn" ? "数据由你掌控" : "You control it"}</em>
+                                            <strong>{locale === "zh-cn" ? "联网按需启用" : "Network is opt-in"}</strong>
+                                            <em>{locale === "zh-cn" ? "同步与检测由你发起" : "You start sync or checks"}</em>
                                         </span>
                                     </div>
                                     <div class="panel-row">
                                         <span class="panel-icon muted"></span>
                                         <span class="panel-text">
-                                            <strong>{locale === "zh-cn" ? "数据格式透明" : "Transparent format"}</strong>
-                                            <em>{locale === "zh-cn" ? "JSON 明文可读" : "Plain JSON"}</em>
+                                            <strong>{locale === "zh-cn" ? ".pmv 加密文件" : "Encrypted .pmv file"}</strong>
+                                            <em>{locale === "zh-cn" ? "与桌面端格式兼容" : "Desktop-compatible format"}</em>
                                         </span>
                                     </div>
                                     <div class="panel-row">
@@ -264,7 +359,7 @@ const showcaseFeatures =
                                     </div>
                                 </div>
                                 <div class="floating-badge badge-one">{locale === "zh-cn" ? "本地加密" : "Encrypted"}</div>
-                                <div class="floating-badge badge-two">{locale === "zh-cn" ? "技术透明" : "Transparent"}</div>
+                                <div class="floating-badge badge-two">{locale === "zh-cn" ? "按需联网" : "Opt-in network"}</div>
                             </div>
                         </div>
                     </div>
@@ -344,8 +439,8 @@ const showcaseFeatures =
     }
     h1 {
         margin: 0;
-        font-size: clamp(3rem, 5.5vw, 5.2rem);
-        line-height: 1.01;
+        font-size: clamp(3rem, 4.4vw, 4rem);
+        line-height: 1.04;
     }
     h2 {
         margin: 0;
@@ -488,6 +583,15 @@ const showcaseFeatures =
     .support-inner h2 {
         max-width: 900px;
     }
+    @media (min-width: 1100px) {
+        .hero-copy {
+            max-width: 1180px;
+        }
+        .hero-copy h1 {
+            max-width: none;
+            white-space: nowrap;
+        }
+    }
     .actions {
         display: flex;
         flex-wrap: wrap;
@@ -500,35 +604,54 @@ const showcaseFeatures =
 
     /* ── Product Showcase ── */
     .showcase-section {
-        padding: 0 0 2.5rem;
+        padding: 1rem 0 clamp(4rem, 7vw, 6rem);
     }
     .showcase-inner {
         width: calc(100% - 4rem);
-        max-width: 1340px;
+        max-width: 1200px;
         margin: 0 auto;
         display: flex;
+        flex-direction: column;
         align-items: center;
-        gap: 2.5rem;
+        gap: 2rem;
+    }
+    .showcase-heading {
+        max-width: 720px;
+        text-align: center;
+    }
+    .showcase-heading h2 {
+        margin: 0;
+        color: #173f50;
+        font-size: clamp(2rem, 4vw, 3.5rem);
+    }
+    .showcase-heading > p:last-child {
+        margin: 1rem auto 0;
+        color: #5a727c;
+        font: 1rem/1.8 Georgia, serif;
+    }
+    .carousel-shell {
+        display: grid;
+        grid-template-columns: 2.75rem minmax(0, 1fr) 2.75rem;
+        align-items: center;
+        gap: 1rem;
+        width: min(1120px, 100%);
     }
 
     /* ── Card Carousel ── */
     .card-carousel {
         width: 100%;
         position: relative;
+        overflow: hidden;
+        padding: 1.2rem 0;
     }
     .card-track {
         display: flex;
         gap: 1.2rem;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        padding: 0.5rem 0 1.5rem;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
+        transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: transform;
     }
-    .card-track::-webkit-scrollbar { display: none; }
     .content-card {
-        flex: 0 0 260px;
-        scroll-snap-align: center;
+        flex: 0 0 68%;
         border-radius: 1.4rem;
         background: #fff;
         border: 1px solid rgba(81, 125, 142, 0.1);
@@ -536,47 +659,88 @@ const showcaseFeatures =
         overflow: hidden;
         transition:
             transform 0.4s cubic-bezier(0.34,1.56,0.64,1),
-            box-shadow 0.4s ease;
+            box-shadow 0.4s ease,
+            opacity 0.35s ease;
+        opacity: 0.56;
+        transform: scale(0.93);
+        transform-origin: center;
         cursor: pointer;
     }
     .content-card.active {
-        transform: scale(1.08);
+        transform: translateY(-0.5rem) scale(1);
+        opacity: 1;
         box-shadow: 0 20px 60px rgba(42, 83, 99, 0.16);
     }
     .content-card:hover {
-        transform: translateY(-4px);
+        opacity: 0.82;
+        transform: translateY(-4px) scale(0.95);
         box-shadow: 0 18px 56px rgba(42, 83, 99, 0.12);
     }
     .content-card.active:hover {
-        transform: scale(1.08) translateY(-2px);
+        opacity: 1;
+        transform: translateY(-0.7rem) scale(1);
     }
-    .cc-image {
-        width: 100%;
-        height: 240px;
+    .cc-media {
         display: flex;
+        width: 100%;
+        min-height: 620px;
+        padding: 1.25rem 1.25rem 0.75rem;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-        position: relative;
+        gap: 0.75rem;
+        background: #f4f7f8;
     }
-    .cc-shape {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.2);
+    .cc-image-button {
+        display: grid;
+        width: 100%;
+        min-height: 560px;
+        padding: 0;
+        place-items: center;
+        border: 0;
+        background: transparent;
+        cursor: zoom-in;
     }
-    .cc-shape::after {
-        content: "";
+    .cc-page-image {
         display: block;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.15);
-        transform: translate(8px, 8px);
+        width: auto;
+        max-width: 100%;
+        height: 560px;
+        object-fit: contain;
+        border-radius: 1rem;
+        background: #fff;
+        box-shadow: 0 18px 44px rgba(18, 55, 72, 0.14);
+    }
+    .cc-page-image[hidden] {
+        display: none;
+    }
+    .cc-screen-tabs {
+        display: flex;
+        width: 100%;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45rem;
+    }
+    .cc-screen-tabs button {
+        padding: 0.45rem 0.7rem;
+        border: 1px solid rgba(42, 83, 99, 0.14);
+        border-radius: 999px;
+        background: #fff;
+        color: #315f72;
+        font-size: 0.7rem;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    .cc-screen-tabs button[aria-pressed="true"] {
+        border-color: #287795;
+        background: #287795;
+        color: #fff;
     }
     .cc-meta {
         padding: 0.8rem 1rem 1rem;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 0.6rem;
     }
     .cc-num {
@@ -585,10 +749,113 @@ const showcaseFeatures =
         color: rgba(40, 119, 149, 0.3);
         letter-spacing: 0.06em;
     }
-    .cc-label {
-        font-size: 0.82rem;
-        font-weight: 660;
+    .cc-copy {
+        display: grid;
+        gap: 0.2rem;
+    }
+    .cc-copy strong {
+        font-size: 0.84rem;
+        font-weight: 700;
         color: #173f50;
+    }
+    .cc-copy small {
+        color: #6a8089;
+        font-size: 0.72rem;
+        line-height: 1.45;
+    }
+    .carousel-button {
+        display: grid;
+        place-items: center;
+        width: 2.75rem;
+        height: 2.75rem;
+        padding: 0;
+        border: 1px solid rgba(42, 83, 99, 0.16);
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.82);
+        color: #173f50;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: transform 0.2s ease, background 0.2s ease;
+    }
+    .carousel-button:hover {
+        transform: translateY(-2px);
+        background: #fff;
+    }
+    .carousel-button:focus-visible,
+    .carousel-dots button:focus-visible {
+        outline: 3px solid rgba(25, 128, 164, 0.2);
+        outline-offset: 3px;
+    }
+    .carousel-footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        min-height: 1.5rem;
+    }
+    .carousel-dots {
+        display: flex;
+        gap: 0.45rem;
+    }
+    .carousel-dots button {
+        width: 0.5rem;
+        height: 0.5rem;
+        padding: 0;
+        border: 0;
+        border-radius: 999px;
+        background: rgba(40, 119, 149, 0.22);
+        cursor: pointer;
+        transition: width 0.25s ease, background 0.25s ease;
+    }
+    .carousel-dots button.active {
+        width: 1.5rem;
+        background: #287795;
+    }
+    .carousel-status {
+        margin: 0;
+        color: #78909a;
+        font-size: 0.72rem;
+        font-variant-numeric: tabular-nums;
+    }
+    .product-image-dialog {
+        width: min(92vw, 720px);
+        max-height: 92vh;
+        padding: 1rem;
+        border: 0;
+        border-radius: 1.25rem;
+        background: #f7f9fa;
+        box-shadow: 0 28px 90px rgba(14, 42, 54, 0.28);
+    }
+    .product-image-dialog::backdrop {
+        background: rgba(13, 31, 39, 0.72);
+        backdrop-filter: blur(6px);
+    }
+    .product-image-dialog img {
+        display: block;
+        width: auto;
+        max-width: 100%;
+        height: auto;
+        max-height: calc(92vh - 2rem);
+        margin: 0 auto;
+        object-fit: contain;
+        border-radius: 0.8rem;
+    }
+    .product-image-dialog-close {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        display: grid;
+        width: 2.5rem;
+        height: 2.5rem;
+        padding: 0;
+        place-items: center;
+        border: 1px solid rgba(42, 83, 99, 0.15);
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.94);
+        color: #173f50;
+        font-size: 1.35rem;
+        cursor: pointer;
+        box-shadow: 0 8px 24px rgba(14, 42, 54, 0.16);
     }
 
     .split-inner {
@@ -844,27 +1111,94 @@ const showcaseFeatures =
             align-items: start;
         }
         .showcase-grid {
-            grid-template-columns: 1fr;
+            grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+            gap: 0.55rem;
+        }
+        .showcase-shell {
+            padding: 0.5rem;
+            border-radius: 1.35rem;
+        }
+        .showcase-card {
+            padding: 0.65rem;
+            border-radius: 1rem;
+        }
+        .showcase-topbar {
+            padding: 0.1rem 0.1rem 0.55rem;
+        }
+        .topbar-label {
+            font-size: 0.58rem;
+            letter-spacing: 0.06em;
         }
         .showcase-panel {
             min-height: auto;
+            padding: 0.65rem;
+            border-radius: 0.85rem;
         }
         .panel-right {
-            min-height: 230px;
+            min-height: 100%;
+        }
+        .feature-pill {
+            padding: 0.3rem 0.45rem;
+            font-size: 0.58rem;
+            letter-spacing: 0.08em;
+        }
+        .panel-stack {
+            gap: 0.35rem;
+            margin-top: 0.55rem;
+        }
+        .panel-row {
+            gap: 0.45rem;
+            padding: 0.42rem 0.45rem;
+            border-radius: 0.65rem;
+        }
+        .panel-icon {
+            width: 0.65rem;
+            height: 0.65rem;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.16);
+            flex: 0 0 auto;
+        }
+        .panel-text strong {
+            font-size: 0.67rem;
+        }
+        .panel-text em {
+            font-size: 0.55rem;
+            letter-spacing: 0;
         }
         .phone-card {
-            margin-top: 0.7rem;
+            width: min(150px, 100%);
+            margin-top: 1.1rem;
+            padding: 0.55rem;
+            border-radius: 1rem;
+        }
+        .phone-screen {
+            padding: 0.6rem;
+            border-radius: 0.75rem;
+        }
+        .phone-nav {
+            margin-bottom: 0.5rem;
+        }
+        .phone-stat {
+            gap: 0.3rem;
+            margin-bottom: 0.45rem;
+        }
+        .phone-list {
+            gap: 0.3rem;
         }
         .floating-badge {
-            position: static;
-            display: inline-flex;
-            margin-top: 0.55rem;
-            margin-right: 0.45rem;
+            padding: 0.3rem 0.4rem;
+            font-size: 0.55rem;
+            letter-spacing: 0.04em;
         }
         .panel-right {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
+            display: block;
+        }
+        .badge-one {
+            top: 0.35rem;
+            right: 0.35rem;
+        }
+        .badge-two {
+            bottom: 0.4rem;
+            left: 0.35rem;
         }
     }
     .guide-section > p,
@@ -879,13 +1213,17 @@ const showcaseFeatures =
         justify-content: center;
     }
     .guide-inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2.5rem;
         width: 100%;
         max-width: 1200px;
         margin: 0 auto !important;
     }
     .guide-head {
-        max-width: 1000px;
-        margin: 0 auto 2.2rem;
+        max-width: 760px;
+        margin: 0;
         text-align: center;
     }
     .section-copy {
@@ -910,6 +1248,7 @@ const showcaseFeatures =
     .workflow-side {
         display: grid;
         place-items: center;
+        width: 100%;
     }
     .workflow-stack {
         display: block;
@@ -934,11 +1273,13 @@ const showcaseFeatures =
         transform-origin: center;
         will-change: transform, box-shadow, z-index;
         cursor: pointer;
+        pointer-events: none;
         transition:
             transform 420ms ease,
             opacity 420ms ease;
     }
     .workflow-card.active {
+        pointer-events: auto;
         box-shadow:
             0 28px 52px rgba(41, 81, 95, 0.17),
             0 0 0 1px rgba(63, 143, 175, 0.15);
@@ -1127,21 +1468,71 @@ const showcaseFeatures =
 
         .showcase-inner {
             gap: 1rem;
+            width: calc(100% - 2.5rem);
+        }
+        .carousel-shell {
+            position: relative;
+            display: block;
         }
         .card-carousel {
             width: 100%;
         }
         .content-card {
-            flex: 0 0 200px;
+            flex: 0 0 86%;
         }
-        .cc-image {
-            height: 170px;
+        .carousel-button {
+            position: absolute;
+            top: 46%;
+            z-index: 5;
+            width: 2.5rem;
+            height: 2.5rem;
+            transform: translateY(-50%);
+        }
+        .carousel-button.previous {
+            left: -0.75rem;
+        }
+        .carousel-button.next {
+            right: -0.75rem;
+        }
+        .carousel-button:hover {
+            transform: translateY(calc(-50% - 2px));
+        }
+        .cc-media {
+            min-height: 530px;
+            padding: 0.75rem 0.75rem 0.6rem;
+        }
+        .cc-image-button {
+            min-height: 470px;
+        }
+        .cc-page-image {
+            height: 470px;
+            border-radius: 0.75rem;
+        }
+        .cc-screen-tabs {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            justify-content: flex-start;
+            padding-bottom: 0.1rem;
+        }
+        .cc-screen-tabs button {
+            flex: 0 0 auto;
+            font-size: 0.64rem;
         }
         .cc-meta {
             padding: 0.6rem 0.8rem 0.8rem;
         }
-        .cc-label {
+        .cc-copy strong {
             font-size: 0.75rem;
+        }
+        .cc-copy small {
+            font-size: 0.65rem;
+        }
+        .guide-inner {
+            gap: 2rem;
+        }
+        .guide-head {
+            max-width: 640px;
+            text-align: center;
         }
 
         .section > * {
@@ -1152,7 +1543,26 @@ const showcaseFeatures =
         }
         .support-card {
             border-radius: 1.7rem;
-            padding: 3rem 1.5rem;
+            width: calc(100% - 2.5rem) !important;
+            padding: 2rem 1.1rem;
+        }
+        .support-card-inner {
+            gap: 1.25rem;
+        }
+        .support-card-inner h2 {
+            font-size: clamp(1.8rem, 9vw, 2.4rem);
+            line-height: 1.08;
+        }
+        .support-pillars {
+            gap: 0.55rem;
+            margin-top: 0;
+        }
+        .pillar-card {
+            padding: 0.5rem 0.8rem;
+            font-size: 0.76rem;
+        }
+        .support-cta {
+            margin-top: 0;
         }
     }
 </style>
@@ -1182,9 +1592,11 @@ const showcaseFeatures =
         function initStack() {
             const stack = document.querySelector<HTMLElement>(".workflow-stack");
             if (!stack) return;
+            if (stack.dataset.stackReady === "true") return;
             const CARDS = Array.from(stack.children) as HTMLElement[];
             const COUNT = CARDS.length;
             if (COUNT < 2) return;
+            stack.dataset.stackReady = "true";
 
             function equalizeHeights() {
                 let maxH = 0;
@@ -1208,6 +1620,8 @@ const showcaseFeatures =
                     card.style.zIndex = `${COUNT - offset}`;
                     card.style.opacity = String(1 - offset * 0.06);
                     card.classList.toggle("active", offset === 0);
+                    card.setAttribute("aria-hidden", String(offset !== 0));
+                    card.tabIndex = offset === 0 ? 0 : -1;
                 });
             }
 
@@ -1216,7 +1630,7 @@ const showcaseFeatures =
             equalizeHeights();
             applyOffsets(0);
 
-            function advance() {
+            function advance(restoreFocus = false) {
                 if (running) return;
                 running = true;
                 const oldCard = CARDS[current];
@@ -1225,12 +1639,22 @@ const showcaseFeatures =
                     current = (current + 1) % COUNT;
                     oldCard.classList.remove("fade-up");
                     applyOffsets(current);
+                    if (restoreFocus) CARDS[current].focus();
                     running = false;
                 }, 440);
             }
 
             CARDS.forEach((card) => {
-                card.addEventListener("click", advance);
+                card.addEventListener("click", () => {
+                    if (card.classList.contains("active")) advance();
+                });
+                card.addEventListener("keydown", (event) => {
+                    if (!card.classList.contains("active")) return;
+                    if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        advance(true);
+                    }
+                });
             });
 
             const DELAY = 4500;
@@ -1250,95 +1674,139 @@ const showcaseFeatures =
         if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initStack);
         else initStack();
 
-        /* ── Infinite Carousel ── */
+        /* ── Product Carousel ── */
         function initCarousel() {
             const track = document.querySelector<HTMLElement>(".card-track");
             if (!track) return;
+            if (track.dataset.carouselReady === "true") return;
+            track.dataset.carouselReady = "true";
+            const carouselTrack = track;
             const cards = Array.from(track.children) as HTMLElement[];
             if (cards.length < 2) return;
+            const shell = track.closest<HTMLElement>(".carousel-shell");
+            const viewport = track.parentElement;
+            const dots = Array.from(document.querySelectorAll<HTMLButtonElement>(".carousel-dots button"));
+            const status = document.querySelector<HTMLElement>(".carousel-status span");
+            const previous = shell?.querySelector<HTMLButtonElement>(".previous");
+            const next = shell?.querySelector<HTMLButtonElement>(".next");
+            const before = cards[cards.length - 1].cloneNode(true) as HTMLElement;
+            const after = cards[0].cloneNode(true) as HTMLElement;
+            before.dataset.clone = "true";
+            after.dataset.clone = "true";
+            before.setAttribute("aria-hidden", "true");
+            after.setAttribute("aria-hidden", "true");
+            carouselTrack.prepend(before);
+            carouselTrack.append(after);
+            const displayCards = Array.from(carouselTrack.children) as HTMLElement[];
+            const imageDialog = document.querySelector<HTMLDialogElement>(".product-image-dialog");
+            const dialogImage = imageDialog?.querySelector<HTMLImageElement>("img");
+            const dialogClose = imageDialog?.querySelector<HTMLButtonElement>(".product-image-dialog-close");
+            let current = 0;
+            let position = 1;
 
-            let prev = 0;
-            let lock = false;
-
-            function unit() {
-                return cards[0].offsetWidth + (parseFloat(getComputedStyle(track).gap) || 0);
+            function selectScreen(card: HTMLElement, selectedIndex: number) {
+                const images = Array.from(card.querySelectorAll<HTMLImageElement>("[data-screen-image]"));
+                const selectors = Array.from(card.querySelectorAll<HTMLButtonElement>("[data-screen-select]"));
+                images.forEach((image, index) => {
+                    image.hidden = index !== selectedIndex;
+                });
+                selectors.forEach((selector, index) => {
+                    selector.setAttribute("aria-pressed", String(index === selectedIndex));
+                });
+                const activeImage = images[selectedIndex];
+                const openButton = card.querySelector<HTMLButtonElement>("[data-open-product-image]");
+                if (activeImage && openButton) {
+                    openButton.setAttribute("aria-label", `${openButton.dataset.openLabel ?? ""}${activeImage.alt}`);
+                }
             }
 
-            /* Infinite DOM reordering */
-            track.addEventListener("scroll", () => {
-                if (lock) return;
-                const u = unit();
-                const sl = track.scrollLeft;
-                const dir = sl - prev;
-
-                if (dir > 0) {
-                    lock = true;
-                    while (track.scrollLeft >= u) {
-                        const el = track.firstElementChild;
-                        if (!el) break;
-                        track.appendChild(el as Node);
-                        cards.push(cards.shift()!);
-                        track.scrollLeft -= u;
-                    }
-                    prev = track.scrollLeft;
-                    lock = false;
-                } else if (dir < 0) {
-                    if (track.scrollLeft < 1) {
-                        lock = true;
-                        const count = Math.min(3, cards.length);
-                        for (let i = 0; i < count; i++) {
-                            const el = track.lastElementChild;
-                            if (!el) break;
-                            track.insertBefore(el as Node, track.firstElementChild! as Node);
-                            cards.unshift(cards.pop()!);
-                        }
-                        track.scrollLeft = count * u;
-                        requestAnimationFrame(() => { lock = false; });
-                    }
-                    prev = track.scrollLeft;
-                } else {
-                    prev = sl;
+            displayCards.forEach((card) => {
+                card.querySelectorAll<HTMLButtonElement>("[data-screen-select]").forEach((selector) => {
+                    selector.addEventListener("click", (event) => {
+                        if (!card.classList.contains("active")) return;
+                        event.stopPropagation();
+                        selectScreen(card, Number(selector.dataset.screenSelect ?? 0));
+                    });
+                });
+                card.querySelector<HTMLButtonElement>("[data-open-product-image]")?.addEventListener("click", (event) => {
+                    if (!card.classList.contains("active")) return;
+                    event.stopPropagation();
+                    const activeImage = card.querySelector<HTMLImageElement>("[data-screen-image]:not([hidden])");
+                    if (!activeImage || !imageDialog || !dialogImage) return;
+                    dialogImage.src = activeImage.src;
+                    dialogImage.alt = activeImage.alt;
+                    imageDialog.showModal();
+                });
+            });
+            dialogClose?.addEventListener("click", () => {
+                imageDialog?.close();
+            });
+            imageDialog?.addEventListener("click", (event) => {
+                if (event.target === imageDialog) {
+                    imageDialog.close();
                 }
             });
 
-            /* Active card detection */
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach((e) => {
-                    if (e.isIntersecting) {
-                        cards.forEach((c) => c.classList.remove("active"));
-                        (e.target as HTMLElement).classList.add("active");
+            function render(animate = true) {
+                const gap = parseFloat(getComputedStyle(carouselTrack).gap) || 0;
+                const cardWidth = displayCards[0].offsetWidth;
+                const step = cardWidth + gap;
+                const viewportWidth = viewport?.getBoundingClientRect().width ?? cardWidth;
+                const offset = viewportWidth / 2 - (position * step + cardWidth / 2);
+                carouselTrack.style.transition = animate
+                    ? "transform 520ms cubic-bezier(0.22, 1, 0.36, 1)"
+                    : "none";
+                carouselTrack.style.transform = `translate3d(${offset}px, 0, 0)`;
+                displayCards.forEach((card, index) => {
+                    card.classList.toggle("active", index === position);
+                });
+                cards.forEach((card, index) => {
+                    card.setAttribute("aria-hidden", String(index !== current));
+                });
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle("active", index === current);
+                    dot.setAttribute("aria-current", index === current ? "true" : "false");
+                });
+                if (status) status.textContent = String(current + 1).padStart(2, "0");
+            }
+
+            function goTo(index: number) {
+                current = (index + cards.length) % cards.length;
+                position = current + 1;
+                render();
+            }
+
+            function stepBy(delta: number) {
+                current = (current + delta + cards.length) % cards.length;
+                position += delta;
+                render();
+            }
+
+            previous?.addEventListener("click", () => stepBy(-1));
+            next?.addEventListener("click", () => stepBy(1));
+            dots.forEach((dot, index) => dot.addEventListener("click", () => goTo(index)));
+            displayCards.forEach((card, index) => {
+                card.addEventListener("click", () => {
+                    const target = index === 0 ? cards.length - 1 : index === displayCards.length - 1 ? 0 : index - 1;
+                    if (target !== current) {
+                        if (index === position - 1) stepBy(-1);
+                        else if (index === position + 1) stepBy(1);
+                        else goTo(target);
                     }
                 });
-            }, { root: track, rootMargin: "-30% 0px", threshold: 0 });
-
-            cards.forEach((c) => observer.observe(c));
-
-            /* Auto-play */
-            let timer: ReturnType<typeof setInterval>;
-            let paused = false;
-
-            function advance() {
-                if (paused) return;
-                const active = track.querySelector<HTMLElement>(".content-card.active");
-                if (active) {
-                    const next = (active.nextElementSibling || track.firstElementChild) as HTMLElement;
-                    next.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+            });
+            carouselTrack.addEventListener("transitionend", (event) => {
+                if (event.propertyName !== "transform") return;
+                if (position === 0) {
+                    position = cards.length;
+                    render(false);
+                } else if (position === cards.length + 1) {
+                    position = 1;
+                    render(false);
                 }
-            }
-
-            timer = setInterval(advance, 3500);
-
-            track.addEventListener("pointerdown", () => { paused = true; clearInterval(timer); });
-            track.addEventListener("pointerup", () => {
-                setTimeout(() => {
-                    paused = false;
-                    clearInterval(timer);
-                    timer = setInterval(advance, 3500);
-                }, 4000);
             });
-            track.addEventListener("scrollend", () => {
-                if (!paused) { clearInterval(timer); timer = setInterval(advance, 3500); }
-            });
+            window.addEventListener("resize", () => render(false));
+            render(false);
         }
 
         document.addEventListener("astro:page-load", initCarousel);

@@ -9,43 +9,38 @@ const c = locale === "zh-cn"
     title: "从为自己写一个工具开始。",
     story: [
       {
-        title: "为什么会有保险库",
+        title: "本地保险库的起点",
         paragraphs: [
-          "市面上的密码管理器并不少，但用了一圈下来总有些地方让人不太舒服：免费版限制设备数量，Pro 功能要订阅，基础的安全同步被划入高级套餐——而这些服务明明只依赖一个加密文件和基本的网络传输。",
-          "更让人在意的是隐私问题。密码数据存在别人的服务器上，服务商声称「加密不可见」，但我始终觉得自己最私密的数字资产不应该默认存放在某个云端，不应让第三方来决定是否安全。",
-          "于是最初的动机很简单：给自己写一个密码管理器。不需要联网，不需要注册账户，不需要纠结该不该续费。一个本地文件，一个主密码，打开就能用。",
+          "最初版本已经包含多账户库、五种内置条目类型、scrypt + AES-256-GCM 加密、生物识别、Wi-Fi 二维码和 OCR 自动填表。",
+          "保险库文件保存在 Android 应用私有目录中，系统备份被关闭；应用不提供开发者托管的账户或云端保险库。",
         ],
       },
       {
-        title: "从一个人到更多人",
+        title: "从管理条目到系统集成",
         paragraphs: [
-          "第一版 Android 客户端功能极其简陋：能输密码、能存下来、能复制。没有自动填充，没有同步，没有好看的界面。但用了一段时间后发现，这个粗糙的工具比那些大而全的商用软件更让我安心——因为数据真的只在我自己手里。",
-          "后来想着既然自己能受益，为什么不把它做得更好一些，让同样在意隐私的人也多个选择？于是开始认真地设计架构：加密方案用 scrypt + AES-256-GCM，文件格式考虑跨平台兼容，UI 开始从能用变得稍微好看一点。",
-          "这个过程远比预想的漫长。自动填充看似简单，实际涉及 Accessibility 框架适配、每个 Android 版本的行为差异、国产 ROM 的各种特殊处理。同步功能涉及 WebDAV 协议、局域网发现、冲突合并策略，每一块都踩过不少坑。",
+          "3.2.2 版本加入 Android Autofill 服务与应用包名关联。当前实现支持原生应用登录表单，并对可确认来源的 HTTPS WebView 进行主机匹配。",
+          "自动填充与 Credential Provider 是两套独立的 Android 系统能力；应用没有使用无障碍服务或悬浮窗来读取界面内容。",
         ],
       },
       {
-        title: "那些被反复重写的地方",
+        title: "同步、扫描与扩展资料",
         paragraphs: [
-          "自动填充是重写次数最多的模块，前后经历了至少三次架构变更。第一次勉强能用但兼容性差，第二次改善了框架适配但仍然不稳定，直到第三次才找到一个兼顾兼容性和安全性的平衡方案。",
-          "UI 上的打磨同样耗费了大量精力。过渡动画的曲线调整、列表滚动的帧率优化、深色模式下的色彩适配——每一个细节都反复调整过很多次。有时候一个转场动画的卡顿问题可能需要排查好几天，最后发现是某个图层合成方式不对。",
-          "密码泄露检测功能需要查询 Have I Been Pwned 的 API，但又不希望把用户的密码哈希发送出去。最终用 k-anonymity 模型实现：只发送哈希的前五位，服务端返回匹配的完整哈希列表，本地再做比对。这个方案本身不复杂，但集成到应用的异步流程里花了不少功夫来保证体验流畅。",
+          "3.1.1 加入二维码和手动地址局域网同步，后续版本又加入系统文档提供程序与 WebDAV，同步时执行合并、并发检查和读回校验。",
+          "银行卡与证件支持相机或相册图像的端上 OCR；Wi-Fi 与动态码模块支持对应二维码的扫描和解析。附件模块则把文件及 SHA-256 摘要随保险库一起加密。",
         ],
       },
       {
-        title: "关于收费的思考",
+        title: "安全能力逐步补全",
         paragraphs: [
-          "开发过程中不止一次想过定价的问题。AI 工具订阅、反复调试、头脑风暴、功能优化、时间投入——这些真实的成本，加上生活上的压力，都会让我想着要不要向付费方向靠拢。市场上同类产品要么收订阅费，要么用免费版引流然后引导购买 Pro。",
-          "最终还是拒绝了这类想法。密码管理工具不应该有「免费版」和「Pro 版」的区别。保护隐私是每个人的基本需求，不是应该付费才能享有的高级功能。广告的模式更不合适——在密码管理器里放广告，这本身就是对安全产品的一种讽刺。",
-          "所以保险库会一直保持免费，核心功能没有限制。如果你觉得它有用，可以通过赞助的方式支持后续开发——仅此而已，不设任何付费墙，不影响任何功能的使用。",
+          "应用使用 FLAG_SECURE 保护敏感窗口，复制的敏感内容带有系统敏感标记并按设置的时间尝试清空；连续解锁失败会触发冷却。",
+          "在线泄露检测启用时，应用只向 Pwned Passwords 服务发送 SHA-1 哈希前五位，再在本地比对完整结果。该功能可以在设置中关闭。",
         ],
       },
       {
-        title: "现在与未来",
+        title: "当前版本",
         paragraphs: [
-          "当前的版本已经具备了密码管理器的核心能力：本地加密存储、系统自动填充、通行密钥支持、多端同步。但这些远远不够。浏览器扩展、更流畅的跨平台体验、更完善的备份机制——每一样都在计划中，每一样也需要时间来打磨。",
-          "这个项目从一开始就不是为了做一款「爆款产品」。它的存在是因为我认为密码管理这件事应该更简单、更透明、更尊重用户。未来也会继续朝着这个方向走：不接入广告、不收订阅费、不收集任何数据。",
-          "如果你正在阅读这些文字，感谢你花时间了解这个项目的故事。也希望它能成为你日常工具中安心的一部分。",
+          "3.6.3 补全 Android 14+ Credential Manager Passkey Provider 的创建与断言流程；Passkey 作为独立条目保存、统计和同步。",
+          "3.6.4 改进 WebDAV 原子上传、冲突检测与双目标自动同步调度。网站仅把已经出现在源码和更新日志中的能力列为现成功能。",
         ],
       },
     ],
@@ -55,43 +50,38 @@ const c = locale === "zh-cn"
     title: "It started with building for myself.",
     story: [
       {
-        title: "Why FAEVault exists",
+        title: "The local vault foundation",
         paragraphs: [
-          "There's no shortage of password managers on the market. But after trying most of them, I kept running into the same frustrations: free tiers limited to a single device, Pro subscriptions for basic features like sync, and everything behind a paywall — even though the underlying technology is just an encrypted file and basic network transfer.",
-          "Privacy was an even bigger concern. Storing passwords on someone else's server, trusting their encryption claims, hoping their security never gets breached. The most intimate digital asset we own — our keys to everything — should not default to living on a third-party server.",
-          "So the motivation was simple at first: build a password manager for myself. No network required. No account registration. No subscription to worry about. Just a local file, one master password, and it works.",
+          "The initial release already included multiple vaults, five built-in entry types, scrypt + AES-256-GCM encryption, biometric unlock, Wi-Fi QR, and OCR-assisted fields.",
+          "Vault files are stored in the Android app's private directory and system backup is disabled. The app does not provide a developer-hosted account or cloud vault.",
         ],
       },
       {
-        title: "From personal tool to something more",
+        title: "From entries to system integration",
         paragraphs: [
-          "The very first Android build was bare-bones: type a password, save it, copy it. No autofill, no sync, no polished UI. But after using it for a while, I realized this rough tool gave me something the big commercial apps couldn't — the certainty that my data truly belonged to me.",
-          "If I benefited from it, maybe others who care about privacy would too. So I started taking it seriously: scrypt + AES-256-GCM for encryption, cross-platform file format compatibility, and a UI that went from functional to actually pleasant to use.",
-          "The journey took far longer than expected. Autofill alone required navigating Android's Accessibility framework, device-by-device behavior quirks, and special handling for Chinese ROMs. Sync meant WebDAV protocol support, LAN discovery, conflict resolution strategies — each component brought its own surprises.",
+          "Version 3.2.2 added Android Autofill and app-package association. The current implementation supports native login forms and host matching for HTTPS WebViews whose origin can be confirmed.",
+          "Autofill and Credential Provider are separate Android system integrations. The app does not use accessibility services or floating windows to read interfaces.",
         ],
       },
       {
-        title: "The parts I rewrote (and rewrote again)",
+        title: "Sync, scanning, and richer data",
         paragraphs: [
-          "Autofill was rewritten at least three times. The first version barely worked across devices. The second improved compat but was still unreliable under edge cases. Only the third iteration struck the right balance between broad compatibility and solid security.",
-          "UI polish was just as time-consuming. Transition animation curves, list scrolling frame rates, dark mode color harmony — every detail went through many rounds of tweaking. A single stutter in a transition animation could take days to trace down, often ending with a subtle compositing issue in the rendering pipeline.",
-          "The leaked password check feature needed to query Have I Been Pwned without sending user password hashes. The k-anonymity model solves this elegantly — send only the first five hash characters, get back full matching hashes, compare locally. Simple in concept, but integrating it into the app's async flow while keeping the UX smooth took significant effort.",
+          "Version 3.1.1 added QR and manual-address LAN sync. Later releases added system document providers and WebDAV, with merge, concurrency checks, and read-back verification.",
+          "Cards and IDs support on-device OCR from camera or gallery images. Wi-Fi and OTP modules parse their corresponding QR formats, while attachments store files and SHA-256 digests inside the encrypted vault.",
         ],
       },
       {
-        title: "On pricing and principles",
+        title: "Security capabilities",
         paragraphs: [
-          "The thought of charging for this crossed my mind more than once. AI tool subscriptions, endless debugging, brainstorming, feature iterations, time investment — these real costs, along with life pressures, made me consider moving toward a paid model. Most apps in this space either charge a subscription or use a free tier to funnel users into a Pro plan.",
-          "But in the end I rejected that path. A password manager shouldn't have a free version and a Pro version. Privacy is a basic need, not a premium feature. And ads in a security app? That feels fundamentally wrong — the very presence of ad trackers contradicts what the app stands for.",
-          "FAEVault will stay free, with no artificial limits on core features. If you find it useful, you can support development through sponsorship — nothing more. No paywalls, no feature gating, no data collection.",
+          "FLAG_SECURE protects sensitive windows. Copied secrets are marked sensitive and cleared after the configured interval when possible, while repeated unlock failures trigger cooldowns.",
+          "When online breach checking is enabled, only the first five characters of a SHA-1 hash are sent to Pwned Passwords; complete matching is performed locally. The feature can be disabled.",
         ],
       },
       {
-        title: "Now and ahead",
+        title: "Current releases",
         paragraphs: [
-          "Today FAEVault covers the core capabilities: local encrypted storage, system-level autofill, passkey support, and multi-device sync. But there's still a long way to go — browser extension, smoother cross-platform experience, better backup mechanisms. Each one is on the roadmap, each one needs time to get right.",
-          "This project was never about building a viral product. It exists because I believe password management should be simpler, more transparent, and more respectful of the user. That direction won't change: no ads, no subscriptions, no data collection — ever.",
-          "If you're reading this, thank you for taking the time to learn about the story behind this project. I hope it becomes a quiet, dependable part of your daily toolkit.",
+          "Version 3.6.3 completed Android 14+ Credential Manager flows for passkey creation and assertions. Passkeys are stored, counted, and synced as a separate entry type.",
+          "Version 3.6.4 improved WebDAV atomic uploads, conflict checks, and dual-target automatic sync scheduling. This site lists a feature as available only when it is present in source or release notes.",
         ],
       },
     ],
