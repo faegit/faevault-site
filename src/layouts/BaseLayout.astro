@@ -240,6 +240,7 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
     const gridCanvas: HTMLCanvasElement = canvas;
     const drawingContext: CanvasRenderingContext2D = ctx;
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const mobileViewport = window.matchMedia("(pointer: coarse)");
 
     type Dot = { x: number; y: number; r: number };
     let w = 0;
@@ -254,10 +255,31 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
     const RIPPLE_GAP = 150;
     const RIPPLE_BAND = 42;
     const RIPPLE_PUSH = 6;
+    const isMobileViewport = () => mobileViewport.matches || window.innerWidth <= 760;
 
-    function resize() {
-        w = gridCanvas.width = window.innerWidth;
-        h = gridCanvas.height = window.innerHeight;
+    function viewportSize() {
+        const width = Math.round(document.documentElement.clientWidth || window.innerWidth);
+        const height = isMobileViewport()
+            ? Math.max(
+                  Math.round(window.innerHeight),
+                  Math.round(document.documentElement.clientHeight),
+                  Math.round(window.screen.height),
+              )
+            : Math.round(window.innerHeight);
+        return { width, height };
+    }
+
+    function resize(force = false) {
+        const next = viewportSize();
+        const widthChanged = Math.abs(next.width - w) > 2;
+        const heightChanged = Math.abs(next.height - h) > 2;
+        if (!force && isMobileViewport() && !widthChanged) return;
+        if (!force && !widthChanged && !heightChanged) return;
+
+        w = gridCanvas.width = next.width;
+        h = gridCanvas.height = next.height;
+        gridCanvas.style.width = `${w}px`;
+        gridCanvas.style.height = `${h}px`;
         dots = [];
         for (let y = SPACING; y < h; y += SPACING)
             for (let x = SPACING; x < w; x += SPACING)
@@ -280,13 +302,10 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
             const centerDx = d.x - centerX;
             const centerDy = d.y - centerY;
             const centerDist = Math.hypot(centerDx, centerDy);
-            let ripple = 0;
-            for (let ring = 0; ring < 2; ring += 1) {
-                const radius = leadingRadius - ring * RIPPLE_GAP;
-                if (radius <= 0) continue;
-                const delta = centerDist - radius;
-                ripple = Math.max(ripple, Math.exp(-(delta * delta) / (2 * RIPPLE_BAND * RIPPLE_BAND)));
-            }
+            const rippleDelta = centerDist - leadingRadius;
+            const ripple = leadingRadius > 0
+                ? Math.exp(-(rippleDelta * rippleDelta) / (2 * RIPPLE_BAND * RIPPLE_BAND))
+                : 0;
             const target = BASE + (MAX_R - BASE) * t * t + ripple * 1.35;
             d.r += (target - d.r) * (prefersReduced ? 1 : 0.12);
             const push = centerDist > 0 ? RIPPLE_PUSH * ripple / centerDist : 0;
@@ -315,11 +334,19 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
     const onLeave = () => { mx = -9999; my = -9999; };
 
     let resizeTimer: ReturnType<typeof setTimeout>;
-    const onResize = () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(resize, 80); };
+    const onResize = () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => resize(), 120);
+    };
+    const onOrientationChange = () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => resize(true), 240);
+    };
 
-    function init() { resize(); prefersReduced ? drawStatic() : draw(); }
+    function init() { resize(true); prefersReduced ? drawStatic() : draw(); }
 
     window.addEventListener("resize", onResize);
+    window.addEventListener("orientationchange", onOrientationChange);
     document.addEventListener("mousemove", onMove);
     document.addEventListener("mouseleave", onLeave);
     init();
