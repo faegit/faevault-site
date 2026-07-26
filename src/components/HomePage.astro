@@ -1625,10 +1625,17 @@ const productScreens =
 
             let current = 0;
             let running = false;
+            let autoTimer: ReturnType<typeof setTimeout>;
             equalizeHeights();
             applyOffsets(0);
 
+            function scheduleAuto() {
+                clearTimeout(autoTimer);
+                autoTimer = setTimeout(() => advance(), 4500);
+            }
+
             function advance(restoreFocus = false) {
+                clearTimeout(autoTimer);
                 if (running) return;
                 running = true;
                 const oldCard = CARDS[current];
@@ -1639,11 +1646,13 @@ const productScreens =
                     applyOffsets(current);
                     if (restoreFocus) CARDS[current].focus();
                     running = false;
+                    scheduleAuto();
                 }, 440);
             }
 
             CARDS.forEach((card, index) => {
                 card.addEventListener("click", () => {
+                    clearTimeout(autoTimer);
                     if (running) return;
                     if (card.classList.contains("active")) {
                         advance();
@@ -1651,6 +1660,7 @@ const productScreens =
                     }
                     current = index;
                     applyOffsets(current);
+                    scheduleAuto();
                 });
                 card.addEventListener("keydown", (event) => {
                     if (!card.classList.contains("active")) return;
@@ -1661,6 +1671,10 @@ const productScreens =
                 });
             });
 
+            stack.addEventListener("mouseenter", () => clearTimeout(autoTimer));
+            stack.addEventListener("mouseleave", scheduleAuto);
+            document.addEventListener("astro:before-swap", () => clearTimeout(autoTimer), { once: true });
+            scheduleAuto();
         }
 
         document.addEventListener("astro:page-load", initStack);
