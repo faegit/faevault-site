@@ -1273,7 +1273,7 @@ const productScreens =
         transform-origin: center;
         will-change: transform, box-shadow, z-index;
         cursor: pointer;
-        pointer-events: none;
+        pointer-events: auto;
         transition:
             transform 420ms ease,
             opacity 420ms ease;
@@ -1587,8 +1587,6 @@ const productScreens =
         if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initTilt);
         else initTilt();
 
-        let timer: ReturnType<typeof setInterval>;
-
         function initStack() {
             const stack = document.querySelector<HTMLElement>(".workflow-stack");
             if (!stack) return;
@@ -1644,9 +1642,15 @@ const productScreens =
                 }, 440);
             }
 
-            CARDS.forEach((card) => {
+            CARDS.forEach((card, index) => {
                 card.addEventListener("click", () => {
-                    if (card.classList.contains("active")) advance();
+                    if (running) return;
+                    if (card.classList.contains("active")) {
+                        advance();
+                        return;
+                    }
+                    current = index;
+                    applyOffsets(current);
                 });
                 card.addEventListener("keydown", (event) => {
                     if (!card.classList.contains("active")) return;
@@ -1657,17 +1661,6 @@ const productScreens =
                 });
             });
 
-            const DELAY = 4500;
-            clearInterval(timer);
-            timer = setInterval(advance, DELAY);
-
-            stack.addEventListener("mouseenter", () => {
-                clearInterval(timer);
-            });
-            stack.addEventListener("mouseleave", () => {
-                clearInterval(timer);
-                timer = setInterval(advance, DELAY);
-            });
         }
 
         document.addEventListener("astro:page-load", initStack);
