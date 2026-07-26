@@ -1710,6 +1710,34 @@ const productScreens =
             const dialogClose = imageDialog?.querySelector<HTMLButtonElement>(".product-image-dialog-close");
             let current = 0;
             let position = 1;
+            let moving = false;
+            let hovered = false;
+            let autoTimer: ReturnType<typeof setTimeout>;
+
+            function scheduleAuto() {
+                clearTimeout(autoTimer);
+                if (hovered || imageDialog?.open || document.hidden) return;
+                autoTimer = setTimeout(() => {
+                    if (moving) {
+                        scheduleAuto();
+                        return;
+                    }
+                    moving = true;
+                    stepBy(1);
+                    scheduleAuto();
+                }, 5000);
+            }
+
+            function manualMove(move: () => void) {
+                clearTimeout(autoTimer);
+                if (moving) {
+                    scheduleAuto();
+                    return;
+                }
+                moving = true;
+                move();
+                scheduleAuto();
+            }
 
             function selectScreen(card: HTMLElement, selectedIndex: number) {
                 const images = Array.from(card.querySelectorAll<HTMLImageElement>("[data-screen-image]"));
@@ -1733,6 +1761,7 @@ const productScreens =
                         if (!card.classList.contains("active")) return;
                         event.stopPropagation();
                         selectScreen(card, Number(selector.dataset.screenSelect ?? 0));
+                        scheduleAuto();
                     });
                 });
                 card.querySelector<HTMLButtonElement>("[data-open-product-image]")?.addEventListener("click", (event) => {
@@ -1742,6 +1771,7 @@ const productScreens =
                     if (!activeImage || !imageDialog || !dialogImage) return;
                     dialogImage.src = activeImage.src;
                     dialogImage.alt = activeImage.alt;
+                    clearTimeout(autoTimer);
                     imageDialog.showModal();
                 });
             });
@@ -1753,6 +1783,7 @@ const productScreens =
                     imageDialog.close();
                 }
             });
+            imageDialog?.addEventListener("close", scheduleAuto);
 
             function render(animate = true) {
                 const gap = parseFloat(getComputedStyle(carouselTrack).gap) || 0;
@@ -1789,16 +1820,24 @@ const productScreens =
                 render();
             }
 
-            previous?.addEventListener("click", () => stepBy(-1));
-            next?.addEventListener("click", () => stepBy(1));
-            dots.forEach((dot, index) => dot.addEventListener("click", () => goTo(index)));
+            previous?.addEventListener("click", () => manualMove(() => stepBy(-1)));
+            next?.addEventListener("click", () => manualMove(() => stepBy(1)));
+            dots.forEach((dot, index) => dot.addEventListener("click", () => {
+                if (index === current) {
+                    scheduleAuto();
+                    return;
+                }
+                manualMove(() => goTo(index));
+            }));
             displayCards.forEach((card, index) => {
                 card.addEventListener("click", () => {
                     const target = index === 0 ? cards.length - 1 : index === displayCards.length - 1 ? 0 : index - 1;
                     if (target !== current) {
-                        if (index === position - 1) stepBy(-1);
-                        else if (index === position + 1) stepBy(1);
-                        else goTo(target);
+                        manualMove(() => {
+                            if (index === position - 1) stepBy(-1);
+                            else if (index === position + 1) stepBy(1);
+                            else goTo(target);
+                        });
                     }
                 });
             });
@@ -1811,9 +1850,24 @@ const productScreens =
                     position = 1;
                     render(false);
                 }
+                moving = false;
             });
+            shell?.addEventListener("mouseenter", () => {
+                hovered = true;
+                clearTimeout(autoTimer);
+            });
+            shell?.addEventListener("mouseleave", () => {
+                hovered = false;
+                scheduleAuto();
+            });
+            document.addEventListener("visibilitychange", () => {
+                if (document.hidden) clearTimeout(autoTimer);
+                else scheduleAuto();
+            });
+            document.addEventListener("astro:before-swap", () => clearTimeout(autoTimer), { once: true });
             window.addEventListener("resize", () => render(false));
             render(false);
+            scheduleAuto();
         }
 
         document.addEventListener("astro:page-load", initCarousel);
