@@ -22,7 +22,14 @@ const { theme, kicker, title, intro } = Astro.props;
   .theme-guides { --page-accent: #287c9d; } .theme-journey { --page-accent: #6c68b4; } .theme-download { --page-accent: #278e78; } .theme-support { --page-accent: #b46b66; }
   @keyframes intro-reveal { from { opacity: 0; filter: blur(8px); transform: translateY(26px); } }
   :global(html[lang="en"]) h1 { font-size: clamp(2.8rem, 3.8vw, 3.45rem); }
-  @media (min-width: 1280px) { h1 { white-space: nowrap; } }
+  @media (min-width: 1280px) {
+    h1 { white-space: nowrap; }
+    .theme-support h1 {
+      max-width: 1080px;
+      white-space: normal;
+      text-wrap: balance;
+    }
+  }
   @media (max-width: 620px) { .inner-page { width: calc(100% - 2rem); padding-top: 8rem; } h1 { font-size: clamp(2.5rem, 13vw, 3.2rem); } .intro-line { grid-template-columns: 42px 1fr; } }
   @media (prefers-reduced-motion: reduce) { .page-intro { animation: none; } }
 </style>
