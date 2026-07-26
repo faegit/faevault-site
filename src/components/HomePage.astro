@@ -23,7 +23,7 @@ const copy =
               whitepaperLink: "查看安全白皮书",
               productKicker: "产品展示",
               productTitle: "浏览保险库的主要页面。",
-              productBody: "从保险库主页到同步与设置，快速了解 Android 客户端的主要页面结构。",
+              productBody: "从保险库主页到同步与设置，对照查看 PC 与 Android 客户端的主要页面结构。",
               guideKicker: "功能展示",
               guideTitle: "保险库具备的实用功能。",
               guideBody: "以下能力均可在 Android 工程的加密、自动填充、凭据、扫描与同步模块中找到对应实现。",
@@ -48,7 +48,7 @@ const copy =
               whitepaperLink: "Read the security whitepaper",
               productKicker: "Product showcase",
               productTitle: "Explore the main product screens.",
-              productBody: "A quick tour of the Android app, from the vault home screen to sync and settings.",
+              productBody: "Compare the main PC and Android screens, from the vault home page to sync and settings.",
               guideKicker: "Feature showcase",
               guideTitle: "Practical features for everyday use.",
               guideBody: "Each capability below maps to an implemented Android encryption, autofill, credential, scanning, or sync module.",
@@ -103,7 +103,7 @@ const features =
               },
           ];
 
-const productScreens =
+const productScreensBase =
     locale === "zh-cn"
         ? [
               { title: "主页", body: "搜索、分类查看并快速新增本地条目。", pages: [{ image: productImage("home.jpg"), label: "保险库主页" }] },
@@ -155,6 +155,43 @@ const productScreens =
                   ],
               },
           ];
+
+const pcPages =
+    locale === "zh-cn"
+        ? [
+              [{ image: productImage("pc-home.png"), label: "PC 主页" }],
+              [{ image: productImage("pc-trash.png"), label: "PC 回收站" }],
+              [{ image: productImage("pc-maintenance.png"), label: "PC 数据整理" }],
+              [{ image: productImage("pc-password-security.png"), label: "PC 密码安全检查" }],
+              [{ image: productImage("pc-data-export-sync.png"), label: "PC 数据导出与同步" }],
+              [{ image: productImage("pc-entry-detail.png"), label: "PC 条目详情" }],
+              [{ image: productImage("pc-entry-edit.png"), label: "PC 条目编辑" }],
+              [
+                  { image: productImage("pc-modules-partial.png"), label: "PC 模块局部" },
+                  { image: productImage("pc-modules-all.png"), label: "PC 全部模块" },
+              ],
+          ]
+        : [
+              [{ image: productImage("pc-home.png"), label: "PC home" }],
+              [{ image: productImage("pc-trash.png"), label: "PC Trash" }],
+              [{ image: productImage("pc-maintenance.png"), label: "PC data maintenance" }],
+              [{ image: productImage("pc-password-security.png"), label: "PC password security" }],
+              [{ image: productImage("pc-data-export-sync.png"), label: "PC data export and sync" }],
+              [{ image: productImage("pc-entry-detail.png"), label: "PC entry details" }],
+              [{ image: productImage("pc-entry-edit.png"), label: "PC entry editor" }],
+              [
+                  { image: productImage("pc-modules-partial.png"), label: "PC module detail" },
+                  { image: productImage("pc-modules-all.png"), label: "PC all modules" },
+              ],
+          ];
+
+const productScreens = productScreensBase.map((item, index) => ({
+    ...item,
+    platforms: [
+        { id: "pc", label: "PC", pages: pcPages[index] },
+        { id: "android", label: "Android", pages: item.pages },
+    ],
+}));
 ---
 
 <div class="home">
@@ -186,38 +223,53 @@ const productScreens =
                         productScreens.map((item, i) => (
                             <article class="content-card" aria-label={`${i + 1} / ${productScreens.length}: ${item.title}`}>
                                 <div class="cc-media">
-                                    <button
-                                        class="cc-image-button"
-                                        type="button"
-                                        data-open-product-image
-                                        data-open-label={locale === "zh-cn" ? "查看大图：" : "View full image: "}
-                                        aria-label={`${locale === "zh-cn" ? "查看大图：" : "View full image: "}${item.pages[0].label}`}
-                                    >
-                                        {item.pages.map((screen, screenIndex) => (
-                                            <img
-                                                class="cc-page-image"
-                                                src={screen.image}
-                                                alt={screen.label}
-                                                loading="lazy"
-                                                draggable="false"
-                                                data-screen-image={screenIndex}
-                                                hidden={screenIndex !== 0}
-                                            />
+                                    <div class="cc-platform-tabs" role="group" aria-label={locale === "zh-cn" ? "选择客户端" : "Choose client"}>
+                                        {item.platforms.map((platform, platformIndex) => (
+                                            <button
+                                                type="button"
+                                                data-platform-select={platform.id}
+                                                aria-pressed={platformIndex === 0 ? "true" : "false"}
+                                            >
+                                                {platform.label}
+                                            </button>
                                         ))}
-                                    </button>
-                                    {item.pages.length > 1 && (
-                                        <div class="cc-screen-tabs" role="group" aria-label={locale === "zh-cn" ? "切换页面截图" : "Choose screen image"}>
-                                            {item.pages.map((screen, screenIndex) => (
-                                                <button
-                                                    type="button"
-                                                    data-screen-select={screenIndex}
-                                                    aria-pressed={screenIndex === 0 ? "true" : "false"}
-                                                >
-                                                    {screen.label}
-                                                </button>
-                                            ))}
+                                    </div>
+                                    {item.platforms.map((platform, platformIndex) => (
+                                        <div class="cc-platform-panel" data-platform-panel={platform.id} hidden={platformIndex !== 0}>
+                                            <button
+                                                class="cc-image-button"
+                                                type="button"
+                                                data-open-product-image
+                                                data-open-label={locale === "zh-cn" ? "查看大图：" : "View full image: "}
+                                                aria-label={`${locale === "zh-cn" ? "查看大图：" : "View full image: "}${platform.pages[0].label}`}
+                                            >
+                                                {platform.pages.map((screen, screenIndex) => (
+                                                    <img
+                                                        class="cc-page-image"
+                                                        src={screen.image}
+                                                        alt={screen.label}
+                                                        loading="lazy"
+                                                        draggable="false"
+                                                        data-screen-image={screenIndex}
+                                                        hidden={screenIndex !== 0}
+                                                    />
+                                                ))}
+                                            </button>
+                                            {platform.pages.length > 1 && (
+                                                <div class="cc-screen-tabs" role="group" aria-label={locale === "zh-cn" ? "切换页面截图" : "Choose screen image"}>
+                                                    {platform.pages.map((screen, screenIndex) => (
+                                                        <button
+                                                            type="button"
+                                                            data-screen-select={screenIndex}
+                                                            aria-pressed={screenIndex === 0 ? "true" : "false"}
+                                                        >
+                                                            {screen.label}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
+                                    ))}
                                 </div>
                                 <div class="cc-meta">
                                     <span class="cc-num">0{i + 1}</span>
@@ -720,6 +772,42 @@ const productScreens =
         border: 0;
         background: transparent;
         cursor: zoom-in;
+    }
+    .cc-platform-tabs {
+        display: inline-grid;
+        grid-template-columns: repeat(2, minmax(5rem, 1fr));
+        gap: 0.25rem;
+        padding: 0.25rem;
+        border: 1px solid rgba(42, 83, 99, 0.12);
+        border-radius: 0.8rem;
+        background: rgba(226, 234, 238, 0.82);
+    }
+    .cc-platform-tabs button {
+        padding: 0.48rem 0.8rem;
+        border: 0;
+        border-radius: 0.6rem;
+        background: transparent;
+        color: #637984;
+        font-size: 0.72rem;
+        font-weight: 760;
+        cursor: pointer;
+    }
+    .cc-platform-tabs button[aria-pressed="true"] {
+        background: #fff;
+        color: #174f65;
+        box-shadow: 0 2px 8px rgba(35, 72, 87, 0.12);
+    }
+    .cc-platform-panel {
+        display: flex;
+        width: 100%;
+        flex: 1;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+    .cc-platform-panel[hidden] {
+        display: none;
     }
     .cc-page-image {
         display: block;
@@ -1751,9 +1839,9 @@ const productScreens =
                 scheduleAuto();
             }
 
-            function selectScreen(card: HTMLElement, selectedIndex: number) {
-                const images = Array.from(card.querySelectorAll<HTMLImageElement>("[data-screen-image]"));
-                const selectors = Array.from(card.querySelectorAll<HTMLButtonElement>("[data-screen-select]"));
+            function selectScreen(panel: HTMLElement, selectedIndex: number) {
+                const images = Array.from(panel.querySelectorAll<HTMLImageElement>("[data-screen-image]"));
+                const selectors = Array.from(panel.querySelectorAll<HTMLButtonElement>("[data-screen-select]"));
                 images.forEach((image, index) => {
                     image.hidden = index !== selectedIndex;
                 });
@@ -1761,7 +1849,7 @@ const productScreens =
                     selector.setAttribute("aria-pressed", String(index === selectedIndex));
                 });
                 const activeImage = images[selectedIndex];
-                const openButton = card.querySelector<HTMLButtonElement>("[data-open-product-image]");
+                const openButton = panel.querySelector<HTMLButtonElement>("[data-open-product-image]");
                 if (activeImage && openButton) {
                     openButton.setAttribute("aria-label", `${openButton.dataset.openLabel ?? ""}${activeImage.alt}`);
                 }
@@ -1771,17 +1859,33 @@ const productScreens =
                 const target = event.target as Element;
                 const card = target.closest<HTMLElement>(".content-card");
                 if (!card?.classList.contains("active")) return;
+                const platformSelector = target.closest<HTMLButtonElement>("[data-platform-select]");
+                if (platformSelector) {
+                    event.stopPropagation();
+                    const platformId = platformSelector.dataset.platformSelect;
+                    card.querySelectorAll<HTMLButtonElement>("[data-platform-select]").forEach((button) => {
+                        button.setAttribute("aria-pressed", String(button === platformSelector));
+                    });
+                    card.querySelectorAll<HTMLElement>("[data-platform-panel]").forEach((panel) => {
+                        panel.hidden = panel.dataset.platformPanel !== platformId;
+                    });
+                    const activePanel = card.querySelector<HTMLElement>("[data-platform-panel]:not([hidden])");
+                    if (activePanel) selectScreen(activePanel, 0);
+                    scheduleAuto();
+                    return;
+                }
                 const selector = target.closest<HTMLButtonElement>("[data-screen-select]");
                 if (selector) {
                     event.stopPropagation();
-                    selectScreen(card, Number(selector.dataset.screenSelect ?? 0));
+                    const panel = selector.closest<HTMLElement>("[data-platform-panel]");
+                    if (panel) selectScreen(panel, Number(selector.dataset.screenSelect ?? 0));
                     scheduleAuto();
                     return;
                 }
                 const openButton = target.closest<HTMLButtonElement>("[data-open-product-image]");
                 if (!openButton) return;
                 event.stopPropagation();
-                const activeImage = card.querySelector<HTMLImageElement>("[data-screen-image]:not([hidden])");
+                const activeImage = openButton.querySelector<HTMLImageElement>("[data-screen-image]:not([hidden])");
                 if (!activeImage || !imageDialog || !dialogImage) return;
                 dialogImage.src = activeImage.src;
                 dialogImage.alt = activeImage.alt;
