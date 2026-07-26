@@ -15,7 +15,7 @@ export const uiText = {
     skipToContent: '跳到正文',
   },
   en: {
-    nav: { home: 'Home', guides: 'Guides', journey: 'Journey', download: 'Download', support: 'Support' },
+    nav: { home: 'Home', guides: 'User Guides', journey: 'Development', download: 'Download', support: 'Sponsor' },
     switchLanguage: '中文',
     skipToContent: 'Skip to content',
   },
