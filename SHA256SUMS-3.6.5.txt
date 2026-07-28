@@ -1,0 +1,8 @@
+# FAEVault v3.6.5 — SHA-256 校验值
+# 使用方法：sha256sum -c SHA256SUMS-3.6.5.txt
+
+5af21d927b165ad5d21cfc7d6d41a9a5809bbb68fef31b468635e27b88a99ecb  app-arm64-v8a-release.apk
+3d62a7b450c8e50e519fa486e224c6f33a04890f6bfa57bb39d85f7baafcca88  app-armeabi-v7a-release.apk
+1f21fe0ec53115e0c91e514346c0e35b268794e299ef3cd927a426fa2923180d  app-universal-release.apk
+c80d62f960ed01aac3416e4f71278cd5102ce9893089634093cd376e96b1cb9a  app-x86_64-release.apk
+e50e92b65b4ded8221a8dc1b339da4ea4fc8d61225b8990a3bc7ae901c56c708  app-x86-release.apk
