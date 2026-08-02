@@ -1,10 +1,10 @@
 # FAEVault v3.7.0 - SHA-256 checksums
 # use: sha256sum -c SHA256SUMS-3.7.0.txt
 
-ef5f7571272f4e70f0bbf87b1f836fb60253a5702a97dbabab5eb9817bd1ffbd  app-arm64-v8a-release.apk
-cad8c1aa800247cc2a4d6662597ad2ab813e4e0dc06dde7d53c9505c2fd77465  app-armeabi-v7a-release.apk
-74ff5e91c8ae26b2093b90ad1980eaa525c1f9a332ca56da54642b249a10ee4d  app-universal-release.apk
-1a52aa782d7d1e1cb4b592396a497fc1f7bbea033a5db21cd5ee0ec20d675645  app-x86_64-release.apk
-152779ac53a401c5b8f255860a06ea402689fd01b906310f5cb0e5535a05a06d  app-x86-release.apk
-993e9c023c877592e4e8953359fbee21dcb265f0b592b8f702ccacc8965982ea  FAEVault_v3.7.0_Setup.exe
-da05cac17854e7b2d500e1cf3fd746f2f144eca3ff4fa95245a55b1a93e2ede9  FAEVault-Windows-x64-Portable.zip
+ff814764a4214f40a3d11341c32db0cf215dd965aae185afee9f8dd93b198b70  app-arm64-v8a-release.apk
+ec00b735cc344f70e600a04893718b605f256a93548d928162d225093a378315  app-armeabi-v7a-release.apk
+9a6ca04ee4498d9d5d7b3a9802a5ea716abec33c876bdb42368c9d6ec8594600  app-universal-release.apk
+4c8bbc1d80242045f45fe5705d7730b8add234cf1196d5d7a69b2ea7f9141c33  app-x86_64-release.apk
+e68b7fe9547a20aa7566bf06e4e4fe530641657d0296cc17168acb04477ca69e  app-x86-release.apk
+3f5a30657f9e7637e89a7d0c945dd0c4fc7504caf18822e2a250c84c0fb1c86b  FAEVault_v3.7.0_Setup.exe
+09dfa3ac3542931365aa1e38e4fa3ec7245d9bc2ccadd5c6455b65fb031197b1  FAEVault-Windows-x64-Portable.zip
