@@ -10,6 +10,12 @@ async function main() {
     "https://api.github.com/repos/faegit/faevault-site/releases/latest",
     { headers: { Accept: "application/vnd.github+json" } }
   );
+  if (res.status === 404) {
+    mkdirSync(dirname(outPath), { recursive: true });
+    writeFileSync(outPath, JSON.stringify({ tag: "", version: "", assets: {} }, null, 2));
+    console.log("[fetch-latest-release] no latest release; wrote empty data");
+    return;
+  }
   if (!res.ok) {
     throw new Error(`GitHub API ${res.status}: ${await res.text()}`);
   }

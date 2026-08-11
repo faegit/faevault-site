@@ -46,15 +46,35 @@ const c =
               notePost: ".",
               releaseUrl,
           };
+const withdrawn = !ver || Object.keys(assets).length === 0;
+const w =
+    locale === "zh-cn"
+        ? {
+              kicker: "下载",
+              title: "新版本正在路上。",
+              intro: "因程序大版本升级，旧格式数据已不兼容，所有历史安装包均已撤回。新版本发布后将重新开放下载。",
+          }
+        : {
+              kicker: "Download",
+              title: "A new version is on the way.",
+              intro: "Due to a major upgrade, the legacy data format is no longer supported and all previous installers have been withdrawn. Downloads will reopen with the new release.",
+          };
 ---
 
-<PageShell theme="download" kicker={c.kicker} title={c.title} intro={c.intro}>
+<PageShell theme="download" kicker={withdrawn ? w.kicker : c.kicker} title={withdrawn ? w.title : c.title} intro={withdrawn ? w.intro : c.intro}>
+    {withdrawn ? (
+        <section class="platform-withdrawn">
+            <div class="platform-orbits" aria-hidden="true"><i></i><i></i><b></b></div>
+            <div class="withdrawn-card"><span>FAEVAULT</span><h2>{w.title}</h2><p>{w.intro}</p></div>
+        </section>
+    ) : (
     <section class="platform-system">
         <div class="platform-orbits" aria-hidden="true"><i></i><i></i><b></b></div>
 <article class="android"><span>ANDROID</span><h2>{c.android}</h2><p>{c.androidDetail}</p><a class="dl-btn" href={androidApk} target="_blank" rel="noopener noreferrer">{c.androidBtn}</a></article>
         <article class="windows"><span>WINDOWS</span><h2>{c.windows}</h2><p>{c.windowsDetail}</p><a class="dl-btn" href={windowsSetup} target="_blank" rel="noopener noreferrer">{c.windowsBtn}</a></article>
         <p class="release-note">{c.notePre}<a href={c.releaseUrl} target="_blank" rel="noopener noreferrer">{c.noteLink}</a>{c.notePost}</p>
     </section>
+    )}
 </PageShell>
 
 <style>
@@ -193,6 +213,45 @@ const c =
     }
     .release-note a:hover {
         color: #1a5f75;
+    }
+    .platform-withdrawn {
+        position: relative;
+        overflow: hidden;
+        display: grid;
+        place-items: center;
+        min-height: 400px;
+        margin-top: 5rem;
+        padding: 5rem 3rem;
+    }
+    .withdrawn-card {
+        position: relative;
+        z-index: 2;
+        max-width: 560px;
+        padding: 3rem;
+        border: 1px solid rgba(255, 255, 255, 0.65);
+        border-radius: 2rem;
+        background: rgba(247, 252, 251, 0.65);
+        box-shadow: 0 26px 70px rgba(45, 82, 94, 0.1);
+        backdrop-filter: blur(18px);
+        text-align: center;
+        animation: platform-in 0.7s cubic-bezier(0.18, 0.78, 0.18, 1) both;
+    }
+    .withdrawn-card > span {
+        color: #39846f;
+        font-size: 0.65rem;
+        letter-spacing: 0.16em;
+    }
+    .withdrawn-card h2 {
+        margin: 1rem 0;
+        color: #284550;
+        font:
+            500 2rem/1.1 Georgia,
+            serif;
+    }
+    .withdrawn-card p {
+        color: #6b8088;
+        font-size: 0.92rem;
+        line-height: 1.7;
     }
     @keyframes platform-in {
         from {
