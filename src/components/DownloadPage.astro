@@ -13,7 +13,8 @@ const dlBase = `https://github.com/faegit/faevault-site/releases/download/${tag}
 const assets = latest.assets as Record<string, string>;
 const androidApk = assets["app-arm64-v8a-release.apk"] ?? `${dlBase}/app-arm64-v8a-release.apk`;
 const setupKey = `FAEVault_v${ver}_Setup.exe`;
-const windowsSetup = assets[setupKey] ?? `${dlBase}/${setupKey}`;
+const windowsSetupAsset = assets[setupKey];
+const windowsSetup = windowsSetupAsset ?? `${dlBase}/${setupKey}`;
 const c =
     locale === "zh-cn"
         ? {
@@ -71,7 +72,9 @@ const w =
     <section class="platform-system">
         <div class="platform-orbits" aria-hidden="true"><i></i><i></i><b></b></div>
 <article class="android"><span>ANDROID</span><h2>{c.android}</h2><p>{c.androidDetail}</p><a class="dl-btn" href={androidApk} target="_blank" rel="noopener noreferrer">{c.androidBtn}</a></article>
+        {windowsSetupAsset && (
         <article class="windows"><span>WINDOWS</span><h2>{c.windows}</h2><p>{c.windowsDetail}</p><a class="dl-btn" href={windowsSetup} target="_blank" rel="noopener noreferrer">{c.windowsBtn}</a></article>
+        )}
         <p class="release-note">{c.notePre}<a href={c.releaseUrl} target="_blank" rel="noopener noreferrer">{c.noteLink}</a>{c.notePost}</p>
     </section>
     )}

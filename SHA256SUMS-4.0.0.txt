@@ -1,0 +1,7 @@
+# FAEVault v4.0.0 - SHA-256 checksums
+# use: sha256sum -c SHA256SUMS-4.0.0.txt
+2395102e7b7dfdbcda729820460cbf827c0274fa34f04123182715ad023810a0  app-arm64-v8a-release.apk
+1782736646ce3846fb2ec7b7c3903db225422dc84c8900e2205d98dfb7807700  app-armeabi-v7a-release.apk
+2f0cf3692150558b57eb92014f7931411fd354d7e5dd1b63c9fb974c3e34bb8c  app-universal-release.apk
+1994389acc14786b712a4fd7ab0bbe20e5e38fd6c13ccc75f2cebd690821bbab  app-x86_64-release.apk
+60568a32ed0099fefa3a8353489683dcf2f70a611e4b5d6d42d3f45a4e3341d8  app-x86-release.apk

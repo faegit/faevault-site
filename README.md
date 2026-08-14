@@ -7,8 +7,8 @@
 - [FAEVault 最新发布页](https://github.com/faegit/faevault-site/releases/latest)
 - [在线下载页](https://faegit.github.io/faevault-site/zh-cn/download/)
 - [Windows、Android 与浏览器扩展安装教程](./INSTALLATION.md)
-- [3.6.4 更新日志](./RELEASE_NOTES_3.6.4.md)
-- [3.6.4 SHA-256 校验值](./SHA256SUMS-3.6.4.txt)
+- [4.0.0 更新日志](./RELEASE_NOTES_4.0.0.md)
+- [4.0.0 SHA-256 校验值](./SHA256SUMS-4.0.0.txt)
 
 ## 本地运行
 
