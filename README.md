@@ -1,14 +1,8 @@
 # FAEVault website
 
-保险库 的公开官网、使用指南、开发历程、版本下载与赞助入口。
+保险库 的公开官网、使用指南、开发历程与赞助入口。
 
-## 下载与安装
-
-- [FAEVault 最新发布页](https://github.com/faegit/faevault-site/releases/latest)
-- [在线下载页](https://faegit.github.io/faevault-site/zh-cn/download/)
-- [Windows、Android 与浏览器扩展安装教程](./INSTALLATION.md)
-- [4.0.0 更新日志](./RELEASE_NOTES_4.0.0.md)
-- [4.0.0 SHA-256 校验值](./SHA256SUMS-4.0.0.txt)
+当前仓库仅保留项目网页，不提供版本安装包、发布日志或校验文件。
 
 ## 本地运行
 
