@@ -559,18 +559,19 @@ const menuLabel = locale === "zh-cn" ? "打开菜单" : "Open menu";
         const ctx = canvas.getContext("2d");
         if (!ctx) return;
         const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        const SPACING = 32;
-        const BASE = 1;
-        const MAX_R = 3.2;
-        const INFLUENCE = 200;
-        const RIPPLE_SPEED = 0.16;
-        const RIPPLE_GAP = 150;
-        const RIPPLE_BAND = 42;
-        const RIPPLE_PUSH = 6;
-        type Dot = { x: number; y: number; r: number };
+        const SPACING = 38;
+        const BASE_R = 1.4;
+        const MAX_R = 4.0;
+        const INFLUENCE = 220;
+        const RIPPLE_SPEED = 0.14;
+        const RIPPLE_GAP = 160;
+        const RIPPLE_BAND = 46;
+        const LINE_ALPHA = 0.055;
+        const LINE_COLOR = "108, 132, 235";
+        type Node = { x: number; y: number; r: number };
         let w = 0;
         let h = 0;
-        let dots: Dot[] = [];
+        let nodes: Node[] = [];
         let mx = -9999;
         let my = -9999;
 
@@ -579,32 +580,50 @@ const menuLabel = locale === "zh-cn" ? "打开菜单" : "Open menu";
             h = canvas!.height = window.innerHeight;
             canvas!.style.width = `${w}px`;
             canvas!.style.height = `${h}px`;
-            dots = [];
-            for (let y = SPACING; y < h; y += SPACING)
-                for (let x = SPACING; x < w; x += SPACING) dots.push({ x, y, r: BASE });
+            nodes = [];
+            for (let y = 0; y <= h + SPACING; y += SPACING)
+                for (let x = 0; x <= w + SPACING; x += SPACING) nodes.push({ x, y, r: BASE_R });
+        }
+
+        function drawLines() {
+            ctx!.strokeStyle = `rgba(${LINE_COLOR}, ${LINE_ALPHA})`;
+            ctx!.lineWidth = 1;
+            for (let x = 0; x <= w + SPACING; x += SPACING) {
+                ctx!.beginPath();
+                ctx!.moveTo(x, 0);
+                ctx!.lineTo(x, h);
+                ctx!.stroke();
+            }
+            for (let y = 0; y <= h + SPACING; y += SPACING) {
+                ctx!.beginPath();
+                ctx!.moveTo(0, y);
+                ctx!.lineTo(w, y);
+                ctx!.stroke();
+            }
         }
 
         function draw(now = 0) {
             ctx!.clearRect(0, 0, w, h);
+            drawLines();
             const centerX = w / 2;
             const centerY = h / 2;
             const rippleCycle = Math.hypot(centerX, centerY) + RIPPLE_GAP * 2;
             const leadingRadius = (now * RIPPLE_SPEED) % rippleCycle;
-            for (const d of dots) {
-                const dx = mx - d.x;
-                const dy = my - d.y;
+            for (const n of nodes) {
+                const dx = mx - n.x;
+                const dy = my - n.y;
                 let t = 1 - Math.sqrt(dx * dx + dy * dy) / INFLUENCE;
                 if (t < 0) t = 0;
-                const centerDist = Math.hypot(d.x - centerX, d.y - centerY);
+                const centerDist = Math.hypot(n.x - centerX, n.y - centerY);
                 const rippleDelta = centerDist - leadingRadius;
                 const ripple =
                     leadingRadius > 0 ? Math.exp(-(rippleDelta * rippleDelta) / (2 * RIPPLE_BAND * RIPPLE_BAND)) : 0;
-                const target = BASE + (MAX_R - BASE) * t * t + ripple * 1.35;
-                d.r += (target - d.r) * (prefersReduced ? 1 : 0.12);
-                const push = centerDist > 0 ? (RIPPLE_PUSH * ripple) / centerDist : 0;
+                const target = BASE_R + (MAX_R - BASE_R) * t * t + ripple * 1.8;
+                n.r += (target - n.r) * (prefersReduced ? 1 : 0.10);
+                const alpha = 0.18 + ripple * 0.22 + t * 0.15;
                 ctx!.beginPath();
-                ctx!.arc(d.x + (d.x - centerX) * push, d.y + (d.y - centerY) * push, d.r, 0, Math.PI * 2);
-                ctx!.fillStyle = `rgba(108, 132, 235, ${0.20 + ripple * 0.18})`;
+                ctx!.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+                ctx!.fillStyle = `rgba(${LINE_COLOR}, ${Math.min(alpha, 0.55)})`;
                 ctx!.fill();
             }
             if (!prefersReduced) requestAnimationFrame(draw);
@@ -612,10 +631,11 @@ const menuLabel = locale === "zh-cn" ? "打开菜单" : "Open menu";
 
         function drawStatic() {
             ctx!.clearRect(0, 0, w, h);
-            for (const d of dots) {
+            drawLines();
+            for (const n of nodes) {
                 ctx!.beginPath();
-                ctx!.arc(d.x, d.y, BASE, 0, Math.PI * 2);
-                ctx!.fillStyle = "rgba(118, 138, 224, 0.22)";
+                ctx!.arc(n.x, n.y, BASE_R, 0, Math.PI * 2);
+                ctx!.fillStyle = `rgba(${LINE_COLOR}, 0.18)`;
                 ctx!.fill();
             }
         }
