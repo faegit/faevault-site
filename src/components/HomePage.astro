@@ -345,7 +345,7 @@ const productScreens = productScreensBase.map((item, index) => ({
                         <div class="window-spacer"></div>
                     </div>
                     <div class="window-body">
-                        <img src={productImage("home.png")} alt={zh ? "保险库主页截图" : "Screenshot of the vault home screen"} loading="eager" draggable="false" />
+                        <img src={productImage("pc-home.png")} alt={zh ? "保险库主页截图" : "Screenshot of the vault home screen"} loading="eager" draggable="false" />
                     </div>
                 </div>
 
@@ -610,6 +610,8 @@ const productScreens = productScreensBase.map((item, index) => ({
     <section class="section" id="download">
         <div class="container">
             <div class="cta" data-reveal>
+                <div class="card-glow cg-white" aria-hidden="true"></div>
+                <div class="card-glow cg-blue" aria-hidden="true"></div>
                 <div class="cta-content">
                     <h2 class="cta-title">{copy.ctaTitle}</h2>
                     <p class="cta-copy">{copy.ctaCopy}</p>
@@ -629,6 +631,8 @@ const productScreens = productScreensBase.map((item, index) => ({
 
     <section class="section support-section" id="support">
         <div class="support-card" data-reveal>
+            <div class="card-glow cg-blue" aria-hidden="true"></div>
+            <div class="card-glow cg-green" aria-hidden="true"></div>
             <div class="support-card-inner">
                 <div class="eyebrow-pill">
                     <span class="eyebrow-dot"></span>
@@ -1561,6 +1565,36 @@ const productScreens = productScreensBase.map((item, index) => ({
         font-size: 1.35rem;
         cursor: pointer;
         box-shadow: 0 8px 24px rgba(20, 36, 74, 0.16);
+    }
+
+    /* ── 卡片光效 ── */
+    .card-glow {
+        position: absolute;
+        border-radius: 999px;
+        filter: blur(50px);
+        pointer-events: none;
+        z-index: 0;
+    }
+    .cg-white {
+        top: -8%;
+        right: 8%;
+        width: 220px;
+        height: 220px;
+        background: rgba(255, 255, 255, 0.12);
+    }
+    .cg-blue {
+        top: 10%;
+        right: 6%;
+        width: 200px;
+        height: 200px;
+        background: rgba(83, 132, 255, 0.15);
+    }
+    .cg-green {
+        left: 6%;
+        bottom: 10%;
+        width: 170px;
+        height: 170px;
+        background: rgba(69, 201, 168, 0.10);
     }
 
     /* ── 下载 CTA ── */
