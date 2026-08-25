@@ -15,6 +15,8 @@ const alternate = otherLocale(locale);
 const text = uiText[locale];
 const brandName = locale === "zh-cn" ? SITE_NAME_CN : SITE_NAME;
 const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`);
+const year = new Date().getFullYear();
+const menuLabel = locale === "zh-cn" ? "打开菜单" : "Open menu";
 ---
 
 <!doctype html>
@@ -24,7 +26,7 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="generator" content={Astro.generator} />
         <meta name="description" content={description} />
-        <meta name="theme-color" content="#f2f6f4" />
+        <meta name="theme-color" content="#f7f9fc" />
         <link rel="icon" href={withBaseAsset("/favicon.ico")} sizes="any" />
         <link rel="canonical" href={canonical} />
         <link rel="alternate" hreflang={localeMeta[locale].htmlLang} href={canonical} />
@@ -35,23 +37,60 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
     <body>
         <canvas id="dot-grid" aria-hidden="true" transition:persist="dot-grid"></canvas>
         <a class="skip-link" href="#main">{text.skipToContent}</a>
-        <header class="site-header">
-            <a class="brand" href={localePath(locale)} aria-label={`${brandName} ${text.nav.home}`}>{brandName}</a>
-            <nav aria-label="Primary">
-                <a href={localePath(locale)}>{text.nav.home}</a>
-                <a href={localePath(locale, "download")}>{text.nav.download}</a>
-                <a href={localePath(locale, "guides")}>{text.nav.guides}</a>
-                <a href={localePath(locale, "journey")}>{text.nav.journey}</a>
-                <a class="support-link" href={localePath(locale, "support")}>{text.nav.support}</a>
-            </nav>
-            <a class="language-switch" href={localePath(alternate, routePath)} hreflang={localeMeta[alternate].htmlLang}>{text.switchLanguage}</a>
+        <header class="site-header" id="siteHeader">
+            <div class="container nav">
+                <a class="brand" href={localePath(locale)} aria-label={`${brandName} ${text.nav.home}`}>
+                    <span class="brand-mark" aria-hidden="true">
+                        <img src={withBaseAsset("/favicon.ico")} alt="" width="24" height="24" />
+                    </span>
+                    <span>{brandName}</span>
+                </a>
+                <nav class="nav-links" id="navLinks" aria-label="Primary">
+                    <a href={localePath(locale)}>{text.nav.home}</a>
+                    <a href={localePath(locale, "download")}>{text.nav.download}</a>
+                    <a href={localePath(locale, "journey")}>{text.nav.journey}</a>
+                    <a href={localePath(locale, "support")}>{text.nav.support}</a>
+                </nav>
+                <div class="nav-actions">
+                    <a class="language-switch" href={localePath(alternate, routePath)} hreflang={localeMeta[alternate].htmlLang}>{text.switchLanguage}</a>
+                    <a class="btn btn-primary nav-cta" href={localePath(locale, "download")}>
+                        {text.nav.download}
+                        <svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                    </a>
+                    <button class="menu-button" id="menuButton" aria-label={menuLabel} aria-expanded="false">
+                        <span></span>
+                    </button>
+                </div>
+            </div>
         </header>
         <main id="main" transition:animate="fade"><slot /></main>
         <footer class="site-footer">
-            <a href="https://github.com/faegit/faevault-site" target="_blank" rel="noopener noreferrer">
-                <img src="https://img.shields.io/github/stars/faegit/faevault-site?style=social" alt="GitHub Stars" />
-                <img src="https://img.shields.io/github/forks/faegit/faevault-site?style=social" alt="GitHub Forks" />
-            </a>
+            <div class="container footer-grid">
+                <div class="footer-brand-col">
+                    <a href={localePath(locale)} class="brand">
+                        <span class="brand-mark" aria-hidden="true">
+                            <img src={withBaseAsset("/favicon.ico")} alt="" width="24" height="24" loading="lazy" />
+                        </span>
+                        <span>{brandName}</span>
+                    </a>
+                    <p class="footer-copy">
+                        {locale === "zh-cn" ? "为更安静的数字安全而设计。" : "Designed for calmer digital security."}<br />
+                        © {year} {brandName}. All rights reserved.
+                    </p>
+                    <a class="footer-badges" href="https://github.com/faegit/faevault-site" target="_blank" rel="noopener noreferrer">
+                        <img src="https://img.shields.io/github/stars/faegit/faevault-site?style=social" alt="GitHub Stars" loading="lazy" />
+                        <img src="https://img.shields.io/github/forks/faegit/faevault-site?style=social" alt="GitHub Forks" loading="lazy" />
+                    </a>
+                </div>
+                <nav class="footer-links" aria-label="Footer">
+                    <a href={localePath(locale)}>{text.nav.home}</a>
+                    <a href={localePath(locale, "download")}>{text.nav.download}</a>
+                    <a href={localePath(locale, "journey")}>{text.nav.journey}</a>
+                    <a href={localePath(locale, "support")}>{text.nav.support}</a>
+                </nav>
+            </div>
         </footer>
     </body>
 </html>
@@ -59,16 +98,33 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
 <style is:global>
     :root {
         color-scheme: light;
-        font-family:
-            Inter,
-            ui-sans-serif,
-            system-ui,
-            -apple-system,
-            BlinkMacSystemFont,
-            "Segoe UI",
-            sans-serif;
-        background: #f1f4f6;
-        color: #172b35;
+        --bg: #f7f9fc;
+        --panel: rgba(255, 255, 255, 0.78);
+        --panel-solid: #ffffff;
+        --text: #111827;
+        --text-soft: #5f6b7a;
+        --text-muted: #8792a2;
+        --line: rgba(15, 23, 42, 0.08);
+        --brand: #2f6fed;
+        --brand-2: #6d8cff;
+        --brand-deep: #1d4fb8;
+        --brand-soft: #eaf1ff;
+        --success: #168a61;
+        --success-soft: #e8f7f0;
+        --shadow: 0 24px 80px rgba(35, 52, 86, 0.12);
+        --shadow-soft: 0 14px 44px rgba(35, 52, 86, 0.08);
+        --radius-xl: 32px;
+        --radius-lg: 24px;
+        --radius-md: 18px;
+        --container: 1180px;
+        --font-sans: "SF Pro Display", "SF Pro Text", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, "Segoe UI", sans-serif;
+        font-family: var(--font-sans);
+        background: var(--bg);
+        color: var(--text);
+        -webkit-font-smoothing: antialiased;
+    }
+    ::selection {
+        background: rgba(47, 111, 237, 0.16);
     }
     #dot-grid {
         position: fixed;
@@ -90,10 +146,19 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
         margin: 0;
         min-width: 320px;
         overflow-x: hidden;
+        color: var(--text);
+        background:
+            radial-gradient(circle at 12% 6%, rgba(92, 130, 255, 0.10), transparent 28%),
+            radial-gradient(circle at 88% 18%, rgba(55, 199, 169, 0.08), transparent 26%),
+            linear-gradient(180deg, #fbfcff 0%, var(--bg) 58%, #f4f7fb 100%);
     }
     a {
         color: inherit;
         text-decoration: none;
+    }
+    button {
+        cursor: pointer;
+        font: inherit;
     }
     .skip-link {
         position: fixed;
@@ -102,62 +167,204 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
         z-index: 100;
         padding: 0.65rem 1rem;
         border-radius: 999px;
-        background: #172030;
+        background: #16233f;
         color: #fff;
         transform: translateY(-160%);
     }
     .skip-link:focus {
         transform: translateY(0);
     }
-    .site-header {
-        position: fixed;
-        top: 1rem;
-        left: 50%;
-        z-index: 30;
-        display: grid;
-        grid-template-columns: 1fr auto 1fr;
+    .container {
+        width: min(calc(100% - 40px), 1200px);
+        margin: 0 auto;
+    }
+
+    .btn {
+        display: inline-flex;
         align-items: center;
-        gap: 2rem;
-        width: min(1180px, calc(100% - 2rem));
-        padding: 0.75rem 1rem;
-        border: 1px solid rgba(255, 255, 255, 0.72);
-        border-radius: 999px;
-        background: rgba(250, 253, 252, 0.68);
-        box-shadow: 0 14px 44px rgba(41, 61, 91, 0.09);
-        backdrop-filter: blur(18px);
-        transform: translateX(-50%);
-    }
-    .brand {
-        font-weight: 760;
-        letter-spacing: -0.04em;
-    }
-    nav {
-        display: flex;
-        align-items: center;
-        gap: 1.25rem;
-        color: #526074;
-        font-size: 0.92rem;
-    }
-    nav a,
-    .language-switch {
+        justify-content: center;
+        gap: 9px;
+        min-height: 46px;
+        padding: 0 18px;
+        border: 0;
+        border-radius: 14px;
+        font-size: 14px;
+        font-weight: 750;
         transition:
-            color 0.2s ease,
-            transform 0.2s ease;
+            transform 160ms ease,
+            box-shadow 160ms ease,
+            background 160ms ease;
     }
-    nav a:hover,
-    .language-switch:hover {
-        color: #3579f6;
+    .btn:hover {
         transform: translateY(-1px);
     }
-    .support-link {
-        color: #2869df;
+    .btn-primary {
+        color: #fff;
+        background: linear-gradient(145deg, #477ff0 0%, #285fda 100%);
+        box-shadow: 0 12px 24px rgba(47, 111, 237, 0.22);
+    }
+    .btn-primary:hover {
+        box-shadow: 0 15px 30px rgba(47, 111, 237, 0.28);
+    }
+    .btn-secondary {
+        color: #2f3a4a;
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        box-shadow: 0 6px 18px rgba(30, 41, 59, 0.04);
+    }
+    .btn-large {
+        min-height: 54px;
+        padding: 0 22px;
+        border-radius: 16px;
+        font-size: 15px;
+    }
+    .arrow {
+        width: 16px;
+        height: 16px;
+        transition: transform 160ms ease;
+    }
+    .btn:hover .arrow {
+        transform: translateX(2px);
+    }
+    .eyebrow-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+        padding: 8px 12px;
+        border: 1px solid rgba(47, 111, 237, 0.12);
+        border-radius: 999px;
+        color: var(--brand);
+        background: rgba(255, 255, 255, 0.72);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+    }
+    .eyebrow-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--brand);
+        box-shadow: 0 0 0 5px rgba(47, 111, 237, 0.08);
+    }
+    [data-reveal] {
+        opacity: 0;
+        transform: translateY(18px);
+        transition:
+            opacity 650ms ease,
+            transform 650ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+    [data-reveal].visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .site-header {
+        position: fixed;
+        z-index: 50;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 14px 0;
+        transition: 220ms ease;
+    }
+    .site-header.scrolled {
+        background: rgba(248, 250, 253, 0.82);
+        border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+    }
+    .site-header .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 48px;
+    }
+    .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 11px;
+        font-size: 17px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--text);
+    }
+    .brand-mark {
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 4px 14px rgba(35, 52, 86, 0.12);
+    }
+    .brand-mark img {
+        width: 24px;
+        height: 24px;
+        object-fit: contain;
+    }
+
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 26px;
+        color: #465162;
+        font-size: 14px;
         font-weight: 650;
     }
-    .language-switch {
-        justify-self: end;
-        font-size: 0.9rem;
-        color: #526074;
+    .nav-links a {
+        transition: color 160ms ease;
     }
+    .nav-links a:hover {
+        color: var(--brand);
+    }
+    .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .language-switch {
+        padding: 0 8px;
+        color: #526074;
+        font-size: 13.5px;
+        font-weight: 650;
+        transition: color 160ms ease;
+    }
+    .language-switch:hover {
+        color: var(--brand);
+    }
+    .menu-button {
+        display: none;
+        width: 42px;
+        height: 42px;
+        padding: 0;
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        background: rgba(255, 255, 255, 0.78);
+    }
+    .menu-button span,
+    .menu-button::before,
+    .menu-button::after {
+        content: "";
+        display: block;
+        width: 18px;
+        height: 2px;
+        margin: 4px auto;
+        border-radius: 2px;
+        background: #273244;
+        transition: 180ms ease;
+    }
+    .menu-button.open span {
+        opacity: 0;
+    }
+    .menu-button.open::before {
+        transform: translateY(6px) rotate(45deg);
+    }
+    .menu-button.open::after {
+        transform: translateY(-6px) rotate(-45deg);
+    }
+
     main {
         position: relative;
         z-index: 1;
@@ -166,25 +373,49 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
         overflow-x: hidden;
     }
     .site-footer {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 1rem;
-        padding: 2rem 1rem 3rem;
+        position: relative;
+        z-index: 1;
+        padding: 42px 0 54px;
     }
-    .site-footer a {
+    .footer-grid {
         display: flex;
-        gap: 0.75rem;
         align-items: center;
-        opacity: 0.55;
+        justify-content: space-between;
+        gap: 24px;
+        padding-top: 28px;
+        border-top: 1px solid var(--line);
+    }
+    .footer-copy {
+        margin: 12px 0 0;
+        color: var(--text-muted);
+        font-size: 12px;
+        line-height: 1.7;
+    }
+    .footer-badges {
+        display: inline-flex;
+        gap: 0.6rem;
+        align-items: center;
+        margin-top: 12px;
+        opacity: 0.75;
         transition: opacity 0.25s ease;
     }
-    .site-footer a:hover {
-        opacity: 0.85;
+    .footer-badges:hover {
+        opacity: 1;
     }
-    .site-footer img {
+    .footer-badges img {
         height: 20px;
     }
+    .footer-links {
+        display: flex;
+        gap: 20px;
+        color: #657083;
+        font-size: 12px;
+        font-weight: 650;
+    }
+    .footer-links a:hover {
+        color: var(--brand);
+    }
+
     ::view-transition-old(root) {
         animation: 0.22s ease both crossfade-out;
     }
@@ -202,19 +433,54 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
             opacity: 0;
         }
     }
-    @media (max-width: 760px) {
-        .site-header {
-            grid-template-columns: 1fr auto;
+    @media (max-width: 980px) {
+        .nav-links {
+            position: absolute;
+            top: 70px;
+            left: 20px;
+            right: 20px;
+            display: none;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 5px;
+            padding: 12px;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: var(--shadow-soft);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
         }
-        nav {
+        .nav-links.open {
+            display: flex;
+        }
+        .nav-links a {
+            padding: 12px 14px;
+            border-radius: 10px;
+        }
+        .nav-links a:hover {
+            background: var(--brand-soft);
+        }
+        .menu-button {
+            display: block;
+        }
+        .language-switch {
             display: none;
         }
-        .site-header {
-            width: calc(100% - 1.2rem);
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 0.5rem 0.8rem;
-            top: 0.6rem;
+    }
+    @media (max-width: 520px) {
+        .container {
+            width: calc(100% - 26px);
+        }
+        .nav-cta {
+            display: none;
+        }
+        .footer-grid {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+        .footer-links {
+            flex-wrap: wrap;
         }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -230,125 +496,147 @@ const canonical = absoluteUrl(`/${locale}${routePath === "/" ? "" : routePath}/`
         }
     }
 </style>
+
 <script>
-(function() {
-    const canvas = document.getElementById("dot-grid") as HTMLCanvasElement | null;
-    if (!canvas || canvas.dataset.gridReady) return;
-    canvas.dataset.gridReady = "true";
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    const gridCanvas: HTMLCanvasElement = canvas;
-    const drawingContext: CanvasRenderingContext2D = ctx;
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const mobileViewport = window.matchMedia("(pointer: coarse)");
+    function updateHeaderState() {
+        const header = document.getElementById("siteHeader");
+        if (header) header.classList.toggle("scrolled", window.scrollY > 18);
+    }
+    window.addEventListener("scroll", updateHeaderState, { passive: true });
 
-    type Dot = { x: number; y: number; r: number };
-    let w = 0;
-    let h = 0;
-    let dots: Dot[] = [];
-    let mx = -9999, my = -9999;
-    const SPACING = 32;
-    const BASE = 1;
-    const MAX_R = 3.2;
-    const INFLUENCE = 200;
-    const RIPPLE_SPEED = 0.16;
-    const RIPPLE_GAP = 150;
-    const RIPPLE_BAND = 42;
-    const RIPPLE_PUSH = 6;
-    const isMobileViewport = () => mobileViewport.matches || window.innerWidth <= 760;
-
-    function viewportSize() {
-        const width = Math.round(document.documentElement.clientWidth || window.innerWidth);
-        const height = isMobileViewport()
-            ? Math.max(
-                  Math.round(window.innerHeight),
-                  Math.round(document.documentElement.clientHeight),
-                  Math.round(window.screen.height),
-              )
-            : Math.round(window.innerHeight);
-        return { width, height };
+    function initChrome() {
+        updateHeaderState();
+        const menuButton = document.getElementById("menuButton");
+        const navLinks = document.getElementById("navLinks");
+        if (!menuButton || !navLinks || menuButton.dataset.menuReady === "true") return;
+        menuButton.dataset.menuReady = "true";
+        const setMenuState = (open: boolean) => {
+            menuButton.classList.toggle("open", open);
+            navLinks.classList.toggle("open", open);
+            menuButton.setAttribute("aria-expanded", String(open));
+            menuButton.setAttribute("aria-label", open ? "关闭菜单" : "打开菜单");
+        };
+        menuButton.addEventListener("click", () => {
+            setMenuState(!navLinks.classList.contains("open"));
+        });
+        navLinks.querySelectorAll("a").forEach((link) => {
+            link.addEventListener("click", () => setMenuState(false));
+        });
     }
 
-    function resize(force = false) {
-        const next = viewportSize();
-        const widthChanged = Math.abs(next.width - w) > 2;
-        const heightChanged = Math.abs(next.height - h) > 2;
-        if (!force && isMobileViewport() && !widthChanged) return;
-        if (!force && !widthChanged && !heightChanged) return;
-
-        w = gridCanvas.width = next.width;
-        h = gridCanvas.height = next.height;
-        gridCanvas.style.width = `${w}px`;
-        gridCanvas.style.height = `${h}px`;
-        dots = [];
-        for (let y = SPACING; y < h; y += SPACING)
-            for (let x = SPACING; x < w; x += SPACING)
-                dots.push({ x, y, r: BASE });
-    }
-
-    function draw(now = 0) {
-        drawingContext.clearRect(0, 0, w, h);
-        const centerX = w / 2;
-        const centerY = h / 2;
-        const maxRippleRadius = Math.hypot(centerX, centerY) + RIPPLE_GAP;
-        const rippleCycle = maxRippleRadius + RIPPLE_GAP;
-        const leadingRadius = (now * RIPPLE_SPEED) % rippleCycle;
-
-        for (const d of dots) {
-            const dx = mx - d.x, dy = my - d.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            let t = 1 - dist / INFLUENCE;
-            if (t < 0) t = 0;
-            const centerDx = d.x - centerX;
-            const centerDy = d.y - centerY;
-            const centerDist = Math.hypot(centerDx, centerDy);
-            const rippleDelta = centerDist - leadingRadius;
-            const ripple = leadingRadius > 0
-                ? Math.exp(-(rippleDelta * rippleDelta) / (2 * RIPPLE_BAND * RIPPLE_BAND))
-                : 0;
-            const target = BASE + (MAX_R - BASE) * t * t + ripple * 1.35;
-            d.r += (target - d.r) * (prefersReduced ? 1 : 0.12);
-            const push = centerDist > 0 ? RIPPLE_PUSH * ripple / centerDist : 0;
-            const drawX = d.x + centerDx * push;
-            const drawY = d.y + centerDy * push;
-
-            drawingContext.beginPath();
-            drawingContext.arc(drawX, drawY, d.r, 0, Math.PI * 2);
-            drawingContext.fillStyle = `rgba(125, 169, 187, ${0.26 + ripple * 0.2})`;
-            drawingContext.fill();
+    function initReveal() {
+        const items = document.querySelectorAll("[data-reveal]:not(.visible)");
+        if (!items.length) return;
+        if (!("IntersectionObserver" in window)) {
+            items.forEach((item) => item.classList.add("visible"));
+            return;
         }
-        if (!prefersReduced) requestAnimationFrame(draw);
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("visible");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            },
+            { threshold: 0.12, rootMargin: "0px 0px -30px 0px" },
+        );
+        items.forEach((item) => observer.observe(item));
     }
 
-    function drawStatic() {
-        drawingContext.clearRect(0, 0, w, h);
-        for (const d of dots) {
-            drawingContext.beginPath();
-            drawingContext.arc(d.x, d.y, BASE, 0, Math.PI * 2);
-            drawingContext.fillStyle = "rgba(155, 175, 190, 0.28)";
-            drawingContext.fill();
+    document.addEventListener("astro:page-load", () => {
+        initChrome();
+        initReveal();
+    });
+    initChrome();
+    initReveal();
+
+    (function () {
+        const canvas = document.getElementById("dot-grid") as HTMLCanvasElement | null;
+        if (!canvas || canvas.dataset.gridReady) return;
+        canvas.dataset.gridReady = "true";
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const SPACING = 32;
+        const BASE = 1;
+        const MAX_R = 3.2;
+        const INFLUENCE = 200;
+        const RIPPLE_SPEED = 0.16;
+        const RIPPLE_GAP = 150;
+        const RIPPLE_BAND = 42;
+        const RIPPLE_PUSH = 6;
+        type Dot = { x: number; y: number; r: number };
+        let w = 0;
+        let h = 0;
+        let dots: Dot[] = [];
+        let mx = -9999;
+        let my = -9999;
+
+        function resize() {
+            w = canvas!.width = window.innerWidth;
+            h = canvas!.height = window.innerHeight;
+            canvas!.style.width = `${w}px`;
+            canvas!.style.height = `${h}px`;
+            dots = [];
+            for (let y = SPACING; y < h; y += SPACING)
+                for (let x = SPACING; x < w; x += SPACING) dots.push({ x, y, r: BASE });
         }
-    }
 
-    const onMove = (e: MouseEvent) => { mx = e.clientX; my = e.clientY; };
-    const onLeave = () => { mx = -9999; my = -9999; };
+        function draw(now = 0) {
+            ctx!.clearRect(0, 0, w, h);
+            const centerX = w / 2;
+            const centerY = h / 2;
+            const rippleCycle = Math.hypot(centerX, centerY) + RIPPLE_GAP * 2;
+            const leadingRadius = (now * RIPPLE_SPEED) % rippleCycle;
+            for (const d of dots) {
+                const dx = mx - d.x;
+                const dy = my - d.y;
+                let t = 1 - Math.sqrt(dx * dx + dy * dy) / INFLUENCE;
+                if (t < 0) t = 0;
+                const centerDist = Math.hypot(d.x - centerX, d.y - centerY);
+                const rippleDelta = centerDist - leadingRadius;
+                const ripple =
+                    leadingRadius > 0 ? Math.exp(-(rippleDelta * rippleDelta) / (2 * RIPPLE_BAND * RIPPLE_BAND)) : 0;
+                const target = BASE + (MAX_R - BASE) * t * t + ripple * 1.35;
+                d.r += (target - d.r) * (prefersReduced ? 1 : 0.12);
+                const push = centerDist > 0 ? (RIPPLE_PUSH * ripple) / centerDist : 0;
+                ctx!.beginPath();
+                ctx!.arc(d.x + (d.x - centerX) * push, d.y + (d.y - centerY) * push, d.r, 0, Math.PI * 2);
+                ctx!.fillStyle = `rgba(108, 132, 235, ${0.20 + ripple * 0.18})`;
+                ctx!.fill();
+            }
+            if (!prefersReduced) requestAnimationFrame(draw);
+        }
 
-    let resizeTimer: ReturnType<typeof setTimeout>;
-    const onResize = () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => resize(), 120);
-    };
-    const onOrientationChange = () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => resize(true), 240);
-    };
+        function drawStatic() {
+            ctx!.clearRect(0, 0, w, h);
+            for (const d of dots) {
+                ctx!.beginPath();
+                ctx!.arc(d.x, d.y, BASE, 0, Math.PI * 2);
+                ctx!.fillStyle = "rgba(118, 138, 224, 0.22)";
+                ctx!.fill();
+            }
+        }
 
-    function init() { resize(true); prefersReduced ? drawStatic() : draw(); }
-
-    window.addEventListener("resize", onResize);
-    window.addEventListener("orientationchange", onOrientationChange);
-    document.addEventListener("mousemove", onMove);
-    document.addEventListener("mouseleave", onLeave);
-    init();
-})();
+        let resizeTimer: ReturnType<typeof setTimeout>;
+        window.addEventListener("resize", () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                resize();
+                if (prefersReduced) drawStatic();
+            }, 120);
+        });
+        document.addEventListener("mousemove", (e) => {
+            mx = e.clientX;
+            my = e.clientY;
+        });
+        document.addEventListener("mouseleave", () => {
+            mx = -9999;
+            my = -9999;
+        });
+        resize();
+        prefersReduced ? drawStatic() : draw();
+    })();
 </script>

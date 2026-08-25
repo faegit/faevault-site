@@ -1,189 +1,275 @@
 ---
 import type { Locale } from "../i18n/config";
 import { localePath } from "../i18n/config";
+import { withBaseAsset } from "../config/site";
 
 interface Props {
     locale: Locale;
 }
 const { locale } = Astro.props;
 const productImage = (name: string) => `${import.meta.env.BASE_URL}images/product/${name}`;
-const copy =
-    locale === "zh-cn"
-        ? {
-              eyebrow: "",
-              title: "你的密码和数据，完全由你掌控。",
-              intro: "保险库在 Android 设备上管理登录、银行卡、身份证、Wi-Fi 与 API 密钥，并将数据保存到本地加密的 .pmv 文件。",
-              storyLink: "了解产品故事",
+const appIcon = withBaseAsset("/favicon.ico");
+const zh = locale === "zh-cn";
 
-              storyKicker: "数据如何保存",
-              storyTitle: "本地优先 · 加密落盘",
-              storyBody:
-                  "保险库默认把数据保存在设备内的加密文件中，不提供开发者托管账户。只有在你主动使用 WebDAV、局域网同步或密码泄露检测时，应用才会发起对应的网络请求。",
-              quote: "本地保存是默认方式，联网能力由你主动选择。",
-              whitepaperLink: "查看安全白皮书",
-              productKicker: "产品展示",
-              productTitle: "浏览保险库的主要页面。",
-              productBody: "从保险库主页到同步与设置，对照查看 PC 与 Android 客户端的主要页面结构。",
-              guideKicker: "功能展示",
-              guideTitle: "保险库具备的实用功能。",
-              guideBody: "以下能力均可在 Android 工程的加密、自动填充、凭据、扫描与同步模块中找到对应实现。",
-              guides: "查看使用指南",
-              download: "下载最新版本",
-              supportKicker: "赞助支持项目",
-              supportTitle: "如果保险库对你有帮助，可以赞助支持项目以持续维护。",
-              supportPoints: ["由独立开发者维护", "持续的功能更新与优化", "问题修复与版本维护"],
-              supportButton: "了解赞助方式",
-          }
-        : {
-              eyebrow: "",
-              title: "Your passwords and data, entirely under your control.",
-              intro: "On Android, FAEVault manages logins, bank cards, IDs, Wi-Fi details, and API keys, storing everything in a locally encrypted .pmv file.",
-              storyLink: "Discover the product story",
+const copy = zh
+    ? {
+          heroBadge: "为真正重要的凭据而设计",
+          titleLine: "你的密码和数据，",
+          titleAccent: "完全由你掌控。",
+          intro: "保险库在 Android 设备上管理登录、银行卡、身份证、Wi-Fi 与 API 密钥，并将数据保存到本地加密的 .pmv 文件。",
+          primaryCta: "免费开始使用",
+          secondaryCta: "浏览全部功能",
+          storyLink: "了解产品故事 →",
+          proofs: ["本地优先 · 离线可用", "无账号体系 · 打开即用", "多端一致 · 局域网同步"],
+          windowTitle: "保险库",
+          floatingCardTitle: ".pmv 加密文件",
+          floatingCardSub: "数据离开设备前保持加密状态",
+          floatingCardAction: "查看安全设计 →",
 
-              storyKicker: "How data is stored",
-              storyTitle: "Local-first · Encrypted on disk",
-              storyBody:
-                  "By default, FAEVault keeps your data in an encrypted file on your device and provides no developer-hosted account. It makes the corresponding network requests only when you actively use WebDAV, LAN sync, or password breach checking.",
-              quote: "Local storage is the default. You decide when to use network features.",
-              whitepaperLink: "View the security whitepaper",
-              productKicker: "Product showcase",
-              productTitle: "Browse FAEVault's main screens.",
-              productBody: "From the vault home page through sync and settings, compare the structure of the main PC and Android screens.",
-              guideKicker: "Feature showcase",
-              guideTitle: "Practical features built into FAEVault.",
-              guideBody: "Every capability below has a corresponding implementation in the Android encryption, autofill, credential, scanning, or sync modules.",
-              guides: "View the user guides",
-              download: "Download the latest version",
-              supportKicker: "Support the project",
-              supportTitle: "If FAEVault has helped you, you can sponsor the project to support its ongoing maintenance.",
-              supportPoints: ["Maintained by an independent developer", "Ongoing feature updates and refinements", "Bug fixes and release maintenance"],
-              supportButton: "Learn how to sponsor",
-          };
+          trustKicker: "",
+          trustItems: [
+              { value: "AES-256-GCM", label: "本地数据加密" },
+              { value: "Passkey", label: "无密码登录体验" },
+              { value: "Autofill", label: "系统级自动填充" },
+              { value: "WebDAV·LAN", label: "跨设备同步能力" },
+          ],
 
-const features =
-    locale === "zh-cn"
-        ? [
-              { title: "本地加密保险库", body: "scrypt + AES-256-GCM 加密，密码与通行密钥离线存储在本地文件中，数据完全由你掌控。", accent: "vault" },
-              { title: "系统自动填充", body: "通过 Android Autofill 服务为登录条目提供填充与保存，并按应用包名或 HTTPS 主机匹配来源。", accent: "flow" },
-              { title: "通行密钥", body: "在 Android 14 及以上注册 Credential Provider，处理 Passkey 的创建与凭据查询；可用性取决于系统选择和调用方兼容性。", accent: "passkey" },
-              { title: "OCR 智能识别", body: "扫描或导入银行卡、身份证图像，使用端上 OCR 与字段解析器提取卡号、有效期、姓名等信息。", accent: "ocr" },
-              { title: "安全防护", body: "使用 FLAG_SECURE、敏感剪贴板标记与定时清理、解锁失败冷却，并为部分敏感操作增加主密码验证。", accent: "security" },
-              { title: "同步与备份", body: "支持 WebDAV、与同一局域网内电脑端同步，以及 .pmbak、.pmv 和 CSV 的导入导出。", accent: "sync" },
-          ]
-        : [
-              {
-                  title: "Locally Encrypted Vault",
-                  body: "With scrypt + AES-256-GCM encryption, passwords and passkeys are stored offline in a local file, keeping your data entirely under your control.",
-                  accent: "vault",
-              },
-              {
-                  title: "System Autofill",
-                  body: "Android Autofill fills and saves login entries, matching each source by app package name or HTTPS host.",
-                  accent: "flow",
-              },
-              {
-                  title: "Passkeys",
-                  body: "A Credential Provider on Android 14+ for passkey creation and credential queries, subject to system selection and caller compatibility.",
-                  accent: "passkey",
-              },
-              {
-                  title: "OCR Recognition",
-                  body: "Scan or import bank card and ID images, then use on-device OCR and field parsers to extract card numbers, expiry dates, names, and other supported details.",
-                  accent: "ocr",
-              },
-              {
-                  title: "Security Protection",
-                  body: "FLAG_SECURE, sensitive clipboard marking and timed clearing, unlock-failure cooldowns, and master-password verification for selected sensitive actions.",
-                  accent: "security",
-              },
-              {
-                  title: "Sync & Backup",
-                  body: "Supports WebDAV, sync with the desktop app on the same LAN, and import or export in .pmbak, .pmv, and CSV formats.",
-                  accent: "sync",
-              },
-          ];
+          featuresKicker: "功能亮点",
+          featuresTitle: "把安全能力放在需要的位置",
+          featuresCopy: "不堆叠复杂入口，不强迫改变使用习惯。加密、自动填充、Passkey、OCR 与同步，都围绕同一个保险库逻辑组织。",
 
-const productScreensBase =
-    locale === "zh-cn"
-        ? [
-              { title: "主页", body: "搜索、分类查看并快速新增本地条目。", pages: [{ image: productImage("home.png"), label: "保险库主页" }] },
-              { title: "回收站", body: "查看已删除条目，并选择恢复或彻底删除。", pages: [{ image: productImage("trash.png"), label: "回收站" }] },
-              { title: "数据库维护", body: "对比重复条目、处理相同服务，并管理回收站自动清理。", pages: [{ image: productImage("maintenance.png"), label: "保险库维护" }] },
-              { title: "密码安全检查", body: "查看密码健康状态、高风险项目与改进建议，并按需执行泄露检查。", pages: [{ image: productImage("password-security.png"), label: "密码安全" }] },
-              {
-                  title: "数据导出和同步",
-                  body: "展示本地备份与导出、局域网跨端同步，以及云端文件与 WebDAV 同步。",
-                  pages: [
-                      { image: productImage("local-export.png"), label: "本地数据导出" },
-                      { image: productImage("lan-sync.png"), label: "局域网跨端同步" },
-                      { image: productImage("cloud-sync.png"), label: "云端同步" },
-                  ],
-              },
-              { title: "详情页展示", body: "集中查看条目资料，并执行复制、编辑和移入回收站等操作。", pages: [{ image: productImage("entry-detail.png"), label: "条目详情" }] },
-              { title: "编辑页展示", body: "编辑基础字段，并按需组合图片、附件及其他内容模块。", pages: [{ image: productImage("entry-edit.png"), label: "条目编辑" }] },
-              {
-                  title: "自定义模块展示",
-                  body: "分别展示自定义条目的局部内容与完整模块组合。",
-                  pages: [
-                      { image: productImage("modules-partial.png"), label: "模块局部" },
-                      { image: productImage("modules-all.png"), label: "全部模块" },
-                  ],
-              },
-          ]
-        : [
-              { title: "Home", body: "Search, browse categories, and quickly add local entries.", pages: [{ image: productImage("home.png"), label: "Vault home" }] },
-              { title: "Trash", body: "Review deleted entries, restore them, or remove them permanently.", pages: [{ image: productImage("trash.png"), label: "Trash" }] },
-              { title: "Database maintenance", body: "Compare duplicate entries, handle entries for the same service, and manage automatic Trash cleanup.", pages: [{ image: productImage("maintenance.png"), label: "Vault maintenance" }] },
-              { title: "Password security check", body: "View password health, high-risk entries, and improvement suggestions, and run breach checks when needed.", pages: [{ image: productImage("password-security.png"), label: "Password security" }] },
-              {
-                  title: "Data export and sync",
-                  body: "See local backup and export, cross-device LAN sync, and cloud-file and WebDAV sync.",
-                  pages: [
-                      { image: productImage("local-export.png"), label: "Local data export" },
-                      { image: productImage("lan-sync.png"), label: "Cross-device LAN sync" },
-                      { image: productImage("cloud-sync.png"), label: "Cloud sync" },
-                  ],
-              },
-              { title: "Detail page", body: "View entry data in one place, then copy, edit, or move the entry to Trash.", pages: [{ image: productImage("entry-detail.png"), label: "Entry details" }] },
-              { title: "Edit page", body: "Edit basic fields and add images, attachments, and other content modules as needed.", pages: [{ image: productImage("entry-edit.png"), label: "Entry editor" }] },
-              {
-                  title: "Custom modules",
-                  body: "See both a focused view and the complete module composition of a custom entry.",
-                  pages: [
-                      { image: productImage("modules-partial.png"), label: "Module detail" },
-                      { image: productImage("modules-all.png"), label: "All modules" },
-                  ],
-              },
-          ];
+          securityKicker: "安全架构",
+          securityTitle: "安全应该可理解，也应该可验证",
+          securityCopy: "设计重点不是制造神秘感，而是让数据如何保存、如何解锁、如何同步都保持清晰边界。",
+          securityList: [
+              { title: "端侧加密", body: "scrypt + AES-256-GCM，敏感数据在离开设备前保持加密状态。" },
+              { title: "敏感信息防护", body: "FLAG_SECURE、敏感剪贴板定时清理与解锁失败冷却。" },
+              { title: "同步边界可控", body: "WebDAV、局域网同步由你主动发起，不改变保险库的加密边界。" },
+          ],
+          whitepaperLink: "查看安全白皮书 →",
+          orbitChips: ["本地数据库", "Passkey", "设备验证", "加密同步"],
 
-const pcPages =
-    locale === "zh-cn"
-        ? [
-              [{ image: productImage("pc-home.png"), label: "PC 主页" }],
-              [{ image: productImage("pc-trash.png"), label: "PC 回收站" }],
-              [{ image: productImage("pc-maintenance.png"), label: "PC 数据整理" }],
-              [{ image: productImage("pc-password-security.png"), label: "PC 密码安全检查" }],
-              [{ image: productImage("pc-data-export-sync.png"), label: "PC 数据导出与同步" }],
-              [{ image: productImage("pc-entry-detail.png"), label: "PC 条目详情" }],
-              [{ image: productImage("pc-entry-edit.png"), label: "PC 条目编辑" }],
-              [
-                  { image: productImage("pc-modules-partial.png"), label: "PC 模块局部" },
-                  { image: productImage("pc-modules-all.png"), label: "PC 全部模块" },
+          productKicker: "产品展示",
+          productTitle: "浏览保险库的主要页面。",
+          productBody: "从保险库主页到同步与设置，对照查看 PC 与 Android 客户端的主要页面结构。",
+
+          ctaTitle: "把密码管理，重新变得简单",
+          ctaCopy: "一个更克制、更透明、更适合长期使用的本地密码管理器。最新版本与更新说明都可以在下载页获取。",
+          ctaPrimary: "下载 Android 版",
+          ctaSecondary: "查看更新日志",
+
+          supportKicker: "赞助支持项目",
+          supportTitle: "如果保险库对你有帮助，可以赞助支持项目以持续维护。",
+          supportPoints: ["由独立开发者维护", "持续的功能更新与优化", "问题修复与版本维护"],
+          supportButton: "了解赞助方式",
+      }
+    : {
+          heroBadge: "Designed for credentials that matter",
+          titleLine: "Your passwords and data,",
+          titleAccent: "entirely under your control.",
+          intro: "On Android, FAEVault manages logins, bank cards, IDs, Wi-Fi details, and API keys, storing everything in a locally encrypted .pmv file.",
+          primaryCta: "Get started free",
+          secondaryCta: "Browse all features",
+          storyLink: "Discover the product story →",
+          proofs: ["Local-first · works offline", "No accounts · open and use", "Consistent across devices"],
+          windowTitle: "FAE Vault",
+          floatingCardTitle: "Encrypted .pmv file",
+          floatingCardSub: "Data stays encrypted before it ever leaves the device",
+          floatingCardAction: "View security design →",
+
+          trustKicker: "",
+          trustItems: [
+              { value: "AES-256-GCM", label: "Local data encryption" },
+              { value: "Passkey", label: "Passwordless sign-in" },
+              { value: "Autofill", label: "System-level filling" },
+              { value: "WebDAV·LAN", label: "Cross-device sync" },
+          ],
+
+          featuresKicker: "Highlights",
+          featuresTitle: "Security where you actually need it",
+          featuresCopy: "No stacked menus, no forced habits. Encryption, autofill, passkeys, OCR, and sync are all organized around a single vault logic.",
+
+          securityKicker: "Security architecture",
+          securityTitle: "Security should be understandable — and verifiable",
+          securityCopy: "The goal is not mystery. How data is stored, unlocked, and synced should all stay within clear boundaries.",
+          securityList: [
+              { title: "End-side encryption", body: "scrypt + AES-256-GCM keeps sensitive data encrypted before it leaves the device." },
+              { title: "Sensitive-data protection", body: "FLAG_SECURE, sensitive clipboard clearing, and unlock-failure cooldowns." },
+              { title: "Controllable sync boundary", body: "WebDAV and LAN sync start only when you do — without changing the encryption boundary." },
+          ],
+          whitepaperLink: "Read the security whitepaper →",
+          orbitChips: ["Local database", "Passkey", "Device auth", "Encrypted sync"],
+
+          productKicker: "Product showcase",
+          productTitle: "Browse FAEVault's main screens.",
+          productBody: "From the vault home page through sync and settings, compare the structure of the main PC and Android screens.",
+
+          ctaTitle: "Make password management simple again",
+          ctaCopy: "A calmer, more transparent password manager built for the long run. Releases and changelogs live on the download page.",
+          ctaPrimary: "Download for Android",
+          ctaSecondary: "View changelog",
+
+          supportKicker: "Support the project",
+          supportTitle: "If FAEVault has helped you, you can sponsor the project to support its ongoing maintenance.",
+          supportPoints: ["Maintained by an independent developer", "Ongoing feature updates and refinements", "Bug fixes and release maintenance"],
+          supportButton: "Learn how to sponsor",
+      };
+
+const features = zh
+    ? [
+          {
+              kind: "primary",
+              icon: "sync",
+              title: "跨设备，同一个保险库",
+              body: "支持 WebDAV 与局域网同步，以及 .pmbak、.pmv 和 CSV 导入导出。同步状态清晰可见，设备之间保持一致，而不是让你猜测哪一份数据才是最新。",
+              art: "sync",
+          },
+          {
+              kind: "secondary",
+              icon: "vault",
+              title: "本地加密保险库",
+              body: "scrypt + AES-256-GCM 加密，密码与通行密钥离线存储在本地文件中，数据完全由你掌控。",
+              art: null,
+          },
+          {
+              kind: "third",
+              icon: "fill",
+              title: "系统自动填充",
+              body: "通过 Android Autofill 服务为登录条目提供填充与保存，并按应用包名或 HTTPS 主机匹配来源。",
+              art: "field",
+          },
+          {
+              kind: "third",
+              icon: "passkey",
+              title: "Passkey 原生体验",
+              body: "在 Android 14 及以上注册 Credential Provider，处理 Passkey 的创建与凭据查询。",
+              art: null,
+          },
+          {
+              kind: "third",
+              icon: "ocr",
+              title: "OCR 智能识别",
+              body: "扫描或导入银行卡、身份证图像，端上提取卡号、有效期、姓名等信息。",
+              art: "otp",
+          },
+      ]
+    : [
+          {
+              kind: "primary",
+              icon: "sync",
+              title: "One vault across devices",
+              body: "WebDAV and LAN sync, plus import/export for .pmbak, .pmv, and CSV. Sync state stays visible and consistent, so you never guess which copy is current.",
+              art: "sync",
+          },
+          {
+              kind: "secondary",
+              icon: "vault",
+              title: "Locally encrypted vault",
+              body: "With scrypt + AES-256-GCM encryption, passwords and passkeys are stored offline in a local file, keeping your data entirely under your control.",
+              art: null,
+          },
+          {
+              kind: "third",
+              icon: "fill",
+              title: "System autofill",
+              body: "Android Autofill fills and saves login entries, matching each source by app package name or HTTPS host.",
+              art: "field",
+          },
+          {
+              kind: "third",
+              icon: "passkey",
+              title: "Native passkeys",
+              body: "A Credential Provider on Android 14+ handles passkey creation and credential queries.",
+              art: null,
+          },
+          {
+              kind: "third",
+              icon: "ocr",
+              title: "OCR recognition",
+              body: "Scan or import bank card and ID images, then extract numbers, expiry dates, and names on-device.",
+              art: "otp",
+          },
+      ];
+
+const productScreensBase = zh
+    ? [
+          { title: "主页", body: "搜索、分类查看并快速新增本地条目。", pages: [{ image: productImage("home.png"), label: "保险库主页" }] },
+          { title: "回收站", body: "查看已删除条目，并选择恢复或彻底删除。", pages: [{ image: productImage("trash.png"), label: "回收站" }] },
+          { title: "数据库维护", body: "对比重复条目、处理相同服务，并管理回收站自动清理。", pages: [{ image: productImage("maintenance.png"), label: "保险库维护" }] },
+          { title: "密码安全检查", body: "查看密码健康状态、高风险项目与改进建议，并按需执行泄露检查。", pages: [{ image: productImage("password-security.png"), label: "密码安全" }] },
+          {
+              title: "数据导出和同步",
+              body: "展示本地备份与导出、局域网跨端同步，以及云端文件与 WebDAV 同步。",
+              pages: [
+                  { image: productImage("local-export.png"), label: "本地数据导出" },
+                  { image: productImage("lan-sync.png"), label: "局域网跨端同步" },
+                  { image: productImage("cloud-sync.png"), label: "云端同步" },
               ],
-          ]
-        : [
-              [{ image: productImage("pc-home.png"), label: "PC home" }],
-              [{ image: productImage("pc-trash.png"), label: "PC Trash" }],
-              [{ image: productImage("pc-maintenance.png"), label: "PC data organization" }],
-              [{ image: productImage("pc-password-security.png"), label: "PC password security" }],
-              [{ image: productImage("pc-data-export-sync.png"), label: "PC data export and sync" }],
-              [{ image: productImage("pc-entry-detail.png"), label: "PC entry details" }],
-              [{ image: productImage("pc-entry-edit.png"), label: "PC entry editor" }],
-              [
-                  { image: productImage("pc-modules-partial.png"), label: "PC module detail" },
-                  { image: productImage("pc-modules-all.png"), label: "PC all modules" },
+          },
+          { title: "详情页展示", body: "集中查看条目资料，并执行复制、编辑和移入回收站等操作。", pages: [{ image: productImage("entry-detail.png"), label: "条目详情" }] },
+          { title: "编辑页展示", body: "编辑基础字段，并按需组合图片、附件及其他内容模块。", pages: [{ image: productImage("entry-edit.png"), label: "条目编辑" }] },
+          {
+              title: "自定义模块展示",
+              body: "分别展示自定义条目的局部内容与完整模块组合。",
+              pages: [
+                  { image: productImage("modules-partial.png"), label: "模块局部" },
+                  { image: productImage("modules-all.png"), label: "全部模块" },
               ],
-          ];
+          },
+      ]
+    : [
+          { title: "Home", body: "Search, browse categories, and quickly add local entries.", pages: [{ image: productImage("home.png"), label: "Vault home" }] },
+          { title: "Trash", body: "Review deleted entries, restore them, or remove them permanently.", pages: [{ image: productImage("trash.png"), label: "Trash" }] },
+          { title: "Database maintenance", body: "Compare duplicate entries, handle entries for the same service, and manage automatic Trash cleanup.", pages: [{ image: productImage("maintenance.png"), label: "Vault maintenance" }] },
+          { title: "Password security check", body: "View password health, high-risk entries, and improvement suggestions, and run breach checks when needed.", pages: [{ image: productImage("password-security.png"), label: "Password security" }] },
+          {
+              title: "Data export and sync",
+              body: "See local backup and export, cross-device LAN sync, and cloud-file and WebDAV sync.",
+              pages: [
+                  { image: productImage("local-export.png"), label: "Local data export" },
+                  { image: productImage("lan-sync.png"), label: "Cross-device LAN sync" },
+                  { image: productImage("cloud-sync.png"), label: "Cloud sync" },
+              ],
+          },
+          { title: "Detail page", body: "View entry data in one place, then copy, edit, or move the entry to Trash.", pages: [{ image: productImage("entry-detail.png"), label: "Entry details" }] },
+          { title: "Edit page", body: "Edit basic fields and add images, attachments, and other content modules as needed.", pages: [{ image: productImage("entry-edit.png"), label: "Entry editor" }] },
+          {
+              title: "Custom modules",
+              body: "See both a focused view and the complete module composition of a custom entry.",
+              pages: [
+                  { image: productImage("modules-partial.png"), label: "Module detail" },
+                  { image: productImage("modules-all.png"), label: "All modules" },
+              ],
+          },
+      ];
+
+const pcPages = zh
+    ? [
+          [{ image: productImage("pc-home.png"), label: "PC 主页" }],
+          [{ image: productImage("pc-trash.png"), label: "PC 回收站" }],
+          [{ image: productImage("pc-maintenance.png"), label: "PC 数据整理" }],
+          [{ image: productImage("pc-password-security.png"), label: "PC 密码安全检查" }],
+          [{ image: productImage("pc-data-export-sync.png"), label: "PC 数据导出与同步" }],
+          [{ image: productImage("pc-entry-detail.png"), label: "PC 条目详情" }],
+          [{ image: productImage("pc-entry-edit.png"), label: "PC 条目编辑" }],
+          [
+              { image: productImage("pc-modules-partial.png"), label: "PC 模块局部" },
+              { image: productImage("pc-modules-all.png"), label: "PC 全部模块" },
+          ],
+      ]
+    : [
+          [{ image: productImage("pc-home.png"), label: "PC home" }],
+          [{ image: productImage("pc-trash.png"), label: "PC Trash" }],
+          [{ image: productImage("pc-maintenance.png"), label: "PC data organization" }],
+          [{ image: productImage("pc-password-security.png"), label: "PC password security" }],
+          [{ image: productImage("pc-data-export-sync.png"), label: "PC data export and sync" }],
+          [{ image: productImage("pc-entry-detail.png"), label: "PC entry details" }],
+          [{ image: productImage("pc-entry-edit.png"), label: "PC entry editor" }],
+          [
+              { image: productImage("pc-modules-partial.png"), label: "PC module detail" },
+              { image: productImage("pc-modules-all.png"), label: "PC all modules" },
+          ],
+      ];
 
 const productScreens = productScreensBase.map((item, index) => ({
     ...item,
@@ -195,222 +281,346 @@ const productScreens = productScreensBase.map((item, index) => ({
 ---
 
 <div class="home">
-    <section class="section hero" id="opening">
-        <div class="hero-inner">
-            <div class="hero-copy">
-                <h1>{copy.title}</h1>
-                <p class="intro">{copy.intro}</p>
-                <div class="actions">
-                    <a class="primary" href={localePath(locale, "download")}>{copy.download}</a>
-                    <a class="secondary" href={localePath(locale, "guides")}>{copy.guides}</a>
-                    <a class="text-link" href={localePath(locale, "journey")}>{copy.storyLink}</a>
+    <section class="hero" id="opening">
+        <div class="container hero-grid">
+            <div class="hero-copy" data-reveal>
+                <div class="hero-badge">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M12 3l7 3v5c0 4.9-2.7 8.2-7 10-4.3-1.8-7-5.1-7-10V6l7-3Z" stroke="currentColor" stroke-width="1.8"></path>
+                        <path d="m9.3 12.2 1.8 1.8 3.8-4.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                    {copy.heroBadge}
+                </div>
+
+                <h1 class="hero-title">
+                    {copy.titleLine}
+                    <span class="accent">{copy.titleAccent}</span>
+                </h1>
+
+                <p class="hero-intro">{copy.intro}</p>
+
+                <div class="hero-actions">
+                    <a class="btn btn-primary btn-large" href={localePath(locale, "download")}>
+                        {copy.primaryCta}
+                        <svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                    </a>
+                    <a class="btn btn-secondary btn-large" href={localePath(locale, "security")}>{copy.secondaryCta}</a>
+                </div>
+
+                <a class="story-link" href={localePath(locale, "journey")}>{copy.storyLink}</a>
+
+                <div class="hero-proof">
+                    {
+                        copy.proofs.map((item) => (
+                            <span class="proof-item">
+                                <span class="proof-dot">
+                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="m6 12 4 4 8-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </span>
+                                {item}
+                            </span>
+                        ))
+                    }
+                </div>
+            </div>
+
+            <div class="product-stage" data-reveal>
+                <div class="glow glow-a"></div>
+                <div class="glow glow-b"></div>
+
+                <div class="app-window">
+                    <div class="window-bar">
+                        <div class="window-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div class="window-title">
+                            <img class="window-app-icon" src={appIcon} alt="" width="14" height="14" />
+                            {copy.windowTitle}
+                        </div>
+                        <div class="window-spacer"></div>
+                    </div>
+                    <div class="window-body">
+                        <img src={productImage("home.png")} alt={zh ? "保险库主页截图" : "Screenshot of the vault home screen"} loading="eager" draggable="false" />
+                    </div>
+                </div>
+
+                <a class="float-card" href={localePath(locale, "security")}>
+                    <div class="float-head">
+                        <span class="float-icon">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M12 3l7 3v5c0 4.9-2.7 8.2-7 10-4.3-1.8-7-5.1-7-10V6l7-3Z" stroke="currentColor" stroke-width="1.8"></path>
+                                <rect x="9" y="10" width="6" height="5" rx="1.4" stroke="currentColor" stroke-width="1.7"></rect>
+                                <path d="M10.5 10V8.7a1.5 1.5 0 0 1 3 0V10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path>
+                            </svg>
+                        </span>
+                        <span>
+                            <strong>{copy.floatingCardTitle}</strong>
+                            <em>{copy.floatingCardSub}</em>
+                        </span>
+                    </div>
+                    <span class="float-action">{copy.floatingCardAction}</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="trust-strip">
+        <div class="container trust-grid">
+            {
+                copy.trustItems.map((item) => (
+                    <div class="trust-item">
+                        <div class="trust-value">{item.value}</div>
+                        <div class="trust-label">{item.label}</div>
+                    </div>
+                ))
+            }
+        </div>
+    </section>
+
+    <section class="section" id="features">
+        <div class="container">
+            <div class="section-head" data-reveal>
+                <div class="eyebrow-pill">
+                    <span class="eyebrow-dot"></span>
+                    {copy.featuresKicker}
+                </div>
+                <h2 class="section-title">{copy.featuresTitle}</h2>
+                <p class="section-copy">{copy.featuresCopy}</p>
+            </div>
+
+            <div class="features-grid">
+                {
+                    features.map((feature) => (
+                        <article class:list={["feature-card", feature.kind]} data-reveal>
+                            <div class="feature-icon">
+                                {feature.icon === "sync" && (
+                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="M7 8a5 5 0 0 1 8.7-3.4L18 7" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+                                        <path d="M17 16a5 5 0 0 1-8.7 3.4L6 17" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+                                        <path d="M18 3v4h-4M6 21v-4h4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                )}
+                                {feature.icon === "vault" && (
+                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="M12 3l7 3v5c0 4.9-2.7 8.2-7 10-4.3-1.8-7-5.1-7-10V6l7-3Z" stroke="currentColor" stroke-width="1.9" />
+                                        <rect x="9" y="10" width="6" height="5" rx="1.4" stroke="currentColor" stroke-width="1.9" />
+                                        <path d="M10.5 10V8.7a1.5 1.5 0 0 1 3 0V10" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+                                    </svg>
+                                )}
+                                {feature.icon === "fill" && (
+                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="M5 5h14v14H5z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" />
+                                        <path d="M8 9h8M8 13h5M8 17h7" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+                                    </svg>
+                                )}
+                                {feature.icon === "passkey" && (
+                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <circle cx="8" cy="12" r="4" stroke="currentColor" stroke-width="1.9" />
+                                        <path d="M12 12h9M17 12v3M20 12v2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+                                    </svg>
+                                )}
+                                {feature.icon === "ocr" && (
+                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.9" />
+                                        <path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                )}
+                            </div>
+
+                            <h3 class="feature-title">{feature.title}</h3>
+                            <p class="feature-copy">{feature.body}</p>
+
+                            {feature.art === "sync" && (
+                                <div class="feature-art sync-art" aria-hidden="true">
+                                    <div class="sync-node one">PC</div>
+                                    <div class="sync-node two">WEB</div>
+                                    <div class="sync-node three">APP</div>
+                                    <span class="sync-line a"></span>
+                                    <span class="sync-line b"></span>
+                                    <span class="sync-line c"></span>
+                                </div>
+                            )}
+                            {feature.art === "field" && (
+                                <div class="feature-art field-art" aria-hidden="true">
+                                    <div class="field-line"></div>
+                                    <div class="field-line"></div>
+                                    <div class="field-line"></div>
+                                </div>
+                            )}
+                            {feature.art === "otp" && (
+                                <div class="feature-art otp-art" aria-hidden="true">
+                                    <span>4</span>
+                                    <span>8</span>
+                                    <span>2</span>
+                                    <span>1</span>
+                                </div>
+                            )}
+                        </article>
+                    ))
+                }
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="security">
+        <div class="container">
+            <div class="security-wrap" data-reveal>
+                <div class="security-grid">
+                    <div>
+                        <div class="eyebrow-pill">
+                            <span class="eyebrow-dot"></span>
+                            {copy.securityKicker}
+                        </div>
+                        <h2 class="section-title">{copy.securityTitle}</h2>
+                        <p class="section-copy">{copy.securityCopy}</p>
+
+                        <div class="security-list">
+                            {
+                                copy.securityList.map((item) => (
+                                    <div class="security-item">
+                                        <div class="security-check">
+                                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                                <path d="m6 12 4 4 8-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <strong>{item.title}</strong>
+                                            <span>{item.body}</span>
+                                        </div>
+                                    </div>
+                                ))
+                            }
+                        </div>
+
+                        <a class="text-link" href={localePath(locale, "security")}>{copy.whitepaperLink}</a>
+                    </div>
+
+                    <div class="security-orbit" aria-hidden="true">
+                        <div class="orbit-ring ring-a"></div>
+                        <div class="orbit-ring ring-b"></div>
+                        <div class="orbit-ring ring-c"></div>
+
+                        <div class="core-shield">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="M12 3l7 3v5c0 4.9-2.7 8.2-7 10-4.3-1.8-7-5.1-7-10V6l7-3Z" stroke="currentColor" stroke-width="1.7"></path>
+                                <rect x="9" y="10" width="6" height="5" rx="1.4" stroke="currentColor" stroke-width="1.7"></rect>
+                                <path d="M10.5 10V8.7a1.5 1.5 0 0 1 3 0V10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path>
+                            </svg>
+                        </div>
+
+                        {copy.orbitChips.map((chip, index) => (
+                            <div class:list={["orbit-chip", `chip-${String.fromCharCode(97 + index)}`]}>{chip}</div>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="showcase-section" id="showcase">
-        <div class="showcase-inner">
-            <div class="showcase-heading">
-                <p class="eyebrow">{copy.productKicker}</p>
-                <h2>{copy.productTitle}</h2>
-                <p>{copy.productBody}</p>
+    <section class="section" id="showcase">
+        <div class="container">
+            <div class="section-head" data-reveal>
+                <div class="eyebrow-pill">
+                    <span class="eyebrow-dot"></span>
+                    {copy.productKicker}
+                </div>
+                <h2 class="section-title">{copy.productTitle}</h2>
+                <p class="section-copy">{copy.productBody}</p>
             </div>
+
             <div class="carousel-shell">
-                <div class="card-carousel" tabindex="0" aria-roledescription="carousel" aria-label={locale === "zh-cn" ? "产品页面轮播，可左右滑动切换" : "Product screen carousel, swipe horizontally to navigate"}>
+                <div class="card-carousel" tabindex="0" aria-roledescription="carousel" aria-label={zh ? "产品页面轮播，可左右滑动切换" : "Product screen carousel, swipe horizontally to navigate"}>
                     <div class="card-track">
-                    {
-                        productScreens.map((item, i) => (
-                            <article class="content-card" aria-label={`${i + 1} / ${productScreens.length}: ${item.title}`}>
-                                <div class="cc-media">
-                                    <div class="cc-platform-tabs" role="group" aria-label={locale === "zh-cn" ? "选择客户端" : "Choose client"}>
+                        {
+                            productScreens.map((item, i) => (
+                                <article class="content-card" aria-label={`${i + 1} / ${productScreens.length}: ${item.title}`}>
+                                    <div class="cc-media">
+                                        <div class="cc-platform-tabs" role="group" aria-label={zh ? "选择客户端" : "Choose client"}>
+                                            {item.platforms.map((platform, platformIndex) => (
+                                                <button type="button" data-platform-select={platform.id} aria-pressed={platformIndex === 0 ? "true" : "false"}>
+                                                    {platform.label}
+                                                </button>
+                                            ))}
+                                        </div>
                                         {item.platforms.map((platform, platformIndex) => (
-                                            <button
-                                                type="button"
-                                                data-platform-select={platform.id}
-                                                aria-pressed={platformIndex === 0 ? "true" : "false"}
-                                            >
-                                                {platform.label}
-                                            </button>
+                                            <div class="cc-platform-panel" data-platform-panel={platform.id} hidden={platformIndex !== 0}>
+                                                <button
+                                                    class="cc-image-button"
+                                                    type="button"
+                                                    data-open-product-image
+                                                    data-open-label={zh ? "查看大图：" : "View full image: "}
+                                                    aria-label={`${zh ? "查看大图：" : "View full image: "}${platform.pages[0].label}`}
+                                                >
+                                                    {platform.pages.map((screen, screenIndex) => (
+                                                        <img
+                                                            class="cc-page-image"
+                                                            src={screen.image}
+                                                            alt={screen.label}
+                                                            loading="lazy"
+                                                            draggable="false"
+                                                            data-screen-image={screenIndex}
+                                                            hidden={screenIndex !== 0}
+                                                        />
+                                                    ))}
+                                                </button>
+                                                {platform.pages.length > 1 && (
+                                                    <div class="cc-screen-tabs" role="group" aria-label={zh ? "切换页面截图" : "Choose screen image"}>
+                                                        {platform.pages.map((screen, screenIndex) => (
+                                                            <button type="button" data-screen-select={screenIndex} aria-pressed={screenIndex === 0 ? "true" : "false"}>
+                                                                {screen.label}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
                                         ))}
                                     </div>
-                                    {item.platforms.map((platform, platformIndex) => (
-                                        <div class="cc-platform-panel" data-platform-panel={platform.id} hidden={platformIndex !== 0}>
-                                            <button
-                                                class="cc-image-button"
-                                                type="button"
-                                                data-open-product-image
-                                                data-open-label={locale === "zh-cn" ? "查看大图：" : "View full image: "}
-                                                aria-label={`${locale === "zh-cn" ? "查看大图：" : "View full image: "}${platform.pages[0].label}`}
-                                            >
-                                                {platform.pages.map((screen, screenIndex) => (
-                                                    <img
-                                                        class="cc-page-image"
-                                                        src={screen.image}
-                                                        alt={screen.label}
-                                                        loading="lazy"
-                                                        draggable="false"
-                                                        data-screen-image={screenIndex}
-                                                        hidden={screenIndex !== 0}
-                                                    />
-                                                ))}
-                                            </button>
-                                            {platform.pages.length > 1 && (
-                                                <div class="cc-screen-tabs" role="group" aria-label={locale === "zh-cn" ? "切换页面截图" : "Choose screen image"}>
-                                                    {platform.pages.map((screen, screenIndex) => (
-                                                        <button
-                                                            type="button"
-                                                            data-screen-select={screenIndex}
-                                                            aria-pressed={screenIndex === 0 ? "true" : "false"}
-                                                        >
-                                                            {screen.label}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                                <div class="cc-meta">
-                                    <span class="cc-num">0{i + 1}</span>
-                                    <span class="cc-copy"><strong>{item.title}</strong><small>{item.body}</small></span>
-                                </div>
-                            </article>
-                        ))
-                    }
+                                    <div class="cc-meta">
+                                        <span class="cc-num">0{i + 1}</span>
+                                        <span class="cc-copy"><strong>{item.title}</strong><small>{item.body}</small></span>
+                                    </div>
+                                </article>
+                            ))
+                        }
                     </div>
                     <button class="carousel-edge-hit previous" type="button" tabindex="-1" aria-hidden="true" data-carousel-edge="-1"></button>
                     <button class="carousel-edge-hit next" type="button" tabindex="-1" aria-hidden="true" data-carousel-edge="1"></button>
                 </div>
             </div>
             <div class="carousel-footer">
-                <div class="carousel-dots" role="group" aria-label={locale === "zh-cn" ? "选择轮播项目" : "Choose carousel item"}>
+                <div class="carousel-dots" role="group" aria-label={zh ? "选择轮播项目" : "Choose carousel item"}>
                     {productScreens.map((item, i) => (
-                        <button type="button" aria-label={`${locale === "zh-cn" ? "显示" : "Show"} ${item.title}`} data-slide={i}></button>
+                        <button type="button" aria-label={`${zh ? "显示" : "Show"} ${item.title}`} data-slide={i}></button>
                     ))}
                 </div>
                 <p class="carousel-status" aria-live="polite"><span>01</span> / 0{productScreens.length}</p>
             </div>
-            <dialog class="product-image-dialog" aria-label={locale === "zh-cn" ? "产品截图大图" : "Full product screenshot"}>
-                <button class="product-image-dialog-close" type="button" aria-label={locale === "zh-cn" ? "关闭大图" : "Close full image"}>×</button>
+            <dialog class="product-image-dialog" aria-label={zh ? "产品截图大图" : "Full product screenshot"}>
+                <button class="product-image-dialog-close" type="button" aria-label={zh ? "关闭大图" : "Close full image"}>×</button>
                 <img alt="" />
             </dialog>
         </div>
     </section>
 
-    <section class="section guide-section" id="guides">
-        <div class="guide-inner">
-            <div class="guide-head section-copy">
-                <p class="eyebrow">{copy.guideKicker}</p>
-                <h2>{copy.guideTitle}</h2>
-                <p>{copy.guideBody}</p>
-            </div>
-            <div class="workflow-side">
-                <div class="workflow-stack">
-                    {
-                        features.map((item) => (
-                            <article
-                                class="workflow-card"
-                                data-feature
-                                role="button"
-                                tabindex="-1"
-                                aria-label={item.title}
-                            >
-                                <span class={`workflow-dot ${item.accent}`} />
-                                <strong>{item.title}</strong>
-                                <p>{item.body}</p>
-                            </article>
-                        ))
-                    }
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="section split" id="why">
-        <div class="split-inner">
-            <div class="split-copy section-copy">
-                <p class="eyebrow">{copy.storyKicker}</p>
-                <h2>{copy.storyTitle}</h2>
-                <p class="story-body">{copy.storyBody}</p>
-                <blockquote class="slide-quote">{copy.quote}</blockquote>
-                <a class="text-link whitepaper-link" href={localePath(locale, "security")}>{copy.whitepaperLink}</a>
-            </div>
-            <div class="showcase-wrap" aria-label={locale === "zh-cn" ? "保险库 产品展示" : "FAEVault product showcase"}>
-                <div class="showcase-shell">
-                    <div class="showcase-glow"></div>
-                    <div class="showcase-card">
-                        <div class="showcase-topbar">
-                            <div class="topbar-dots"><span></span><span></span><span></span></div>
-                            <div class="topbar-label">{locale === "zh-cn" ? "本地优先 · 加密保存" : "Local-first · Encrypted"}</div>
-                        </div>
-                        <div class="showcase-grid">
-                            <div class="showcase-panel panel-left">
-                                <div class="feature-pill">{locale === "zh-cn" ? "可信赖" : "Trustworthy"}</div>
-                                <div class="panel-stack">
-                                    <div class="panel-row active">
-                                        <span class="panel-icon"></span>
-                                        <span class="panel-text">
-                                            <strong>{locale === "zh-cn" ? "离线可用" : "Works offline"}</strong>
-                                            <em>{locale === "zh-cn" ? "无需网络连接" : "No internet needed"}</em>
-                                        </span>
-                                    </div>
-                                    <div class="panel-row">
-                                        <span class="panel-icon muted"></span>
-                                        <span class="panel-text">
-                                            <strong>{locale === "zh-cn" ? "本地加密" : "Local encryption"}</strong>
-                                            <em>{locale === "zh-cn" ? "数据不出设备" : "Data never leaves"}</em>
-                                        </span>
-                                    </div>
-                                    <div class="panel-row">
-                                        <span class="panel-icon accent"></span>
-                                        <span class="panel-text">
-                                            <strong>{locale === "zh-cn" ? "无账号体系" : "No accounts"}</strong>
-                                            <em>{locale === "zh-cn" ? "打开即用" : "Open and use"}</em>
-                                        </span>
-                                    </div>
-                                    <div class="panel-row active">
-                                        <span class="panel-icon"></span>
-                                        <span class="panel-text">
-                                            <strong>{locale === "zh-cn" ? "联网按需启用" : "Network is opt-in"}</strong>
-                                            <em>{locale === "zh-cn" ? "同步与检测由你发起" : "You start sync or checks"}</em>
-                                        </span>
-                                    </div>
-                                    <div class="panel-row">
-                                        <span class="panel-icon muted"></span>
-                                        <span class="panel-text">
-                                            <strong>{locale === "zh-cn" ? ".pmv 加密文件" : "Encrypted .pmv file"}</strong>
-                                            <em>{locale === "zh-cn" ? "与桌面端格式兼容" : "Desktop-compatible format"}</em>
-                                        </span>
-                                    </div>
-                                    <div class="panel-row">
-                                        <span class="panel-icon accent"></span>
-                                        <span class="panel-text">
-                                            <strong>{locale === "zh-cn" ? "可自行备份" : "Bring your own backup"}</strong>
-                                            <em>{locale === "zh-cn" ? "文件级自由备份" : "File-level freedom"}</em>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="showcase-panel panel-right">
-                                <div class="phone-card">
-                                    <div class="phone-screen">
-                                        <div class="phone-nav"></div>
-                                        <div class="phone-stat">
-                                            <span class="stat-chip"></span>
-                                            <span class="stat-chip short"></span>
-                                        </div>
-                                        <div class="phone-list">
-                                            <div class="phone-item"></div>
-                                            <div class="phone-item short"></div>
-                                            <div class="phone-item tiny"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="floating-badge badge-one">{locale === "zh-cn" ? "本地加密" : "Encrypted"}</div>
-                                <div class="floating-badge badge-two">{locale === "zh-cn" ? "按需联网" : "Opt-in network"}</div>
-                            </div>
-                        </div>
+    <section class="section" id="download">
+        <div class="container">
+            <div class="cta" data-reveal>
+                <div class="cta-content">
+                    <h2 class="cta-title">{copy.ctaTitle}</h2>
+                    <p class="cta-copy">{copy.ctaCopy}</p>
+                    <div class="cta-actions">
+                        <a class="btn btn-primary btn-large" href={localePath(locale, "download")}>
+                            {copy.ctaPrimary}
+                            <svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                        </a>
+                        <a class="btn btn-secondary btn-large" href={localePath(locale, "download")}>{copy.ctaSecondary}</a>
                     </div>
                 </div>
             </div>
@@ -418,10 +628,13 @@ const productScreens = productScreensBase.map((item, index) => ({
     </section>
 
     <section class="section support-section" id="support">
-        <div class="support-card">
+        <div class="support-card" data-reveal>
             <div class="support-card-inner">
-                <p class="eyebrow">{copy.supportKicker}</p>
-                <h2>{copy.supportTitle}</h2>
+                <div class="eyebrow-pill">
+                    <span class="eyebrow-dot"></span>
+                    {copy.supportKicker}
+                </div>
+                <h2 class="section-title">{copy.supportTitle}</h2>
                 <div class="support-pillars">
                     {
                         copy.supportPoints.map((pt) => (
@@ -432,9 +645,11 @@ const productScreens = productScreensBase.map((item, index) => ({
                         ))
                     }
                 </div>
-                <a class="support-cta" href={localePath(locale, "support")}>
+                <a class="btn btn-primary btn-large support-cta" href={localePath(locale, "support")}>
                     <span>{copy.supportButton}</span>
-                    <span class="support-cta-arrow" aria-hidden="true">→</span>
+                    <svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
                 </a>
             </div>
         </div>
@@ -444,249 +659,645 @@ const productScreens = productScreensBase.map((item, index) => ({
 <style>
     .home {
         position: relative;
+        overflow-x: clip;
     }
-
     .section {
-        padding: clamp(3.6rem, 7vw, 6rem) 0;
+        padding: 104px 0;
     }
-    .section > * {
-        width: calc(100% - 4rem);
-        max-width: 1700px;
-        margin: 0 auto;
-    }
-    .hero {
-        padding-top: clamp(4.4rem, 8vw, 7rem);
-        padding-bottom: clamp(3.2rem, 6vw, 4.8rem);
-    }
-
-    .hero-inner {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 2rem;
-    }
-    .hero-copy {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        max-width: 900px;
-    }
-    .hero-copy .actions {
-        justify-content: center;
-    }
-    .eyebrow {
-        margin: 0 0 1rem;
-        color: #287795;
-        font-size: 0.72rem;
-        font-weight: 820;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-    }
-    h1,
-    h2 {
-        font-family: Georgia, "Times New Roman", serif;
-        font-weight: 500;
-        letter-spacing: -0.052em;
-    }
-    h1 {
+    .section-title {
         margin: 0;
-        font-size: clamp(3rem, 4.4vw, 4rem);
-        line-height: 1.04;
+        font-size: clamp(34px, 5vw, 56px);
+        line-height: 1.08;
+        letter-spacing: -0.045em;
+        color: var(--text);
     }
-    h2 {
-        margin: 0;
-        font-size: clamp(2.2rem, 4.5vw, 4.2rem);
-        line-height: 1.06;
+    .section-copy {
+        max-width: 720px;
+        margin: 20px 0 0;
+        color: var(--text-soft);
+        font-size: 17px;
+        line-height: 1.8;
     }
-    .intro {
-        max-width: 520px;
-        margin: 1.2rem 0 0;
-        color: #4f6974;
-        font:
-            1rem/1.8 Georgia,
-            serif;
+    .section-head {
+        max-width: 760px;
+        margin-bottom: 42px;
     }
-    .actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1.3rem;
-        align-items: center;
-        margin-top: 1.8rem;
-        position: relative;
-        z-index: 1;
-    }
-    .primary,
-    .secondary,
-    .tertiary,
-    .support-button,
     .text-link {
-        cursor: pointer;
-    }
-    .primary,
-    .secondary,
-    .tertiary,
-    .support-button {
         display: inline-flex;
-        gap: 0.6rem;
-        align-items: center;
-        padding: 0.85rem 1.2rem;
-        border-radius: 999px;
-        background: #173f50;
-        color: #fff;
-        font-size: 0.85rem;
+        margin-top: 22px;
+        color: var(--brand);
+        font-size: 13.5px;
         font-weight: 750;
-        box-shadow: 0 13px 30px rgba(23, 63, 80, 0.17);
-        transition:
-            transform 0.18s ease,
-            box-shadow 0.18s ease,
-            background 0.18s ease;
-        pointer-events: auto;
-        position: relative;
-        z-index: 1;
-    }
-    .primary:hover,
-    .secondary:hover,
-    .tertiary:hover,
-    .support-button:hover {
-        transform: translateY(-3px);
-        background: #20596f;
-        box-shadow: 0 18px 36px rgba(23, 63, 80, 0.24);
-    }
-    .primary:active,
-    .secondary:active,
-    .tertiary:active,
-    .support-button:active {
-        transform: translateY(0);
-        box-shadow: 0 8px 18px rgba(23, 63, 80, 0.12);
-        transition:
-            transform 0.08s ease,
-            box-shadow 0.12s ease;
-    }
-    .primary:focus,
-    .secondary:focus,
-    .tertiary:focus,
-    .support-button:focus,
-    .text-link:focus {
-        outline: 3px solid rgba(25, 128, 164, 0.16);
-        outline-offset: 3px;
-        border-radius: 999px;
-    }
-    .primary.muted {
-        background: #315f72;
-    }
-    .secondary {
-        background: rgba(255, 255, 255, 0.92);
-        border: 1px solid rgba(23, 63, 80, 0.16);
-        color: #173f50;
-        box-shadow: 0 10px 24px rgba(11, 42, 56, 0.08);
-    }
-    .secondary:hover {
-        background: rgba(255, 255, 255, 1);
-    }
-    .tertiary {
-        background: transparent;
-        border: 1px solid rgba(23, 63, 80, 0.16);
-        color: #173f50;
-        box-shadow: none;
-    }
-    .tertiary:hover {
-        background: rgba(23, 63, 80, 0.05);
-        box-shadow: none;
-    }
-    .text-link {
-        position: relative;
-        display: inline-flex;
-        gap: 0.6rem;
-        align-items: center;
-        padding-bottom: 0.2rem;
-        color: #245e75;
-        font-size: 0.83rem;
-        font-weight: 760;
-        transition:
-            gap 0.25s ease,
-            color 0.25s ease;
-    }
-    .text-link::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        height: 1px;
-        background: rgba(46, 110, 134, 0.45);
-        transform: scaleX(0);
-        transform-origin: left;
-        transition: transform 0.32s ease;
-    }
-    .text-link:hover::after {
-        transform: scaleX(1);
     }
     .text-link:hover {
-        gap: 0.9rem;
-        color: #1980a4;
-    }
-    .text-link:active {
-        transform: translateY(0);
-        color: #156f8f;
-    }
-    .hero-copy h1,
-    .split-copy h2,
-    .support-inner h2 {
-        max-width: 900px;
-    }
-    @media (min-width: 1100px) {
-        .hero-copy {
-            max-width: 1180px;
-        }
-        .hero-copy h1 {
-            max-width: none;
-            white-space: nowrap;
-        }
-    }
-    .actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        align-items: center;
-        margin-top: 1.8rem;
-        position: relative;
-        z-index: 1;
+        text-decoration: underline;
     }
 
-    /* ── Product Showcase ── */
-    .showcase-section {
-        padding: 1rem 0 clamp(4rem, 7vw, 6rem);
+    /* ── Hero ── */
+    .hero {
+        position: relative;
+        min-height: 780px;
+        padding: 158px 0 84px;
     }
-    .showcase-inner {
-        width: calc(100% - 4rem);
-        max-width: 1200px;
-        margin: 0 auto;
-        display: flex;
-        flex-direction: column;
+    .hero::before {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        inset: 0;
+        background-image:
+            linear-gradient(rgba(47, 111, 237, 0.035) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(47, 111, 237, 0.035) 1px, transparent 1px);
+        background-size: 40px 40px;
+        mask-image: linear-gradient(to bottom, transparent, black 15%, black 70%, transparent);
+        -webkit-mask-image: linear-gradient(to bottom, transparent, black 15%, black 70%, transparent);
+    }
+    .hero-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 0.94fr) minmax(460px, 1.06fr);
         align-items: center;
-        gap: 2rem;
+        gap: 54px;
     }
-    .showcase-heading {
-        max-width: 720px;
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 8px 12px;
+        margin-bottom: 22px;
+        color: #325dbe;
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(47, 111, 237, 0.12);
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+        box-shadow: 0 8px 30px rgba(37, 63, 112, 0.06);
+    }
+    .hero-badge svg {
+        width: 16px;
+        height: 16px;
+    }
+    .hero-title {
+        max-width: 620px;
+        margin: 0;
+        font-size: clamp(44px, 6vw, 72px);
+        line-height: 1.02;
+        letter-spacing: -0.055em;
+        font-weight: 800;
+        color: var(--text);
+    }
+    .hero-title .accent {
+        display: block;
+        color: transparent;
+        background: linear-gradient(120deg, #1f56c7 0%, #4d7ff0 42%, #7696f4 72%, #2c70cf 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+    }
+    :global(html[lang="en"]) .hero-title {
+        font-size: clamp(38px, 5vw, 60px);
+        line-height: 1.06;
+    }
+    .hero-intro {
+        max-width: 560px;
+        margin: 24px 0 0;
+        color: var(--text-soft);
+        font-size: 18px;
+        line-height: 1.85;
+    }
+    .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 32px;
+    }
+    .story-link {
+        display: inline-flex;
+        margin-top: 18px;
+        color: #465162;
+        font-size: 13.5px;
+        font-weight: 650;
+        transition: color 160ms ease;
+    }
+    .story-link:hover {
+        color: var(--brand);
+    }
+    .hero-proof {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px 24px;
+        margin-top: 30px;
+        color: #6e7887;
+        font-size: 13px;
+        font-weight: 650;
+    }
+    .proof-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .proof-dot {
+        display: grid;
+        place-items: center;
+        width: 21px;
+        height: 21px;
+        border-radius: 50%;
+        color: var(--success);
+        background: var(--success-soft);
+    }
+    .proof-dot svg {
+        width: 12px;
+        height: 12px;
+    }
+
+    /* ── 产品预览窗口 ── */
+    .product-stage {
+        position: relative;
+        min-height: 600px;
+    }
+    .glow {
+        position: absolute;
+        border-radius: 999px;
+        filter: blur(30px);
+        opacity: 0.7;
+        pointer-events: none;
+    }
+    .glow-a {
+        top: 10%;
+        right: 6%;
+        width: 230px;
+        height: 230px;
+        background: rgba(83, 132, 255, 0.18);
+    }
+    .glow-b {
+        left: 4%;
+        bottom: 8%;
+        width: 190px;
+        height: 190px;
+        background: rgba(69, 201, 168, 0.12);
+    }
+    .app-window {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.72);
+        border-radius: 28px;
+        background: rgba(255, 255, 255, 0.72);
+        box-shadow:
+            0 38px 90px rgba(37, 54, 92, 0.18),
+            inset 0 0 0 1px rgba(15, 23, 42, 0.04);
+        backdrop-filter: blur(28px);
+        -webkit-backdrop-filter: blur(28px);
+        transform: perspective(1100px) rotateY(-4deg) rotateX(1.2deg);
+    }
+    .window-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 52px;
+        padding: 0 18px;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+        background: rgba(250, 252, 255, 0.78);
+    }
+    .window-dots {
+        display: flex;
+        gap: 7px;
+    }
+    .window-dots span {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #d8deea;
+    }
+    .window-title {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #778192;
+        font-size: 12px;
+        font-weight: 700;
+    }
+    .window-app-icon {
+        border-radius: 3px;
+    }
+    .window-spacer {
+        width: 36px;
+    }
+    .window-body {
+        display: grid;
+        place-items: center;
+        padding: 20px;
+        background:
+            radial-gradient(circle at 50% 0%, rgba(47, 111, 237, 0.07), transparent 55%),
+            linear-gradient(160deg, #f6f9ff 0%, #eef3fb 100%);
+    }
+    .window-body img {
+        display: block;
+        height: 480px;
+        width: auto;
+        max-width: 100%;
+        object-fit: contain;
+        border-radius: 14px;
+        box-shadow: 0 24px 56px rgba(31, 48, 86, 0.18);
+    }
+    .float-card {
+        position: absolute;
+        right: -14px;
+        bottom: 26px;
+        display: block;
+        width: 260px;
+        padding: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.75);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.88);
+        box-shadow: 0 20px 44px rgba(34, 53, 89, 0.18);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        animation: float-card 5s ease-in-out infinite;
+    }
+    .float-head {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+    }
+    .float-icon {
+        display: grid;
+        place-items: center;
+        flex: 0 0 auto;
+        width: 38px;
+        height: 38px;
+        border-radius: 13px;
+        color: #2d66dc;
+        background: #edf3ff;
+    }
+    .float-icon svg {
+        width: 20px;
+        height: 20px;
+    }
+    .float-head strong {
+        display: block;
+        font-size: 12.5px;
+        font-weight: 800;
+        color: var(--text);
+    }
+    .float-head em {
+        display: block;
+        margin-top: 4px;
+        color: #8993a1;
+        font-size: 10px;
+        font-style: normal;
+        line-height: 1.5;
+    }
+    .float-action {
+        display: block;
+        margin-top: 15px;
+        padding-top: 13px;
+        border-top: 1px solid rgba(15, 23, 42, 0.06);
+        color: #3869d2;
+        font-size: 11px;
+        font-weight: 750;
+    }
+    @keyframes float-card {
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-8px);
+        }
+    }
+
+    /* ── 信任条 ── */
+    .trust-strip {
+        padding: 22px 0;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.58);
+        backdrop-filter: blur(12px);
+    }
+    .trust-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+    .trust-item {
         text-align: center;
     }
-    .showcase-heading h2 {
-        margin: 0;
-        color: #173f50;
-        font-size: clamp(2rem, 4vw, 3.5rem);
+    .trust-value {
+        font-size: 20px;
+        font-weight: 850;
+        letter-spacing: -0.03em;
+        color: var(--text);
     }
-    .showcase-heading > p:last-child {
-        margin: 1rem auto 0;
-        color: #5a727c;
-        font: 1rem/1.8 Georgia, serif;
+    .trust-label {
+        margin-top: 5px;
+        color: var(--text-muted);
+        font-size: 12px;
     }
+
+    /* ── 功能网格 ── */
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 18px;
+    }
+    .feature-card {
+        position: relative;
+        overflow: hidden;
+        min-height: 290px;
+        padding: 28px;
+        border: 1px solid rgba(15, 23, 42, 0.065);
+        border-radius: var(--radius-lg);
+        background: rgba(255, 255, 255, 0.78);
+        box-shadow: var(--shadow-soft);
+        transition: transform 200ms ease, box-shadow 200ms ease;
+    }
+    .feature-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow);
+    }
+    .feature-card.primary {
+        grid-column: span 7;
+    }
+    .feature-card.secondary {
+        grid-column: span 5;
+    }
+    .feature-card.third {
+        grid-column: span 4;
+    }
+    .feature-icon {
+        display: grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        color: var(--brand);
+        background: var(--brand-soft);
+    }
+    .feature-icon svg {
+        width: 22px;
+        height: 22px;
+    }
+    .feature-title {
+        margin: 22px 0 0;
+        font-size: 23px;
+        font-weight: 800;
+        letter-spacing: -0.035em;
+        color: var(--text);
+    }
+    .feature-copy {
+        position: relative;
+        z-index: 1;
+        max-width: 520px;
+        margin: 12px 0 0;
+        color: var(--text-soft);
+        font-size: 14px;
+        line-height: 1.8;
+    }
+    .feature-art {
+        position: absolute;
+        pointer-events: none;
+    }
+    .sync-art {
+        right: -25px;
+        bottom: -28px;
+        width: 310px;
+        height: 184px;
+        border: 1px solid rgba(47, 111, 237, 0.1);
+        border-radius: 24px 0 0 0;
+        background:
+            radial-gradient(circle at 50% 50%, rgba(47, 111, 237, 0.16), transparent 30%),
+            linear-gradient(145deg, rgba(235, 241, 255, 0.9), rgba(250, 252, 255, 0.5));
+    }
+    .sync-node {
+        position: absolute;
+        display: grid;
+        place-items: center;
+        width: 48px;
+        height: 48px;
+        border: 1px solid rgba(47, 111, 237, 0.12);
+        border-radius: 16px;
+        color: #3e70db;
+        background: #fff;
+        box-shadow: 0 10px 26px rgba(47, 111, 237, 0.12);
+        font-size: 11px;
+        font-weight: 800;
+    }
+    .sync-node.one {
+        top: 28px;
+        left: 35px;
+    }
+    .sync-node.two {
+        top: 76px;
+        right: 40px;
+    }
+    .sync-node.three {
+        left: 128px;
+        bottom: 17px;
+    }
+    .sync-line {
+        position: absolute;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(47, 111, 237, 0.32), transparent);
+        transform-origin: left center;
+    }
+    .sync-line.a {
+        top: 66px;
+        left: 78px;
+        width: 145px;
+        transform: rotate(12deg);
+    }
+    .sync-line.b {
+        top: 120px;
+        left: 80px;
+        width: 105px;
+        transform: rotate(23deg);
+    }
+    .sync-line.c {
+        top: 117px;
+        left: 172px;
+        width: 88px;
+        transform: rotate(-28deg);
+    }
+    .otp-art {
+        right: 26px;
+        bottom: 24px;
+        display: flex;
+        gap: 6px;
+    }
+    .otp-art span {
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 44px;
+        border: 1px solid rgba(47, 111, 237, 0.1);
+        border-radius: 10px;
+        color: #3f6ed3;
+        background: #f5f8ff;
+        font-size: 15px;
+        font-weight: 800;
+    }
+    .field-art {
+        right: 22px;
+        bottom: 24px;
+        width: 180px;
+    }
+    .field-line {
+        height: 9px;
+        margin-top: 9px;
+        border-radius: 999px;
+        background: #edf1f7;
+    }
+    .field-line:nth-child(1) {
+        width: 52%;
+    }
+    .field-line:nth-child(2) {
+        width: 86%;
+        background: #e9f0ff;
+    }
+    .field-line:nth-child(3) {
+        width: 68%;
+    }
+
+    /* ── 安全架构 ── */
+    .security-wrap {
+        position: relative;
+        overflow: hidden;
+        padding: 58px;
+        border: 1px solid rgba(15, 23, 42, 0.07);
+        border-radius: 34px;
+        background:
+            radial-gradient(circle at 86% 20%, rgba(56, 111, 238, 0.12), transparent 32%),
+            linear-gradient(145deg, #ffffff 0%, #f6f9ff 100%);
+        box-shadow: var(--shadow);
+    }
+    .security-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 54px;
+        align-items: center;
+    }
+    .security-list {
+        display: grid;
+        gap: 14px;
+        margin-top: 28px;
+    }
+    .security-item {
+        display: flex;
+        gap: 14px;
+        padding: 16px 17px;
+        border: 1px solid rgba(15, 23, 42, 0.06);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.72);
+    }
+    .security-check {
+        display: grid;
+        place-items: center;
+        flex: 0 0 28px;
+        height: 28px;
+        border-radius: 9px;
+        color: var(--success);
+        background: var(--success-soft);
+    }
+    .security-check svg {
+        width: 15px;
+        height: 15px;
+    }
+    .security-item strong {
+        display: block;
+        font-size: 14px;
+        color: var(--text);
+    }
+    .security-item span {
+        display: block;
+        margin-top: 5px;
+        color: var(--text-muted);
+        font-size: 12.5px;
+        line-height: 1.6;
+    }
+    .security-orbit {
+        position: relative;
+        min-height: 460px;
+        display: grid;
+        place-items: center;
+    }
+    .orbit-ring {
+        position: absolute;
+        border: 1px solid rgba(47, 111, 237, 0.11);
+        border-radius: 50%;
+    }
+    .orbit-ring.ring-a {
+        width: 360px;
+        height: 360px;
+    }
+    .orbit-ring.ring-b {
+        width: 270px;
+        height: 270px;
+    }
+    .orbit-ring.ring-c {
+        width: 180px;
+        height: 180px;
+    }
+    .core-shield {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        place-items: center;
+        width: 108px;
+        height: 108px;
+        border: 1px solid rgba(47, 111, 237, 0.17);
+        border-radius: 34px;
+        color: #fff;
+        background: linear-gradient(145deg, #75a0ff, #336fe7 55%, #2050b6);
+        box-shadow:
+            0 24px 50px rgba(47, 111, 237, 0.26),
+            inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    }
+    .core-shield svg {
+        width: 48px;
+        height: 48px;
+    }
+    .orbit-chip {
+        position: absolute;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 38px;
+        padding: 0 12px;
+        border: 1px solid rgba(15, 23, 42, 0.065);
+        border-radius: 12px;
+        color: #536074;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 10px 30px rgba(41, 58, 93, 0.1);
+        font-size: 11px;
+        font-weight: 750;
+    }
+    .orbit-chip::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #4faf88;
+    }
+    .chip-a {
+        top: 64px;
+        left: 42px;
+    }
+    .chip-b {
+        top: 116px;
+        right: 12px;
+    }
+    .chip-c {
+        bottom: 84px;
+        left: 18px;
+    }
+    .chip-d {
+        right: 64px;
+        bottom: 45px;
+    }
+
+    /* ── 产品轮播 ── */
     .carousel-shell {
         display: block;
         width: min(1120px, 100%);
+        margin: 0 auto;
     }
-
-    /* ── Card Carousel ── */
     .card-carousel {
         width: 100%;
         position: relative;
@@ -726,11 +1337,11 @@ const productScreens = productScreensBase.map((item, index) => ({
         flex: 0 0 68%;
         border-radius: 1.4rem;
         background: #fff;
-        border: 1px solid rgba(81, 125, 142, 0.1);
-        box-shadow: 0 12px 40px rgba(42, 83, 99, 0.08);
+        border: 1px solid rgba(47, 111, 237, 0.09);
+        box-shadow: 0 12px 40px rgba(35, 52, 86, 0.08);
         overflow: hidden;
         transition:
-            transform 0.4s cubic-bezier(0.34,1.56,0.64,1),
+            transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
             box-shadow 0.4s ease,
             opacity 0.35s ease;
         opacity: 0.56;
@@ -741,12 +1352,12 @@ const productScreens = productScreensBase.map((item, index) => ({
     .content-card.active {
         transform: translateY(-0.5rem) scale(1);
         opacity: 1;
-        box-shadow: 0 20px 60px rgba(42, 83, 99, 0.16);
+        box-shadow: 0 20px 60px rgba(35, 52, 86, 0.16);
     }
     .content-card:hover {
         opacity: 0.82;
         transform: translateY(-4px) scale(0.95);
-        box-shadow: 0 18px 56px rgba(42, 83, 99, 0.12);
+        box-shadow: 0 18px 56px rgba(35, 52, 86, 0.12);
     }
     .content-card.active:hover {
         opacity: 1;
@@ -761,7 +1372,7 @@ const productScreens = productScreensBase.map((item, index) => ({
         align-items: center;
         justify-content: center;
         gap: 0.75rem;
-        background: #f4f7f8;
+        background: linear-gradient(160deg, #f6f9ff 0%, #eff3fa 100%);
     }
     .cc-image-button {
         display: grid;
@@ -778,24 +1389,24 @@ const productScreens = productScreensBase.map((item, index) => ({
         grid-template-columns: repeat(2, minmax(5rem, 1fr));
         gap: 0.25rem;
         padding: 0.25rem;
-        border: 1px solid rgba(42, 83, 99, 0.12);
+        border: 1px solid rgba(47, 111, 237, 0.14);
         border-radius: 0.8rem;
-        background: rgba(226, 234, 238, 0.82);
+        background: rgba(228, 237, 252, 0.82);
     }
     .cc-platform-tabs button {
         padding: 0.48rem 0.8rem;
         border: 0;
         border-radius: 0.6rem;
         background: transparent;
-        color: #637984;
+        color: #5c6b85;
         font-size: 0.72rem;
         font-weight: 760;
         cursor: pointer;
     }
     .cc-platform-tabs button[aria-pressed="true"] {
         background: #fff;
-        color: #174f65;
-        box-shadow: 0 2px 8px rgba(35, 72, 87, 0.12);
+        color: #2b57b8;
+        box-shadow: 0 2px 8px rgba(47, 111, 237, 0.14);
     }
     .cc-platform-panel {
         display: flex;
@@ -817,7 +1428,7 @@ const productScreens = productScreensBase.map((item, index) => ({
         object-fit: contain;
         border-radius: 1rem;
         background: #fff;
-        box-shadow: 0 18px 44px rgba(18, 55, 72, 0.14);
+        box-shadow: 0 18px 44px rgba(28, 46, 88, 0.14);
         pointer-events: none;
     }
     .cc-page-image[hidden] {
@@ -833,17 +1444,17 @@ const productScreens = productScreensBase.map((item, index) => ({
     }
     .cc-screen-tabs button {
         padding: 0.45rem 0.7rem;
-        border: 1px solid rgba(42, 83, 99, 0.14);
+        border: 1px solid rgba(47, 111, 237, 0.16);
         border-radius: 999px;
         background: #fff;
-        color: #315f72;
+        color: #2f4d92;
         font-size: 0.7rem;
         font-weight: 700;
         cursor: pointer;
     }
     .cc-screen-tabs button[aria-pressed="true"] {
-        border-color: #287795;
-        background: #287795;
+        border-color: var(--brand);
+        background: var(--brand);
         color: #fff;
     }
     .cc-meta {
@@ -855,7 +1466,7 @@ const productScreens = productScreensBase.map((item, index) => ({
     .cc-num {
         font-size: 0.65rem;
         font-weight: 800;
-        color: rgba(40, 119, 149, 0.3);
+        color: rgba(47, 111, 237, 0.34);
         letter-spacing: 0.06em;
     }
     .cc-copy {
@@ -865,16 +1476,16 @@ const productScreens = productScreensBase.map((item, index) => ({
     .cc-copy strong {
         font-size: 0.84rem;
         font-weight: 700;
-        color: #173f50;
+        color: #182a52;
     }
     .cc-copy small {
-        color: #6a8089;
+        color: #66748e;
         font-size: 0.72rem;
         line-height: 1.45;
     }
     .card-carousel:focus-visible,
     .carousel-dots button:focus-visible {
-        outline: 3px solid rgba(25, 128, 164, 0.2);
+        outline: 3px solid rgba(47, 111, 237, 0.22);
         outline-offset: 3px;
     }
     .carousel-footer {
@@ -883,6 +1494,7 @@ const productScreens = productScreensBase.map((item, index) => ({
         justify-content: center;
         gap: 1rem;
         min-height: 1.5rem;
+        margin-top: 0.75rem;
     }
     .carousel-dots {
         display: flex;
@@ -894,17 +1506,19 @@ const productScreens = productScreensBase.map((item, index) => ({
         padding: 0;
         border: 0;
         border-radius: 999px;
-        background: rgba(40, 119, 149, 0.22);
+        background: rgba(47, 111, 237, 0.22);
         cursor: pointer;
-        transition: width 0.25s ease, background 0.25s ease;
+        transition:
+            width 0.25s ease,
+            background 0.25s ease;
     }
     .carousel-dots button.active {
         width: 1.5rem;
-        background: #287795;
+        background: var(--brand);
     }
     .carousel-status {
         margin: 0;
-        color: #78909a;
+        color: #8291ab;
         font-size: 0.72rem;
         font-variant-numeric: tabular-nums;
     }
@@ -914,11 +1528,11 @@ const productScreens = productScreensBase.map((item, index) => ({
         padding: 1rem;
         border: 0;
         border-radius: 1.25rem;
-        background: #f7f9fa;
-        box-shadow: 0 28px 90px rgba(14, 42, 54, 0.28);
+        background: #f8fafd;
+        box-shadow: 0 28px 90px rgba(20, 36, 74, 0.28);
     }
     .product-image-dialog::backdrop {
-        background: rgba(13, 31, 39, 0.72);
+        background: rgba(13, 22, 43, 0.72);
         backdrop-filter: blur(6px);
     }
     .product-image-dialog img {
@@ -940,537 +1554,97 @@ const productScreens = productScreensBase.map((item, index) => ({
         height: 2.5rem;
         padding: 0;
         place-items: center;
-        border: 1px solid rgba(42, 83, 99, 0.15);
+        border: 1px solid rgba(47, 111, 237, 0.18);
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.94);
-        color: #173f50;
+        color: #182a52;
         font-size: 1.35rem;
         cursor: pointer;
-        box-shadow: 0 8px 24px rgba(14, 42, 54, 0.16);
+        box-shadow: 0 8px 24px rgba(20, 36, 74, 0.16);
     }
 
-    .split-inner {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 2.5rem;
-    }
-    .split-inner .split-copy {
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    .story-body {
-        max-width: 1000px;
-        margin: 1rem 0 0;
-        color: #4f6974;
-        font:
-            1rem/1.8 Georgia,
-            serif;
-    }
-    .slide-quote {
-        margin: 1.8rem 0 0;
-        padding: 0 0 0 1.2rem;
-        border-left: 2px solid rgba(43, 124, 154, 0.4);
-        color: #254c5d;
-        font:
-            italic 0.95rem/1.6 Georgia,
-            serif;
-        max-width: 400px;
-    }
-    .whitepaper-link {
-        margin-top: 1.6rem;
-    }
-
-    .showcase-wrap {
-        width: 100%;
-        max-width: 500px;
-        margin: 0 auto;
-    }
-    .showcase-shell {
+    /* ── 下载 CTA ── */
+    .cta {
         position: relative;
         overflow: hidden;
-        border-radius: 2rem;
-        padding: 0.8rem;
-        background: linear-gradient(135deg, rgba(248, 251, 255, 0.85), rgba(239, 247, 248, 0.78));
-        box-shadow:
-            0 22px 80px rgba(42, 83, 99, 0.16),
-            inset 0 1px 0 rgba(255, 255, 255, 0.8);
-        backdrop-filter: blur(10px);
+        padding: 72px 40px;
+        border-radius: 34px;
+        color: #fff;
+        text-align: center;
+        background:
+            radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.16), transparent 28%),
+            radial-gradient(circle at 86% 40%, rgba(120, 184, 255, 0.2), transparent 30%),
+            linear-gradient(135deg, #173b86 0%, #285fcf 48%, #326edb 100%);
+        box-shadow: 0 30px 80px rgba(27, 71, 158, 0.22);
     }
-    .showcase-glow {
+    .cta::before {
+        content: "";
         position: absolute;
         inset: 0;
-        background:
-            radial-gradient(circle at top left, rgba(63, 155, 181, 0.16), transparent 42%),
-            radial-gradient(circle at 85% 0%, rgba(131, 106, 181, 0.18), transparent 34%);
-        pointer-events: none;
+        background-image:
+            linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+        background-size: 34px 34px;
+        mask-image: radial-gradient(circle at center, black, transparent 76%);
+        -webkit-mask-image: radial-gradient(circle at center, black, transparent 76%);
     }
-    .showcase-card {
+    .cta-content {
         position: relative;
-        overflow: hidden;
-        border-radius: 1.4rem;
-        border: 1px solid rgba(81, 125, 142, 0.16);
-        background: rgba(255, 255, 255, 0.78);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
-        backdrop-filter: blur(18px);
-        padding: 1rem;
-    }
-    .showcase-topbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 1rem;
-        padding: 0.2rem 0.2rem 0.85rem;
-    }
-    .topbar-dots {
-        display: flex;
-        gap: 0.35rem;
-    }
-    .topbar-dots span {
-        width: 0.58rem;
-        height: 0.58rem;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #8fc8d9, #4b8fa3);
-        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
-    }
-    .topbar-label {
-        color: #4e6973;
-        font-size: 0.7rem;
-        font-weight: 760;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-    }
-    .showcase-grid {
-        display: grid;
-        grid-template-columns: 1.02fr 0.98fr;
-        gap: 0.9rem;
-    }
-    .showcase-panel {
-        position: relative;
-        border-radius: 1.15rem;
-        padding: 1rem;
-        min-height: 240px;
-    }
-    .panel-left {
-        background: linear-gradient(145deg, rgba(14, 73, 95, 0.96), rgba(31, 115, 140, 0.92));
-        color: #f4fbff;
-    }
-    .panel-right {
-        background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(239, 247, 250, 0.95));
-        border: 1px solid rgba(82, 126, 141, 0.12);
-    }
-    .feature-pill {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.42rem 0.64rem;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.18);
-        color: #f7fdff;
-        font-size: 0.7rem;
-        font-weight: 760;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-    }
-    .panel-stack {
-        display: grid;
-        gap: 0.6rem;
-        margin-top: 0.95rem;
-    }
-    .panel-row {
-        display: flex;
-        align-items: center;
-        gap: 0.65rem;
-        padding: 0.7rem 0.75rem;
-        border-radius: 0.9rem;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.13);
-    }
-    .panel-row.active {
-        background: rgba(255, 255, 255, 0.16);
-        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
-    }
-    .panel-icon {
-        width: 0.85rem;
-        height: 0.85rem;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #7dd2e6, #2d7c95);
-        box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.16);
-    }
-    .panel-icon.muted {
-        background: linear-gradient(135deg, #b9d4de, #7a95a1);
-    }
-    .panel-icon.accent {
-        background: linear-gradient(135deg, #c4adff, #7a5db5);
-    }
-    .panel-text {
-        display: flex;
-        flex-direction: column;
-        gap: 0.08rem;
-    }
-    .panel-text strong {
-        font-size: 0.8rem;
-        font-weight: 760;
-    }
-    .panel-text em {
-        color: rgba(247, 253, 255, 0.74);
-        font-size: 0.68rem;
-        font-style: normal;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-    }
-    .phone-card {
-        position: relative;
-        width: min(220px, 100%);
-        margin: 1rem auto 0;
-        padding: 0.8rem;
-        border-radius: 1.45rem;
-        background: linear-gradient(135deg, #153f50 0%, #2f6c82 55%, #4f9bb0 100%);
-        box-shadow: 0 18px 38px rgba(24, 61, 74, 0.22);
-    }
-    .phone-screen {
-        border-radius: 1.1rem;
-        padding: 0.85rem;
-        background: linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(223, 240, 245, 0.9));
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
-    }
-    .phone-nav {
-        width: 42%;
-        height: 0.4rem;
-        border-radius: 999px;
-        background: rgba(62, 95, 107, 0.2);
-        margin-bottom: 0.8rem;
-    }
-    .phone-stat {
-        display: flex;
-        gap: 0.45rem;
-        margin-bottom: 0.7rem;
-    }
-    .stat-chip {
-        width: 70px;
-        height: 0.6rem;
-        border-radius: 999px;
-        background: linear-gradient(90deg, #3f8197, #62b6d1);
-    }
-    .stat-chip.short {
-        width: 44px;
-    }
-    .phone-list {
-        display: grid;
-        gap: 0.45rem;
-    }
-    .phone-item {
-        height: 0.72rem;
-        border-radius: 999px;
-        background: linear-gradient(90deg, rgba(44, 91, 112, 0.34), rgba(44, 91, 112, 0.12));
-    }
-    .phone-item.short {
-        width: 72%;
-    }
-    .phone-item.tiny {
-        width: 48%;
-    }
-    .floating-badge {
-        position: absolute;
-        padding: 0.4rem 0.56rem;
-        border-radius: 999px;
-        border: 1px solid rgba(70, 111, 128, 0.16);
-        background: rgba(255, 255, 255, 0.9);
-        color: #2f5564;
-        font-size: 0.68rem;
-        font-weight: 760;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        box-shadow: 0 10px 24px rgba(37, 82, 95, 0.12);
-    }
-    .badge-one {
-        top: 0.5rem;
-        right: 0.55rem;
-    }
-    .badge-two {
-        bottom: 0.6rem;
-        left: 0.45rem;
-    }
-
-    @media (max-width: 760px) {
-        .showcase-wrap {
-            max-width: 100%;
-        }
-        .hero-inner {
-            gap: 1.25rem;
-            align-items: start;
-        }
-        .showcase-grid {
-            grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
-            gap: 0.55rem;
-        }
-        .showcase-shell {
-            padding: 0.5rem;
-            border-radius: 1.35rem;
-        }
-        .showcase-card {
-            padding: 0.65rem;
-            border-radius: 1rem;
-        }
-        .showcase-topbar {
-            padding: 0.1rem 0.1rem 0.55rem;
-        }
-        .topbar-label {
-            font-size: 0.58rem;
-            letter-spacing: 0.06em;
-        }
-        .showcase-panel {
-            min-height: auto;
-            padding: 0.65rem;
-            border-radius: 0.85rem;
-        }
-        .panel-right {
-            min-height: 100%;
-        }
-        .feature-pill {
-            padding: 0.3rem 0.45rem;
-            font-size: 0.58rem;
-            letter-spacing: 0.08em;
-        }
-        .panel-stack {
-            gap: 0.35rem;
-            margin-top: 0.55rem;
-        }
-        .panel-row {
-            gap: 0.45rem;
-            padding: 0.42rem 0.45rem;
-            border-radius: 0.65rem;
-        }
-        .panel-icon {
-            width: 0.65rem;
-            height: 0.65rem;
-            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.16);
-            flex: 0 0 auto;
-        }
-        .panel-text strong {
-            font-size: 0.67rem;
-        }
-        .panel-text em {
-            font-size: 0.55rem;
-            letter-spacing: 0;
-        }
-        .phone-card {
-            width: min(150px, 100%);
-            margin-top: 1.1rem;
-            padding: 0.55rem;
-            border-radius: 1rem;
-        }
-        .phone-screen {
-            padding: 0.6rem;
-            border-radius: 0.75rem;
-        }
-        .phone-nav {
-            margin-bottom: 0.5rem;
-        }
-        .phone-stat {
-            gap: 0.3rem;
-            margin-bottom: 0.45rem;
-        }
-        .phone-list {
-            gap: 0.3rem;
-        }
-        .floating-badge {
-            padding: 0.3rem 0.4rem;
-            font-size: 0.55rem;
-            letter-spacing: 0.04em;
-        }
-        .panel-right {
-            display: block;
-        }
-        .badge-one {
-            top: 0.35rem;
-            right: 0.35rem;
-        }
-        .badge-two {
-            bottom: 0.4rem;
-            left: 0.35rem;
-        }
-    }
-    .guide-section > p,
-    .support-section > p {
-        color: #5a727c;
-        font:
-            1rem/1.9 Georgia,
-            serif;
-    }
-
-    .guide-section {
-        justify-content: center;
-    }
-    .guide-inner {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 2.5rem;
-        width: 100%;
-        max-width: 1200px;
-        margin: 0 auto !important;
-    }
-    .guide-head {
+        z-index: 1;
         max-width: 760px;
-        margin: 0;
-        text-align: center;
-    }
-    .section-copy {
-        max-width: 720px;
-    }
-    .section-copy > p {
-        max-width: 1000px;
-        margin: 1.2rem 0 0;
-        color: #5a727c;
-        font:
-            1rem/1.9 Georgia,
-            serif;
-    }
-    .section-copy h2 {
-        margin: 0.8rem 0 0;
-    }
-    .section-copy h2,
-    .section-copy h1 {
-        color: #173f50;
-        line-height: 1.05;
-    }
-    .workflow-side {
-        display: grid;
-        place-items: center;
-        width: 100%;
-    }
-    .workflow-stack {
-        display: block;
-        position: relative;
-        width: min(720px, 100%);
         margin: 0 auto;
-        min-height: 14rem;
     }
-    .workflow-stack .workflow-card {
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        margin: 0 auto;
-        width: 100%;
-        padding: 1.15rem 1.2rem;
-        border-radius: 1.45rem;
-        border: 1px solid rgba(71, 106, 122, 0.14);
-        background: linear-gradient(145deg, rgba(255, 255, 255, 0.78), rgba(241, 248, 251, 0.7));
-        box-shadow: 0 20px 40px rgba(41, 81, 95, 0.1);
-        backdrop-filter: blur(8px);
-        transform-origin: center;
-        will-change: transform, box-shadow, z-index;
-        cursor: pointer;
-        pointer-events: auto;
-        transition:
-            transform 420ms ease,
-            opacity 420ms ease;
-    }
-    .workflow-card.active {
-        pointer-events: auto;
-        box-shadow:
-            0 28px 52px rgba(41, 81, 95, 0.17),
-            0 0 0 1px rgba(63, 143, 175, 0.15);
-        background: linear-gradient(145deg, rgba(255, 255, 255, 0.85), rgba(244, 250, 252, 0.78));
-    }
-    .workflow-card.fade-up {
-        transform: translateY(-36px) scale(1.02) !important;
-        opacity: 0 !important;
-    }
-    .workflow-dot {
-        display: inline-block;
-        width: 0.72rem;
-        height: 0.72rem;
-        margin-bottom: 0.95rem;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #72c3db, #2c7695);
-        box-shadow: 0 0 0 4px rgba(42, 118, 149, 0.16);
-    }
-    .workflow-dot.flow {
-        background: linear-gradient(135deg, #9bd7ba, #4a8b6c);
-        box-shadow: 0 0 0 4px rgba(74, 139, 108, 0.16);
-    }
-    .workflow-dot.sync {
-        background: linear-gradient(135deg, #c6b3f4, #7b5fb1);
-        box-shadow: 0 0 0 4px rgba(123, 95, 177, 0.16);
-    }
-    .workflow-dot.passkey {
-        background: linear-gradient(135deg, #f4b37a, #c97d3a);
-        box-shadow: 0 0 0 4px rgba(201, 125, 58, 0.16);
-    }
-    .workflow-dot.ocr {
-        background: linear-gradient(135deg, #7ac4e8, #3a8fb0);
-        box-shadow: 0 0 0 4px rgba(58, 143, 176, 0.16);
-    }
-    .workflow-dot.security {
-        background: linear-gradient(135deg, #e87a8a, #b03a4a);
-        box-shadow: 0 0 0 4px rgba(176, 58, 74, 0.16);
-    }
-    .workflow-card strong {
-        display: block;
-        margin-bottom: 0.55rem;
-        color: #173f50;
-        font-size: 0.96rem;
-        font-weight: 760;
-    }
-    .workflow-card p {
+    .cta-title {
         margin: 0;
-        color: #5d7480;
-        font-size: 0.92rem;
-        line-height: 1.7;
+        font-size: clamp(34px, 4.6vw, 54px);
+        line-height: 1.06;
+        letter-spacing: -0.05em;
+        font-weight: 800;
+        color: #fff;
     }
-
-    .support-section {
+    .cta-copy {
+        margin: 18px auto 0;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 16px;
+        line-height: 1.8;
+    }
+    .cta-actions {
         display: flex;
         justify-content: center;
-        padding-bottom: clamp(4rem, 8vw, 7rem) !important;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 30px;
+    }
+    .cta .btn-primary {
+        color: #234f9e;
+        background: #fff;
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.14);
+    }
+    .cta .btn-secondary {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.18);
+        box-shadow: none;
+    }
+
+    /* ── 赞助区 ── */
+    .support-section {
+        padding-bottom: clamp(4rem, 8vw, 7rem);
     }
     .support-card {
         position: relative;
         overflow: hidden;
-        width: min(900px, calc(100% - 3rem)) !important;
-        margin: 0 auto !important;
-        padding: clamp(3.5rem, 7vw, 6rem);
-        border: 1px solid rgba(255, 255, 255, 0.7);
-        border-radius: 2.5rem;
-        background: linear-gradient(135deg, rgba(229, 248, 247, 0.62), rgba(229, 237, 251, 0.48));
-        box-shadow: 0 28px 90px rgba(42, 83, 99, 0.12);
+        width: min(900px, calc(100% - 3rem));
+        margin: 0 auto;
+        padding: clamp(3rem, 6vw, 5rem) clamp(1.6rem, 5vw, 4rem);
+        border: 1px solid rgba(47, 111, 237, 0.1);
+        border-radius: 34px;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(240, 245, 253, 0.82));
+        box-shadow: var(--shadow);
         backdrop-filter: blur(22px);
         transform-style: preserve-3d;
         will-change: transform;
         transition: transform 0.15s ease;
-    }
-    .support-card::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(
-            105deg,
-            transparent 30%,
-            rgba(255, 255, 255, 0.5) 45%,
-            rgba(255, 255, 255, 0.65) 50%,
-            rgba(255, 255, 255, 0.5) 55%,
-            transparent 70%
-        );
-        background-size: 300% 100%;
-        background-position: 100% 0;
-        pointer-events: none;
-        animation: shimmer 5s ease-in-out infinite;
-    }
-    @keyframes shimmer {
-        0%,
-        60% {
-            background-position: 100% 0;
-        }
-        70% {
-            background-position: 0 0;
-        }
-        100% {
-            background-position: 0 0;
-        }
     }
     .support-card-inner {
         position: relative;
@@ -1479,7 +1653,7 @@ const productScreens = productScreensBase.map((item, index) => ({
         flex-direction: column;
         align-items: center;
         text-align: center;
-        gap: 2.5rem;
+        gap: 1.8rem;
     }
     .support-card-inner h2 {
         max-width: 700px;
@@ -1496,102 +1670,130 @@ const productScreens = productScreensBase.map((item, index) => ({
         align-items: center;
         gap: 0.7rem;
         padding: 0.7rem 1.2rem 0.7rem 1rem;
-        border: 1px solid rgba(42, 83, 99, 0.12);
+        border: 1px solid rgba(47, 111, 237, 0.14);
         border-radius: 999px;
-        background: rgba(255, 255, 255, 0.5);
-        color: #2d5567;
+        background: rgba(255, 255, 255, 0.72);
+        color: #33415e;
         font-size: 0.88rem;
-        font-weight: 520;
+        font-weight: 550;
         transition:
             background 0.2s ease,
             border-color 0.2s ease,
             transform 0.2s ease;
     }
     .pillar-card:hover {
-        background: rgba(255, 255, 255, 0.8);
-        border-color: rgba(42, 83, 99, 0.22);
+        background: #fff;
+        border-color: rgba(47, 111, 237, 0.26);
         transform: translateY(-1px);
     }
     .pillar-icon {
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        background: #3f8aa8;
+        background: var(--brand);
+        box-shadow: 0 0 0 4px rgba(47, 111, 237, 0.1);
         flex-shrink: 0;
     }
     .support-cta {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
         margin-top: 0.5rem;
-        min-width: 10rem;
-        padding: 0.85rem 1.2rem 0.85rem 1.5rem;
-        justify-content: space-between;
-        border: 1px solid #174f65;
-        border-radius: 999px;
-        background: #174f65;
-        box-shadow: 0 12px 28px rgba(23, 79, 101, 0.22);
-        color: #fff;
-        font-size: 0.9rem;
-        font-weight: 720;
-        transition:
-            background 0.2s ease,
-            box-shadow 0.2s ease,
-            border-color 0.2s ease,
-            transform 0.2s ease;
-    }
-    .support-cta:hover {
-        background: #0f4053;
-        border-color: #0f4053;
-        box-shadow: 0 16px 34px rgba(23, 79, 101, 0.3);
-        transform: translateY(-2px);
-    }
-    .support-cta-arrow {
-        display: grid;
-        width: 1.6rem;
-        height: 1.6rem;
-        place-items: center;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.16);
-        font-size: 0.9rem;
-        transition: transform 0.2s ease;
-    }
-    .support-cta:hover .support-cta-arrow {
-        transform: translateX(0.2rem);
     }
 
-    @media (max-width: 760px) {
-        .feature-grid {
+    /* ── 响应式 ── */
+    @media (max-width: 980px) {
+        .hero {
+            padding-top: 138px;
+        }
+        .hero-grid {
             grid-template-columns: 1fr;
         }
+        .product-stage {
+            min-height: 560px;
+            margin-top: 1rem;
+        }
+        .app-window {
+            transform: none;
+        }
+        .float-card {
+            right: 0;
+        }
+        .security-grid {
+            grid-template-columns: 1fr;
+        }
+        .security-orbit {
+            min-height: 400px;
+        }
+        .trust-grid {
+            grid-template-columns: repeat(2, 1fr);
+            row-gap: 24px;
+        }
+        .section {
+            padding: 84px 0;
+        }
+    }
+    @media (max-width: 760px) {
+        .container {
+            width: calc(100% - 26px);
+        }
+        .section {
+            padding: 72px 0;
+        }
         .hero {
-            padding-top: clamp(4.2rem, 14vw, 5.5rem);
+            min-height: auto;
+            padding-bottom: 60px;
         }
-        .actions {
-            flex-direction: column;
-            align-items: stretch;
+        .hero-title {
+            font-size: clamp(40px, 12vw, 58px);
         }
-        .actions a {
-            width: 100%;
-            justify-content: center;
+        :global(html[lang="en"]) .hero-title {
+            font-size: clamp(34px, 10vw, 48px);
         }
-
-        .showcase-inner {
-            gap: 1rem;
+        .hero-intro {
+            font-size: 16px;
+        }
+        .product-stage {
+            min-height: 500px;
+        }
+        .window-body img {
+            height: 400px;
+        }
+        .float-card {
+            width: 230px;
+            right: -4px;
+            bottom: 6px;
+        }
+        .feature-card.primary,
+        .feature-card.secondary,
+        .feature-card.third {
+            grid-column: span 12;
+        }
+        .feature-card {
+            min-height: 260px;
+        }
+        .security-wrap {
+            padding: 32px 22px;
+        }
+        .security-orbit {
+            min-height: 340px;
+            transform: scale(0.88);
+        }
+        .cta {
+            padding: 54px 22px;
+            border-radius: 26px;
+        }
+        .support-card {
+            border-radius: 24px;
             width: calc(100% - 2.5rem);
+            padding: 2.4rem 1.4rem;
         }
-        .carousel-shell {
-            position: relative;
-            display: block;
-        }
-        .card-carousel {
+        .carousel-shell,
+        .carousel-footer {
             width: 100%;
         }
         .card-track {
             gap: 0.75rem;
         }
         .content-card {
-            flex: 0 0 76%;
+            flex: 0 0 82%;
         }
         .cc-media {
             min-height: 530px;
@@ -1614,51 +1816,37 @@ const productScreens = productScreensBase.map((item, index) => ({
             flex: 0 0 auto;
             font-size: 0.64rem;
         }
-        .cc-meta {
-            padding: 0.6rem 0.8rem 0.8rem;
+    }
+    @media (max-width: 520px) {
+        .hero-actions .btn {
+            width: 100%;
         }
-        .cc-copy strong {
-            font-size: 0.75rem;
+        .hero-proof {
+            display: grid;
+            gap: 12px;
         }
-        .cc-copy small {
-            font-size: 0.65rem;
+        .product-stage {
+            min-height: 450px;
         }
-        .guide-inner {
-            gap: 2rem;
+        .window-body {
+            padding: 14px;
         }
-        .guide-head {
-            max-width: 640px;
-            text-align: center;
+        .window-body img {
+            height: 360px;
         }
-
-        .section > * {
-            width: calc(100% - 2.5rem);
+        .float-card {
+            left: 16px;
+            right: 16px;
+            bottom: -2px;
+            width: auto;
         }
-        .split-copy h2 {
-            font-size: clamp(1.6rem, 8vw, 2.8rem);
+        .security-orbit {
+            margin: -28px -42px;
+            transform: scale(0.72);
         }
-        .support-card {
-            border-radius: 1.7rem;
-            width: calc(100% - 2.5rem) !important;
-            padding: 2rem 1.1rem;
-        }
-        .support-card-inner {
-            gap: 1.25rem;
-        }
-        .support-card-inner h2 {
-            font-size: clamp(1.8rem, 9vw, 2.4rem);
-            line-height: 1.08;
-        }
-        .support-pillars {
-            gap: 0.55rem;
-            margin-top: 0;
-        }
-        .pillar-card {
-            padding: 0.5rem 0.8rem;
-            font-size: 0.76rem;
-        }
-        .support-cta {
-            margin-top: 0;
+        .sync-art,
+        .field-art {
+            opacity: 0.82;
         }
     }
 </style>
@@ -1668,7 +1856,8 @@ const productScreens = productScreensBase.map((item, index) => ({
         const MAX = 6;
         function initTilt() {
             const card = document.querySelector<HTMLElement>(".support-card");
-            if (!card) return;
+            if (!card || card.dataset.tiltReady === "true") return;
+            card.dataset.tiltReady = "true";
             card.addEventListener("mousemove", (e) => {
                 const rect = card.getBoundingClientRect();
                 const x = (e.clientX - rect.left) / rect.width;
@@ -1679,105 +1868,7 @@ const productScreens = productScreensBase.map((item, index) => ({
                 card.style.transform = "perspective(800px) rotateX(0) rotateY(0)";
             });
         }
-        document.addEventListener("astro:page-load", initTilt);
-        if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initTilt);
-        else initTilt();
 
-        function initStack() {
-            const stack = document.querySelector<HTMLElement>(".workflow-stack");
-            if (!stack) return;
-            if (stack.dataset.stackReady === "true") return;
-            const CARDS = Array.from(stack.children) as HTMLElement[];
-            const COUNT = CARDS.length;
-            if (COUNT < 2) return;
-            stack.dataset.stackReady = "true";
-
-            function equalizeHeights() {
-                let maxH = 0;
-                CARDS.forEach((c) => {
-                    c.style.height = "auto";
-                    maxH = Math.max(maxH, c.offsetHeight);
-                });
-                if (maxH > 0)
-                    CARDS.forEach((c) => {
-                        c.style.height = `${maxH}px`;
-                    });
-            }
-
-            function applyOffsets(activeIndex: number) {
-                CARDS.forEach((card, i) => {
-                    const offset = (i - activeIndex + COUNT) % COUNT;
-                    const y = offset * 18;
-                    const scale = 1 - offset * 0.035;
-                    card.style.transition = "transform 420ms ease, opacity 420ms ease";
-                    card.style.transform = `translateY(${y}px) scale(${scale})`;
-                    card.style.zIndex = `${COUNT - offset}`;
-                    card.style.opacity = String(1 - offset * 0.06);
-                    card.classList.toggle("active", offset === 0);
-                    card.setAttribute("aria-hidden", String(offset !== 0));
-                    card.tabIndex = offset === 0 ? 0 : -1;
-                });
-            }
-
-            let current = 0;
-            let running = false;
-            let autoTimer: ReturnType<typeof setTimeout>;
-            equalizeHeights();
-            applyOffsets(0);
-
-            function scheduleAuto() {
-                clearTimeout(autoTimer);
-                autoTimer = setTimeout(() => advance(), 4500);
-            }
-
-            function advance(restoreFocus = false) {
-                clearTimeout(autoTimer);
-                if (running) return;
-                running = true;
-                const oldCard = CARDS[current];
-                oldCard.classList.add("fade-up");
-                setTimeout(() => {
-                    current = (current + 1) % COUNT;
-                    oldCard.classList.remove("fade-up");
-                    applyOffsets(current);
-                    if (restoreFocus) CARDS[current].focus();
-                    running = false;
-                    scheduleAuto();
-                }, 440);
-            }
-
-            CARDS.forEach((card, index) => {
-                card.addEventListener("click", () => {
-                    clearTimeout(autoTimer);
-                    if (running) return;
-                    if (card.classList.contains("active")) {
-                        advance();
-                        return;
-                    }
-                    current = index;
-                    applyOffsets(current);
-                    scheduleAuto();
-                });
-                card.addEventListener("keydown", (event) => {
-                    if (!card.classList.contains("active")) return;
-                    if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        advance(true);
-                    }
-                });
-            });
-
-            stack.addEventListener("mouseenter", () => clearTimeout(autoTimer));
-            stack.addEventListener("mouseleave", scheduleAuto);
-            document.addEventListener("astro:before-swap", () => clearTimeout(autoTimer), { once: true });
-            scheduleAuto();
-        }
-
-        document.addEventListener("astro:page-load", initStack);
-        if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initStack);
-        else initStack();
-
-        /* ── Product Carousel ── */
         function initCarousel() {
             const track = document.querySelector<HTMLElement>(".card-track");
             if (!track) return;
@@ -1908,9 +1999,7 @@ const productScreens = productScreensBase.map((item, index) => ({
                 const step = cardWidth + gap;
                 const viewportWidth = viewport?.getBoundingClientRect().width ?? cardWidth;
                 const offset = viewportWidth / 2 - (position * step + cardWidth / 2);
-                carouselTrack.style.transition = animate
-                    ? "transform 520ms cubic-bezier(0.22, 1, 0.36, 1)"
-                    : "none";
+                carouselTrack.style.transition = animate ? "transform 520ms cubic-bezier(0.22, 1, 0.36, 1)" : "none";
                 carouselTrack.style.transform = `translate3d(${offset}px, 0, 0)`;
                 displayCards.forEach((card, index) => {
                     card.classList.toggle("active", index === position);
@@ -1937,18 +2026,22 @@ const productScreens = productScreensBase.map((item, index) => ({
                 render();
             }
 
-            dots.forEach((dot, index) => dot.addEventListener("click", () => {
-                if (index === current) {
-                    scheduleAuto();
-                    return;
-                }
-                manualMove(() => goTo(index));
-            }));
-            edgeHits.forEach((edge) => edge.addEventListener("click", (event) => {
-                event.preventDefault();
-                if (performance.now() < suppressClickUntil) return;
-                manualMove(() => stepBy(Number(edge.dataset.carouselEdge) < 0 ? -1 : 1));
-            }));
+            dots.forEach((dot, index) =>
+                dot.addEventListener("click", () => {
+                    if (index === current) {
+                        scheduleAuto();
+                        return;
+                    }
+                    manualMove(() => goTo(index));
+                }),
+            );
+            edgeHits.forEach((edge) =>
+                edge.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    if (performance.now() < suppressClickUntil) return;
+                    manualMove(() => stepBy(Number(edge.dataset.carouselEdge) < 0 ? -1 : 1));
+                }),
+            );
             displayCards.forEach((card, index) => {
                 card.addEventListener("click", () => {
                     const target = index === 0 ? cards.length - 1 : index === displayCards.length - 1 ? 0 : index - 1;
@@ -2013,11 +2106,15 @@ const productScreens = productScreensBase.map((item, index) => ({
                 dragPointer = null;
                 scheduleAuto();
             });
-            carouselTrack.addEventListener("click", (event) => {
-                if (performance.now() >= suppressClickUntil) return;
-                event.preventDefault();
-                event.stopImmediatePropagation();
-            }, true);
+            carouselTrack.addEventListener(
+                "click",
+                (event) => {
+                    if (performance.now() >= suppressClickUntil) return;
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                },
+                true,
+            );
             viewport?.addEventListener("keydown", (event) => {
                 if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
                 event.preventDefault();
@@ -2041,8 +2138,11 @@ const productScreens = productScreensBase.map((item, index) => ({
             scheduleAuto();
         }
 
-        document.addEventListener("astro:page-load", initCarousel);
-        if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initCarousel);
-        else initCarousel();
+        document.addEventListener("astro:page-load", () => {
+            initTilt();
+            initCarousel();
+        });
+        initTilt();
+        initCarousel();
     })();
 </script>

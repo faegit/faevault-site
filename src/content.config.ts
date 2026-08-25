@@ -11,14 +11,6 @@ const localizedBase = z.object({
   draft: z.boolean().default(false),
 });
 
-const guides = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/guides' }),
-  schema: localizedBase.extend({
-    section: z.enum(['start', 'vault', 'autofill', 'passkeys', 'sync', 'security']),
-    platforms: z.array(z.enum(['android', 'windows'])).min(1),
-  }),
-});
-
 const stories = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/stories' }),
   schema: localizedBase.extend({
@@ -41,4 +33,4 @@ const legal = defineCollection({
   schema: localizedBase,
 });
 
-export const collections = { guides, stories, releases, legal };
+export const collections = { stories, releases, legal };
