@@ -703,18 +703,6 @@ const productScreens = productScreensBase.map((item, index) => ({
         min-height: 780px;
         padding: 158px 0 84px;
     }
-    .hero::before {
-        content: "";
-        position: absolute;
-        z-index: -1;
-        inset: 0;
-        background-image:
-            linear-gradient(rgba(47, 111, 237, 0.035) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(47, 111, 237, 0.035) 1px, transparent 1px);
-        background-size: 40px 40px;
-        mask-image: linear-gradient(to bottom, transparent, black 15%, black 70%, transparent);
-        -webkit-mask-image: linear-gradient(to bottom, transparent, black 15%, black 70%, transparent);
-    }
     .hero-grid {
         display: grid;
         grid-template-columns: minmax(0, 0.94fr) minmax(460px, 1.06fr);
@@ -1679,6 +1667,29 @@ const productScreens = productScreensBase.map((item, index) => ({
         transform-style: preserve-3d;
         will-change: transform;
         transition: transform 0.15s ease;
+    }
+    .support-card::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 60%;
+        height: 100%;
+        background: linear-gradient(
+            105deg,
+            transparent 0%,
+            rgba(255, 215, 100, 0.06) 30%,
+            rgba(255, 200, 60, 0.13) 50%,
+            rgba(255, 215, 100, 0.06) 70%,
+            transparent 100%
+        );
+        pointer-events: none;
+        z-index: 2;
+        animation: gold-sweep 5s ease-in-out infinite;
+    }
+    @keyframes gold-sweep {
+        0%, 100% { left: -100%; }
+        50% { left: 140%; }
     }
     .support-card-inner {
         position: relative;
