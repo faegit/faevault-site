@@ -10,12 +10,12 @@ export const localeMeta: Record<Locale, { label: string; htmlLang: string }> = {
 
 export const uiText = {
   'zh-cn': {
-    nav: { home: '首页', journey: '开发历程', download: '下载', support: '赞助支持' },
+    nav: { home: '首页', journey: '开发历程', security: '安全白皮书', download: '下载', support: '赞助支持' },
     switchLanguage: 'English',
     skipToContent: '跳到正文',
   },
   en: {
-    nav: { home: 'Home', journey: 'Development', download: 'Download', support: 'Sponsor' },
+    nav: { home: 'Home', journey: 'Development', security: 'Security', download: 'Download', support: 'Sponsor' },
     switchLanguage: '中文',
     skipToContent: 'Skip to content',
   },

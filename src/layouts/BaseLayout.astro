@@ -49,6 +49,7 @@ const menuLabel = locale === "zh-cn" ? "打开菜单" : "Open menu";
                     <a href={localePath(locale)}>{text.nav.home}</a>
                     <a href={localePath(locale, "download")}>{text.nav.download}</a>
                     <a href={localePath(locale, "journey")}>{text.nav.journey}</a>
+                    <a href={localePath(locale, "security")}>{text.nav.security}</a>
                     <a href={localePath(locale, "support")}>{text.nav.support}</a>
                 </nav>
                 <div class="nav-actions">
@@ -88,6 +89,7 @@ const menuLabel = locale === "zh-cn" ? "打开菜单" : "Open menu";
                     <a href={localePath(locale)}>{text.nav.home}</a>
                     <a href={localePath(locale, "download")}>{text.nav.download}</a>
                     <a href={localePath(locale, "journey")}>{text.nav.journey}</a>
+                    <a href={localePath(locale, "security")}>{text.nav.security}</a>
                     <a href={localePath(locale, "support")}>{text.nav.support}</a>
                 </nav>
             </div>
@@ -200,11 +202,11 @@ const menuLabel = locale === "zh-cn" ? "打开菜单" : "Open menu";
     }
     .btn-primary {
         color: #fff;
-        background: linear-gradient(145deg, #477ff0 0%, #285fda 100%);
-        box-shadow: 0 12px 24px rgba(47, 111, 237, 0.22);
+        background: linear-gradient(145deg, #1a3a6e 0%, #0f2850 100%);
+        box-shadow: 0 12px 24px rgba(15, 30, 65, 0.28);
     }
     .btn-primary:hover {
-        box-shadow: 0 15px 30px rgba(47, 111, 237, 0.28);
+        box-shadow: 0 15px 30px rgba(15, 30, 65, 0.35);
     }
     .btn-secondary {
         color: #2f3a4a;
@@ -294,15 +296,13 @@ const menuLabel = locale === "zh-cn" ? "打开菜单" : "Open menu";
         place-items: center;
         width: 34px;
         height: 34px;
-        border: 1px solid var(--line);
         border-radius: 10px;
-        background: #fff;
-        box-shadow: 0 4px 14px rgba(35, 52, 86, 0.12);
+        overflow: hidden;
     }
     .brand-mark img {
-        width: 24px;
-        height: 24px;
-        object-fit: contain;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 
     .nav-links {
@@ -521,6 +521,12 @@ const menuLabel = locale === "zh-cn" ? "打开菜单" : "Open menu";
         });
         navLinks.querySelectorAll("a").forEach((link) => {
             link.addEventListener("click", () => setMenuState(false));
+        });
+        document.addEventListener("click", (e) => {
+            if (!navLinks.classList.contains("open")) return;
+            if (!menuButton.contains(e.target as Node) && !navLinks.contains(e.target as Node)) {
+                setMenuState(false);
+            }
         });
     }
 
