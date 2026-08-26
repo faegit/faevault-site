@@ -1,5 +1,6 @@
 node_modules/
 dist/
+.worktrees/
 .DS_Store
 *.local
 # src/data/latest-release.json
