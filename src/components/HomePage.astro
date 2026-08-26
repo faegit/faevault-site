@@ -1841,31 +1841,24 @@ const productScreens = productScreensBase.map((item, index) => ({
         }
         .is-feature-stack .feature-card {
             position: absolute;
-            inset: 0;
-            min-height: 300px;
-            cursor: default;
-            transform-origin: center top;
-            transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms ease;
-        }
-        .is-feature-stack .feature-card[data-feature-layer="0"] {
-            z-index: 5;
+            top: 0;
+            right: 0;
+            left: 0;
+            width: 100%;
+            min-height: 0;
             cursor: pointer;
-            transform: translateY(0) scale(1);
+            background: linear-gradient(145deg, #ffffff, #f7f9fc);
+            transform-origin: center;
+            will-change: transform, opacity;
+            transition: transform 420ms ease, opacity 420ms ease, box-shadow 420ms ease;
         }
-        .is-feature-stack .feature-card[data-feature-layer="1"] {
-            z-index: 4;
-            transform: translateY(16px) scale(0.97);
+        .is-feature-stack .feature-card.is-stack-active {
+            box-shadow: var(--shadow);
         }
-        .is-feature-stack .feature-card[data-feature-layer="2"] {
-            z-index: 3;
-            transform: translateY(32px) scale(0.94);
-        }
-        .is-feature-stack .feature-card[data-feature-layer="3"],
-        .is-feature-stack .feature-card[data-feature-layer="4"] {
-            z-index: 1;
-            opacity: 0;
+        .is-feature-stack .feature-card.is-exiting {
             pointer-events: none;
-            transform: translateY(42px) scale(0.92);
+            opacity: 0 !important;
+            transform: translateY(-36px) scale(1.02) !important;
         }
         .security-wrap {
             padding: 32px 22px;
