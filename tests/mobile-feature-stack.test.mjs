@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { featureLayer, nextFeatureIndex } from "../src/scripts/mobile-feature-stack.mjs";
 
@@ -17,4 +18,11 @@ test("advances exactly one card and wraps", () => {
 test("returns a safe index when no cards exist", () => {
     assert.equal(nextFeatureIndex(0, 0), 0);
     assert.equal(featureLayer(0, 0, 0), 0);
+});
+
+test("controller uses the mobile breakpoint and a single transition lock", async () => {
+    const source = await readFile(new URL("../src/scripts/mobile-feature-stack.mjs", import.meta.url), "utf8");
+    assert.match(source, /max-width: 760px/);
+    assert.match(source, /if \(locked\) return/);
+    assert.match(source, /astro:before-swap/);
 });
