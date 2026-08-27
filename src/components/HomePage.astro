@@ -2,6 +2,7 @@
 import type { Locale } from "../i18n/config";
 import { localePath } from "../i18n/config";
 import { withBaseAsset } from "../config/site";
+import BeyondPasswords from "./BeyondPasswords.astro";
 
 interface Props {
     locale: Locale;
@@ -466,6 +467,8 @@ const productScreens = productScreensBase.map((item, index) => ({
             </div>
         </div>
     </section>
+
+    <BeyondPasswords locale={locale} />
 
     <section class="section" id="security">
         <div class="container">
