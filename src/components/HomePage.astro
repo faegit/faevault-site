@@ -2028,7 +2028,7 @@ const productScreens = productScreensBase.map((item, index) => ({
 </style>
 
 <script>
-    import { initMobileFeatureStack } from "../scripts/mobile-feature-stack.mjs";
+    import { initAllMobileStacks } from "../scripts/mobile-feature-stack.mjs";
 
     (function () {
         function initCarousel() {
@@ -2319,10 +2319,10 @@ const productScreens = productScreensBase.map((item, index) => ({
         document.addEventListener("astro:page-load", () => {
             initCarousel();
             initTilt();
-            initMobileFeatureStack();
+            initAllMobileStacks();
         });
         initCarousel();
         initTilt();
-        initMobileFeatureStack();
+        initAllMobileStacks();
     })();
 </script>

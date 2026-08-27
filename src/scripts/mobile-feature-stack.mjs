@@ -15,14 +15,8 @@ export function featureStackStyle(layer, count) {
     };
 }
 
-let activeCleanup = null;
-
-export function initMobileFeatureStack(root = document) {
-    activeCleanup?.();
-    const grid = root.querySelector("[data-feature-stack]");
-    if (!grid) return () => {};
-
-    const cards = Array.from(grid.querySelectorAll("[data-feature-card]"));
+export function initMobileStack(grid, { card = "[data-feature-card]", title = ".feature-title" } = {}) {
+    const cards = Array.from(grid.querySelectorAll(card));
     if (cards.length < 2) return () => {};
 
     const media = window.matchMedia("(max-width: 760px)");
@@ -89,7 +83,7 @@ export function initMobileFeatureStack(root = document) {
         cards.forEach((card, index) => {
             const layer = featureLayer(index, current, cards.length);
             const style = featureStackStyle(layer, cards.length);
-            const title = card.querySelector(".feature-title")?.textContent?.trim() ?? "";
+            const label = card.querySelector(title)?.textContent?.trim() ?? "";
             card.dataset.featureLayer = String(layer);
             card.style.transform = `translateY(${style.translateY}px) scale(${style.scale})`;
             card.style.zIndex = String(style.zIndex);
@@ -100,7 +94,7 @@ export function initMobileFeatureStack(root = document) {
             card.setAttribute("aria-current", layer === 0 ? "true" : "false");
             card.setAttribute("aria-hidden", layer === 0 ? "false" : "true");
             if (layer === 0) {
-                card.setAttribute("aria-label", `${title}. ${grid.dataset.stackHint ?? ""}`.trim());
+                card.setAttribute("aria-label", `${label}. ${grid.dataset.stackHint ?? ""}`.trim());
             } else {
                 card.removeAttribute("aria-label");
             }
@@ -111,8 +105,7 @@ export function initMobileFeatureStack(root = document) {
 
     function advance(restoreFocus = false) {
         clearAuto();
-        if (locked) return;
-        if (!media.matches) return;
+        if (locked || !media.matches) return;
         locked = true;
         const outgoing = cards[current];
         outgoing.classList.add("is-exiting");
@@ -196,11 +189,18 @@ export function initMobileFeatureStack(root = document) {
         clearAuto();
         clearTimeout(transitionTimer);
         controller.abort();
-        activeCleanup = null;
     };
     document.addEventListener("astro:before-swap", cleanup, { once: true, signal: controller.signal });
-    activeCleanup = cleanup;
     render();
     scheduleAuto();
     return cleanup;
+}
+
+export function initAllMobileStacks(root = document) {
+    root.querySelectorAll("[data-feature-stack]").forEach((grid) => {
+        initMobileStack(grid, {
+            card: grid.dataset.stackCard || "[data-feature-card]",
+            title: grid.dataset.stackTitle || ".feature-title",
+        });
+    });
 }
