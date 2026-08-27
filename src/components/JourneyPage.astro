@@ -20,7 +20,7 @@ const c = locale === "zh-cn"
         title: "从一个人到更多人",
         paragraphs: [
           "第一版 Android 客户端功能极其简陋：能输密码、能存下来、能复制。没有自动填充，没有同步，没有好看的界面。但用了一段时间后发现，这个粗糙的工具比那些大而全的商用软件更让我安心——因为数据真的只在我自己手里。",
-          "后来想着既然自己能受益，为什么不把它做得更好一些，让同样在意隐私的人也多个选择？于是开始认真地设计架构：加密方案用 scrypt + AES-256-GCM，文件格式考虑跨平台兼容，UI 开始从能用变得稍微好看一点。",
+          "后来想着既然自己能受益，为什么不把它做得更好一些，让同样在意隐私的人也多个选择？于是开始认真地设计架构：加密方案用 Argon2id + AES-256-GCM，文件格式考虑跨平台兼容，UI 开始从能用变得稍微好看一点。",
           "这个过程远比预想的漫长。自动填充看似简单，实际涉及 Android Autofill 框架适配、系统版本差异和不同设备环境下的行为差异。同步功能涉及 WebDAV 协议、局域网连接、冲突合并策略，每一块都踩过不少坑。",
         ],
       },
@@ -66,7 +66,7 @@ const c = locale === "zh-cn"
         title: "From personal tool to something more",
         paragraphs: [
           "The very first Android build was bare-bones: type a password, save it, copy it. No autofill, no sync, no polished UI. But after using it for a while, I realized this rough tool gave me something the big commercial apps couldn't — the certainty that my data truly belonged to me.",
-          "If I benefited from it, maybe others who care about privacy would too. So I started taking it seriously: scrypt + AES-256-GCM for encryption, cross-platform file format compatibility, and a UI that went from functional to actually pleasant to use.",
+          "If I benefited from it, maybe others who care about privacy would too. So I started taking it seriously: Argon2id + AES-256-GCM for encryption, cross-platform file format compatibility, and a UI that went from functional to actually pleasant to use.",
           "The journey took far longer than expected. Autofill alone required adapting to Android's Autofill framework, differences between system versions, and varying behavior across device environments. Sync involved the WebDAV protocol, LAN connections, and conflict-merging strategies — each part brought its share of hard-earned lessons.",
         ],
       },

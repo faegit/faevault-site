@@ -44,7 +44,7 @@ const copy = zh
           securityTitle: "安全应该可理解，也应该可验证",
           securityCopy: "设计重点不是制造神秘感，而是让数据如何保存、如何解锁、如何同步都保持清晰边界。",
           securityList: [
-              { title: "端侧加密", body: "scrypt + AES-256-GCM，敏感数据在离开设备前保持加密状态。" },
+              { title: "端侧加密", body: "Argon2id + AES-256-GCM，敏感数据在离开设备前保持加密状态。" },
               { title: "敏感信息防护", body: "FLAG_SECURE、敏感剪贴板定时清理与解锁失败冷却。" },
               { title: "同步边界可控", body: "WebDAV、局域网同步由你主动发起，不改变保险库的加密边界。" },
           ],
@@ -97,7 +97,7 @@ const copy = zh
           securityTitle: "Security should be understandable — and verifiable",
           securityCopy: "The goal is not mystery. How data is stored, unlocked, and synced should all stay within clear boundaries.",
           securityList: [
-              { title: "End-side encryption", body: "scrypt + AES-256-GCM keeps sensitive data encrypted before it leaves the device." },
+              { title: "End-side encryption", body: "Argon2id + AES-256-GCM keeps sensitive data encrypted before it leaves the device." },
               { title: "Sensitive-data protection", body: "FLAG_SECURE, sensitive clipboard clearing, and unlock-failure cooldowns." },
               { title: "Controllable sync boundary", body: "WebDAV and LAN sync start only when you do — without changing the encryption boundary." },
           ],
@@ -132,7 +132,7 @@ const features = zh
               kind: "secondary",
               icon: "vault",
               title: "本地加密保险库",
-              body: "scrypt + AES-256-GCM 加密，密码与通行密钥离线存储在本地文件中，数据完全由你掌控。",
+               body: "Argon2id + AES-256-GCM 加密，密码与通行密钥离线存储在本地文件中，数据完全由你掌控。",
               art: null,
           },
           {
@@ -169,7 +169,7 @@ const features = zh
               kind: "secondary",
               icon: "vault",
               title: "Locally encrypted vault",
-              body: "With scrypt + AES-256-GCM encryption, passwords and passkeys are stored offline in a local file, keeping your data entirely under your control.",
+               body: "With Argon2id + AES-256-GCM encryption, passwords and passkeys are stored offline in a local file, keeping your data entirely under your control.",
               art: null,
           },
           {

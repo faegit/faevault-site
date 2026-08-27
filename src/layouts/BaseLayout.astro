@@ -128,6 +128,21 @@ const menuLabel = locale === "zh-cn" ? "打开菜单" : "Open menu";
     ::selection {
         background: rgba(47, 111, 237, 0.16);
     }
+    body {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+    }
+    body.copy-enabled,
+    body.copy-enabled * {
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
+        -webkit-touch-callout: default;
+    }
     #dot-grid {
         position: fixed;
         inset: 0;
@@ -551,12 +566,31 @@ const menuLabel = locale === "zh-cn" ? "打开菜单" : "Open menu";
         items.forEach((item) => observer.observe(item));
     }
 
+    function initCopyGuard() {
+        if (document.body.dataset.copyGuardReady === "true") return;
+        document.body.dataset.copyGuardReady = "true";
+        const isTextField = (el: EventTarget | null) =>
+            el instanceof HTMLElement && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable);
+        const block = (e: Event) => {
+            if (document.body.classList.contains("copy-enabled")) return;
+            if (isTextField(e.target)) return;
+            e.preventDefault();
+        };
+        document.addEventListener("copy", block);
+        document.addEventListener("cut", block);
+        document.addEventListener("contextmenu", block);
+        document.addEventListener("selectstart", block);
+        document.addEventListener("dragstart", block);
+    }
+
     document.addEventListener("astro:page-load", () => {
         initChrome();
         initReveal();
+        initCopyGuard();
     });
     initChrome();
     initReveal();
+    initCopyGuard();
 
     (function () {
         const canvas = document.getElementById("dot-grid") as HTMLCanvasElement | null;
