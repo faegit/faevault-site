@@ -105,7 +105,8 @@ export function initMobileStack(grid, { card = "[data-feature-card]", title = ".
 
     function advance(restoreFocus = false) {
         clearAuto();
-        if (locked || !media.matches) return;
+        if (locked) return;
+        if (!media.matches) return;
         locked = true;
         const outgoing = cards[current];
         outgoing.classList.add("is-exiting");
