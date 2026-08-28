@@ -5,4 +5,5 @@ dist/
 *.local
 # src/data/latest-release.json
 
-# Astro build cache.astro/
+# Astro build cache
+.astro/
