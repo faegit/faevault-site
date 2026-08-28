@@ -1,299 +1,223 @@
 ---
 import type { Locale } from "../i18n/config";
 import PageShell from "./PageShell.astro";
-interface Props {
-    locale: Locale;
-}
+
+interface Props { locale: Locale; }
+interface Fact { label: string; value: string; }
+interface Callout { tone: "protect" | "limit" | "note"; title: string; body: string; }
+interface Section { id: string; title: string; lead: string; paragraphs?: string[]; facts?: Fact[]; callouts?: Callout[]; }
+interface Copy { kicker: string; title: string; intro: string; snapshot: string; summaryTitle: string; summary: Fact[]; tocLabel: string; sections: Section[]; closingTitle: string; closing: string; }
+
 const { locale } = Astro.props;
-const c =
-    locale === "zh-cn"
-        ? {
-              kicker: "安全白皮书",
-              title: "加密设计与安全架构。",
-              intro: "本文档详细说明保险库的加密方案、密钥管理、威胁模型与平台安全机制。",
-              sections: [
-                  {
-                      id: "encryption",
-                      title: "加密架构",
-                      items: [
-                          {
-                              label: "密钥派生",
-                              body: "主密码经 Argon2id v1.3（内存 64 MiB、迭代 3、并行度 1）派生为 256-bit 密钥加密密钥（KEK），再以信封加密保护 Vault Root Key；随后通过 HKDF-SHA256 做用途隔离，派生出多把相互独立的根密钥。Argon2id 是 memory-hard 函数，可有效抵御 ASIC/GPU 暴力破解。",
-                          },
-                          {
-                              label: "对称加密",
-                              body: "使用 AES-256-GCM（Galois/Counter Mode），在加密同时提供完整性认证，防止密文被篡改。每条加密操作使用独立随机 Nonce，并以用途相关的附加数据（AAD）绑定上下文。",
-                          },
-                          {
-                              label: "文件格式",
-                              body: "主库 .pmv 采用 PMVE 容器（wire magic PMVS）：文件头携带 Argon2id 的盐与版本；数据以追加写（append-only）的分块方式存储，每块使用由根密钥经 HKDF 派生的独立 AES-256-GCM 密钥（含 AAD）加密。加密与序列化格式与桌面端逐字节一致，可双向互导；备份 .pmbak 则使用独立的导出口令加密。",
-                          },
-                      ],
-                  },
-                  {
-                      id: "key-management",
-                      title: "密钥管理",
-                      items: [
-                          {
-                              label: "主密码",
-                              body: "主密码用于解锁保险库，以及必要的二次验证；它不会以明文写入保险库文件。解锁后的会话材料只保留在应用进程的内存中。",
-                          },
-                          {
-                              label: "生物识别",
-                              body: "启用生物识别后，AndroidKeyStore 中的 AES/GCM 密钥（要求 BIOMETRIC_STRONG 验证）会包裹设备解锁信封（其中包含主密码）；新增或删除生物识别模板后，旧密文自动失效。应用不读取或保存指纹、人脸等原始生物特征。",
-                          },
-                          { label: "会话安全", body: "会话密钥由 SessionSecret / SessionBytes 保存在内存中，用完后会对临时明文字节清零；锁定时清理会话状态。" },
-                          {
-                              label: "恢复密钥",
-                              body: "可生成一把随机的 256-bit 恢复密钥（带校验码），用于在主密码丢失时重置主密码；每次使用后会失效并需要重新保存。恢复流程不依赖任何第三方服务。",
-                          },
-                      ],
-                  },
-                  {
-                      id: "platform-security",
-                      title: "平台安全",
-                      items: [
-                          {
-                              label: "屏幕防护",
-                              body: "屏幕保护默认启用 FLAG_SECURE；用户通过主密码验证并确认风险后可以关闭。自动填充认证、Passkey 与同步扫码等敏感窗口始终保持保护。",
-                          },
-                          { label: "剪贴板防护", body: "复制敏感字段时使用系统敏感标记。自动清理时间可在 0–600 秒之间设置，默认 60 秒；0 表示不自动清理。" },
-                          {
-                              label: "解锁失败冷却",
-                              body: "前四次失败分别增加 0.25、0.5、1、2 秒重试延迟；第五次进入 30 秒冷却，后续轮次按 60、90 秒递增，成功解锁后清零。",
-                          },
-                          {
-                              label: "敏感信息门禁",
-                              body: "查看银行卡、身份证、API 密钥等敏感条目的详细字段或图片，以及执行修改主密码、导出等操作时，都需要再次输入当前主密码。",
-                          },
-                      ],
-                  },
-                  {
-                      id: "autofill-security",
-                      title: "自动填充安全",
-                      items: [
-                          { label: "逐次认证", body: "每次填充或保存新凭证，都必须通过当前保险库的强生物识别或主密码验证；后台不会保留任何明文免验证缓存。" },
-                          { label: "来源验证", body: "按关联应用包名或 HTTPS 主机精确匹配来源。拒绝来自本应用、系统设置/权限管理等敏感来源的填充请求。" },
-                          { label: "安全边界", body: "不使用无障碍服务、自启动或电池白名单等权限。自动填充只作用于登录类条目，不影响其它条目类型。" },
-                      ],
-                  },
-                  {
-                      id: "sync-security",
-                      title: "同步安全",
-                      items: [
-                          {
-                              label: "传输约束",
-                              body: "WebDAV 与局域网同步均通过 HTTPS 传输，并拒绝从 HTTPS 降级到 HTTP 的重定向。WebDAV 可固定服务器证书的 SHA-256 指纹；局域网配对使用 SPAKE2-P256 派生会话密钥。",
-                          },
-                          {
-                              label: "同步内容",
-                              body: "上传和下载的都是加密后的保险库文件。默认同步会先在本机解密、合并，再重新加密写回；云端或 WebDAV 服务仍然能看到连接元数据与密文文件。",
-                          },
-                          { label: "完整性校验", body: "同步完成后读回密文并解密校验，确保数据未在传输或存储过程中损坏。逻辑内容一致时跳过不必要的远端重写。" },
-                      ],
-                  },
-                  {
-                      id: "threat-model",
-                      title: "威胁模型",
-                      items: [
-                          {
-                              label: "应用边界",
-                              body: "保险库位于应用私有目录，Android 自动备份已关闭。FLAG_SECURE 保护屏幕内容，但无法代替设备锁屏、系统更新和可信设备环境。",
-                          },
-                          {
-                              label: "设备丢失",
-                              body: "保险库文件使用 Argon2id 与 AES-256-GCM 加密。实际保护强度仍取决于主密码质量、设备安全状态以及是否泄露了导出文件。",
-                          },
-                          {
-                              label: "离线文件",
-                              body: "拿到 .pmv 文件的攻击者可以离线尝试主密码；Argon2id 的参数会提高每次猜测所需的计算与内存成本，却无法弥补弱主密码的问题。",
-                          },
-                      ],
-                  },
-              ],
-          }
-        : {
-              kicker: "Security Whitepaper",
-              title: "Encryption design & security architecture.",
-              intro: "This document details the encryption scheme, key management, threat model, and platform security mechanisms used by FAEVault.",
-              sections: [
-                  {
-                      id: "encryption",
-                      title: "Encryption Architecture",
-                      items: [
-                          {
-                              label: "Key Derivation",
-                              body: "The master password is derived into a 256-bit key-encryption key (KEK) using Argon2id v1.3 (64 MiB memory, 3 iterations, parallelism 1), then an envelope protects the Vault Root Key. HKDF-SHA256 isolates purposes to derive several independent root keys. Argon2id is a memory-hard function that resists ASIC/GPU brute-force attacks.",
-                          },
-                          {
-                              label: "Symmetric Encryption",
-                              body: "AES-256-GCM (Galois/Counter Mode) provides both confidentiality and authenticated integrity protection. Each encryption operation uses a unique random Nonce and binds context with purpose-specific additional authenticated data (AAD).",
-                          },
-                          {
-                              label: "File Format",
-                              body: "The main vault .pmv uses a PMVE container (wire magic PMVS): the header carries the Argon2id salt and version; data is stored as append-only blocks, each encrypted with a unique AES-256-GCM key (with AAD) derived from a root key via HKDF. The encryption and serialization format is byte-identical with the desktop client for bidirectional exchange; backups (.pmbak) are encrypted with a separate export passphrase.",
-                          },
-                      ],
-                  },
-                  {
-                      id: "key-management",
-                      title: "Key Management",
-                      items: [
-                          {
-                              label: "Master Password",
-                              body: "The master password unlocks the vault and selected sensitive actions. It is not written in plaintext to the vault file; unlocked session material remains in app-process memory.",
-                          },
-                          {
-                              label: "Biometrics",
-                              body: "When enabled, an AndroidKeyStore AES/GCM key that requires BIOMETRIC_STRONG wraps a device-unlock envelope holding the master password; adding or removing a biometric template invalidates the old ciphertext automatically. The app never reads or stores raw fingerprint or face data.",
-                          },
-                          {
-                              label: "Session Security",
-                              body: "SessionSecret and SessionBytes hold session keys in memory and zero temporary plaintext byte arrays after use. Locking clears session state.",
-                          },
-                          {
-                              label: "Recovery Key",
-                              body: "A randomly generated 256-bit recovery key (with a checksum) can reset the master password if it is lost; the key expires after each use and must be saved again. The recovery flow relies on no third party.",
-                          },
-                      ],
-                  },
-                  {
-                      id: "platform-security",
-                      title: "Platform Security",
-                      items: [
-                          {
-                              label: "Screen Protection",
-                              body: "FLAG_SECURE is enabled by default and can be disabled only after master-password verification and a risk confirmation. Sensitive autofill, passkey, and sync-scanning windows remain protected.",
-                          },
-                          {
-                              label: "Clipboard Guard",
-                              body: "Copied secrets use the system sensitive flag. Auto-clear is configurable from 0 to 600 seconds and defaults to 60; zero disables automatic clearing.",
-                          },
-                          {
-                              label: "Unlock Cooldown",
-                              body: "The first four failures add retry delays of 0.25, 0.5, 1, and 2 seconds. The fifth triggers a 30-second cooldown; later rounds rise to 60 and 90 seconds. Success clears the state.",
-                          },
-                          {
-                              label: "Sensitive Data Gate",
-                              body: "Viewing detailed fields or images for bank card, ID, and API key entries, as well as changing the master password or exporting data, requires re-entering the current master password.",
-                          },
-                      ],
-                  },
-                  {
-                      id: "autofill-security",
-                      title: "Autofill Security",
-                      items: [
-                          {
-                              label: "Per-action Authentication",
-                              body: "Every fill or new-credential save requires strong biometric or master-password authentication for the current vault. No unauthenticated plaintext cache is kept in the background.",
-                          },
-                          {
-                              label: "Origin Verification",
-                              body: "Sources are matched exactly by associated app package name or HTTPS host. Fill requests from FAEVault itself, system settings, permission managers, and other sensitive sources are rejected.",
-                          },
-                          {
-                              label: "Security Boundaries",
-                              body: "No accessibility services, floating windows, auto-start, or battery whitelist permissions. Autofill applies to login entries only.",
-                          },
-                      ],
-                  },
-                  {
-                      id: "sync-security",
-                      title: "Sync Security",
-                      items: [
-                          {
-                              label: "Transport Constraints",
-                              body: "WebDAV and LAN sync both transfer over HTTPS and reject any redirect that downgrades HTTPS to HTTP. WebDAV can pin the server certificate's SHA-256 fingerprint, while LAN pairing derives a session key with SPAKE2-P256.",
-                          },
-                          {
-                              label: "Synced Content",
-                              body: "Uploads and downloads contain encrypted vault files. Default sync decrypts and merges locally before re-encrypting and writing back; storage providers can still observe connection metadata and ciphertext files.",
-                          },
-                          {
-                              label: "Integrity Verification",
-                              body: "After sync, ciphertext is read back and decrypted to verify integrity. Logically identical content skips unnecessary remote overwrites.",
-                          },
-                      ],
-                  },
-                  {
-                      id: "threat-model",
-                      title: "Threat Model",
-                      items: [
-                          {
-                              label: "App Boundary",
-                              body: "The vault lives in the app-private directory and Android automatic backup is disabled. FLAG_SECURE protects screen content but does not replace device locking, system updates, or a trusted device environment.",
-                          },
-                          {
-                              label: "Device Loss",
-                              body: "Vault files use Argon2id and AES-256-GCM. Protection still depends on master-password strength, device security, and whether exported files have been exposed.",
-                          },
-                          {
-                              label: "Offline File",
-                              body: "An attacker with a .pmv file can guess master passwords offline. The Argon2id parameters raise the cost of each guess but cannot compensate for a weak password.",
-                          },
-                      ],
-                  },
-              ],
-          };
+
+const zh: Copy = {
+    kicker: "安全白皮书 · Android 实现快照",
+    title: "安全不是一句承诺，而是一组明确的边界。",
+    intro: "本文依据现阶段 FAEVault 安卓端可执行代码，说明数据如何加密、密钥如何流转、同步与系统集成如何受控，以及这些机制不能解决什么问题。",
+    snapshot: "实现快照：2026 年 8 月 · PMV v1 / 密码学套件 1",
+    summaryTitle: "当前安全基线",
+    summary: [
+        { label: "主库", value: "PMVE 容器（文件线标识 PMVS）" },
+        { label: "口令派生", value: "Argon2id v1.3，标准与加固配置" },
+        { label: "内容保护", value: "AES-256-GCM 认证加密" },
+        { label: "用途隔离", value: "HKDF-SHA256 派生独立子密钥" },
+    ],
+    tocLabel: "本页目录",
+    sections: [
+        { id: "overview", title: "01 · 安全设计概览", lead: "保险库以本地加密文件为核心，而不是依赖服务端替用户保密。", paragraphs: [
+            "新建保险库时生成随机的 256-bit 保险库根密钥（Vault RootKey）。主密码通过 Argon2id 派生密钥加密密钥（KEK），再由 KEK 包裹 RootKey。修改主密码时重新包裹同一 RootKey，不需要把主密码当作直接内容密钥。",
+            "RootKey 经 HKDF-SHA256 分离为元数据、条目、附件、索引、搜索索引、完整性、同步认证和密钥包裹等根密钥；对象、版本与附件分块继续派生独立密钥，避免跨场景复用。",
+        ], callouts: [{ tone: "note", title: "文档口径", body: "这里只描述当前安卓实现，不把规划能力、桌面端独有行为或未经代码确认的机制写成既有功能。" }] },
+        { id: "threat-model", title: "02 · 威胁模型与信任边界", lead: "保护目标包括保险库文件丢失、远端存储不可信、传输损坏和未授权系统请求。", paragraphs: [
+            "应用内冷却只能限制通过应用界面的连续尝试。攻击者复制 .pmv 后仍可离线猜测主密码，因此口令质量始终是安全边界的一部分。",
+        ], callouts: [
+            { tone: "protect", title: "重点保护", body: "攻击者只拿到锁定的 .pmv；云端或 WebDAV 只保存加密库；同步内容被损坏或替换；自动填充或 Passkey 请求来源不匹配。" },
+            { tone: "limit", title: "不保护", body: "已 root 或被恶意软件完全控制的设备、被接管的解锁进程、恶意输入法、屏幕旁观、主动关闭屏幕保护、泄露的主密码/恢复密钥/导出文件，以及弱主密码遭离线猜测。" },
+        ] },
+        { id: "cryptography", title: "03 · PMVE 密码学架构", lead: "PMV v1 密码学套件 1 分开处理口令派生、信封、分块加密、头部认证与签名身份。", facts: [
+            { label: "标准 Argon2id", value: "v1.3；64 MiB；3 次迭代；并行度 1" },
+            { label: "加固 Argon2id", value: "v1.3；128 MiB；4 次迭代；并行度 1" },
+            { label: "读取安全范围", value: "64–256 MiB；3–10 次迭代；并行度 1–4" },
+            { label: "密钥派生", value: "HKDF-SHA256，按保险库、用途、对象、版本和分块隔离" },
+            { label: "认证加密", value: "AES-256-GCM；随机 Nonce；上下文 AAD；128-bit 标签" },
+            { label: "头部与身份", value: "HMAC-SHA256 认证完整头部；Ed25519 绑定保险库签名身份" },
+        ], paragraphs: [
+            "固定 4 KiB 的 PMVH 引导头保存版本、密码学套件、Argon2id 参数与盐，以及密码、恢复和签名种子的加密信封。解锁后认证完整头部；不支持或超出安全范围的 KDF 参数会被拒绝。",
+            "每个不可变块使用随机 Nonce，并将保险库 ID、块类型、对象、版本与分块编号等写入 AAD。密文或上下文被修改时，AES-GCM 认证失败而不会返回未经验证的明文。",
+        ] },
+        { id: "key-lifecycle", title: "04 · 解锁与密钥生命周期", lead: "密码、恢复和生物识别是不同入口，但最终都要得到并验证同一保险库身份下的 RootKey。", facts: [
+            { label: "恢复密钥", value: "随机 256-bit；PMRK1 Crockford Base32；校验码与短指纹" },
+            { label: "生物识别", value: "AndroidKeyStore AES-GCM + BIOMETRIC_STRONG" },
+            { label: "失败后退", value: "250 ms、500 ms、1 s、2 s；第 5 次进入 30 s，后续轮次每次增加 30 s" },
+        ], paragraphs: [
+            "当前 PMVE 生物识别路径包裹与保险库身份绑定的 RootKey 材料（vault-bound RootKey），绑定保险库 ID、签名公钥和密钥版本；它不把主密码明文保存为生物识别凭据。生物模板变化会令 AndroidKeyStore 密钥失效，应用清理旧材料并回到密码解锁。",
+            "恢复密钥经独立 HKDF-SHA256 路径打开恢复信封，可在不知道旧密码时建立新密码信封。会话容器和临时字节数组在关闭或使用后尽可能清零，但托管运行时无法保证物理内存被绝对擦除。",
+        ] },
+        { id: "storage", title: "05 · 条目、附件与完整性", lead: "主库采用追加式不可变块，提交记录决定当前可见状态。", paragraphs: [
+            "条目、索引页、元数据、提交、墓碑和附件对象分别编码与认证。对象 ID 和版本参与密钥派生及 AAD；更新产生新一代对象，而非原地覆盖旧密文。读取时验证块头、认证标签、索引关系与提交状态。",
+            "附件按块加密，每个附件对象和分块均有独立派生密钥。大对象可按需读取需要的分块，避免查看局部时一次解密全部内容；分块与整体摘要用于发现损坏。旧块在压缩或维护前可能继续占用空间。",
+        ], callouts: [{ tone: "limit", title: "可观察元数据", body: "加密保护内容和经认证的结构，但文件持有者仍可能看到文件大小、修改与传输时间、IP 和大致增长等元数据。" }] },
+        { id: "android-protections", title: "06 · Android 平台防护", lead: "平台控制减少意外泄露，但每项控制都有明确作用范围。", facts: [
+            { label: "本地边界", value: "应用私有存储；Android 自动备份与设备迁移均排除应用数据" },
+            { label: "屏幕保护", value: "FLAG_SECURE 可配置；敏感流程可强制启用" },
+            { label: "后台隐藏", value: "可独立从最近任务排除，不等同于截图保护" },
+            { label: "剪贴板", value: "标记敏感；可配置清理时间，仅清理仍可确认由本应用写入的内容" },
+        ], paragraphs: ["FLAG_SECURE 阻止常规截图、录屏和非安全显示捕获，但不承诺抵御已 root 系统或另一台相机。最近任务隐藏与 FLAG_SECURE 是独立设置。保险库认证、自动填充、Passkey 和同步授权界面复用安全窗口策略。"] },
+        { id: "autofill-passkeys", title: "07 · 自动填充与 Passkey", lead: "Android Autofill 与 Credential Manager 是两条独立系统通道，均需验证调用方和当前用户。", paragraphs: [
+            "自动填充只从已解锁或刚完成认证的保险库读取登录凭据。候选项按关联应用包名或 HTTPS 主机匹配，应用签名证书可计算 SHA-256 指纹；来自本应用、系统设置与权限管理等敏感目标的请求会被拒绝。",
+            "Passkey 创建和使用验证 RP ID、HTTPS Origin 或 Android APK 密钥哈希、挑战及允许的凭据 ID。原生应用需通过 Digital Asset Links 关联包名、签名证书和 RP；受信任浏览器还需通过允许列表。签名覆盖 authenticator data 与 client data hash。",
+        ], callouts: [{ tone: "limit", title: "系统选择仍然重要", body: "安装 FAEVault 不会自动使其成为所有请求的凭据提供方。Credential Manager、自动填充服务选择、调用方实现和网站关联配置仍在应用控制之外。" }] },
+        { id: "sync", title: "08 · 局域网、WebDAV 与云端同步", lead: "同步移动加密保险库；合并在本机解锁、验证后进行，再加密写回。", paragraphs: [
+            "局域网配对使用 SPAKE2-P256 从配对口令建立共享秘密，再派生会话材料与执行授权。WebDAV 和云端路径分别执行 HTTPS、重定向和证书检查；WebDAV 可固定服务器证书的 SHA-256 指纹以发现意外换证。",
+            "下载结果先进入临时路径，经过结构、认证与逻辑校验后才参与合并或替换；结果可重新读取验证，逻辑相同时跳过无意义的远端重写。服务方仍能看到账号、IP、时间、对象大小和密文文件。",
+        ], callouts: [{ tone: "note", title: "端点责任", body: "传输加密不能替代可信服务器配置。用户仍需安全管理 WebDAV、云端凭据、证书固定更新和局域网配对码。" }] },
+        { id: "backup-export", title: "09 · 备份、导出与恢复", lead: "不同导出物的安全属性不同；来自加密库不等于导出后仍全部加密。", paragraphs: [
+            ".pmv 是加密工作库；.pmbak 使用独立备份密码学封装和导出口令。外部实时备份复制保险库文件，并通过写入与校验流程降低半写入文件替换有效备份的风险。",
+            "CSV、JSON、媒体等可读导出可能包含明文，其目标目录、分享应用、云盘回收站不受保险库会话控制。恢复密钥可以重置主密码，应离线保存并与任何不可信的保险库副本分开。",
+        ] },
+        { id: "guidance-limitations", title: "10 · 使用建议与诚实限制", lead: "密码学强化边界，但不能替代安全使用方式。", facts: [
+            { label: "主密码", value: "使用随机长密码或至少五个互不相关的词，且不复用" },
+            { label: "恢复材料", value: "离线、分开保存；重新生成后更新副本" },
+            { label: "设备", value: "启用可靠锁屏并更新系统，避免在 root 或不可信环境处理敏感库" },
+            { label: "同步与导出", value: "核对服务器、证书和目标目录，及时处置明文导出" },
+        ], callouts: [{ tone: "limit", title: "审计状态", body: "本文是基于源码的实现说明，不等于独立第三方审计、形式化证明或漏洞悬赏结论。行为会演进，应以对应版本源码与发布说明为准。" }] },
+    ],
+    closingTitle: "结论",
+    closing: "FAEVault 的安全模型建立在强主密码、认证加密容器、用途隔离密钥、受控系统入口和明确用户责任之上。重点不是宣称绝对安全，而是让每项保护与限制都能被核对。",
+};
+
+const en: Copy = {
+    kicker: "Security Whitepaper · Android implementation snapshot",
+    title: "Security is a set of explicit boundaries, not a slogan.",
+    intro: "Grounded in the current executable Android code, this document explains how FAEVault encrypts data, moves keys, controls sync and system integrations, and where those protections stop.",
+    snapshot: "Implementation snapshot: August 2026 · PMV v1 / cryptographic suite 1",
+    summaryTitle: "Current security baseline",
+    summary: [
+        { label: "Primary vault", value: "PMVE container (PMVS wire identifier)" },
+        { label: "Password derivation", value: "Argon2id v1.3, standard and hardened profiles" },
+        { label: "Content protection", value: "AES-256-GCM authenticated encryption" },
+        { label: "Purpose separation", value: "Independent subkeys derived with HKDF-SHA256" },
+    ],
+    tocLabel: "On this page",
+    sections: [
+        { id: "overview", title: "01 · Security design overview", lead: "FAEVault is built around a locally encrypted file, not a server that must be trusted with plaintext.", paragraphs: [
+            "A new vault receives a random 256-bit Vault RootKey. Argon2id derives a key-encryption key (KEK) from the master password, and that KEK wraps the RootKey. Changing the password rewraps the same RootKey rather than using a password as the direct content key.",
+            "HKDF-SHA256 separates roots for metadata, entries, attachments, indexes, the search index, integrity, sync authentication, and key wrapping. Keys are derived again by object, generation, and attachment chunk to avoid cross-context reuse.",
+        ], callouts: [{ tone: "note", title: "Document scope", body: "This page describes the current Android implementation. Planned work, desktop-only behavior, and mechanisms not confirmed in code are not presented as shipped features." }] },
+        { id: "threat-model", title: "02 · Threat model and trust boundaries", lead: "The design targets stolen vault files, untrusted remote storage, transfer corruption, and unauthorized system requests.", paragraphs: [
+            "In-app cooldowns only limit attempts made through the application. An attacker with a copied .pmv can perform offline guessing, so password strength remains part of the security boundary.",
+        ], callouts: [
+            { tone: "protect", title: "Designed to protect", body: "A locked .pmv copied by an attacker; encrypted vaults stored by cloud or WebDAV; damaged or substituted sync data; and autofill or passkey requests with a mismatched caller." },
+            { tone: "limit", title: "Does not protect", body: "A rooted or fully compromised device, a hijacked unlocked process, malicious keyboards, shoulder surfing, capture after protection is disabled, exposed passwords/recovery keys/exports, or offline guessing against a weak password." },
+        ] },
+        { id: "cryptography", title: "03 · PMVE cryptographic architecture", lead: "PMV v1 suite 1 separates password derivation, envelopes, block encryption, header authentication, and signing identity.", facts: [
+            { label: "Standard Argon2id", value: "v1.3; 64 MiB; 3 iterations; parallelism 1" },
+            { label: "Hardened Argon2id", value: "v1.3; 128 MiB; 4 iterations; parallelism 1" },
+            { label: "Accepted read bounds", value: "64–256 MiB; 3–10 iterations; parallelism 1–4" },
+            { label: "Key derivation", value: "HKDF-SHA256, separated by vault, purpose, object, generation, and chunk" },
+            { label: "Authenticated encryption", value: "AES-256-GCM; random nonce; contextual AAD; 128-bit tag" },
+            { label: "Header and identity", value: "HMAC-SHA256 authenticates the full header; Ed25519 binds the signing identity" },
+        ], paragraphs: [
+            "The fixed 4 KiB PMVH bootstrap header stores versions, Argon2id parameters and salt, plus encrypted password, recovery, and signing-seed envelopes. Unlock authenticates the complete header; unsupported or out-of-policy KDF parameters are rejected.",
+            "Every immutable block uses a random nonce and AAD containing its vault ID, type, object, revision, and chunk context. Modified ciphertext or context makes AES-GCM authentication fail instead of returning unverified plaintext.",
+        ] },
+        { id: "key-lifecycle", title: "04 · Unlock and key lifecycle", lead: "Password, recovery, and biometric unlock are different entrances to the same verified RootKey and vault identity.", facts: [
+            { label: "Recovery key", value: "Random 256-bit; PMRK1 Crockford Base32; checksum and short fingerprint" },
+            { label: "Biometrics", value: "AndroidKeyStore AES-GCM + BIOMETRIC_STRONG" },
+            { label: "Failure backoff", value: "250 ms, 500 ms, 1 s, 2 s; then 30 s after the fifth failure, increasing 30 s per round" },
+        ], paragraphs: [
+            "The current PMVE path wraps vault-bound RootKey material tied to the vault ID, signing public key, and key revision. It does not store the plaintext master password as the biometric credential. Enrollment changes invalidate the AndroidKeyStore key; stale material is cleared and password unlock is required.",
+            "A recovery key opens a separate HKDF-SHA256 recovery envelope and can install a new password envelope without the old password. Session holders and temporary arrays are cleared where controlled by the code, although a managed runtime cannot guarantee physical memory erasure.",
+        ] },
+        { id: "storage", title: "05 · Entries, attachments, and integrity", lead: "The main vault uses append-oriented immutable blocks, with commits selecting the visible state.", paragraphs: [
+            "Entries, index pages, metadata, commits, tombstones, and attachment objects are encoded and authenticated separately. Object IDs and generations enter key derivation and AAD. Updates create a new generation rather than overwriting ciphertext in place; reads validate headers, tags, index relationships, and commit state.",
+            "Attachments use independently derived object and chunk keys. Large objects can be read on demand without decrypting the whole file for a small range, while chunk and whole-object digests detect damage. Old blocks can remain until compaction or maintenance.",
+        ], callouts: [{ tone: "limit", title: "Observable metadata", body: "Encryption protects content and authenticated structure, but a file holder may still observe file size, modification and transfer time, IP address, and approximate growth." }] },
+        { id: "android-protections", title: "06 · Android platform protections", lead: "Platform controls reduce accidental exposure, each within a defined scope.", facts: [
+            { label: "Local boundary", value: "App-private storage; Android backup and device transfer exclude application data" },
+            { label: "Screen protection", value: "Configurable FLAG_SECURE; sensitive flows can require it" },
+            { label: "Background hiding", value: "Optional Recents exclusion, separate from capture protection" },
+            { label: "Clipboard", value: "Marked sensitive; configurable clearing only when content remains identifiable as app-owned" },
+        ], paragraphs: ["FLAG_SECURE blocks ordinary screenshots, recording, and non-secure display capture; it is not a promise against a rooted OS or another camera. Recents hiding is separate. Vault authentication, autofill, passkey, and sync-authorization screens reuse secure-window policy."] },
+        { id: "autofill-passkeys", title: "07 · Autofill and passkeys", lead: "Android Autofill and Credential Manager are separate channels; both verify the caller and current user.", paragraphs: [
+            "Autofill reads login credentials only from an unlocked vault or after current authentication. Candidates match an associated app package or HTTPS host; signing certificates can be reduced to SHA-256 fingerprints. Requests targeting FAEVault, settings, permission managers, and other sensitive targets are rejected.",
+            "Passkey operations validate RP ID, HTTPS origin or Android APK key hash, challenge, and allowed credential IDs. Native apps require Digital Asset Links to associate package, signing certificate, and RP; trusted browsers also pass an allowlist. Signatures cover authenticator data and the client data hash.",
+        ], callouts: [{ tone: "limit", title: "System selection still matters", body: "Installing FAEVault does not make it the provider for every request. Credential Manager and Autofill selection, caller behavior, and website association remain outside the app's control." }] },
+        { id: "sync", title: "08 · LAN, WebDAV, and cloud sync", lead: "Sync transfers an encrypted vault; merging happens locally after unlock and validation, followed by re-encryption.", paragraphs: [
+            "LAN pairing uses SPAKE2-P256 to establish a shared secret from the pairing code, then derives session material and performs authorization. WebDAV and cloud paths apply their HTTPS, redirect, and certificate checks. WebDAV can pin the server certificate's SHA-256 fingerprint to detect an unexpected change.",
+            "Downloads enter a temporary path and pass structural, authentication, and logical checks before merge or replacement. Results can be read back and verified, and identical content avoids unnecessary rewrites. Providers still see account, IP, timing, object size, and ciphertext files.",
+        ], callouts: [{ tone: "note", title: "Endpoint responsibility", body: "Transport encryption does not replace trustworthy endpoint configuration. Users remain responsible for WebDAV, cloud credentials, pin updates, and LAN pairing codes." }] },
+        { id: "backup-export", title: "09 · Backup, export, and recovery", lead: "Export types have different properties; originating in an encrypted vault does not make every export encrypted.", paragraphs: [
+            ".pmv is the encrypted working vault. .pmbak uses a separate backup cryptographic wrapper and export passphrase. External real-time backup copies the vault and uses write-and-verify behavior to reduce partial-write replacement risk.",
+            "CSV, JSON, media, and other readable exports may contain plaintext. Their destination, sharing app, cloud trash, and downloads folder are outside the vault session. A recovery key can reset the master password, so keep it offline and separate from untrusted vault copies.",
+        ] },
+        { id: "guidance-limitations", title: "10 · Guidance and honest limitations", lead: "Cryptography strengthens a boundary; it does not replace safe operation.", facts: [
+            { label: "Master password", value: "Use a random long password or at least five unrelated words; never reuse it" },
+            { label: "Recovery material", value: "Keep offline and separate; update saved copies after regeneration" },
+            { label: "Device", value: "Use a strong screen lock and current OS; avoid rooted or untrusted environments" },
+            { label: "Sync and exports", value: "Verify servers, certificates, and destinations; dispose of plaintext promptly" },
+        ], callouts: [{ tone: "limit", title: "Audit status", body: "This source-grounded document is not an independent audit, formal proof, or bug-bounty conclusion. Behavior evolves; matching source and release notes remain authoritative." }] },
+    ],
+    closingTitle: "Conclusion",
+    closing: "FAEVault's model rests on a strong master password, an authenticated encrypted container, purpose-separated keys, controlled system entry points, and explicit user responsibilities. The goal is reviewable protections and limitations, not a claim of absolute security.",
+};
+
+const c = locale === "zh-cn" ? zh : en;
 ---
 
 <PageShell theme="journey" kicker={c.kicker} title={c.title} intro={c.intro}>
-    {
-        c.sections.map((sec) => (
-            <section class="wp-section">
-                <h2 id={sec.id}>{sec.title}</h2>
-                <div class="wp-grid">
-                    {sec.items.map((item) => (
-                        <article class="wp-card">
-                            <strong>{item.label}</strong>
-                            <p>{item.body}</p>
-                        </article>
-                    ))}
-                </div>
-            </section>
-        ))
-    }
+    <p class="wp-snapshot">{c.snapshot}</p>
+    <section class="wp-summary" aria-labelledby="security-baseline">
+        <h2 id="security-baseline">{c.summaryTitle}</h2>
+        <dl>{c.summary.map((item) => <div><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl>
+    </section>
+    <div class="wp-layout">
+        <nav class="wp-toc" aria-label={c.tocLabel}>
+            <strong>{c.tocLabel}</strong>
+            <ol>{c.sections.map((section) => <li><a href={`#${section.id}`}>{section.title}</a></li>)}</ol>
+        </nav>
+        <article class="wp-document">
+            {c.sections.map((section) => (
+                <section class="wp-section" id={section.id}>
+                    <header><h2>{section.title}</h2><p>{section.lead}</p></header>
+                    {section.paragraphs?.map((paragraph) => <p class="wp-body">{paragraph}</p>)}
+                    {section.facts && <div class="wp-facts" role="table">{section.facts.map((fact) => <div class="wp-fact" role="row"><strong role="rowheader">{fact.label}</strong><span role="cell">{fact.value}</span></div>)}</div>}
+                    {section.callouts?.map((callout) => <aside class={`wp-callout is-${callout.tone}`}><strong>{callout.title}</strong><p>{callout.body}</p></aside>)}
+                </section>
+            ))}
+            <footer class="wp-closing"><h2>{c.closingTitle}</h2><p>{c.closing}</p></footer>
+        </article>
+    </div>
 </PageShell>
 
 <style>
-    .wp-section {
-        margin-top: 5rem;
-    }
-    .wp-section h2 {
-        color: #173f50;
-        font: 750 clamp(1.4rem, 2.8vw, 2rem)/1.15 var(--font-sans);
-        letter-spacing: -0.03em;
-        margin: 0 0 1.6rem;
-        padding-bottom: 0.6rem;
-        border-bottom: 2px solid rgba(43, 124, 154, 0.2);
-    }
-    .wp-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-        gap: 1.2rem;
-    }
-    .wp-card {
-        padding: 1.4rem 1.3rem;
-        border-radius: 1.2rem;
-        border: 1px solid rgba(71, 106, 122, 0.12);
-        background: rgba(255, 255, 255, 0.6);
-        box-shadow: 0 6px 20px rgba(41, 81, 95, 0.06);
-    }
-    .wp-card strong {
-        display: block;
-        margin-bottom: 0.5rem;
-        color: #173f50;
-        font-size: 0.95rem;
-        font-weight: 760;
-    }
-    .wp-card p {
-        margin: 0;
-        color: #5a727c;
-        font: 0.92rem/1.7 var(--font-sans);
-    }
-    @media (max-width: 760px) {
-        .wp-grid {
-            grid-template-columns: 1fr;
-        }
-    }
+    .wp-snapshot { margin: 2.2rem 0 0; color: #71838d; font: 650 .78rem/1.5 var(--font-sans); letter-spacing: .04em; }
+    .wp-summary { margin-top: 2rem; padding: 1.5rem; border: 1px solid rgba(74,93,146,.14); border-radius: 1.4rem; background: linear-gradient(135deg,rgba(243,247,255,.92),rgba(238,250,249,.78)); box-shadow: 0 18px 50px rgba(49,75,103,.07); }
+    .wp-summary h2 { margin: 0 0 1rem; color: #1b4050; font: 780 1rem/1.3 var(--font-sans); }
+    .wp-summary dl { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: .8rem; margin: 0; }
+    .wp-summary dl div { min-width: 0; padding: .85rem .9rem; border-radius: 1rem; background: rgba(255,255,255,.72); }
+    .wp-summary dt { color: #6b7c85; font: 700 .7rem/1.3 var(--font-sans); letter-spacing: .05em; text-transform: uppercase; }
+    .wp-summary dd { margin: .42rem 0 0; color: #173f50; font: 720 .88rem/1.5 var(--font-sans); overflow-wrap: anywhere; }
+    .wp-layout { display: grid; grid-template-columns: 220px minmax(0,760px); justify-content: space-between; gap: clamp(2.5rem,6vw,6rem); margin-top: 5rem; }
+    .wp-toc { position: sticky; top: 6.5rem; align-self: start; max-height: calc(100vh - 8rem); overflow: auto; padding: 1rem 0; }
+    .wp-toc > strong { display: block; margin-bottom: .8rem; color: #173f50; font: 780 .78rem/1.3 var(--font-sans); }
+    .wp-toc ol { display: grid; gap: .15rem; margin: 0; padding: 0; list-style: none; }
+    .wp-toc a { display: block; padding: .52rem .65rem; border-left: 2px solid rgba(61,116,139,.14); color: #607680; font: 650 .78rem/1.45 var(--font-sans); text-decoration: none; transition: color .2s,border-color .2s,background .2s; }
+    .wp-toc a:hover, .wp-toc a:focus-visible { border-color: #3c91ad; color: #17485b; background: rgba(218,241,247,.45); outline: none; }
+    .wp-document { min-width: 0; }
+    .wp-section { margin: 0 0 5.5rem; scroll-margin-top: 7rem; }
+    .wp-section header { margin-bottom: 1.7rem; padding-bottom: 1.1rem; border-bottom: 1px solid rgba(43,124,154,.2); }
+    .wp-section h2, .wp-closing h2 { margin: 0; color: #173f50; font: 780 clamp(1.5rem,2.5vw,2rem)/1.18 var(--font-sans); letter-spacing: -.035em; }
+    .wp-section header p { max-width: 680px; margin: .75rem 0 0; color: #3d6979; font: 650 1rem/1.7 var(--font-sans); }
+    .wp-body { margin: 0 0 1.05rem; color: #566e78; font: .96rem/1.9 var(--font-sans); }
+    .wp-facts { margin: 1.5rem 0; overflow: hidden; border: 1px solid rgba(57,104,125,.14); border-radius: 1.15rem; background: rgba(255,255,255,.55); }
+    .wp-fact { display: grid; grid-template-columns: minmax(150px,.7fr) minmax(0,1.7fr); gap: 1.2rem; padding: .95rem 1rem; border-top: 1px solid rgba(57,104,125,.1); }
+    .wp-fact:first-child { border-top: 0; } .wp-fact strong { color: #244f60; font: 750 .82rem/1.6 var(--font-sans); } .wp-fact span { color: #5b717a; font: .86rem/1.65 var(--font-sans); overflow-wrap: anywhere; }
+    .wp-callout { margin: 1.35rem 0; padding: 1.05rem 1.15rem; border-left: 3px solid #5a9fb6; border-radius: .25rem 1rem 1rem .25rem; background: rgba(225,244,248,.55); }
+    .wp-callout.is-protect { border-color: #419578; background: rgba(224,246,237,.58); } .wp-callout.is-limit { border-color: #b67a72; background: rgba(251,235,231,.64); }
+    .wp-callout strong { color: #234d5c; font: 770 .85rem/1.4 var(--font-sans); } .wp-callout p { margin: .4rem 0 0; color: #5b6f77; font: .88rem/1.75 var(--font-sans); }
+    .wp-closing { padding: 1.5rem 0 0; border-top: 2px solid rgba(43,124,154,.2); } .wp-closing p { margin: 1rem 0 0; color: #506b76; font: 1rem/1.85 var(--font-sans); }
+    @media (max-width: 960px) { .wp-summary dl { grid-template-columns: repeat(2,minmax(0,1fr)); } .wp-layout { grid-template-columns: 1fr; gap: 2rem; margin-top: 3.5rem; } .wp-toc { position: static; max-height: none; padding: 1rem; border: 1px solid rgba(57,104,125,.12); border-radius: 1rem; background: rgba(255,255,255,.48); } .wp-toc ol { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+    @media (max-width: 760px) { .wp-summary { padding: 1rem; } .wp-summary dl { grid-template-columns: 1fr; } .wp-layout { margin-top: 2.6rem; } .wp-toc { overflow-x: auto; padding: .8rem; } .wp-toc > strong { position: sticky; left: 0; } .wp-toc ol { display: flex; width: max-content; } .wp-toc li { width: min(72vw,260px); flex: 0 0 auto; } .wp-toc a { min-height: 44px; border-left: 0; border-bottom: 2px solid rgba(61,116,139,.14); } .wp-section { margin-bottom: 4rem; scroll-margin-top: 5rem; } .wp-fact { grid-template-columns: 1fr; gap: .25rem; padding: .9rem; } .wp-body { font-size: .93rem; line-height: 1.82; } }
+    @media (prefers-reduced-motion: reduce) { .wp-toc a { transition: none; } }
 </style>
