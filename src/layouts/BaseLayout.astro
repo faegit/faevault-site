@@ -588,9 +588,12 @@ const menuLabel = locale === "zh-cn" ? "打开菜单" : "Open menu";
         document.body.dataset.copyGuardReady = "true";
         const isTextField = (el: EventTarget | null) =>
             el instanceof HTMLElement && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable);
+        const isSaveable = (el: EventTarget | null) =>
+            el instanceof HTMLElement && !!el.closest(".qr-real");
         const block = (e: Event) => {
             if (document.body.classList.contains("copy-enabled")) return;
             if (isTextField(e.target)) return;
+            if (isSaveable(e.target)) return;
             e.preventDefault();
         };
         document.addEventListener("copy", block);
