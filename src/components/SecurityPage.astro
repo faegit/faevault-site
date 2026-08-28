@@ -1,193 +1,299 @@
 ---
 import type { Locale } from "../i18n/config";
 import PageShell from "./PageShell.astro";
-interface Props { locale: Locale }
+interface Props {
+    locale: Locale;
+}
 const { locale } = Astro.props;
-const c = locale === "zh-cn"
-  ? {
-    kicker: "安全白皮书",
-    title: "加密设计与安全架构。",
-    intro: "本文档详细说明保险库的加密方案、密钥管理、威胁模型与平台安全机制。",
-    sections: [
-      {
-        id: "encryption",
-        title: "加密架构",
-        items: [
-          { label: "密钥派生", body: "主密码经 Argon2id v1.3（内存 64 MiB、迭代 3、并行度 1）派生为 256-bit 密钥加密密钥（KEK），再以信封加密保护 Vault Root Key；随后通过 HKDF-SHA256 做用途隔离，派生出多把相互独立的根密钥。Argon2id 是 memory-hard 函数，可有效抵御 ASIC/GPU 暴力破解。" },
-          { label: "对称加密", body: "使用 AES-256-GCM（Galois/Counter Mode），在加密同时提供完整性认证，防止密文被篡改。每条加密操作使用独立随机 Nonce，并以用途相关的附加数据（AAD）绑定上下文。" },
-          { label: "文件格式", body: "主库 .pmv 采用 PMVE 容器（wire magic PMVS）：文件头携带 Argon2id 的盐与版本；数据以追加写（append-only）的分块方式存储，每块使用由根密钥经 HKDF 派生的独立 AES-256-GCM 密钥（含 AAD）加密。加密与序列化格式与桌面端逐字节一致，可双向互导；备份 .pmbak 则使用独立的导出口令加密。" },
-        ],
-      },
-      {
-        id: "key-management",
-        title: "密钥管理",
-        items: [
-          { label: "主密码", body: "主密码用于解锁保险库和必要的二次验证，不以明文写入保险库文件。解锁后的会话材料仅保留在应用进程内存中。" },
-          { label: "生物识别", body: "启用生物识别后，AndroidKeyStore 中的 AES/GCM 密钥（要求 BIOMETRIC_STRONG 验证）会包裹设备解锁信封（其中包含主密码）；新增或删除生物识别模板后，旧密文自动失效。应用不读取或保存指纹、人脸等原始生物特征。" },
-          { label: "会话安全", body: "会话密钥由 SessionSecret / SessionBytes 在内存中保存，使用后对临时明文字节填零；锁定时清理会话状态。" },
-          { label: "恢复密钥", body: "可生成一把随机的 256-bit 恢复密钥（带校验码），用于在主密码丢失时重置主密码；每次使用后会失效并需要重新保存。恢复流程不依赖任何第三方服务。" },
-        ],
-      },
-      {
-        id: "platform-security",
-        title: "平台安全",
-        items: [
-          { label: "屏幕防护", body: "屏幕保护默认启用 FLAG_SECURE；用户通过主密码验证并确认风险后可以关闭。自动填充认证、Passkey 与同步扫码等敏感窗口始终保持保护。" },
-          { label: "剪贴板防护", body: "复制敏感字段时使用系统敏感标记。自动清理时间可在 0–600 秒之间设置，默认 60 秒；0 表示不自动清理。" },
-          { label: "解锁失败冷却", body: "前四次失败分别增加 0.25、0.5、1、2 秒重试延迟；第五次进入 30 秒冷却，后续轮次按 60、90 秒递增，成功解锁后清零。" },
-          { label: "敏感信息门禁", body: "查看银行卡、身份证、API 密钥等敏感条目的详细字段或图片，以及执行修改主密码、导出等操作前，均需二次输入当前主密码。" },
-        ],
-      },
-      {
-        id: "autofill-security",
-        title: "自动填充安全",
-        items: [
-          { label: "逐次认证", body: "每次填充或保存新凭证均需通过当前保险库的强生物识别或主密码验证。后台不维护明文免验证缓存。" },
-          { label: "来源验证", body: "按关联应用包名或 HTTPS 主机精确匹配来源。拒绝来自本应用、系统设置/权限管理等敏感来源的填充请求。" },
-          { label: "安全边界", body: "不使用无障碍服务、悬浮窗、自启动或电池白名单权限。自动填充仅作用于登录类型条目，不影响其他条目类别。" },
-        ],
-      },
-      {
-        id: "sync-security",
-        title: "同步安全",
-        items: [
-          { label: "传输约束", body: "WebDAV 与局域网同步均通过 HTTPS 传输，并拒绝从 HTTPS 降级到 HTTP 的重定向。WebDAV 可固定服务器证书的 SHA-256 指纹；局域网配对使用 SPAKE2-P256 派生会话密钥。" },
-          { label: "同步内容", body: "上传和下载的是加密的保险库文件。默认同步会在本机解密、合并并重新加密后写回；云端或 WebDAV 服务仍能看到连接元数据与密文文件。" },
-          { label: "完整性校验", body: "同步完成后读回密文并解密校验，确保数据未在传输或存储过程中损坏。逻辑内容一致时跳过不必要的远端重写。" },
-        ],
-      },
-      {
-        id: "threat-model",
-        title: "威胁模型",
-        items: [
-          { label: "应用边界", body: "保险库位于应用私有目录，Android 自动备份已关闭。FLAG_SECURE 保护屏幕内容，但无法代替设备锁屏、系统更新和可信设备环境。" },
-          { label: "设备丢失", body: "保险库文件使用 Argon2id 与 AES-256-GCM 加密。实际保护强度仍取决于主密码质量、设备安全状态以及是否泄露了导出文件。" },
-          { label: "离线文件", body: "获取 .pmv 文件的攻击者可以离线尝试主密码；Argon2id 参数会提高每次猜测的计算与内存成本，但不能弥补弱主密码。" },
-        ],
-      },
-    ],
-  }
-  : {
-    kicker: "Security Whitepaper",
-    title: "Encryption design & security architecture.",
-    intro: "This document details the encryption scheme, key management, threat model, and platform security mechanisms used by FAEVault.",
-    sections: [
-      {
-        id: "encryption",
-        title: "Encryption Architecture",
-        items: [
-          { label: "Key Derivation", body: "The master password is derived into a 256-bit key-encryption key (KEK) using Argon2id v1.3 (64 MiB memory, 3 iterations, parallelism 1), then an envelope protects the Vault Root Key. HKDF-SHA256 isolates purposes to derive several independent root keys. Argon2id is a memory-hard function that resists ASIC/GPU brute-force attacks." },
-          { label: "Symmetric Encryption", body: "AES-256-GCM (Galois/Counter Mode) provides both confidentiality and authenticated integrity protection. Each encryption operation uses a unique random Nonce and binds context with purpose-specific additional authenticated data (AAD)." },
-          { label: "File Format", body: "The main vault .pmv uses a PMVE container (wire magic PMVS): the header carries the Argon2id salt and version; data is stored as append-only blocks, each encrypted with a unique AES-256-GCM key (with AAD) derived from a root key via HKDF. The encryption and serialization format is byte-identical with the desktop client for bidirectional exchange; backups (.pmbak) are encrypted with a separate export passphrase." },
-        ],
-      },
-      {
-        id: "key-management",
-        title: "Key Management",
-        items: [
-          { label: "Master Password", body: "The master password unlocks the vault and selected sensitive actions. It is not written in plaintext to the vault file; unlocked session material remains in app-process memory." },
-          { label: "Biometrics", body: "When enabled, an AndroidKeyStore AES/GCM key that requires BIOMETRIC_STRONG wraps a device-unlock envelope holding the master password; adding or removing a biometric template invalidates the old ciphertext automatically. The app never reads or stores raw fingerprint or face data." },
-          { label: "Session Security", body: "SessionSecret and SessionBytes hold session keys in memory and zero temporary plaintext byte arrays after use. Locking clears session state." },
-          { label: "Recovery Key", body: "A randomly generated 256-bit recovery key (with a checksum) can reset the master password if it is lost; the key expires after each use and must be saved again. The recovery flow relies on no third party." },
-        ],
-      },
-      {
-        id: "platform-security",
-        title: "Platform Security",
-        items: [
-          { label: "Screen Protection", body: "FLAG_SECURE is enabled by default and can be disabled only after master-password verification and a risk confirmation. Sensitive autofill, passkey, and sync-scanning windows remain protected." },
-          { label: "Clipboard Guard", body: "Copied secrets use the system sensitive flag. Auto-clear is configurable from 0 to 600 seconds and defaults to 60; zero disables automatic clearing." },
-          { label: "Unlock Cooldown", body: "The first four failures add retry delays of 0.25, 0.5, 1, and 2 seconds. The fifth triggers a 30-second cooldown; later rounds rise to 60 and 90 seconds. Success clears the state." },
-          { label: "Sensitive Data Gate", body: "Viewing detailed fields or images for bank card, ID, and API key entries, as well as changing the master password or exporting data, requires re-entering the current master password." },
-        ],
-      },
-      {
-        id: "autofill-security",
-        title: "Autofill Security",
-        items: [
-          { label: "Per-action Authentication", body: "Every fill or new-credential save requires strong biometric or master-password authentication for the current vault. No unauthenticated plaintext cache is kept in the background." },
-          { label: "Origin Verification", body: "Sources are matched exactly by associated app package name or HTTPS host. Fill requests from FAEVault itself, system settings, permission managers, and other sensitive sources are rejected." },
-          { label: "Security Boundaries", body: "No accessibility services, floating windows, auto-start, or battery whitelist permissions. Autofill applies to login entries only." },
-        ],
-      },
-      {
-        id: "sync-security",
-        title: "Sync Security",
-        items: [
-          { label: "Transport Constraints", body: "WebDAV and LAN sync both transfer over HTTPS and reject any redirect that downgrades HTTPS to HTTP. WebDAV can pin the server certificate's SHA-256 fingerprint, while LAN pairing derives a session key with SPAKE2-P256." },
-          { label: "Synced Content", body: "Uploads and downloads contain encrypted vault files. Default sync decrypts and merges locally before re-encrypting and writing back; storage providers can still observe connection metadata and ciphertext files." },
-          { label: "Integrity Verification", body: "After sync, ciphertext is read back and decrypted to verify integrity. Logically identical content skips unnecessary remote overwrites." },
-        ],
-      },
-      {
-        id: "threat-model",
-        title: "Threat Model",
-        items: [
-          { label: "App Boundary", body: "The vault lives in the app-private directory and Android automatic backup is disabled. FLAG_SECURE protects screen content but does not replace device locking, system updates, or a trusted device environment." },
-          { label: "Device Loss", body: "Vault files use Argon2id and AES-256-GCM. Protection still depends on master-password strength, device security, and whether exported files have been exposed." },
-          { label: "Offline File", body: "An attacker with a .pmv file can guess master passwords offline. The Argon2id parameters raise the cost of each guess but cannot compensate for a weak password." },
-        ],
-      },
-    ],
-  };
+const c =
+    locale === "zh-cn"
+        ? {
+              kicker: "安全白皮书",
+              title: "加密设计与安全架构。",
+              intro: "本文档详细说明保险库的加密方案、密钥管理、威胁模型与平台安全机制。",
+              sections: [
+                  {
+                      id: "encryption",
+                      title: "加密架构",
+                      items: [
+                          {
+                              label: "密钥派生",
+                              body: "主密码经 Argon2id v1.3（内存 64 MiB、迭代 3、并行度 1）派生为 256-bit 密钥加密密钥（KEK），再以信封加密保护 Vault Root Key；随后通过 HKDF-SHA256 做用途隔离，派生出多把相互独立的根密钥。Argon2id 是 memory-hard 函数，可有效抵御 ASIC/GPU 暴力破解。",
+                          },
+                          {
+                              label: "对称加密",
+                              body: "使用 AES-256-GCM（Galois/Counter Mode），在加密同时提供完整性认证，防止密文被篡改。每条加密操作使用独立随机 Nonce，并以用途相关的附加数据（AAD）绑定上下文。",
+                          },
+                          {
+                              label: "文件格式",
+                              body: "主库 .pmv 采用 PMVE 容器（wire magic PMVS）：文件头携带 Argon2id 的盐与版本；数据以追加写（append-only）的分块方式存储，每块使用由根密钥经 HKDF 派生的独立 AES-256-GCM 密钥（含 AAD）加密。加密与序列化格式与桌面端逐字节一致，可双向互导；备份 .pmbak 则使用独立的导出口令加密。",
+                          },
+                      ],
+                  },
+                  {
+                      id: "key-management",
+                      title: "密钥管理",
+                      items: [
+                          {
+                              label: "主密码",
+                              body: "主密码用于解锁保险库，以及必要的二次验证；它不会以明文写入保险库文件。解锁后的会话材料只保留在应用进程的内存中。",
+                          },
+                          {
+                              label: "生物识别",
+                              body: "启用生物识别后，AndroidKeyStore 中的 AES/GCM 密钥（要求 BIOMETRIC_STRONG 验证）会包裹设备解锁信封（其中包含主密码）；新增或删除生物识别模板后，旧密文自动失效。应用不读取或保存指纹、人脸等原始生物特征。",
+                          },
+                          { label: "会话安全", body: "会话密钥由 SessionSecret / SessionBytes 保存在内存中，用完后会对临时明文字节清零；锁定时清理会话状态。" },
+                          {
+                              label: "恢复密钥",
+                              body: "可生成一把随机的 256-bit 恢复密钥（带校验码），用于在主密码丢失时重置主密码；每次使用后会失效并需要重新保存。恢复流程不依赖任何第三方服务。",
+                          },
+                      ],
+                  },
+                  {
+                      id: "platform-security",
+                      title: "平台安全",
+                      items: [
+                          {
+                              label: "屏幕防护",
+                              body: "屏幕保护默认启用 FLAG_SECURE；用户通过主密码验证并确认风险后可以关闭。自动填充认证、Passkey 与同步扫码等敏感窗口始终保持保护。",
+                          },
+                          { label: "剪贴板防护", body: "复制敏感字段时使用系统敏感标记。自动清理时间可在 0–600 秒之间设置，默认 60 秒；0 表示不自动清理。" },
+                          {
+                              label: "解锁失败冷却",
+                              body: "前四次失败分别增加 0.25、0.5、1、2 秒重试延迟；第五次进入 30 秒冷却，后续轮次按 60、90 秒递增，成功解锁后清零。",
+                          },
+                          {
+                              label: "敏感信息门禁",
+                              body: "查看银行卡、身份证、API 密钥等敏感条目的详细字段或图片，以及执行修改主密码、导出等操作时，都需要再次输入当前主密码。",
+                          },
+                      ],
+                  },
+                  {
+                      id: "autofill-security",
+                      title: "自动填充安全",
+                      items: [
+                          { label: "逐次认证", body: "每次填充或保存新凭证，都必须通过当前保险库的强生物识别或主密码验证；后台不会保留任何明文免验证缓存。" },
+                          { label: "来源验证", body: "按关联应用包名或 HTTPS 主机精确匹配来源。拒绝来自本应用、系统设置/权限管理等敏感来源的填充请求。" },
+                          { label: "安全边界", body: "不使用无障碍服务、自启动或电池白名单等权限。自动填充只作用于登录类条目，不影响其它条目类型。" },
+                      ],
+                  },
+                  {
+                      id: "sync-security",
+                      title: "同步安全",
+                      items: [
+                          {
+                              label: "传输约束",
+                              body: "WebDAV 与局域网同步均通过 HTTPS 传输，并拒绝从 HTTPS 降级到 HTTP 的重定向。WebDAV 可固定服务器证书的 SHA-256 指纹；局域网配对使用 SPAKE2-P256 派生会话密钥。",
+                          },
+                          {
+                              label: "同步内容",
+                              body: "上传和下载的都是加密后的保险库文件。默认同步会先在本机解密、合并，再重新加密写回；云端或 WebDAV 服务仍然能看到连接元数据与密文文件。",
+                          },
+                          { label: "完整性校验", body: "同步完成后读回密文并解密校验，确保数据未在传输或存储过程中损坏。逻辑内容一致时跳过不必要的远端重写。" },
+                      ],
+                  },
+                  {
+                      id: "threat-model",
+                      title: "威胁模型",
+                      items: [
+                          {
+                              label: "应用边界",
+                              body: "保险库位于应用私有目录，Android 自动备份已关闭。FLAG_SECURE 保护屏幕内容，但无法代替设备锁屏、系统更新和可信设备环境。",
+                          },
+                          {
+                              label: "设备丢失",
+                              body: "保险库文件使用 Argon2id 与 AES-256-GCM 加密。实际保护强度仍取决于主密码质量、设备安全状态以及是否泄露了导出文件。",
+                          },
+                          {
+                              label: "离线文件",
+                              body: "拿到 .pmv 文件的攻击者可以离线尝试主密码；Argon2id 的参数会提高每次猜测所需的计算与内存成本，却无法弥补弱主密码的问题。",
+                          },
+                      ],
+                  },
+              ],
+          }
+        : {
+              kicker: "Security Whitepaper",
+              title: "Encryption design & security architecture.",
+              intro: "This document details the encryption scheme, key management, threat model, and platform security mechanisms used by FAEVault.",
+              sections: [
+                  {
+                      id: "encryption",
+                      title: "Encryption Architecture",
+                      items: [
+                          {
+                              label: "Key Derivation",
+                              body: "The master password is derived into a 256-bit key-encryption key (KEK) using Argon2id v1.3 (64 MiB memory, 3 iterations, parallelism 1), then an envelope protects the Vault Root Key. HKDF-SHA256 isolates purposes to derive several independent root keys. Argon2id is a memory-hard function that resists ASIC/GPU brute-force attacks.",
+                          },
+                          {
+                              label: "Symmetric Encryption",
+                              body: "AES-256-GCM (Galois/Counter Mode) provides both confidentiality and authenticated integrity protection. Each encryption operation uses a unique random Nonce and binds context with purpose-specific additional authenticated data (AAD).",
+                          },
+                          {
+                              label: "File Format",
+                              body: "The main vault .pmv uses a PMVE container (wire magic PMVS): the header carries the Argon2id salt and version; data is stored as append-only blocks, each encrypted with a unique AES-256-GCM key (with AAD) derived from a root key via HKDF. The encryption and serialization format is byte-identical with the desktop client for bidirectional exchange; backups (.pmbak) are encrypted with a separate export passphrase.",
+                          },
+                      ],
+                  },
+                  {
+                      id: "key-management",
+                      title: "Key Management",
+                      items: [
+                          {
+                              label: "Master Password",
+                              body: "The master password unlocks the vault and selected sensitive actions. It is not written in plaintext to the vault file; unlocked session material remains in app-process memory.",
+                          },
+                          {
+                              label: "Biometrics",
+                              body: "When enabled, an AndroidKeyStore AES/GCM key that requires BIOMETRIC_STRONG wraps a device-unlock envelope holding the master password; adding or removing a biometric template invalidates the old ciphertext automatically. The app never reads or stores raw fingerprint or face data.",
+                          },
+                          {
+                              label: "Session Security",
+                              body: "SessionSecret and SessionBytes hold session keys in memory and zero temporary plaintext byte arrays after use. Locking clears session state.",
+                          },
+                          {
+                              label: "Recovery Key",
+                              body: "A randomly generated 256-bit recovery key (with a checksum) can reset the master password if it is lost; the key expires after each use and must be saved again. The recovery flow relies on no third party.",
+                          },
+                      ],
+                  },
+                  {
+                      id: "platform-security",
+                      title: "Platform Security",
+                      items: [
+                          {
+                              label: "Screen Protection",
+                              body: "FLAG_SECURE is enabled by default and can be disabled only after master-password verification and a risk confirmation. Sensitive autofill, passkey, and sync-scanning windows remain protected.",
+                          },
+                          {
+                              label: "Clipboard Guard",
+                              body: "Copied secrets use the system sensitive flag. Auto-clear is configurable from 0 to 600 seconds and defaults to 60; zero disables automatic clearing.",
+                          },
+                          {
+                              label: "Unlock Cooldown",
+                              body: "The first four failures add retry delays of 0.25, 0.5, 1, and 2 seconds. The fifth triggers a 30-second cooldown; later rounds rise to 60 and 90 seconds. Success clears the state.",
+                          },
+                          {
+                              label: "Sensitive Data Gate",
+                              body: "Viewing detailed fields or images for bank card, ID, and API key entries, as well as changing the master password or exporting data, requires re-entering the current master password.",
+                          },
+                      ],
+                  },
+                  {
+                      id: "autofill-security",
+                      title: "Autofill Security",
+                      items: [
+                          {
+                              label: "Per-action Authentication",
+                              body: "Every fill or new-credential save requires strong biometric or master-password authentication for the current vault. No unauthenticated plaintext cache is kept in the background.",
+                          },
+                          {
+                              label: "Origin Verification",
+                              body: "Sources are matched exactly by associated app package name or HTTPS host. Fill requests from FAEVault itself, system settings, permission managers, and other sensitive sources are rejected.",
+                          },
+                          {
+                              label: "Security Boundaries",
+                              body: "No accessibility services, floating windows, auto-start, or battery whitelist permissions. Autofill applies to login entries only.",
+                          },
+                      ],
+                  },
+                  {
+                      id: "sync-security",
+                      title: "Sync Security",
+                      items: [
+                          {
+                              label: "Transport Constraints",
+                              body: "WebDAV and LAN sync both transfer over HTTPS and reject any redirect that downgrades HTTPS to HTTP. WebDAV can pin the server certificate's SHA-256 fingerprint, while LAN pairing derives a session key with SPAKE2-P256.",
+                          },
+                          {
+                              label: "Synced Content",
+                              body: "Uploads and downloads contain encrypted vault files. Default sync decrypts and merges locally before re-encrypting and writing back; storage providers can still observe connection metadata and ciphertext files.",
+                          },
+                          {
+                              label: "Integrity Verification",
+                              body: "After sync, ciphertext is read back and decrypted to verify integrity. Logically identical content skips unnecessary remote overwrites.",
+                          },
+                      ],
+                  },
+                  {
+                      id: "threat-model",
+                      title: "Threat Model",
+                      items: [
+                          {
+                              label: "App Boundary",
+                              body: "The vault lives in the app-private directory and Android automatic backup is disabled. FLAG_SECURE protects screen content but does not replace device locking, system updates, or a trusted device environment.",
+                          },
+                          {
+                              label: "Device Loss",
+                              body: "Vault files use Argon2id and AES-256-GCM. Protection still depends on master-password strength, device security, and whether exported files have been exposed.",
+                          },
+                          {
+                              label: "Offline File",
+                              body: "An attacker with a .pmv file can guess master passwords offline. The Argon2id parameters raise the cost of each guess but cannot compensate for a weak password.",
+                          },
+                      ],
+                  },
+              ],
+          };
 ---
+
 <PageShell theme="journey" kicker={c.kicker} title={c.title} intro={c.intro}>
-  {
-    c.sections.map((sec) => (
-      <section class="wp-section">
-        <h2 id={sec.id}>{sec.title}</h2>
-        <div class="wp-grid">
-          {sec.items.map((item) => (
-            <article class="wp-card">
-              <strong>{item.label}</strong>
-              <p>{item.body}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-    ))
-  }
+    {
+        c.sections.map((sec) => (
+            <section class="wp-section">
+                <h2 id={sec.id}>{sec.title}</h2>
+                <div class="wp-grid">
+                    {sec.items.map((item) => (
+                        <article class="wp-card">
+                            <strong>{item.label}</strong>
+                            <p>{item.body}</p>
+                        </article>
+                    ))}
+                </div>
+            </section>
+        ))
+    }
 </PageShell>
 
 <style>
-  .wp-section {
-    margin-top: 5rem;
-  }
-  .wp-section h2 {
-    color: #173f50;
-    font: 750 clamp(1.4rem, 2.8vw, 2rem)/1.15 var(--font-sans);
-    letter-spacing: -0.03em;
-    margin: 0 0 1.6rem;
-    padding-bottom: 0.6rem;
-    border-bottom: 2px solid rgba(43, 124, 154, 0.2);
-  }
-  .wp-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 1.2rem;
-  }
-  .wp-card {
-    padding: 1.4rem 1.3rem;
-    border-radius: 1.2rem;
-    border: 1px solid rgba(71, 106, 122, 0.12);
-    background: rgba(255, 255, 255, 0.6);
-    box-shadow: 0 6px 20px rgba(41, 81, 95, 0.06);
-  }
-  .wp-card strong {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: #173f50;
-    font-size: 0.95rem;
-    font-weight: 760;
-  }
-  .wp-card p {
-    margin: 0;
-    color: #5a727c;
-    font: 0.92rem/1.7 var(--font-sans);
-  }
-  @media (max-width: 760px) {
-    .wp-grid {
-      grid-template-columns: 1fr;
+    .wp-section {
+        margin-top: 5rem;
     }
-  }
+    .wp-section h2 {
+        color: #173f50;
+        font: 750 clamp(1.4rem, 2.8vw, 2rem)/1.15 var(--font-sans);
+        letter-spacing: -0.03em;
+        margin: 0 0 1.6rem;
+        padding-bottom: 0.6rem;
+        border-bottom: 2px solid rgba(43, 124, 154, 0.2);
+    }
+    .wp-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 1.2rem;
+    }
+    .wp-card {
+        padding: 1.4rem 1.3rem;
+        border-radius: 1.2rem;
+        border: 1px solid rgba(71, 106, 122, 0.12);
+        background: rgba(255, 255, 255, 0.6);
+        box-shadow: 0 6px 20px rgba(41, 81, 95, 0.06);
+    }
+    .wp-card strong {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #173f50;
+        font-size: 0.95rem;
+        font-weight: 760;
+    }
+    .wp-card p {
+        margin: 0;
+        color: #5a727c;
+        font: 0.92rem/1.7 var(--font-sans);
+    }
+    @media (max-width: 760px) {
+        .wp-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>

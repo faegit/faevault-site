@@ -17,9 +17,9 @@ const copy = zh
           heroBadge: "为真正重要的凭据而设计",
           titleLine: "你的密码和数据，",
           titleAccent: "完全由你掌控。",
-           intro: "保险库管理登录、银行卡、身份证、Wi-Fi 与 API 密钥，并将数据保存到本地加密的 .pmv 文件。",
+           intro: "保险库帮你管理登录信息、银行卡、身份证、Wi-Fi 和 API 密钥，全部存放在本地加密的 .pmv 文件里。",
           primaryCta: "免费开始使用",
-          secondaryCta: "浏览全部功能",
+          secondaryCta: "浏览安全白皮书",
           storyLink: "了解产品故事 →",
           proofs: ["本地优先 · 离线可用", "无账号体系 · 打开即用", "多端一致 · 局域网同步"],
           windowTitle: "保险库",
@@ -36,16 +36,16 @@ const copy = zh
           ],
 
           featuresKicker: "功能亮点",
-          featuresTitle: "把安全能力放在需要的位置",
-          featuresCopy: "不堆叠复杂入口，不强迫改变使用习惯。加密、自动填充、Passkey、OCR 与同步，都围绕同一个保险库逻辑组织。",
+           featuresTitle: "安全能力，用在你需要的地方",
+           featuresCopy: "没有层层嵌套的入口，也不强迫你改变习惯。加密、自动填充、Passkey、OCR 和同步，都围绕同一个保险库来组织。",
           featureStackLabel: "功能亮点轮播",
           featureStackHint: "点击或按回车查看下一项",
 
           securityKicker: "安全架构",
           securityTitle: "安全应该可理解，也应该可验证",
-          securityCopy: "设计重点不是制造神秘感，而是让数据如何保存、如何解锁、如何同步都保持清晰边界。",
-          securityList: [
-              { title: "端侧加密", body: "scrypt + AES-256-GCM，敏感数据在离开设备前保持加密状态。" },
+           securityCopy: "设计的目的不是制造神秘感，而是让数据如何保存、如何解锁、如何同步，都保持清晰的边界。",
+           securityList: [
+               { title: "端侧加密", body: "Argon2id + AES-256-GCM 加密，敏感数据在离开设备前始终处于加密状态。" },
               { title: "敏感信息防护", body: "FLAG_SECURE、敏感剪贴板定时清理与解锁失败冷却。" },
               { title: "同步边界可控", body: "WebDAV、局域网同步由你主动发起，不改变保险库的加密边界。" },
           ],
@@ -56,13 +56,13 @@ const copy = zh
           productTitle: "浏览保险库的主要页面。",
           productBody: "从保险库主页到同步与设置，对照查看 PC 与 Android 客户端的主要页面结构。",
 
-          ctaTitle: "把密码管理，重新变得简单",
+           ctaTitle: "让密码管理，重新变得简单",
           ctaCopy: "一个更克制、更透明、更适合长期使用的本地密码管理器。最新版本与更新说明都可以在下载页获取。",
           ctaPrimary: "下载保险库",
           ctaSecondary: "查看更新日志",
 
           supportKicker: "赞助支持项目",
-          supportTitle: "如果保险库对你有帮助，可以赞助支持项目以持续维护。",
+           supportTitle: "如果保险库对你有帮助，欢迎赞助，帮项目持续维护下去。",
           supportPoints: ["由独立开发者维护", "持续的功能更新与优化", "问题修复与版本维护"],
           supportButton: "了解赞助方式",
       }
@@ -70,9 +70,9 @@ const copy = zh
           heroBadge: "Designed for credentials that matter",
           titleLine: "Your passwords and data,",
           titleAccent: "entirely under your control.",
-           intro: "FAEVault manages logins, bank cards, IDs, Wi-Fi details, and API keys, storing everything in a locally encrypted .pmv file.",
+           intro: "FAEVault manages your logins, bank cards, IDs, Wi-Fi details, and API keys — all kept in a locally encrypted .pmv file.",
           primaryCta: "Get started free",
-          secondaryCta: "Browse all features",
+          secondaryCta: "Browse the security whitepaper",
           storyLink: "Discover the product story →",
           proofs: ["Local-first · works offline", "No accounts · open and use", "Consistent across devices"],
           windowTitle: "FAE Vault",
@@ -98,7 +98,7 @@ const copy = zh
           securityTitle: "Security should be understandable — and verifiable",
           securityCopy: "The goal is not mystery. How data is stored, unlocked, and synced should all stay within clear boundaries.",
           securityList: [
-              { title: "End-side encryption", body: "scrypt + AES-256-GCM keeps sensitive data encrypted before it leaves the device." },
+               { title: "End-side encryption", body: "Argon2id + AES-256-GCM keeps sensitive data encrypted before it leaves the device." },
               { title: "Sensitive-data protection", body: "FLAG_SECURE, sensitive clipboard clearing, and unlock-failure cooldowns." },
               { title: "Controllable sync boundary", body: "WebDAV and LAN sync start only when you do — without changing the encryption boundary." },
           ],
@@ -115,7 +115,7 @@ const copy = zh
           ctaSecondary: "View changelog",
 
           supportKicker: "Support the project",
-          supportTitle: "If FAEVault has helped you, you can sponsor the project to support its ongoing maintenance.",
+           supportTitle: "If FAEVault has been useful to you, consider sponsoring its continued upkeep.",
           supportPoints: ["Maintained by an independent developer", "Ongoing feature updates and refinements", "Bug fixes and release maintenance"],
           supportButton: "Learn how to sponsor",
       };
@@ -126,35 +126,35 @@ const features = zh
               kind: "primary",
               icon: "sync",
               title: "跨设备，同一个保险库",
-              body: "支持 WebDAV 与局域网同步，以及 .pmbak、.pmv 和 CSV 导入导出。同步状态清晰可见，设备之间保持一致，而不是让你猜测哪一份数据才是最新。",
+               body: "支持 WebDAV 与局域网同步，也能导入导出 .pmbak、.pmv 和 CSV。同步状态一目了然，多设备之间始终保持一致，不必去猜哪份才是最新。",
               art: null,
           },
           {
               kind: "secondary",
               icon: "vault",
               title: "本地加密保险库",
-              body: "scrypt + AES-256-GCM 加密，密码与通行密钥离线存储在本地文件中，数据完全由你掌控。",
+               body: "采用 Argon2id + AES-256-GCM 加密，密码与通行密钥离线保存在本地文件里，数据完全由你掌控。",
               art: null,
           },
           {
               kind: "third",
               icon: "fill",
               title: "系统自动填充",
-              body: "通过 Android Autofill 服务为登录条目提供填充与保存，并按应用包名或 HTTPS 主机匹配来源。",
+               body: "借助 Android Autofill 服务，为登录条目提供填充与保存，并按应用包名或 HTTPS 主机匹配来源。",
               art: "field",
           },
           {
               kind: "third",
               icon: "passkey",
               title: "Passkey 原生体验",
-              body: "在 Android 14 及以上注册 Credential Provider，处理 Passkey 的创建与凭据查询。",
+               body: "在 Android 14 及以上注册 Credential Provider，负责 Passkey 的创建与凭据查询。",
               art: null,
           },
           {
               kind: "third",
               icon: "ocr",
               title: "OCR 智能识别",
-              body: "扫描或导入银行卡、身份证图像，端上提取卡号、有效期、姓名等信息。",
+               body: "扫描或导入银行卡、身份证图片，在设备端提取卡号、有效期、姓名等信息。",
               art: "otp",
           },
       ]
@@ -163,14 +163,14 @@ const features = zh
               kind: "primary",
               icon: "sync",
               title: "One vault across devices",
-              body: "WebDAV and LAN sync, plus import/export for .pmbak, .pmv, and CSV. Sync state stays visible and consistent, so you never guess which copy is current.",
+               body: "WebDAV and LAN sync, with import/export of .pmbak, .pmv, and CSV. Sync status is always visible and stays consistent across devices, so you never wonder which copy is the latest.",
               art: null,
           },
           {
               kind: "secondary",
               icon: "vault",
               title: "Locally encrypted vault",
-              body: "With scrypt + AES-256-GCM encryption, passwords and passkeys are stored offline in a local file, keeping your data entirely under your control.",
+               body: "Argon2id + AES-256-GCM keeps passwords and passkeys stored offline in a local file, so your data stays entirely in your hands.",
               art: null,
           },
           {
@@ -198,21 +198,21 @@ const features = zh
 
 const productScreensBase = zh
     ? [
-          { title: "主页", body: "搜索、分类查看并快速新增本地条目。", pages: [{ image: productImage("home.png"), label: "保险库主页" }] },
-          { title: "回收站", body: "查看已删除条目，并选择恢复或彻底删除。", pages: [{ image: productImage("trash.png"), label: "回收站" }] },
+           { title: "主页", body: "搜索、按分类查看，并快速新建本地条目。", pages: [{ image: productImage("home.png"), label: "保险库主页" }] },
+           { title: "回收站", body: "查看已删除的条目，选择恢复或彻底删除。", pages: [{ image: productImage("trash.png"), label: "回收站" }] },
           {
               title: "数据库维护",
-              body: "对比重复条目、处理相同服务，并管理回收站自动清理。",
+               body: "对比重复条目、归并同一服务的账号，并管理回收站的自动清理。",
               pages: [{ image: productImage("maintenance.png"), label: "保险库维护" }],
           },
           {
               title: "密码安全检查",
-              body: "查看密码健康状态、高风险项目与改进建议，并按需执行泄露检查。",
+               body: "查看密码健康度、高风险项与改进建议，并按需进行泄露检查。",
               pages: [{ image: productImage("password-security.png"), label: "密码安全" }],
           },
           {
               title: "数据导出和同步",
-              body: "展示本地备份与导出、局域网跨端同步，以及云端文件与 WebDAV 同步。",
+               body: "展示本地备份与导出、局域网跨设备同步，以及云端文件与 WebDAV 同步。",
               pages: [
                   { image: productImage("local-export.png"), label: "本地数据导出" },
                   { image: productImage("lan-sync.png"), label: "局域网跨端同步" },
@@ -221,12 +221,12 @@ const productScreensBase = zh
           },
           {
               title: "详情页展示",
-              body: "集中查看条目资料，并执行复制、编辑和移入回收站等操作。",
+               body: "集中查看条目信息，并可复制、编辑或移入回收站。",
               pages: [{ image: productImage("entry-detail.png"), label: "条目详情" }],
           },
           {
               title: "编辑页展示",
-              body: "编辑基础字段，并按需组合图片、附件及其他内容模块。",
+               body: "编辑基础字段，并按需组合图片、附件等其它内容模块。",
               pages: [{ image: productImage("entry-edit.png"), label: "条目编辑" }],
           },
           {
@@ -240,8 +240,8 @@ const productScreensBase = zh
       ]
     : [
           {
-              title: "Home",
-              body: "Search, browse categories, and quickly add local entries.",
+               title: "Home",
+               body: "Search, browse by category, and quickly add local entries.",
               pages: [{ image: productImage("home.png"), label: "Vault home" }],
           },
           {
@@ -250,18 +250,18 @@ const productScreensBase = zh
               pages: [{ image: productImage("trash.png"), label: "Trash" }],
           },
           {
-              title: "Database maintenance",
-              body: "Compare duplicate entries, handle entries for the same service, and manage automatic Trash cleanup.",
+               title: "Database maintenance",
+               body: "Compare duplicates, merge accounts for the same service, and manage automatic Trash cleanup.",
               pages: [{ image: productImage("maintenance.png"), label: "Vault maintenance" }],
           },
           {
-              title: "Password security check",
-              body: "View password health, high-risk entries, and improvement suggestions, and run breach checks when needed.",
+               title: "Password security check",
+               body: "View password health, high-risk items, and suggestions, and run breach checks when needed.",
               pages: [{ image: productImage("password-security.png"), label: "Password security" }],
           },
           {
-              title: "Data export and sync",
-              body: "See local backup and export, cross-device LAN sync, and cloud-file and WebDAV sync.",
+               title: "Data export and sync",
+               body: "See local backup and export, cross-device LAN sync, and cloud-file plus WebDAV sync.",
               pages: [
                   { image: productImage("local-export.png"), label: "Local data export" },
                   { image: productImage("lan-sync.png"), label: "Cross-device LAN sync" },
@@ -269,8 +269,8 @@ const productScreensBase = zh
               ],
           },
           {
-              title: "Detail page",
-              body: "View entry data in one place, then copy, edit, or move the entry to Trash.",
+               title: "Detail page",
+               body: "See all entry details in one place, then copy, edit, or move it to Trash.",
               pages: [{ image: productImage("entry-detail.png"), label: "Entry details" }],
           },
           {

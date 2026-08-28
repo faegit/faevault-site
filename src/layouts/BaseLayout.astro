@@ -53,12 +53,13 @@ const menuLabel = locale === "zh-cn" ? "打开菜单" : "Open menu";
                     <a href={localePath(locale, "support")}>{text.nav.support}</a>
                 </nav>
                 <div class="nav-actions">
-                    <a class="language-switch" href={localePath(alternate, routePath)} hreflang={localeMeta[alternate].htmlLang}>{text.switchLanguage}</a>
-                    <a class="btn btn-primary nav-cta" href={localePath(locale, "download")}>
-                        {text.nav.download}
-                        <svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <a class="lang-toggle" href={localePath(alternate, routePath)} hreflang={localeMeta[alternate].htmlLang} aria-label={text.switchLanguage}>
+                        <svg class="lang-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="9"></circle>
+                            <path d="M3 12h18"></path>
+                            <path d="M12 3c2.4 2.6 2.4 15.4 0 18M12 3c-2.4 2.6-2.4 15.4 0 18"></path>
                         </svg>
+                        <span>{text.switchLanguage}</span>
                     </a>
                     <button class="menu-button" id="menuButton" aria-label={menuLabel} aria-expanded="false">
                         <span></span>
@@ -339,15 +340,31 @@ const menuLabel = locale === "zh-cn" ? "打开菜单" : "Open menu";
         align-items: center;
         gap: 10px;
     }
-    .language-switch {
-        padding: 0 8px;
-        color: #526074;
+    .lang-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        min-height: 40px;
+        padding: 0 14px;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.72);
+        color: #2f3a4a;
         font-size: 13.5px;
-        font-weight: 650;
-        transition: color 160ms ease;
+        font-weight: 700;
+        transition:
+            color 160ms ease,
+            border-color 160ms ease,
+            box-shadow 160ms ease;
     }
-    .language-switch:hover {
+    .lang-toggle:hover {
         color: var(--brand);
+        border-color: rgba(47, 111, 237, 0.25);
+        box-shadow: 0 6px 18px rgba(30, 41, 59, 0.06);
+    }
+    .lang-toggle .lang-icon {
+        width: 16px;
+        height: 16px;
     }
     .menu-button {
         display: none;
@@ -479,16 +496,10 @@ const menuLabel = locale === "zh-cn" ? "打开菜单" : "Open menu";
         .menu-button {
             display: block;
         }
-        .language-switch {
-            display: none;
-        }
     }
     @media (max-width: 520px) {
         .container {
             width: calc(100% - 26px);
-        }
-        .nav-cta {
-            display: none;
         }
         .footer-grid {
             align-items: flex-start;
@@ -496,6 +507,12 @@ const menuLabel = locale === "zh-cn" ? "打开菜单" : "Open menu";
         }
         .footer-links {
             flex-wrap: wrap;
+        }
+        .lang-toggle span {
+            display: none;
+        }
+        .lang-toggle {
+            padding: 0 11px;
         }
     }
     @media (prefers-reduced-motion: reduce) {

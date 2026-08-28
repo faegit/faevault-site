@@ -25,6 +25,14 @@ const c = locale === "zh-cn"
         ],
       },
       {
+        title: "在研究和对比中重新认识安全",
+        paragraphs: [
+          "做这个工具的过程中，我对密码管理器的理解也在不断变化。最初它只是「一个能存密码的本地文件」，后来才慢慢意识到，真正重要的不是能不能存，而是数据在保存、解锁、同步的每一步里，边界是否清晰、是否被验证、是否可被理解。",
+          "我花了很多时间读开源密码管理器的实现，也对照它们的安全白皮书、设计文档和公开的事故复盘。正是这些公开的材料，让我学到了密钥派生、认证加密、威胁建模、最小权限这些概念，也让我看清了很多设计选择背后的取舍。",
+          "更重要的是，那些真实发生过的安全教训，比任何教程都更让人警醒：弱主密码、明文缓存、敏感界面未加保护、把验证委托给不可信的环境——每一个疏漏都可能在特定场景下变成真实的危害。这些教训反过来塑造了保险库的安全行为：关键操作前二次验证、敏感界面启用 FLAG_SECURE、剪贴板定时清理、解锁失败冷却，以及坚持本地优先、不依赖云端的边界。",
+        ],
+      },
+      {
         title: "那些被反复重写的地方",
         paragraphs: [
           "自动填充是重写次数最多的模块，前后经历了至少三次架构变更。第一次勉强能用但兼容性差，第二次改善了框架适配但仍然不稳定，直到第三次才找到一个兼顾兼容性和安全性的平衡方案。",
@@ -68,6 +76,14 @@ const c = locale === "zh-cn"
           "The very first Android build was bare-bones: type a password, save it, copy it. No autofill, no sync, no polished UI. But after using it for a while, I realized this rough tool gave me something the big commercial apps couldn't — the certainty that my data truly belonged to me.",
           "If I benefited from it, maybe others who care about privacy would too. So I started taking it seriously: Argon2id + AES-256-GCM for encryption, cross-platform file format compatibility, and a UI that went from functional to actually pleasant to use.",
           "The journey took far longer than expected. Autofill alone required adapting to Android's Autofill framework, differences between system versions, and varying behavior across device environments. Sync involved the WebDAV protocol, LAN connections, and conflict-merging strategies — each part brought its share of hard-earned lessons.",
+        ],
+      },
+      {
+        title: "Rediscovering security through research and comparison",
+        paragraphs: [
+          "Building this tool also changed how I understood password managers. At first it was simply 'a local file that stores passwords.' Over time I realized the real question isn't whether it can store data, but whether the boundaries are clear, verified, and understandable at every step — saving, unlocking, and syncing.",
+          "I spent a lot of time reading how open-source password managers are built, studying their security whitepapers, design docs, and public post-mortems of real incidents. Those public materials taught me concepts like key derivation, authenticated encryption, threat modeling, and least privilege — and showed me the trade-offs behind many design choices.",
+          "More importantly, real-world security failures were far more instructive than any tutorial: weak master passwords, plaintext caches, unprotected sensitive screens, trusting verification to an untrusted environment — each flaw can turn into real harm under the right conditions. Those lessons shaped FAEVault's secure behavior in concrete ways: re-authentication before sensitive actions, FLAG_SECURE on sensitive screens, timed clipboard clearing, unlock fail-cooldowns, and a strict local-first boundary that never relies on the cloud.",
         ],
       },
       {
