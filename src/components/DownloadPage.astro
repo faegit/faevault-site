@@ -1,34 +1,53 @@
 ---
 import type { Locale } from "../i18n/config";
 import PageShell from "./PageShell.astro";
-
+const ver = "4.5.0";
+const androidApk = "https://github.com/faegit/faevault-site/releases/download/v4.5.0/FAEVault-4.5.0-arm64-v8a.apk";
+const releaseUrl = "https://github.com/faegit/faevault-site/releases/tag/v4.5.0";
 interface Props {
     locale: Locale;
 }
-
 const { locale } = Astro.props;
 const c =
     locale === "zh-cn"
         ? {
               kicker: "下载",
-              title: "Android 4.5.0",
-              intro: "下载最新 Android 安装包。",
-              label: "FAEVAULT",
-              detail: "支持 ARM64-v8a 设备。",
+              title: "在你的设备上，继续掌控自己的资料。",
+              intro: "FAEVault 4.0.0 正式发布：全新 PMVE 加密引擎，局域网与云端同步全面升级，新增本地备份与设备身份保护。Android 版通过 GitHub Releases 发布，arm64 架构适配绝大多数现代手机。",
+              androidBtn: "下载安装",
+              windowsBtn: "下载安装",
+              android: "Android 版本",
+              windows: "Windows 版本",
+              androidDetail: `版本 ${ver} · arm64-v8a / universal`,
+              windowsDetail: `版本 ${ver} · 64 位中文安装包`,
+              notePre: "其他 CPU 架构（armeabi-v7a、x86_64、x86）请从 ",
+              noteLink: "GitHub Releases",
+              notePost: " 获取。",
+              releaseUrl,
           }
         : {
               kicker: "Download",
-              title: "Android 4.5.0",
-              intro: "Download the latest Android installer.",
-              label: "FAEVAULT",
-              detail: "For ARM64-v8a devices.",
+              title: "Stay in control of your data on every device.",
+              intro: "FAEVault 4.0.0 is here: a new PMVE encryption engine, rebuilt LAN and cloud sync, plus local backup with device identity protection. The Android build is published through GitHub Releases; arm64 covers most modern phones.",
+              androidBtn: "Download and install",
+              windowsBtn: "Download and install",
+              android: "Android version",
+              windows: "Windows version",
+              androidDetail: `Version ${ver} · arm64-v8a / universal`,
+              windowsDetail: `Version ${ver} · 64-bit installer in Chinese`,
+              notePre: "For other CPU architectures (armeabi-v7a, x86_64, x86), visit ",
+              noteLink: "GitHub Releases",
+              notePost: ".",
+              releaseUrl,
           };
 ---
 
 <PageShell theme="download" kicker={c.kicker} title={c.title} intro={c.intro}>
-    <section class="platform-withdrawn">
+    <section class="platform-system">
         <div class="platform-orbits" aria-hidden="true"><i></i><i></i><b></b></div>
-        <div class="withdrawn-card"><span>{c.label}</span><h2>{c.title}</h2><p>{c.detail}</p><a class="download-link" href="/faevault-site/downloads/FAEVault-4.5.0-arm64-v8a.apk" download>下载 APK</a></div>
+        <article class="android"><span>ANDROID</span><h2>{c.android}</h2><p>{c.androidDetail}</p><a class="dl-btn" href={androidApk} target="_blank" rel="noopener noreferrer">{c.androidBtn}</a></article>
+        <article class="windows"><span>WINDOWS</span><h2>{c.windows}</h2><p>等待发布</p></article>
+        <p class="release-note">{c.notePre}<a href={c.releaseUrl} target="_blank" rel="noopener noreferrer">{c.noteLink}</a>{c.notePost}</p>
     </section>
 </PageShell>
 
@@ -36,12 +55,19 @@ const c =
     :global(.inner-page.theme-download) {
         padding-top: clamp(4.4rem, 8vw, 7rem);
     }
-    .platform-withdrawn {
+    @media (max-width: 760px) {
+        :global(.inner-page.theme-download) {
+            padding-top: clamp(4.2rem, 14vw, 5.5rem);
+        }
+    }
+    .platform-system {
         position: relative;
         overflow: hidden;
         display: grid;
-        place-items: center;
-        min-height: 400px;
+        grid-template-columns: 1fr 1fr;
+        gap: 8rem;
+        align-items: center;
+        min-height: 610px;
         margin-top: 5rem;
         padding: 5rem 3rem;
     }
@@ -75,9 +101,101 @@ const c =
         height: 14px;
         border-radius: 50%;
         background: #42a88f;
-        box-shadow: 0 0 0 8px rgba(66, 168, 143, 0.1), 0 0 22px rgba(66, 168, 143, 0.55);
+        box-shadow:
+            0 0 0 8px rgba(66, 168, 143, 0.1),
+            0 0 22px rgba(66, 168, 143, 0.55);
         animation: orbit-dot 6s linear infinite;
         transform-origin: 0 202px;
+    }
+    article {
+        position: relative;
+        z-index: 2;
+        padding: 3rem;
+        border: 1px solid rgba(255, 255, 255, 0.65);
+        border-radius: 2rem;
+        background: rgba(247, 252, 251, 0.65);
+        box-shadow: 0 26px 70px rgba(45, 82, 94, 0.1);
+        backdrop-filter: blur(18px);
+        transition:
+            transform 0.35s ease,
+            box-shadow 0.35s ease;
+        animation: platform-in 0.7s cubic-bezier(0.18, 0.78, 0.18, 1) both;
+    }
+    article.windows {
+        animation-delay: 0.14s;
+    }
+    article:hover {
+        transform: translateY(-8px) rotate(-0.5deg);
+        box-shadow: 0 34px 85px rgba(45, 82, 94, 0.16);
+    }
+    article > span {
+        color: #39846f;
+        font-size: 0.65rem;
+        letter-spacing: 0.16em;
+    }
+    h2 {
+        margin: 1rem 0;
+        color: #284550;
+        font:
+            500 2rem/1.1 Georgia,
+            serif;
+    }
+    article p {
+        color: #6b8088;
+        font-size: 0.82rem;
+    }
+    .dl-btn {
+        display: inline-block;
+        margin-top: 2rem;
+        padding: 0.8rem 1.6rem;
+        border: 0;
+        border-radius: 99px;
+        background: #287795;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: background 0.2s ease, transform 0.2s ease;
+        pointer-events: auto;
+    }
+    .dl-btn:hover {
+        background: #1f6079;
+        transform: translateY(-2px);
+    }
+    .dl-btn.disabled {
+        background: #dfe9e7;
+        color: #71807e;
+        pointer-events: none;
+    }
+    .release-note {
+        position: absolute;
+        left: 50%;
+        bottom: 1.5rem;
+        width: min(560px, 90%);
+        color: #6b7f87;
+        text-align: center;
+        font:
+            0.9rem/1.7 Georgia,
+            serif;
+        transform: translateX(-50%);
+    }
+    .release-note a {
+        color: #287795;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        transition: color 0.2s ease;
+    }
+    .release-note a:hover {
+        color: #1a5f75;
+    }
+    .platform-withdrawn {
+        position: relative;
+        overflow: hidden;
+        display: grid;
+        place-items: center;
+        min-height: 400px;
+        margin-top: 5rem;
+        padding: 5rem 3rem;
     }
     .withdrawn-card {
         position: relative;
@@ -100,7 +218,9 @@ const c =
     .withdrawn-card h2 {
         margin: 1rem 0;
         color: #284550;
-        font: 800 1.8rem/1.15 var(--font-sans);
+        font:
+            500 2rem/1.1 Georgia,
+            serif;
     }
     .withdrawn-card p {
         color: #6b8088;
@@ -108,33 +228,34 @@ const c =
         line-height: 1.7;
     }
     @keyframes platform-in {
-        from { opacity: 0; transform: translateY(30px) scale(0.97); }
+        from {
+            opacity: 0;
+            transform: translateY(30px) scale(0.97);
+        }
     }
     @keyframes orbit-breathe {
-        50% { transform: translate(-50%, -52%) rotate(-3deg) scale(1.035); }
+        50% {
+            transform: translate(-50%, -52%) rotate(-3deg) scale(1.035);
+        }
     }
     @keyframes orbit-dot {
-        to { transform: rotate(360deg); }
-    }
-    @media (max-width: 760px) {
-        :global(.inner-page.theme-download) {
-            padding-top: clamp(4.2rem, 14vw, 5.5rem);
+        to {
+            transform: rotate(360deg);
         }
-        .platform-withdrawn {
-            margin-top: 3rem;
-            padding: 4rem 0;
+    }
+    @media (max-width: 800px) {
+        .platform-system {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            padding: 4rem 0 7rem;
         }
         .platform-orbits {
             display: none;
         }
-        .withdrawn-card {
-            padding: 2.25rem 1.5rem;
-        }
-    }
-    @media (prefers-reduced-motion: reduce) {
-        .platform-orbits,
-        .withdrawn-card {
-            animation: none;
+        .release-note {
+            bottom: 1rem;
         }
     }
 </style>
+
+
