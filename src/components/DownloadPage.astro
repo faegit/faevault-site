@@ -11,24 +11,24 @@ const c =
     locale === "zh-cn"
         ? {
               kicker: "下载",
-              title: "安装包已撤回。",
-              intro: "当前仓库仅保留项目网页，暂不提供 Android 与 Windows 安装包下载。",
+              title: "Android 4.5.0",
+              intro: "下载最新 Android 安装包。",
               label: "FAEVAULT",
-              detail: "版本安装包、发布日志与校验文件均已从远端撤回。",
+              detail: "支持 ARM64-v8a 设备。",
           }
         : {
               kicker: "Download",
-              title: "Installers have been withdrawn.",
-              intro: "This repository now hosts the project website only. Android and Windows installers are currently unavailable.",
+              title: "Android 4.5.0",
+              intro: "Download the latest Android installer.",
               label: "FAEVAULT",
-              detail: "All installers, release notes, and checksum files have been removed from the remote repository.",
+              detail: "For ARM64-v8a devices.",
           };
 ---
 
 <PageShell theme="download" kicker={c.kicker} title={c.title} intro={c.intro}>
     <section class="platform-withdrawn">
         <div class="platform-orbits" aria-hidden="true"><i></i><i></i><b></b></div>
-        <div class="withdrawn-card"><span>{c.label}</span><h2>{c.title}</h2><p>{c.detail}</p></div>
+        <div class="withdrawn-card"><span>{c.label}</span><h2>{c.title}</h2><p>{c.detail}</p><a class="download-link" href="/faevault-site/downloads/FAEVault-4.5.0-arm64-v8a.apk" download>下载 APK</a></div>
     </section>
 </PageShell>
 
