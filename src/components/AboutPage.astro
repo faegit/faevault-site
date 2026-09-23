@@ -20,64 +20,94 @@ const c =
         ? {
               kicker: "关于",
               title: "关于 保险库",
-              intro: "本页集中展示保险库 Android 客户端的隐私政策与更新日志。隐私政策说明数据处理与权限使用；更新日志记录各版本的功能、改进与修复。",
-              tocLabel: "本页目录",
+              intro: "本页集中展示保险库客户端的隐私政策与更新日志。隐私政策说明数据处理与权限使用；更新日志记录各版本的功能、改进与修复。",
+              tabsLabel: "选择文档",
               privacyTitle: "隐私政策",
               changelogTitle: "更新日志",
           }
         : {
               kicker: "About",
               title: "About FAEVault",
-              intro: "This page hosts the FAEVault Android privacy policy and changelog. The privacy policy explains data handling and permissions; the changelog records features, improvements, and fixes by release.",
-              tocLabel: "On this page",
+              intro: "This page hosts the FAEVault privacy policy and changelog. The privacy policy explains data handling and permissions; the changelog records features, improvements, and fixes by release.",
+              tabsLabel: "Choose a document",
               privacyTitle: "Privacy Policy",
               changelogTitle: "Changelog",
           };
 ---
 
 <PageShell theme="journey" kicker={c.kicker} title={c.title} intro={c.intro}>
-    <nav class="about-toc" aria-label={c.tocLabel}>
-        <strong>{c.tocLabel}</strong>
-        <ol>
-            <li><a href="#privacy">{c.privacyTitle}</a></li>
-            <li><a href="#changelog">{c.changelogTitle}</a></li>
-        </ol>
-    </nav>
+    <div class="about-tabs" data-about-tabs>
+        <div class="about-tabs-bar" role="tablist" aria-label={c.tabsLabel}>
+            <button class="about-tab active" id="tab-privacy" role="tab" aria-selected="true" aria-controls="panel-privacy" tabindex="0" data-about-tab="privacy">
+                {c.privacyTitle}
+            </button>
+            <button class="about-tab" id="tab-changelog" role="tab" aria-selected="false" aria-controls="panel-changelog" tabindex="-1" data-about-tab="changelog">
+                {c.changelogTitle}
+            </button>
+        </div>
 
-    <section class="about-section" id="privacy">
-        <h2>{c.privacyTitle}</h2>
-        {PrivacyContent ? <div class="about-doc"><PrivacyContent /></div> : <p class="about-empty">—</p>}
-    </section>
+        <section class="about-panel" id="panel-privacy" role="tabpanel" aria-labelledby="tab-privacy" tabindex="0" data-about-panel="privacy">
+            {PrivacyContent ? <div class="about-doc"><PrivacyContent /></div> : <p class="about-empty">—</p>}
+        </section>
 
-    <section class="about-section" id="changelog">
-        <h2>{c.changelogTitle}</h2>
-        {ChangelogContent ? <div class="about-doc"><ChangelogContent /></div> : <p class="about-empty">—</p>}
-    </section>
+        <section class="about-panel" id="panel-changelog" role="tabpanel" aria-labelledby="tab-changelog" tabindex="0" data-about-panel="changelog" hidden>
+            {ChangelogContent ? <div class="about-doc"><ChangelogContent /></div> : <p class="about-empty">—</p>}
+        </section>
+    </div>
 </PageShell>
 
 <style>
-    .about-toc {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin: 3rem 0 0;
-        padding: 1rem 1.2rem;
-        border: 1px solid rgba(57, 104, 125, 0.12);
-        border-radius: 1rem;
-        background: rgba(255, 255, 255, 0.48);
+    .about-tabs {
+        margin-top: clamp(3rem, 6vw, 4.5rem);
+        scroll-margin-top: 8rem;
     }
-    .about-toc strong { color: #173f50; font: 780 0.82rem/1.3 var(--font-sans); }
-    .about-toc ol { display: flex; gap: 0.75rem; margin: 0; padding: 0; list-style: none; }
-    .about-toc a { color: #3c91ad; font: 680 0.82rem/1.4 var(--font-sans); text-decoration: none; transition: color 0.2s, background 0.2s; padding: 0.35rem 0.6rem; border-radius: 0.6rem; }
-    .about-toc a:hover, .about-toc a:focus-visible { color: #17485b; background: rgba(218, 241, 247, 0.55); outline: none; border-radius: 0.6rem; }
 
-    .about-section { margin-top: clamp(4rem, 7vw, 6.5rem); scroll-margin-top: 7rem; }
-    .about-section h2 { margin: 0 0 clamp(1.4rem, 2.5vw, 2rem); color: #173f50; font: 780 clamp(1.5rem, 2.5vw, 2rem)/1.18 var(--font-sans); letter-spacing: -0.035em; }
+    .about-tabs-bar {
+        position: sticky;
+        top: 80px;
+        z-index: 30;
+        display: flex;
+        gap: 0.4rem;
+        width: 100%;
+        padding: 0.35rem;
+        border: 1px solid rgba(57, 104, 125, 0.14);
+        border-radius: 1rem;
+        background: rgba(255, 255, 255, 0.82);
+        box-shadow: 0 10px 30px rgba(49, 75, 103, 0.08);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+    }
+    .about-tab {
+        flex: 1 1 0;
+        min-height: 46px;
+        padding: 0 1rem;
+        border: 0;
+        border-radius: 0.75rem;
+        background: transparent;
+        color: #5f7480;
+        font: 710 0.92rem/1.2 var(--font-sans);
+        cursor: pointer;
+        transition:
+            color 0.2s ease,
+            background 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+    .about-tab:hover { color: #17485b; background: rgba(218, 241, 247, 0.5); }
+    .about-tab:focus-visible { outline: 2px solid #3c91ad; outline-offset: -2px; }
+    .about-tab.active {
+        color: #fff;
+        background: linear-gradient(145deg, #287795, #1f6079);
+        box-shadow: 0 8px 20px rgba(31, 96, 121, 0.3);
+    }
+
+    .about-panel {
+        margin-top: clamp(2rem, 4vw, 3rem);
+        scroll-margin-top: 8rem;
+        animation: panel-in 0.32s cubic-bezier(0.18, 0.78, 0.18, 1) both;
+    }
+    .about-panel[hidden] { display: none; }
 
     .about-doc {
-        max-width: 100%;
-        border-top: 2px solid rgba(43, 124, 154, 0.2);
-        padding-top: clamp(1.5rem, 3vw, 2.5rem);
         color: #566e78;
         font: 0.96rem/1.9 var(--font-sans);
     }
@@ -103,9 +133,79 @@ const c =
 
     .about-empty { color: #8792a2; font-style: italic; }
 
+    @keyframes panel-in {
+        from {
+            opacity: 0;
+            transform: translateY(14px);
+        }
+    }
+
     @media (max-width: 760px) {
-        .about-toc { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
-        .about-section { margin-top: 4rem; }
+        .about-tabs-bar { top: 70px; }
+        .about-tab { min-height: 42px; padding: 0 0.5rem; font-size: 0.86rem; }
+        .about-panel { margin-top: 1.75rem; }
         .about-doc { font-size: 0.93rem; line-height: 1.82; }
     }
+    @media (prefers-reduced-motion: reduce) {
+        .about-tab, .about-tab.active { transition: none; }
+        .about-panel, .about-tab.active { animation: none; }
+    }
 </style>
+
+<script>
+    function initAboutTabs() {
+        const root = document.querySelector<HTMLElement>("[data-about-tabs]");
+        if (!root || root.dataset.ready === "true") return;
+        root.dataset.ready = "true";
+
+        const tabs = Array.from(root.querySelectorAll<HTMLElement>("[data-about-tab]"));
+        const panels = new Map(
+            Array.from(root.querySelectorAll<HTMLElement>("[data-about-panel]")).map((el) => [el.dataset.aboutPanel, el]),
+        );
+
+        const selected = () => {
+            const hash = (window.location.hash || "").replace(/^#/, "");
+            return hash === "changelog" ? "changelog" : "privacy";
+        };
+
+        const select = (name: string) => {
+            tabs.forEach((tab) => {
+                const active = tab.dataset.aboutTab === name;
+                tab.classList.toggle("active", active);
+                tab.setAttribute("aria-selected", String(active));
+                tab.setAttribute("tabindex", active ? "0" : "-1");
+            });
+            panels.forEach((panel, key) => {
+                panel.hidden = key !== name;
+            });
+        };
+
+        tabs.forEach((tab) => {
+            tab.addEventListener("click", () => {
+                const name = tab.dataset.aboutTab || "privacy";
+                if ((window.location.hash || "").replace(/^#/, "") !== name) {
+                    window.location.hash = name;
+                }
+                select(name);
+            });
+            tab.addEventListener("keydown", (ev: KeyboardEvent) => {
+                const keys = ["ArrowLeft", "ArrowRight", "Home", "End"];
+                if (!keys.includes(ev.key)) return;
+                ev.preventDefault();
+                const idx = tabs.indexOf(tab);
+                const next =
+                    ev.key === "ArrowLeft" ? (idx - 1 + tabs.length) % tabs.length :
+                    ev.key === "ArrowRight" ? (idx + 1) % tabs.length :
+                    ev.key === "Home" ? 0 : tabs.length - 1;
+                tabs[next].focus();
+                tabs[next].click();
+            });
+        });
+
+        window.addEventListener("hashchange", () => select(selected()));
+        select(selected());
+    }
+
+    document.addEventListener("astro:page-load", initAboutTabs);
+    initAboutTabs();
+</script>
