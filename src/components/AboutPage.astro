@@ -1,0 +1,111 @@
+---
+import { getCollection, render } from "astro:content";
+import type { Locale } from "../i18n/config";
+import PageShell from "./PageShell.astro";
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+
+const entries = await getCollection("legal");
+const pick = (key: string) =>
+    entries.find((entry) => entry.data.translationKey === key && entry.data.locale === locale);
+const privacy = pick("privacy-policy");
+const changelog = pick("changelog");
+
+const { Content: PrivacyContent } = privacy ? await render(privacy) : { Content: undefined };
+const { Content: ChangelogContent } = changelog ? await render(changelog) : { Content: undefined };
+
+const c =
+    locale === "zh-cn"
+        ? {
+              kicker: "关于",
+              title: "关于 保险库",
+              intro: "本页集中展示保险库 Android 客户端的隐私政策与更新日志。隐私政策说明数据处理与权限使用；更新日志记录各版本的功能、改进与修复。",
+              tocLabel: "本页目录",
+              privacyTitle: "隐私政策",
+              changelogTitle: "更新日志",
+          }
+        : {
+              kicker: "About",
+              title: "About FAEVault",
+              intro: "This page hosts the FAEVault Android privacy policy and changelog. The privacy policy explains data handling and permissions; the changelog records features, improvements, and fixes by release.",
+              tocLabel: "On this page",
+              privacyTitle: "Privacy Policy",
+              changelogTitle: "Changelog",
+          };
+---
+
+<PageShell theme="journey" kicker={c.kicker} title={c.title} intro={c.intro}>
+    <nav class="about-toc" aria-label={c.tocLabel}>
+        <strong>{c.tocLabel}</strong>
+        <ol>
+            <li><a href="#privacy">{c.privacyTitle}</a></li>
+            <li><a href="#changelog">{c.changelogTitle}</a></li>
+        </ol>
+    </nav>
+
+    <section class="about-section" id="privacy">
+        <h2>{c.privacyTitle}</h2>
+        {PrivacyContent ? <div class="about-doc"><PrivacyContent /></div> : <p class="about-empty">—</p>}
+    </section>
+
+    <section class="about-section" id="changelog">
+        <h2>{c.changelogTitle}</h2>
+        {ChangelogContent ? <div class="about-doc"><ChangelogContent /></div> : <p class="about-empty">—</p>}
+    </section>
+</PageShell>
+
+<style>
+    .about-toc {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 3rem 0 0;
+        padding: 1rem 1.2rem;
+        border: 1px solid rgba(57, 104, 125, 0.12);
+        border-radius: 1rem;
+        background: rgba(255, 255, 255, 0.48);
+    }
+    .about-toc strong { color: #173f50; font: 780 0.82rem/1.3 var(--font-sans); }
+    .about-toc ol { display: flex; gap: 0.75rem; margin: 0; padding: 0; list-style: none; }
+    .about-toc a { color: #3c91ad; font: 680 0.82rem/1.4 var(--font-sans); text-decoration: none; transition: color 0.2s, background 0.2s; padding: 0.35rem 0.6rem; border-radius: 0.6rem; }
+    .about-toc a:hover, .about-toc a:focus-visible { color: #17485b; background: rgba(218, 241, 247, 0.55); outline: none; border-radius: 0.6rem; }
+
+    .about-section { margin-top: clamp(4rem, 7vw, 6.5rem); scroll-margin-top: 7rem; }
+    .about-section h2 { margin: 0 0 clamp(1.4rem, 2.5vw, 2rem); color: #173f50; font: 780 clamp(1.5rem, 2.5vw, 2rem)/1.18 var(--font-sans); letter-spacing: -0.035em; }
+
+    .about-doc {
+        max-width: 100%;
+        border-top: 2px solid rgba(43, 124, 154, 0.2);
+        padding-top: clamp(1.5rem, 3vw, 2.5rem);
+        color: #566e78;
+        font: 0.96rem/1.9 var(--font-sans);
+    }
+    .about-doc :global(h1) { display: none; }
+    .about-doc :global(h2) { margin: 2.2em 0 0.7em; color: #173f50; font: 780 1.3rem/1.25 var(--font-sans); letter-spacing: -0.02em; }
+    .about-doc :global(h3) { margin: 1.9em 0 0.6em; color: #244f60; font: 740 1.05rem/1.3 var(--font-sans); }
+    .about-doc :global(h4) { margin: 1.6em 0 0.5em; color: #244f60; font: 720 0.95rem/1.3 var(--font-sans); }
+    .about-doc :global(p) { margin: 0 0 1.05rem; overflow-wrap: anywhere; }
+    .about-doc :global(strong) { color: #3a5560; font-weight: 720; }
+    .about-doc :global(ul), .about-doc :global(ol) { margin: 0 0 1.05rem; padding-left: 1.35rem; }
+    .about-doc :global(li) { margin: 0.3rem 0; }
+    .about-doc :global(li > ul), .about-doc :global(li > ol) { margin-bottom: 0.3rem; }
+    .about-doc :global(table) { width: 100%; margin: 1.2rem 0; border-collapse: collapse; font-size: 0.9rem; }
+    .about-doc :global(th), .about-doc :global(td) { padding: 0.55rem 0.75rem; border: 1px solid rgba(57, 104, 125, 0.18); text-align: left; vertical-align: top; }
+    .about-doc :global(th) { background: rgba(225, 244, 248, 0.55); color: #234d5c; font-weight: 720; }
+    .about-doc :global(code) { padding: 0.1em 0.4em; border-radius: 0.4em; background: rgba(57, 104, 125, 0.1); color: #244f60; font-size: 0.88em; }
+    .about-doc :global(pre) { overflow-x: auto; margin: 1.2rem 0; padding: 1rem 1.15rem; border-radius: 1rem; background: rgba(23, 63, 80, 0.06); }
+    .about-doc :global(pre code) { padding: 0; background: none; font-size: 0.85rem; line-height: 1.7; }
+    .about-doc :global(blockquote) { margin: 1.2rem 0; padding: 0.2rem 0 0.2rem 1rem; border-left: 3px solid #5a9fb6; color: #5b6f77; }
+    .about-doc :global(hr) { margin: 2rem 0; border: 0; border-top: 1px solid rgba(57, 104, 125, 0.18); }
+    .about-doc :global(a) { color: #277a98; text-decoration: underline; text-underline-offset: 3px; }
+    .about-doc :global(a:hover) { color: #17485b; }
+
+    .about-empty { color: #8792a2; font-style: italic; }
+
+    @media (max-width: 760px) {
+        .about-toc { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+        .about-section { margin-top: 4rem; }
+        .about-doc { font-size: 0.93rem; line-height: 1.82; }
+    }
+</style>
