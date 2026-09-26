@@ -1,10 +1,57 @@
 ---
 import type { Locale } from "../i18n/config";
 import PageShell from "./PageShell.astro";
-const ver = "4.6.2";
-const androidApk = "https://github.com/faegit/faevault-site/releases/download/v4.6.2/app-arm64-v8a-release.apk";
-const releaseUrl = "https://github.com/faegit/faevault-site/releases/tag/v4.6.2";
+
 const oneDriveUrl = "https://1drv.ms/f/c/0b38d985c76ba514/IgCBsE77B0B-SYxlFxTQ0kJKAU_4WNF-nFn1wYHLTUZ1VHI";
+
+/**
+ * 版本与下载地址在构建时从 GitHub Releases 读取，避免官网与实际发布版本脱节。
+ * 只认 Android 端前缀 "android/v" 的发布；PC 端 "pc/v" 由另一页面/链接负责。
+ * 网络不可用时回退到 FALLBACK_VERSION，保证本地构建与 Pages 构建都能成功。
+ */
+const RELEASES_API = "https://api.github.com/repos/faegit/faevault-site/releases?per_page=50";
+const RELEASE_TAG_PREFIX = "android/v";
+const FALLBACK_VERSION = "4.6.2";
+const APK_ASSET = "faevault-arm64-v8a.apk";
+
+type ReleaseAsset = { name?: string; browser_download_url?: string };
+type Release = { tag_name?: string; draft?: boolean; prerelease?: boolean; html_url?: string; assets?: ReleaseAsset[] };
+
+function versionKey(version: string): number {
+    const match = /^(\d+)\.(\d+)\.(\d+)/.exec(version);
+    if (!match) return 0;
+    return Number(match[1]) * 1_000_000 + Number(match[2]) * 1_000 + Number(match[3]);
+}
+
+async function latestAndroidRelease(): Promise<Release | null> {
+    try {
+        const response = await fetch(RELEASES_API, {
+            headers: { Accept: "application/vnd.github+json", "User-Agent": "FAEVault-site-build" },
+        });
+        if (!response.ok) return null;
+        const releases = (await response.json()) as Release[];
+        return (
+            releases
+                .filter((item) => typeof item?.tag_name === "string"
+                    && item.tag_name!.startsWith(RELEASE_TAG_PREFIX)
+                    && !item.draft && !item.prerelease)
+                .sort((a, b) =>
+                    versionKey(b.tag_name!.slice(RELEASE_TAG_PREFIX.length))
+                    - versionKey(a.tag_name!.slice(RELEASE_TAG_PREFIX.length)))[0] ?? null
+        );
+    } catch {
+        return null;
+    }
+}
+
+const release = await latestAndroidRelease();
+const ver = release ? release.tag_name!.slice(RELEASE_TAG_PREFIX.length) : FALLBACK_VERSION;
+const androidApk =
+    release?.assets?.find((asset) => asset.name === APK_ASSET)?.browser_download_url
+    ?? `https://github.com/faegit/faevault-site/releases/download/${RELEASE_TAG_PREFIX}${ver}/${APK_ASSET}`;
+const releaseUrl = release?.html_url
+    ?? `https://github.com/faegit/faevault-site/releases/tag/${RELEASE_TAG_PREFIX}${ver}`;
+
 interface Props {
     locale: Locale;
 }
