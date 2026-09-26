@@ -12,6 +12,27 @@ This changelog records features and fixes for the FAEVault Android client only. 
 
 ---
 
+## 4.6.2 - 2026-09-26
+
+### Security
+- Changing or resetting the master password rotates the vault root key and signing identity and re-encrypts entries, trash, and attachments. An old password combined with an old header can no longer read the updated vault. Historical backups retain their original credentials; save the new recovery key and reconnect other devices after rotation.
+- Strengthened session checks for sensitive exports, master-password verification, and asynchronous operations so stale actions cannot continue after locking or switching accounts.
+- Strengthened LAN pairing rate limits, pairing credential rotation, and session authorization. File transfers now require device proof and confirmation for the current connection.
+- Hardened legacy autofill binding confirmation, Passkey operation-token storage, and interrupted backup handling.
+- In-app updates now verify server-provided SHA-256 digests, restrict HTTPS redirects, check download integrity, and remove incomplete files on failure.
+
+### Improved
+- Bottom floating buttons and action bars share persistent blur sources, including empty lists, loading states, and searches with no results.
+- Bottom action controls now use half the window width as a minimum and grow to fit their content within safe side margins, preventing delete labels from wrapping vertically after selecting all items.
+- Restored transparent backgrounds for the login page's add-account and username controls. Reduced the upward movement when the keyboard opens while preserving input visibility and scrolling.
+- Changelog and privacy-policy links now open the corresponding official website pages.
+
+### Fixed
+- Fixed stale search updates moving the caret or restoring deleted text during long-query editing; added a trailing clear button.
+- Restored immediate press feedback on home category cards. Corrected leading-padding coordinates when entering drag mode and settling after release, removing the small upward jump while retaining shadows and reordering.
+
+---
+
 ## 4.6.1 - 2026-09-23
 
 ### Added
@@ -33,7 +54,7 @@ This changelog records features and fixes for the FAEVault Android client only. 
 ### Fixed
 - Bottom sheets (app picker / fill picker / module picker) were painted at the top of the screen instead of as bottom cards.
 - Storage: merge write-back now streams and reuses the source container instead of rewriting it wholesale; a read-only object manifest descriptor was added.
-- Security (per-item status in `SECURITY_AUDIT_2026-09-23.md` section 0): the external-action flag could bypass auto-lock permanently; cross-account pending import was not bound to a target vault; CSV formula injection; WebDAV credentials entered saved state; the WebDAV client cache key held a plaintext private key; dependency-repository boundary.
+- Security (current per-item status in `security_audit/SECURITY_AUDIT.md`): the external-action flag could bypass auto-lock permanently; cross-account pending import was not bound to a target vault; CSV formula injection; WebDAV credentials entered saved state; the WebDAV client cache key held a plaintext private key; dependency-repository boundary.
 - Build: `gradle/verification-metadata.xml` was missing two checksums, which made online builds fail unconditionally; `org.gradle.jvmargs` raised from 2g to 4g (release packaging OOMs when run in the same invocation as tests).
 
 ### Removed
