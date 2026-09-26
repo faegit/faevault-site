@@ -1,9 +1,10 @@
 ---
 import type { Locale } from "../i18n/config";
 import PageShell from "./PageShell.astro";
-const ver = "4.5.0";
-const androidApk = "https://github.com/faegit/faevault-site/releases/download/v4.5.0/FAEVault-4.5.0-arm64-v8a.apk";
-const releaseUrl = "https://github.com/faegit/faevault-site/releases/tag/v4.5.0";
+const ver = "4.6.1";
+const androidApk = "https://github.com/faegit/faevault-site/releases/download/v4.6.1/app-arm64-v8a-release.apk";
+const releaseUrl = "https://github.com/faegit/faevault-site/releases/tag/v4.6.1";
+const oneDriveUrl = "https://1drv.ms/f/c/0b38d985c76ba514/IgCBsE77B0B-SYxlFxTQ0kJKAU_4WNF-nFn1wYHLTUZ1VHI";
 interface Props {
     locale: Locale;
 }
@@ -13,8 +14,10 @@ const c =
         ? {
               kicker: "下载",
               title: "在你的设备上，继续掌控自己的资料。",
-              intro: "FAEVault 4.0.0 正式发布：全新 PMVE 加密引擎，局域网与云端同步全面升级，新增本地备份与设备身份保护。Android 版通过 GitHub Releases 发布，arm64 架构适配绝大多数现代手机。",
+              intro: "FAEVault Android 正式版：全新 PMVE 加密引擎，局域网与云端同步全面升级，新增本地备份与设备身份保护。Android 版通过 GitHub Releases 发布，arm64 架构适配绝大多数现代手机。",
               androidBtn: "下载安装",
+              backupBtn: "OneDrive 备用下载",
+              backupHint: "无法访问 GitHub 时，可进入备用目录选择版本和安装包。",
               windowsBtn: "下载安装",
               android: "Android 版本",
               windows: "Windows 版本",
@@ -28,8 +31,10 @@ const c =
         : {
               kicker: "Download",
               title: "Stay in control of your data on every device.",
-              intro: "FAEVault 4.0.0 is here: a new PMVE encryption engine, rebuilt LAN and cloud sync, plus local backup with device identity protection. The Android build is published through GitHub Releases; arm64 covers most modern phones.",
+              intro: "FAEVault for Android: a new PMVE encryption engine, rebuilt LAN and cloud sync, plus local backup with device identity protection. The Android build is published through GitHub Releases; arm64 covers most modern phones.",
               androidBtn: "Download and install",
+              backupBtn: "OneDrive mirror",
+              backupHint: "If GitHub is unavailable, choose your version and APK in the mirror folder.",
               windowsBtn: "Download and install",
               android: "Android version",
               windows: "Windows version",
@@ -45,7 +50,7 @@ const c =
 <PageShell theme="download" kicker={c.kicker} title={c.title} intro={c.intro}>
     <section class="platform-system">
         <div class="platform-orbits" aria-hidden="true"><i></i><i></i><b></b></div>
-        <article class="android"><span>ANDROID</span><h2>{c.android}</h2><p>{c.androidDetail}</p><a class="dl-btn" href={androidApk} target="_blank" rel="noopener noreferrer">{c.androidBtn}</a></article>
+        <article class="android"><span>ANDROID</span><h2>{c.android}</h2><p>{c.androidDetail}</p><a class="dl-btn" href={androidApk} target="_blank" rel="noopener noreferrer">{c.androidBtn}</a><div class="backup-download"><a href={oneDriveUrl} target="_blank" rel="noopener noreferrer">{c.backupBtn}</a><p>{c.backupHint}</p></div></article>
         <article class="windows"><span>WINDOWS</span><h2>{c.windows}</h2><p>等待发布</p></article>
         <p class="release-note">{c.notePre}<a href={c.releaseUrl} target="_blank" rel="noopener noreferrer">{c.noteLink}</a>{c.notePost}</p>
     </section>
@@ -162,6 +167,9 @@ const c =
         background: #1f6079;
         transform: translateY(-2px);
     }
+    .backup-download { margin-top: 1rem; }
+    .backup-download a { color: #287795; text-underline-offset: 3px; }
+    .backup-download p { max-width: 30ch; line-height: 1.6; }
     .dl-btn.disabled {
         background: #dfe9e7;
         color: #71807e;

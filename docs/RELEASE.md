@@ -32,3 +32,13 @@
 - 上传后核对 Release 资产名称、大小和 SHA-256 digest；推送网站仓库后核对 Pages 构建结果。
 - 本地 ARM64 副本放到 `C:\Users\21236\OneDrive\应用\FAEVault-release-arm64-v8a.apk`，复制后比较 SHA-256。OneDrive 远端同步是否完成由客户端负责。
 - 同版本修复沿用版本号时，已经安装 4.5.0 的用户需要手动下载安装；需要自动发现新版本时应在下一轮提升客户端版本与发布标签。
+
+
+## OneDrive 备用下载（2026-09-26）
+
+- 应用内更新继续使用 GitHub Releases API 和 Release APK；不切换更新清单、不删除 GitHub 安装包。
+- 官网 Android 下载卡片保留 GitHub 主下载按钮，并提供 OneDrive 备用目录入口，用户自行选择版本和架构。
+- 备用目录：`C:\Users\21236\OneDrive\FAEVault`；公开链接：https://1drv.ms/f/c/0b38d985c76ba514/IgCBsE77B0B-SYxlFxTQ0kJKAU_4WNF-nFn1wYHLTUZ1VHI
+- 每个版本使用独立子目录（例如 `4.6.1`），复制与 GitHub Release 完全相同的五种架构 APK，核对大小与 SHA-256，等待 OneDrive 同步完成后再检查浏览器中的文件。
+- 此链接是浏览器备用下载入口，不是应用内自动下载地址。无需提供编辑权限；共享应允许任何人查看与下载。
+- 当前备用目录中的 4.6.1 五个 APK 已与 GitHub Release 的大小及 SHA-256 核对一致；云端同步和用户网络可达性需单独检查。
