@@ -9,50 +9,121 @@ const { locale } = Astro.props;
 const entries = await getCollection("legal");
 const pick = (key: string) =>
     entries.find((entry) => entry.data.translationKey === key && entry.data.locale === locale);
-const privacy = pick("privacy-policy");
-const changelog = pick("changelog");
 
-const { Content: PrivacyContent } = privacy ? await render(privacy) : { Content: undefined };
-const { Content: ChangelogContent } = changelog ? await render(changelog) : { Content: undefined };
+// 两级结构：先选客户端（Android / PC），再看该端的隐私政策或更新日志。
+const platforms = [
+    {
+        id: "android",
+        privacyKey: "privacy-policy",
+        changelogKey: "changelog",
+    },
+    {
+        id: "pc",
+        privacyKey: "pc-privacy-policy",
+        changelogKey: "pc-changelog",
+    },
+] as const;
+
+type Panel = { platform: string; doc: "privacy" | "changelog"; Content?: any };
+
+const panels: Panel[] = [];
+for (const platform of platforms) {
+    for (const doc of ["privacy", "changelog"] as const) {
+        const entry = pick(doc === "privacy" ? platform.privacyKey : platform.changelogKey);
+        const rendered = entry ? await render(entry) : { Content: undefined };
+        panels.push({ platform: platform.id, doc, Content: rendered.Content });
+    }
+}
 
 const c =
     locale === "zh-cn"
         ? {
               kicker: "关于",
               title: "关于 保险库",
-              intro: "本页集中展示保险库客户端的隐私政策与更新日志。隐私政策说明数据处理与权限使用；更新日志记录各版本的功能、改进与修复。",
-              tabsLabel: "选择文档",
+              intro: "本页集中展示保险库各客户端的隐私政策与更新日志。先选择客户端，再查看对应的隐私政策说明或版本变更记录。",
+              platformTabsLabel: "选择客户端",
+              docTabsLabel: "选择文档",
+              platforms: { android: "Android 客户端", pc: "PC 客户端" },
               privacyTitle: "隐私政策",
               changelogTitle: "更新日志",
+              missing: "该客户端在此语言下暂无可用文档。",
           }
         : {
               kicker: "About",
               title: "About FAEVault",
-              intro: "This page hosts the FAEVault privacy policy and changelog. The privacy policy explains data handling and permissions; the changelog records features, improvements, and fixes by release.",
-              tabsLabel: "Choose a document",
+              intro: "This page hosts the privacy policy and changelog for each FAEVault client. Pick a client, then view its privacy policy or release history.",
+              platformTabsLabel: "Choose a client",
+              docTabsLabel: "Choose a document",
+              platforms: { android: "Android", pc: "PC" },
               privacyTitle: "Privacy Policy",
               changelogTitle: "Changelog",
+              missing: "No document is available for this client in this language yet.",
           };
 ---
 
 <PageShell theme="journey" kicker={c.kicker} title={c.title} intro={c.intro}>
     <div class="about-tabs" data-about-tabs>
-        <div class="about-tabs-bar" role="tablist" aria-label={c.tabsLabel}>
-            <button class="about-tab active" id="tab-privacy" role="tab" aria-selected="true" aria-controls="panel-privacy" tabindex="0" data-about-tab="privacy">
+        <div class="about-platforms" role="tablist" aria-label={c.platformTabsLabel}>
+            {platforms.map((platform, index) => (
+                <button
+                    class:list={["about-platform", { active: index === 0 }]}
+                    id={`platform-tab-${platform.id}`}
+                    role="tab"
+                    aria-selected={index === 0 ? "true" : "false"}
+                    aria-controls={`panel-${platform.id}-privacy`}
+                    tabindex={index === 0 ? "0" : "-1"}
+                    data-about-platform-tab={platform.id}
+                >
+                    {c.platforms[platform.id]}
+                </button>
+            ))}
+        </div>
+
+        <div class="about-docs" role="tablist" aria-label={c.docTabsLabel}>
+            <button
+                class="about-tab active"
+                id="doc-tab-privacy"
+                role="tab"
+                aria-selected="true"
+                aria-controls="panel-android-privacy"
+                tabindex="0"
+                data-about-doc-tab="privacy"
+            >
                 {c.privacyTitle}
             </button>
-            <button class="about-tab" id="tab-changelog" role="tab" aria-selected="false" aria-controls="panel-changelog" tabindex="-1" data-about-tab="changelog">
+            <button
+                class="about-tab"
+                id="doc-tab-changelog"
+                role="tab"
+                aria-selected="false"
+                aria-controls="panel-android-changelog"
+                tabindex="-1"
+                data-about-doc-tab="changelog"
+            >
                 {c.changelogTitle}
             </button>
         </div>
 
-        <section class="about-panel" id="panel-privacy" role="tabpanel" aria-labelledby="tab-privacy" tabindex="0" data-about-panel="privacy">
-            {PrivacyContent ? <div class="about-doc"><PrivacyContent /></div> : <p class="about-empty">—</p>}
-        </section>
-
-        <section class="about-panel" id="panel-changelog" role="tabpanel" aria-labelledby="tab-changelog" tabindex="0" data-about-panel="changelog" hidden>
-            {ChangelogContent ? <div class="about-doc"><ChangelogContent /></div> : <p class="about-empty">—</p>}
-        </section>
+        {platforms.map((platform) =>
+            (["privacy", "changelog"] as const).map((doc) => {
+                const panel = panels.find((item) => item.platform === platform.id && item.doc === doc)!;
+                const Content = panel.Content;
+                const hidden = !(platform.id === "android" && doc === "privacy");
+                return (
+                    <section
+                        class="about-panel"
+                        id={`panel-${platform.id}-${doc}`}
+                        role="tabpanel"
+                        aria-labelledby={`${doc === "privacy" ? "doc" : "doc"}-tab-${doc}`}
+                        tabindex="0"
+                        data-about-panel={`${platform.id}:${doc}`}
+                        hidden={hidden}
+                    >
+                        {Content ? <div class="about-doc"><Content /></div> : <p class="about-empty">{c.missing}</p>}
+                    </section>
+                );
+            }),
+        )}
     </div>
 </PageShell>
 
@@ -62,13 +133,53 @@ const c =
         scroll-margin-top: 8rem;
     }
 
-    .about-tabs-bar {
+    /* 平台选择器：比文档 Tab 更醒目，作为一级导航 */
+    .about-platforms {
         position: sticky;
         top: 80px;
+        z-index: 31;
+        display: flex;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 0.4rem;
+        border: 1px solid rgba(57, 104, 125, 0.16);
+        border-radius: 1.1rem;
+        background: rgba(255, 255, 255, 0.86);
+        box-shadow: 0 12px 34px rgba(49, 75, 103, 0.1);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+    }
+    .about-platform {
+        flex: 1 1 0;
+        min-height: 52px;
+        padding: 0 1rem;
+        border: 0;
+        border-radius: 0.85rem;
+        background: transparent;
+        color: #5f7480;
+        font: 740 0.98rem/1.2 var(--font-sans);
+        cursor: pointer;
+        transition:
+            color 0.2s ease,
+            background 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+    .about-platform:hover { color: #17485b; background: rgba(218, 241, 247, 0.5); }
+    .about-platform:focus-visible { outline: 2px solid #3c91ad; outline-offset: -2px; }
+    .about-platform.active {
+        color: #fff;
+        background: linear-gradient(145deg, #287795, #1f6079);
+        box-shadow: 0 8px 20px rgba(31, 96, 121, 0.3);
+    }
+
+    .about-docs {
+        position: sticky;
+        top: 144px;
         z-index: 30;
         display: flex;
         gap: 0.4rem;
         width: 100%;
+        margin-top: 0.6rem;
         padding: 0.35rem;
         border: 1px solid rgba(57, 104, 125, 0.14);
         border-radius: 1rem;
@@ -141,14 +252,16 @@ const c =
     }
 
     @media (max-width: 760px) {
-        .about-tabs-bar { top: 70px; }
+        .about-platforms { top: 70px; }
+        .about-docs { top: 130px; }
+        .about-platform { min-height: 46px; font-size: 0.9rem; }
         .about-tab { min-height: 42px; padding: 0 0.5rem; font-size: 0.86rem; }
         .about-panel { margin-top: 1.75rem; }
         .about-doc { font-size: 0.93rem; line-height: 1.82; }
     }
     @media (prefers-reduced-motion: reduce) {
-        .about-tab, .about-tab.active { transition: none; }
-        .about-panel, .about-tab.active { animation: none; }
+        .about-tab, .about-tab.active, .about-platform, .about-platform.active { transition: none; }
+        .about-panel, .about-tab.active, .about-platform.active { animation: none; }
     }
 </style>
 
@@ -158,52 +271,93 @@ const c =
         if (!root || root.dataset.ready === "true") return;
         root.dataset.ready = "true";
 
-        const tabs = Array.from(root.querySelectorAll<HTMLElement>("[data-about-tab]"));
+        const platformTabs = Array.from(root.querySelectorAll<HTMLElement>("[data-about-platform-tab]"));
+        const docTabs = Array.from(root.querySelectorAll<HTMLElement>("[data-about-doc-tab]"));
         const panels = new Map(
-            Array.from(root.querySelectorAll<HTMLElement>("[data-about-panel]")).map((el) => [el.dataset.aboutPanel, el]),
+            Array.from(root.querySelectorAll<HTMLElement>("[data-about-panel]"))
+                .map((el) => [el.dataset.aboutPanel!, el]),
         );
 
-        const selected = () => {
+        let platform = "android";
+        let doc = "privacy";
+
+        const fromHash = () => {
+            // 支持 #privacy / #changelog（沿用旧链接，自动定位到 Android 端）
+            // 与 #pc-privacy / #pc-changelog 这类带平台前缀的新链接。
             const hash = (window.location.hash || "").replace(/^#/, "");
-            return hash === "changelog" ? "changelog" : "privacy";
+            if (hash.startsWith("pc-")) {
+                platform = "pc";
+                doc = hash.slice(3) === "changelog" ? "changelog" : "privacy";
+                return;
+            }
+            if (hash.startsWith("android-")) {
+                platform = "android";
+                doc = hash.slice(8) === "changelog" ? "changelog" : "privacy";
+                return;
+            }
+            doc = hash === "changelog" ? "changelog" : "privacy";
         };
 
-        const select = (name: string) => {
-            tabs.forEach((tab) => {
-                const active = tab.dataset.aboutTab === name;
+        const syncHash = () => {
+            const next = platform === "pc" ? `#pc-${doc}` : `#${doc}`;
+            if ((window.location.hash || "") !== next) {
+                window.history.replaceState(null, "", next);
+            }
+        };
+
+        const select = () => {
+            platformTabs.forEach((tab) => {
+                const active = tab.dataset.aboutPlatformTab === platform;
+                tab.classList.toggle("active", active);
+                tab.setAttribute("aria-selected", String(active));
+                tab.setAttribute("tabindex", active ? "0" : "-1");
+                // 平台切换后，两个文档 Tab 的 aria-controls 指向当前平台的面板
+                (["privacy", "changelog"] as const).forEach((name) => {
+                    const button = docTabs.find((d) => d.dataset.aboutDocTab === name);
+                    button?.setAttribute("aria-controls", `panel-${platform}-${name}`);
+                });
+            });
+            docTabs.forEach((tab) => {
+                const active = tab.dataset.aboutDocTab === doc;
                 tab.classList.toggle("active", active);
                 tab.setAttribute("aria-selected", String(active));
                 tab.setAttribute("tabindex", active ? "0" : "-1");
             });
             panels.forEach((panel, key) => {
-                panel.hidden = key !== name;
+                panel.hidden = key !== `${platform}:${doc}`;
+            });
+            syncHash();
+        };
+
+        const bindKeys = (tabs: HTMLElement[], apply: (name: string) => void, nameOf: (tab: HTMLElement) => string) => {
+            tabs.forEach((tab) => {
+                tab.addEventListener("click", () => {
+                    apply(nameOf(tab));
+                    select();
+                });
+                tab.addEventListener("keydown", (ev: KeyboardEvent) => {
+                    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(ev.key)) return;
+                    ev.preventDefault();
+                    const idx = tabs.indexOf(tab);
+                    const next =
+                        ev.key === "ArrowLeft" ? (idx - 1 + tabs.length) % tabs.length :
+                        ev.key === "ArrowRight" ? (idx + 1) % tabs.length :
+                        ev.key === "Home" ? 0 : tabs.length - 1;
+                    tabs[next].focus();
+                    tabs[next].click();
+                });
             });
         };
 
-        tabs.forEach((tab) => {
-            tab.addEventListener("click", () => {
-                const name = tab.dataset.aboutTab || "privacy";
-                if ((window.location.hash || "").replace(/^#/, "") !== name) {
-                    window.location.hash = name;
-                }
-                select(name);
-            });
-            tab.addEventListener("keydown", (ev: KeyboardEvent) => {
-                const keys = ["ArrowLeft", "ArrowRight", "Home", "End"];
-                if (!keys.includes(ev.key)) return;
-                ev.preventDefault();
-                const idx = tabs.indexOf(tab);
-                const next =
-                    ev.key === "ArrowLeft" ? (idx - 1 + tabs.length) % tabs.length :
-                    ev.key === "ArrowRight" ? (idx + 1) % tabs.length :
-                    ev.key === "Home" ? 0 : tabs.length - 1;
-                tabs[next].focus();
-                tabs[next].click();
-            });
-        });
+        bindKeys(platformTabs, (name) => { platform = name; }, (tab) => tab.dataset.aboutPlatformTab!);
+        bindKeys(docTabs, (name) => { doc = name; }, (tab) => tab.dataset.aboutDocTab!);
 
-        window.addEventListener("hashchange", () => select(selected()));
-        select(selected());
+        window.addEventListener("hashchange", () => {
+            fromHash();
+            select();
+        });
+        fromHash();
+        select();
     }
 
     document.addEventListener("astro:page-load", initAboutTabs);
