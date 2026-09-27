@@ -8,7 +8,7 @@ order: 10
 
 # FAEVault PC Privacy Policy
 
-> **Effective date: 2026-07-14**
+> **Effective date: 2026-09-27**
 >
 > This policy applies to the FAEVault desktop client and explains how the app handles vault data on your own machine, and when it communicates with external devices or services.
 
@@ -41,7 +41,13 @@ The app accesses the corresponding device capability only when you click the cam
 - FAEVault encrypts data with keys derived from the master password; the master password is never written to the vault file in plaintext.
 - When Windows Hello is enabled, the app uses Windows-provided authentication and DPAPI to protect local unlock material, and never reads raw biometric data.
 - Passkey private keys are treated as mandatory sensitive fields and never enter the search index, logs, notifications, clipboard, or ordinary previews.
-- The PC client only manages, backs up, and synchronizes Passkeys; it never performs Passkey creation or signing.
+- On supported Windows 11 versions, after you enable the system-level FAE Vault Passkey Provider, the PC client can create Passkeys and sign sign-in requests using private keys in the vault at your direction. The vault must be unlocked and any Windows-required user confirmation must be completed. Private keys are not sent to websites or the developer.
+
+### Windows Passkey Provider
+
+- Windows forwards creation and sign-in requests to the Provider you have enabled. The app processes the current website identifier and account information needed for that request, and stores new credentials in the local encrypted vault.
+- For sign-in, the native component uses the matching private key only to produce the signature for that request, which Windows returns to the requester. The private key remains within the vault's controlled processing flow. Sync or export that you choose to enable handles encrypted data as described elsewhere in this policy.
+- The certificate used to sign the Provider installer is separate from website Passkey private keys. For a self-signed installer, you must check and trust its public certificate yourself; the installer does not silently add system trust.
 
 ### Browser Autofill
 

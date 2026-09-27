@@ -14,6 +14,8 @@ Only records features and fixes for the FAEVault desktop client. Android client 
 
 ## 4.6.2 - 2026-09-26
 
+Republished on 2026-09-27: the x64 installer includes the signed Windows Passkey Provider. Before first installation, users must verify the `FAE-Vault-CodeSigning.cer` supplied with the same release and explicitly add it to Windows `TrustedPeople`; the installer does not silently add trust. The public certificate and installer are covered by `SHA256SUMS.txt`. The portable package does not install the system-level Provider.
+
 ### Changes
 - The dark theme accent color changed from purple (hue 238°) to a blue from the same family as the light theme (hue 217–222°): `accent` / `accent_hover` / `accent_soft` / `accent_text` / `accent_text_hover` and the primary button are recolored as a whole; the dark primary button stays a solid color (only the light theme uses a deep-blue gradient), matching the original structure.
 - LAN is no longer a three-level dropdown menu: it is consolidated into a single entry, and opening it shows a three-stop capsule slider at the top of the page (Start transfer station / LAN sync / File transfer). Switching stops only replaces the content below, without changing the page header, and defaults to "LAN sync". The slider is disabled while a sync or transfer is in progress, and automatically switches to the channel the other device is using.
