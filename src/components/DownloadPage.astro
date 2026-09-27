@@ -6,13 +6,16 @@ const oneDriveUrl = "https://1drv.ms/f/c/0b38d985c76ba514/IgCBsE77B0B-SYxlFxTQ0k
 
 /**
  * 版本与下载地址在构建时从 GitHub Releases 读取，避免官网与实际发布版本脱节。
- * 只认 Android 端前缀 "android/v" 的发布；PC 端 "pc/v" 由另一页面/链接负责。
+ * 分别选择 Android 和 PC 的正式发布，且 PC 发布必须包含对应的安装包。
  * 网络不可用时回退到 FALLBACK_VERSION，保证本地构建与 Pages 构建都能成功。
  */
-const RELEASES_API = "https://api.github.com/repos/faegit/faevault-site/releases?per_page=50";
-const RELEASE_TAG_PREFIX = "android/v";
+const RELEASES_API = "https://api.github.com/repos/faegit/faevault-site/releases?per_page=100";
+const ANDROID_TAG_PREFIX = "android/v";
+const PC_TAG_PREFIX = "pc/v";
 const FALLBACK_VERSION = "4.6.2";
 const APK_ASSET = "faevault-arm64-v8a.apk";
+const PC_CERT_ASSET = "FAE-Vault-CodeSigning.cer";
+const CHECKSUM_ASSET = "SHA256SUMS.txt";
 
 type ReleaseAsset = { name?: string; browser_download_url?: string };
 type Release = { tag_name?: string; draft?: boolean; prerelease?: boolean; html_url?: string; assets?: ReleaseAsset[] };
@@ -23,34 +26,45 @@ function versionKey(version: string): number {
     return Number(match[1]) * 1_000_000 + Number(match[2]) * 1_000 + Number(match[3]);
 }
 
-async function latestAndroidRelease(): Promise<Release | null> {
+async function latestReleases(): Promise<Release[]> {
     try {
         const response = await fetch(RELEASES_API, {
             headers: { Accept: "application/vnd.github+json", "User-Agent": "FAEVault-site-build" },
         });
-        if (!response.ok) return null;
-        const releases = (await response.json()) as Release[];
-        return (
-            releases
-                .filter((item) => typeof item?.tag_name === "string"
-                    && item.tag_name!.startsWith(RELEASE_TAG_PREFIX)
-                    && !item.draft && !item.prerelease)
-                .sort((a, b) =>
-                    versionKey(b.tag_name!.slice(RELEASE_TAG_PREFIX.length))
-                    - versionKey(a.tag_name!.slice(RELEASE_TAG_PREFIX.length)))[0] ?? null
-        );
+        if (!response.ok) return [];
+        return (await response.json()) as Release[];
     } catch {
-        return null;
+        return [];
     }
 }
 
-const release = await latestAndroidRelease();
-const ver = release ? release.tag_name!.slice(RELEASE_TAG_PREFIX.length) : FALLBACK_VERSION;
+function latestRelease(releases: Release[], prefix: string, requiredAsset: (version: string) => string): Release | null {
+    return releases
+        .filter((item) => typeof item?.tag_name === "string"
+            && item.tag_name.startsWith(prefix)
+            && !item.draft && !item.prerelease
+            && item.assets?.some((asset) => asset.name === requiredAsset(item.tag_name!.slice(prefix.length))))
+        .sort((a, b) =>
+            versionKey(b.tag_name!.slice(prefix.length))
+            - versionKey(a.tag_name!.slice(prefix.length)))[0] ?? null;
+}
+
+const releases = await latestReleases();
+const release = latestRelease(releases, ANDROID_TAG_PREFIX, () => APK_ASSET);
+const pcRelease = latestRelease(releases, PC_TAG_PREFIX, (version) => `FAEVault_v${version}_Setup.exe`);
+const ver = release ? release.tag_name!.slice(ANDROID_TAG_PREFIX.length) : FALLBACK_VERSION;
+const pcVer = pcRelease ? pcRelease.tag_name!.slice(PC_TAG_PREFIX.length) : FALLBACK_VERSION;
 const androidApk =
     release?.assets?.find((asset) => asset.name === APK_ASSET)?.browser_download_url
-    ?? `https://github.com/faegit/faevault-site/releases/download/${RELEASE_TAG_PREFIX}${ver}/${APK_ASSET}`;
+    ?? `https://github.com/faegit/faevault-site/releases/download/${ANDROID_TAG_PREFIX}${ver}/${APK_ASSET}`;
 const releaseUrl = release?.html_url
-    ?? `https://github.com/faegit/faevault-site/releases/tag/${RELEASE_TAG_PREFIX}${ver}`;
+    ?? `https://github.com/faegit/faevault-site/releases/tag/${ANDROID_TAG_PREFIX}${ver}`;
+const pcReleaseBase = `https://github.com/faegit/faevault-site/releases/download/${PC_TAG_PREFIX}${pcVer}/`;
+const pcSetupName = `FAEVault_v${pcVer}_Setup.exe`;
+const pcSetup = pcRelease?.assets?.find((asset) => asset.name === pcSetupName)?.browser_download_url ?? pcReleaseBase + pcSetupName;
+const pcCert = pcRelease?.assets?.find((asset) => asset.name === PC_CERT_ASSET)?.browser_download_url ?? pcReleaseBase + PC_CERT_ASSET;
+const pcChecksums = pcRelease?.assets?.find((asset) => asset.name === CHECKSUM_ASSET)?.browser_download_url ?? pcReleaseBase + CHECKSUM_ASSET;
+const pcReleaseUrl = pcRelease?.html_url ?? `https://github.com/faegit/faevault-site/releases/tag/${PC_TAG_PREFIX}${pcVer}`;
 
 interface Props {
     locale: Locale;
@@ -61,15 +75,19 @@ const c =
         ? {
               kicker: "下载",
               title: "在你的设备上，继续掌控自己的资料。",
-              intro: "FAEVault Android 正式版：全新 PMVE 加密引擎，局域网与云端同步全面升级，新增本地备份与设备身份保护。Android 版通过 GitHub Releases 发布，arm64 架构适配绝大多数现代手机。",
+              intro: "FAEVault Android 与 Windows 正式版通过 GitHub Releases 发布。请选择对应设备的安装包。",
               androidBtn: "下载安装",
               backupBtn: "OneDrive 备用下载",
               backupHint: "无法访问 GitHub 时，可进入备用目录选择版本和安装包。",
               windowsBtn: "下载安装",
+              windowsCert: "下载签名证书",
+              windowsChecksums: "下载校验文件",
+              windowsTrust: "首次安装前，请核对校验文件与证书指纹，并自行信任签名证书；Windows 不会自动信任项目自签证书。",
+              windowsRelease: "查看 Windows 发布说明",
               android: "Android 版本",
               windows: "Windows 版本",
               androidDetail: `版本 ${ver} · arm64-v8a / universal`,
-              windowsDetail: `版本 ${ver} · 64 位中文安装包`,
+              windowsDetail: `版本 ${pcVer} · x64 中文安装包`,
               notePre: "其他 CPU 架构（armeabi-v7a、x86_64、x86）请从 ",
               noteLink: "GitHub Releases",
               notePost: " 获取。",
@@ -78,15 +96,19 @@ const c =
         : {
               kicker: "Download",
               title: "Stay in control of your data on every device.",
-              intro: "FAEVault for Android: a new PMVE encryption engine, rebuilt LAN and cloud sync, plus local backup with device identity protection. The Android build is published through GitHub Releases; arm64 covers most modern phones.",
+              intro: "FAEVault for Android and Windows is published through GitHub Releases. Choose the installer for your device.",
               androidBtn: "Download and install",
               backupBtn: "OneDrive mirror",
               backupHint: "If GitHub is unavailable, choose your version and APK in the mirror folder.",
               windowsBtn: "Download and install",
+              windowsCert: "Download signing certificate",
+              windowsChecksums: "Download checksums",
+              windowsTrust: "Before your first installation, verify the checksums and certificate fingerprint, then explicitly trust the signing certificate. Windows does not automatically trust this self-signed certificate.",
+              windowsRelease: "View Windows release notes",
               android: "Android version",
               windows: "Windows version",
               androidDetail: `Version ${ver} · arm64-v8a / universal`,
-              windowsDetail: `Version ${ver} · 64-bit installer in Chinese`,
+              windowsDetail: `Version ${pcVer} · x64 installer in Chinese`,
               notePre: "For other CPU architectures (armeabi-v7a, x86_64, x86), visit ",
               noteLink: "GitHub Releases",
               notePost: ".",
@@ -98,7 +120,7 @@ const c =
     <section class="platform-system">
         <div class="platform-orbits" aria-hidden="true"><i></i><i></i><b></b></div>
         <article class="android"><span>ANDROID</span><h2>{c.android}</h2><p>{c.androidDetail}</p><a class="dl-btn" href={androidApk} target="_blank" rel="noopener noreferrer">{c.androidBtn}</a><div class="backup-download"><a href={oneDriveUrl} target="_blank" rel="noopener noreferrer">{c.backupBtn}</a><p>{c.backupHint}</p></div></article>
-        <article class="windows"><span>WINDOWS</span><h2>{c.windows}</h2><p>等待发布</p></article>
+        <article class="windows"><span>WINDOWS</span><h2>{c.windows}</h2><p>{c.windowsDetail}</p><p class="trust-note">{c.windowsTrust}</p><div class="release-assets"><a href={pcCert} target="_blank" rel="noopener noreferrer">{c.windowsCert}</a><a href={pcChecksums} target="_blank" rel="noopener noreferrer">{c.windowsChecksums}</a><a href={pcReleaseUrl} target="_blank" rel="noopener noreferrer">{c.windowsRelease}</a></div><a class="dl-btn" href={pcSetup} target="_blank" rel="noopener noreferrer">{c.windowsBtn}</a></article>
         <p class="release-note">{c.notePre}<a href={c.releaseUrl} target="_blank" rel="noopener noreferrer">{c.noteLink}</a>{c.notePost}</p>
     </section>
 </PageShell>
@@ -217,6 +239,9 @@ const c =
     .backup-download { margin-top: 1rem; }
     .backup-download a { color: #287795; text-underline-offset: 3px; }
     .backup-download p { max-width: 30ch; line-height: 1.6; }
+    .trust-note { max-width: 44ch; line-height: 1.6; }
+    .release-assets { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; margin-top: 1rem; }
+    .release-assets a { color: #287795; font-size: 0.82rem; text-underline-offset: 3px; }
     .dl-btn.disabled {
         background: #dfe9e7;
         color: #71807e;
