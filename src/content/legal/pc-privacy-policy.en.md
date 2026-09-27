@@ -83,7 +83,7 @@ After native application autofill is enabled, the app acts only when you press t
 
 - It reads the process name, window title, and input control properties exposed by UI Automation for the current foreground Windows application;
 - It uses this information to match associated login entries and to identify username and password fields;
-- It writes the username and password directly into the target controls through Windows UI Automation.
+- For detectable fields, it writes the username and password through Windows UI Automation. For applications such as Epic that do not expose standard input fields, it sends only the item you explicitly select (username or password) to the focused field of the verified foreground window.
 
 This process does not go through the clipboard, does not submit automatically, and never sends credentials to the developer or to third-party servers. The app does not continuously record window titles, input content, or keystrokes; when the foreground application is not associated, no vault data is offered.
 
