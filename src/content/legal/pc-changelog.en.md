@@ -12,6 +12,15 @@ Only records features and fixes for the FAEVault desktop client. Android client 
 
 ---
 
+## 4.6.3 - 2026-09-29
+
+### Fixed
+- Fixed "device authorization records cannot be read" breaking key authentication for every device on a shared vault. Older Android codecs accepted a 4-bit permission mask (bit3 has no defined meaning) and signed such records into the vault metadata; the strict 3-bit check here raised during decoding, and because the authorization list is parsed all-or-nothing, a single historical record made the whole list unreadable and left every device unable to authenticate. The permission record now keeps the exact value found on the wire (so re-encoding reproduces the original bytes and signatures keep verifying) and undefined bits are projected away at decision time, so they can never grant an operation. Existing vaults need no migration or re-entry — they open and work as-is.
+- Fixed transient export/transfer grants permanently blocking later persistent grants for the same device. Transient grants minted their epoch from the current millisecond clock (~10^12) while persistent grants use an incrementing counter; sharing one epoch sequence let a transient grant outrank every later persistent grant for that device, blocking its sync approval. The two now use separate epoch namespaces that do not participate in each other's ordering, while each record is still verified against the vault key on its own and a device passes under either namespace — so this cannot grant more than the vault itself signed.
+- Added a cross-end vector for a record carrying undefined permission bits (`permissions=15`), covering decode, signature verification, byte-exact re-encode, and the fact that bit3 grants nothing. Both test runners now iterate every case so further boundary vectors can be added without code changes.
+
+---
+
 ## 4.6.2 - 2026-09-26
 
 Republished on 2026-09-27: the x64 installer includes the signed Windows Passkey Provider. Before first installation, users must verify the `FAE-Vault-CodeSigning.cer` supplied with the same release and explicitly add it to Windows `TrustedPeople`; the installer does not silently add trust. The public certificate and installer are covered by `SHA256SUMS.txt`. The portable package does not install the system-level Provider.
