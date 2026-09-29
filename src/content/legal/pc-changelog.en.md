@@ -12,7 +12,25 @@ Only records features and fixes for the FAEVault desktop client. Android client 
 
 ---
 
+## 4.6.3 - 2026-09-29
+
+### Fixed
+- Fixed "Check for updates" doing nothing. The update dialog's `__init__` had lost its indentation and ended up at module level, so `UpdateDialog` inherited its parent's two-argument constructor while the call site passed three — raising `TypeError`. The exception is raised inside a Qt slot, which PySide6 swallows silently (the windowed build discards stderr too), so the button resets and no dialog ever appears. **The in-app update channel has been dead since 2026-08-20.**
+- Fixed "device authorization records cannot be read" breaking key authentication for *every* device on a shared vault. Older Android builds wrote an undefined permission bit into the authorization records and signed them into the vault; the strict 3-bit check here made the whole list unreadable, so no device could authenticate. Records now keep their exact value (signatures and data stay valid) and undefined bits grant nothing. **Existing vaults need no migration or re-entry.**
+- Fixed the contradictory LAN state after a peer disconnects: the page kept showing "connected, waiting for sync or transfer…" while the "establish transfer station" button was clickable again. The teardown refreshed the status before stopping the server, but pairing records are only cleared by `stop()`, so the "connected" text was written and then frozen once polling stopped. The teardown now stops the server first, resets the state, and only then reveals the entry — restoring the auto-collapsed QR/pairing hints as well.
+- Fixed the LAN gear slider being permanently disabled after a file transfer: the transfer-in-progress flag was only cleared in `__init__`, never on `stop()`, so "a task is running" stayed true forever. `stop()` now also resets the transfer and sync progress.
+- Fixed the module card's delete × turning into a solid pink block with the × missing after a click. Painting the hover tint set the painter's pen to *no pen*, and the × then inherited that pen; changing its colour and width does not restore the line style, so both diagonal lines drew nothing. The × now uses its own freshly constructed solid pen, so the tint and the cross coexist.
+- Floating buttons are now plainly **translucent**. The frosted-glass treatment was invisible over an entry list: the backdrop is flat, evenly coloured rows, so a Gaussian blur either smeared the rows into the same colour as the background or, at a smaller radius, was crushed below visibility by the glass colour on top (measured contrast as low as 8–20 out of 255) — it just looked transparent. It also re-rendered the entire scroll viewport and blurred it on every paint, triggered by the scrollbar. The blur is gone; the controls are clean translucent surfaces and the per-frame re-render with it.
+- Added a cross-end vector for a record carrying undefined permission bits (`permissions=15`), covering decode, signature verification, byte-exact re-encode, and the fact that bit3 grants nothing. Both test runners now iterate every case.
+
+### Changed
+- Screen capture protection now defaults to **on** ("allow screen capture" defaults to off): vault contents should not appear in screenshots, screen recordings or screen shares by default. Values the user has explicitly saved (either the new key or the legacy inverse key) are still honoured and are not changed by the new default.
+
+---
+
 ## 4.6.2 - 2026-09-26
+
+Republished on 2026-09-27: the x64 installer includes the signed Windows Passkey Provider. Before first installation, users must verify the `FAE-Vault-CodeSigning.cer` supplied with the same release and explicitly add it to Windows `TrustedPeople`; the installer does not silently add trust. The public certificate and installer are covered by `SHA256SUMS.txt`. The portable package does not install the system-level Provider.
 
 ### Changes
 - The dark theme accent color changed from purple (hue 238°) to a blue from the same family as the light theme (hue 217–222°): `accent` / `accent_hover` / `accent_soft` / `accent_text` / `accent_text_hover` and the primary button are recolored as a whole; the dark primary button stays a solid color (only the light theme uses a deep-blue gradient), matching the original structure.
