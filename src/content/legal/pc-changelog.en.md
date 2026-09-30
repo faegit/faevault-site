@@ -12,6 +12,23 @@ Only records features and fixes for the FAEVault desktop client. Android client 
 
 ---
 
+## 4.6.4 - 2026-09-30
+
+### Fixed
+- Fixed "Close page" doing nothing on the host side. That path needs a workspace reference to fall back to the station entry, but the connecting page was never registered with the workspace, so the lookup raised `AttributeError` and Qt swallowed it silently.
+- Fixed the connecting device being completely blind to "the other device closed the transfer connection". Errors while polling for transfer items were swallowed, so after the station shut down the connection still looked alive: the sender stayed on the page and the button still read "Disconnect". It now treats repeated failures as a disconnect and converges on one teardown path.
+- Fixed the sender area merely being disabled after a disconnect, still occupying the page and looking usable while no longer being able to send. Host side (ended locally / ended by peer / connection timeout) and connecting side (peer closed / connection failed) now actually collapse the sender, switch the button to "Close page", and keep the transfer records for review.
+- Fixed connection timeouts not running the disconnect teardown, leaving the sender and button in the wrong state.
+- Fixed the sync result never appearing for the connecting side. The result card was additionally gated on "no other channel is busy", and there is a recomposition window between the sync-finished flag clearing and the result being written where neither condition holds, so the result always fell through to the "closed" branch.
+- Fixed three Chinese strings that had picked up a stray space (station description, export authorisation hint, export confirmation dialog). Those strings are also the lookup keys for the English translation table, so the extra space made the lookup miss and Chinese leaked into the English UI.
+- Removed imports in `ui/sync_pages.py` that no longer had references, and aligned the file's formatting.
+
+### Changed
+- Disconnecting now asks for confirmation first. Interrupting a sync abandons the in-flight merge and upload and can leave a half-merged state, which costs more than interrupting a transfer (a transfer only drops individual items). Station shutdown, connector disconnect, and both transfer-page exits now confirm first, matching the Android client.
+- The exit after a session ends is uniformly called "Close page" on both the sync and transfer pages. After a disconnect there is nothing left to disconnect, so the button that stays really means "close this page".
+
+---
+
 ## 4.6.3 - 2026-09-29
 
 ### Fixed
