@@ -12,6 +12,22 @@ This changelog records features and fixes for the FAEVault Android client only. 
 
 ---
 
+## 4.6.4 - 2026-09-30
+
+### Fixed
+- Fixed the file transfer page refusing to stay closed: pressing "Close page" made it come straight back. Closing only cleared the open flag, while the effect that starts the view set it open again as long as the session flag was still true — and that effect re-ran whenever the pairing sequence changed, so a freshly closed page revived immediately. The closed state is now tied to the pairing sequence: within one pairing, closing is terminal, and a new view only opens when the other device pairs again.
+- Fixed the role being recorded wrongly on disconnect. The disconnect callback also "started a session", and the host-side flag it read had not been refreshed yet, so a stale role got frozen as this device's identity and the view ended up crossed after disconnecting.
+- Fixed only one side showing the full sync information after a LAN sync finished on both devices while the other merely said "closed". The host side had no result source at all; it now decodes the complete merge statistics from the response (including passkey conflicts and lineage). The UI decision was extracted into a mutually exclusive "result / disconnected / live" decision that looks only at the result itself — the result card was additionally gated on "no other channel is busy", and there is a recomposition window between the sync-finished flag clearing and the result being written where neither condition holds.
+- Fixed "Disconnected" filling the sync page the moment a scanned sync started. A live session used to fall into the "disconnected" branch; it is now its own case, with the session panel conveying state and progress.
+- Fixed leftover Chinese in the English UI: the cloud drive and backup device names are bare Chinese interpolated into a template, so the outer translation wrapper received the already-interpolated whole string, found no table entry, and printed it verbatim. The backup volume's parentheses now follow the language (full-width in Chinese, half-width in English).
+- Fixed three hardcoded Chinese strings in the sync result. They used to be whole-string templates, and the guard, which reasons line by line, could not see the wrapping context and treated them as newly untranslated copy.
+
+### Changed
+- Disconnecting during a sync now asks for confirmation first: interrupting abandons the in-flight merge and upload and can leave a half-merged state, which costs more than interrupting a transfer. The transfer page already confirmed; the sync page did not.
+- The exit after a session ends is uniformly called "Close page". After a disconnect there is nothing left to disconnect, so the button that remains really means "close this page".
+
+---
+
 ## 4.6.3 - 2026-09-29
 
 ### Fixed
