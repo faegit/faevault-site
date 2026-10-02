@@ -12,6 +12,26 @@ Only records features and fixes for the FAEVault desktop client. Android client 
 
 ---
 
+## 4.6.5 - 2026-10-02
+
+### Fixed
+- Fixed that secondary verification for sensitive operations could be retried indefinitely. The dialog only shook and showed "incorrect master password" — no counter, no backoff, no cooldown. This gap is worse on desktop than on mobile: the fast path in `verify_password` uses `hmac.compare_digest` without running Argon2id, so a guess costs nearly nothing, whereas the unlock dialog runs the full KDF (64 MiB, t=3) and is throttled by that alone. Secondary verification now shares the same failure record as the unlock page, matching Android's `MasterPasswordDialog` behaviour item for item.
+- Fixed that the app still stayed unlocked after secondary verification hit the limit. Consecutive wrong guesses against an already-unlocked vault mean the holder is probably not the owner, so the session should drop to locked immediately.
+- Fixed that the cooldown countdown was unreliable. Remaining seconds were counted down in memory, which drifts from the real deadline: after minimising the window, suspending the system or sleeping, the two disagree, and background pausing can end the cooldown early. The countdown is now recomputed from the persisted deadline, with the same 200 ms polling interval as Android.
+- Fixed that failure backoff gave no visible feedback. Remaining seconds are now shown during backoff too.
+- Fixed that a stale window could clear a cooldown just created by another entry point. UI code should not write security state; it now decides which controls to restore based on the current account.
+- Fixed a read-modify-write race in `record_password_failure`. Concurrent failures from the main process and the resident browser_host process could both read the old value, so the cooldown round advanced once instead of twice — looser than intended.
+- Fixed that passkey entries could not use tags. Tags are pure metadata but were excluded in four places: loading, import, the tag index and the context menu. The entries themselves stay non-editable (key material is written only by the Credential Provider), but users need to filter and organise them.
+- Fixed that the entry editor's deferred resize could fire after the dialog was destroyed. Closing the editor before the event loop dispatched that callback made PySide raise "internal C++ object already deleted".
+- Fixed that auto-update only showed download progress, leaving installation completely invisible. The installer's exit code was discarded, so the app could not know whether installation succeeded and failures were entirely invisible to the user. It now shows four stages — download, verify, install, done — and only exits once the installer confirms success.
+- Fixed leftover Chinese in the English interface. Automatic sync status is persisted Chinese shown without translation, and the local backup label "Backup device (VOL-xxxx)" only translated the prefix, leaving the volume name and parentheses raw.
+- Fixed CSV import dropping tags: the check was mistakenly written to keep only login entries, discarding tags for Wi-Fi, cards, API keys and every other type.
+
+### Changed
+- Cloud uploads now stream to the final URL in one pass, closing the window between the two-stage write. Content-level CAS is added for weak-ETag servers: because the merge flow rewrites the snapshot path in place, the SHA-256 recorded at download time is kept separately as the "remote copy" witness. An explicit user "overwrite upload" skips every gate and publishes unconditionally.
+
+---
+
 ## 4.6.4 - 2026-09-30
 
 ### Fixed
