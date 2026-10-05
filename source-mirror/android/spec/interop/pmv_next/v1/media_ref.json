@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "suite": "PMV_NEXT_V1_SUITE_1",
+  "cases": [
+    {
+      "id": "media_ref_entry_fields_v1",
+      "reference": {
+        "object_id": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "generation": 7,
+        "kind": "attachment",
+        "size": 8193,
+        "sha256": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
+      },
+      "json": {
+        "$pmv_media_ref": "pmv4-object-v1",
+        "object_id": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "generation": 7,
+        "kind": "attachment",
+        "size": 8193,
+        "sha256": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
+      },
+      "string": "pmv4-object:v1:10213243-5465-7687-98a9-bacbdcedfe0f:7:attachment:8193:000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "fields": {
+        "modules": [
+          {
+            "type": "images",
+            "value": [
+              "img:legacy-photo.enc",
+              "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==",
+              "not-a-media-reference"
+            ]
+          },
+          {
+            "type": "attachments",
+            "value": [
+              {
+                "name": "document.bin",
+                "data": "att:legacy-document.enc"
+              },
+              {
+                "name": "stored.bin",
+                "data": {
+                  "$pmv_media_ref": "pmv4-object-v1",
+                  "object_id": "10213243-5465-7687-98a9-bacbdcedfe0f",
+                  "generation": 7,
+                  "kind": "attachment",
+                  "size": 8193,
+                  "sha256": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
+                }
+              }
+            ]
+          }
+        ],
+        "card_images_b64": [
+          "pmv4-object:v1:10213243-5465-7687-98a9-bacbdcedfe0f:7:attachment:8193:000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
+        ]
+      },
+      "classifications": {
+        "/fields/modules/0/value/0": "legacy_external",
+        "/fields/modules/0/value/1": "inline",
+        "/fields/modules/0/value/2": "unknown",
+        "/fields/modules/1/value/0/data": "legacy_external",
+        "/fields/modules/1/value/1/data": "object",
+        "/fields/card_images_b64/0": "object"
+      },
+      "closure_cases": [
+        {
+          "id": "existing_and_imported_referenced",
+          "available": ["10213243-5465-7687-98a9-bacbdcedfe0f:7", "00000000-0000-0000-0000-000000000002:1"],
+          "imported": ["00000000-0000-0000-0000-000000000002:1"],
+          "referenced": ["10213243-5465-7687-98a9-bacbdcedfe0f:7", "00000000-0000-0000-0000-000000000002:1"],
+          "valid": true
+        },
+        {
+          "id": "dangling_reference",
+          "available": ["10213243-5465-7687-98a9-bacbdcedfe0f:7"],
+          "imported": [],
+          "referenced": ["00000000-0000-0000-0000-000000000099:1"],
+          "valid": false
+        },
+        {
+          "id": "orphan_import",
+          "available": ["00000000-0000-0000-0000-000000000003:1"],
+          "imported": ["00000000-0000-0000-0000-000000000003:1"],
+          "referenced": [],
+          "valid": false
+        },
+        {
+          "id": "duplicate_import_key",
+          "available": [],
+          "imported": ["00000000-0000-0000-0000-000000000004:1", "00000000-0000-0000-0000-000000000004:1"],
+          "referenced": ["00000000-0000-0000-0000-000000000004:1"],
+          "valid": false
+        }
+      ]
+    }
+  ]
+}

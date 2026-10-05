@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 品牌主色：深靛蓝。与 Compose 端 primary 协调，用于启动屏 / 最近任务卡片 -->
+    <color name="brand_bg_top">#1A1B1E</color>
+    <color name="brand_bg_bottom">#23262B</color>
+    <color name="brand_primary">#1A7DC4</color>
+    <color name="brand_on_primary">#FFFFFF</color>
+</resources>

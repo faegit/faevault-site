@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <cache-path name="img_share" path="img_share/" />
+    <cache-path name="img_capture" path="img_capture/" />
+    <files-path name="updates" path="updates/" />
+    <external-path name="transfer_downloads" path="Download/Vaultshare/" />
+    <external-files-path name="transfer_downloads_fallback" path="Download/Vaultshare/" />
+</paths>

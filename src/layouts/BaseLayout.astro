@@ -48,6 +48,7 @@ const menuLabel = locale === "zh-cn" ? "打开菜单" : "Open menu";
                 <nav class="nav-links" id="navLinks" aria-label="Primary">
                     <a href={localePath(locale)}>{text.nav.home}</a>
                     <a href={localePath(locale, "download")}>{text.nav.download}</a>
+                    <a href={localePath(locale, "source")}>{text.nav.source}</a>
                     <a href={localePath(locale, "journey")}>{text.nav.journey}</a>
                     <a href={localePath(locale, "security")}>{text.nav.security}</a>
                     <a href={localePath(locale, "about")}>{text.nav.about}</a>
@@ -90,6 +91,7 @@ const menuLabel = locale === "zh-cn" ? "打开菜单" : "Open menu";
                 <nav class="footer-links" aria-label="Footer">
                     <a href={localePath(locale)}>{text.nav.home}</a>
                     <a href={localePath(locale, "download")}>{text.nav.download}</a>
+                    <a href={localePath(locale, "source")}>{text.nav.source}</a>
                     <a href={localePath(locale, "journey")}>{text.nav.journey}</a>
                     <a href={localePath(locale, "security")}>{text.nav.security}</a>
                     <a href={localePath(locale, "about")}>{text.nav.about}</a>
@@ -326,7 +328,7 @@ const menuLabel = locale === "zh-cn" ? "打开菜单" : "Open menu";
     .nav-links {
         display: flex;
         align-items: center;
-        gap: 26px;
+        gap: 20px;
         color: #465162;
         font-size: 14px;
         font-weight: 650;
@@ -467,7 +469,7 @@ const menuLabel = locale === "zh-cn" ? "打开菜单" : "Open menu";
             opacity: 0;
         }
     }
-    @media (max-width: 980px) {
+    @media (max-width: 1080px) {
         .nav-links {
             position: absolute;
             top: 70px;

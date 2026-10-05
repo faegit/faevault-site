@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 通用：图片查看器 / 弹窗 -->
+    <string name="media_close">关闭</string>
+    <string name="media_confirm">确认</string>
+    <string name="media_delete">删除</string>
+    <string name="media_restore">恢复</string>
+    <string name="media_qr_code">二维码</string>
+    <string name="media_importing">正在导入</string>
+    <string name="media_import_exit_warning">完成前退出将丢失本次添加内容，不影响已保存数据</string>
+
+    <!-- 图片查看器（高清分块） -->
+    <string name="media_image_read_failed">图片读取失败</string>
+    <string name="media_image_decode_failed">图像解码失败：%1$s</string>
+    <string name="media_image_too_large_or_unsupported">超大图片或格式不受支持</string>
+    <string name="media_image_preview_failed">图像预览失败：%1$s</string>
+    <string name="media_unsupported_format">格式不受支持</string>
+
+    <!-- 图片加载占位 / 提示 -->
+    <string name="media_image_not_imported">图片尚未导入完成，请稍后查看</string>
+    <string name="media_image_loading">图像加载中</string>
+    <string name="media_image_still_loading_hint">如果长期未加载完成，请退出后重新查看</string>
+
+    <!-- 图片 / 附件操作 Toast -->
+    <string name="media_import_verify_failed">图片导入校验失败，图片可能已损坏</string>
+    <string name="media_image_verify_failed">图片数据校验失败，可能已损坏</string>
+    <string name="media_attachment_verify_failed">附件导出校验失败，数据可能已损坏</string>
+    <string name="media_image_copied">已复制图片，可粘贴到图库或聊天</string>
+    <string name="media_copy_image_failed">复制图片失败：%1$s</string>
+    <string name="media_image_saved">图片已保存</string>
+    <string name="media_save_failed">保存失败：%1$s</string>
+    <string name="media_image_file_missing">图片文件不存在</string>
+    <string name="media_cannot_write_location">无法写入所选位置</string>
+
+    <!-- 剪贴板 -->
+    <string name="clipboard_empty">「%1$s」为空，无可复制内容</string>
+    <string name="clipboard_copied_no_ttl">已复制「%1$s」（不自动清理）</string>
+    <string name="clipboard_copied_ttl">已复制「%1$s」（%2$d 秒后自动清理）</string>
+
+    <!-- 应用选择面板 -->
+    <string name="media_select_app">选择关联应用</string>
+    <string name="media_search_app_name">搜索应用名或包名</string>
+    <string name="media_no_match">无匹配结果</string>
+    <string name="media_no_app_list">未获取到应用列表</string>
+    <string name="media_app_list_permission">可能系统拒绝了 "读取应用列表" 权限。\n请到应用权限设置中开启。</string>
+    <string name="media_open_settings">去设置开启</string>
+
+    <!-- 回收站 -->
+    <string name="trash_deselect">取消选择</string>
+    <string name="trash_select_all">全选</string>
+    <string name="trash_deselect_all">取消全选</string>
+    <string name="trash_count">共 %1$d 条</string>
+    <string name="trash_selected">已选 %1$d</string>
+    <string name="trash_empty">回收站为空</string>
+    <string name="trash_clear_all">清空回收站</string>
+    <string name="trash_clear_all_confirm">将彻底删除全部 %1$d 条，此操作不可恢复。</string>
+    <string name="trash_next">下一步</string>
+    <string name="trash_confirm_again">再次确认清空</string>
+    <string name="trash_final_confirm">最后确认：这 %1$d 条将无法找回。</string>
+    <string name="trash_purge_all">彻底清空</string>
+    <string name="trash_purge_item">彻底删除条目</string>
+    <string name="trash_purge_item_confirm">将彻底删除「%1$s」，此操作不可恢复。</string>
+    <string name="trash_untitled">(无标题)</string>
+    <string name="trash_purge">彻底删除</string>
+    <string name="trash_purge_selected">彻底删除所选条目</string>
+    <string name="trash_purge_selected_confirm">将彻底删除所选 %1$d 条，此操作不可恢复。</string>
+    <string name="trash_deleting_soon">即将自动删除</string>
+    <string name="trash_delete_in_hours">%1$d 小时后自动删除</string>
+    <string name="trash_delete_in_days">%1$d 天后自动删除</string>
+</resources>

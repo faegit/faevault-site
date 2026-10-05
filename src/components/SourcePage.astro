@@ -1,0 +1,66 @@
+---
+import PageShell from './PageShell.astro';
+import { withBaseAsset } from '../config/site';
+import type { Locale } from '../i18n/config';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const zh = locale === 'zh-cn';
+const repo = 'https://github.com/faegit/faevault-site';
+const text = zh ? {
+  kicker: 'SOURCE / APACHE-2.0', title: '阅读源码，了解保险库',
+  intro: 'Android 与 PC 的经筛选源码快照，供阅读、研究与按许可证使用。快照日期：2026-10-05。',
+  browse: '浏览源码', download: '下载源码 ZIP',
+  scope: '公开范围', included: '包含自有加密实现、文件格式、同步、数据模型、自动填充与 Passkey 相关模块，以及筛选后的测试和 spec 测试向量。各平台的实际文件以清单与评估报告为准。',
+  excluded: '不包含真实保险库、凭据、签名密钥、编译缓存、第三方二进制，以及未明确授权公开的品牌资源。测试向量用于验证协议与跨端互操作，不是用户数据。',
+  limits: '如何使用这份快照', details: '这不是完整历史仓库，也不承诺直接重建官方签名成品。依赖、环境配置和被排除的资源可能需要另行准备；请先阅读评估报告与各平台说明。',
+  license: '许可与第三方内容', licensing: '快照中的自有源码按 Apache-2.0 提供。第三方源码、依赖和资源遵循各自许可；Apache-2.0 不会替代它们的许可，也不授予未明确授权品牌资源的使用权。',
+  manifest: '快照清单与 SHA-256', review: '公开范围评估报告', apache: '阅读 Apache-2.0 许可文本',
+} : {
+  kicker: 'SOURCE / APACHE-2.0', title: 'Read the source behind FAEVault',
+  intro: 'Selected Android and PC source snapshots for reading, research and use under the license. Snapshot date: 2026-10-05.',
+  browse: 'Browse source', download: 'Download source ZIP',
+  scope: 'What is included', included: 'The selection includes first-party cryptography, file formats, sync, data models, autofill and Passkey modules, plus selected tests and spec vectors. See the manifest and review for the actual files on each platform.',
+  excluded: 'Real vaults, credentials, signing keys, build caches, third-party binaries and brand assets without explicit publication permission are excluded. Test vectors verify protocols and cross-platform interoperability; they are not user data.',
+  limits: 'Using these snapshots', details: 'These are not full history repositories and do not promise a direct rebuild of official signed releases. Dependencies, environment configuration and excluded assets may need separate preparation. Read the review and platform notes first.',
+  license: 'License and third-party content', licensing: 'First-party source in these snapshots is provided under Apache-2.0. Third-party source, dependencies and assets remain subject to their own licenses. Apache-2.0 does not replace those licenses or grant rights to brand assets without explicit permission.',
+  manifest: 'Snapshot manifest and SHA-256', review: 'Publication scope review', apache: 'Read the Apache-2.0 license',
+};
+---
+<PageShell theme="source" kicker={text.kicker} title={text.title} intro={text.intro}>
+  <div class="platforms">
+    {['android', 'pc'].map(platform => (
+      <article class="platform">
+        <p class="label">FAEVault / {platform === 'android' ? 'ANDROID' : 'PC'}</p>
+        <h2>{platform === 'android' ? 'Android' : 'PC · Windows'}</h2>
+        <div class="actions">
+          <a class="btn btn-primary" href={`${repo}/tree/main/source-mirror/${platform}`}>{text.browse} ↗</a>
+          <a class="btn btn-secondary" href={withBaseAsset(`/source/faevault-${platform}-source.zip`)} download>{text.download} ↓</a>
+        </div>
+      </article>
+    ))}
+  </div>
+  <section class="notes" aria-label={text.scope}>
+    <div><h2>{text.scope}</h2><p>{text.included}</p><p>{text.excluded}</p></div>
+    <div><h2>{text.limits}</h2><p>{text.details}</p></div>
+    <div><h2>{text.license}</h2><p>{text.licensing}</p></div>
+  </section>
+  <nav class="documents" aria-label={zh ? '源码文档' : 'Source documents'}>
+    <a href={withBaseAsset('/source/snapshot.json')}>{text.manifest} ↗</a>
+    <a href={`${repo}/blob/main/source-mirror/OPEN_SOURCE_REVIEW.md`}>{text.review} ↗</a>
+    <a href={`${repo}/blob/main/source-mirror/LICENSE`}>{text.apache} ↗</a>
+  </nav>
+</PageShell>
+<style>
+  .platforms { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; margin-top: 3rem; }
+  .platform { padding: 2rem; border: 1px solid var(--line); border-radius: 24px; background: var(--panel); }
+  .label { margin: 0; color: #277a98; font-size: .72rem; font-weight: 800; letter-spacing: .12em; }
+  h2 { margin: .8rem 0 1.2rem; color: #16233f; font-size: 1.4rem; letter-spacing: -.025em; }
+  .actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+  .notes { margin-top: 3rem; display: grid; gap: 1.5rem; }
+  .notes > div { padding-bottom: 1.5rem; border-bottom: 1px solid var(--line); }
+  .notes h2 { margin-top: 0; }
+  .notes p { max-width: 900px; color: var(--text-soft); font-size: .95rem; line-height: 1.9; }
+  .documents { display: flex; flex-wrap: wrap; gap: 1rem 2rem; margin-top: 2rem; color: #277a98; font-size: .9rem; font-weight: 700; }
+  a:focus-visible { outline: 2px solid var(--brand); outline-offset: 5px; }
+  @media (max-width: 700px) { .platforms { grid-template-columns: 1fr; } .platform { padding: 1.5rem; } }
+</style>

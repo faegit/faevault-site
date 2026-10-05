@@ -1,0 +1,797 @@
+autofill/AutofillVaultGateway.kt	设备解锁信封与当前 PMVE 身份不匹配
+autofill/AutofillVaultGateway.kt	PMVE Mutation 不可用
+autofill/FieldClassifier.kt	密码
+autofill/FieldClassifier.kt	确认密码
+autofill/FieldClassifier.kt	新密码
+autofill/FieldClassifier.kt	验证码
+autofill/FieldClassifier.kt	用户名
+autofill/FieldClassifier.kt	邮件
+autofill/FieldClassifier.kt	邮箱
+autofill/FieldClassifier.kt	帐号
+autofill/FieldClassifier.kt	账号
+ui/AppRoot.kt	 · 远端 ${result.remoteBytes / 1024} KB
+ui/AppRoot.kt	安全
+ui/AppRoot.kt	包含高风险问题的条目，请优先处理。
+ui/AppRoot.kt	保留双份
+ui/AppRoot.kt	冲突
+ui/AppRoot.kt	读回校验
+ui/AppRoot.kt	高风险
+ui/AppRoot.kt	合并重复条目
+ui/AppRoot.kt	忽略过期删除日志
+ui/AppRoot.kt	检测结果
+ui/AppRoot.kt	留本地
+ui/AppRoot.kt	取远端
+ui/AppRoot.kt	全部风险
+ui/AppRoot.kt	通行密钥冲突
+ui/AppRoot.kt	通过
+ui/AppRoot.kt	未发现本地问题；不代表密码从未泄露。
+ui/AppRoot.kt	未执行
+ui/AppRoot.kt	无变化
+ui/AppRoot.kt	无高风险问题，但仍有可改进之处。
+ui/AppRoot.kt	新增
+ui/AppRoot.kt	需改进
+ui/AppRoot.kt	已清理
+ui/AppRoot.kt	已完成拉取、合并、上传和远端读回校验。
+ui/AppRoot.kt	已完成拉取和合并；远端已包含合并结果，无需重复上传。
+ui/AppRoot.kt	远端内容校验
+ui/screens/EntryDetailScreen.kt	动态码
+ui/screens/EntryDetailScreen.kt	港澳通行证
+ui/screens/EntryDetailScreen.kt	即将到期
+ui/screens/EntryDetailScreen.kt	密码
+ui/screens/EntryDetailScreen.kt	模块
+ui/screens/EntryDetailScreen.kt	社保卡
+ui/screens/EntryDetailScreen.kt	身份证
+ui/screens/EntryDetailScreen.kt	已过期
+ui/screens/EntryDetailScreen.kt	已泄露 ${formatLeakCount(leakCount)} 次
+ui/screens/EntryDetailScreen.kt	银行卡
+ui/screens/EntryDetailScreen.kt	自定义
+ui/screens/EntryEditScreen.kt	安全保存此条目
+ui/screens/EntryEditScreen.kt	按需组合模块，长按模块可调整顺序
+ui/screens/EntryEditScreen.kt	补充额外说明
+ui/screens/EntryEditScreen.kt	不属于字段的附加说明
+ui/screens/EntryEditScreen.kt	动态口令参数
+ui/screens/EntryEditScreen.kt	附加内容
+ui/screens/EntryEditScreen.kt	港澳通行证
+ui/screens/EntryEditScreen.kt	护照
+ui/screens/EntryEditScreen.kt	基本信息
+ui/screens/EntryEditScreen.kt	驾照
+ui/screens/EntryEditScreen.kt	接口身份与访问密钥
+ui/screens/EntryEditScreen.kt	卡片信息与卡面影像
+ui/screens/EntryEditScreen.kt	其他
+ui/screens/EntryEditScreen.kt	社保卡
+ui/screens/EntryEditScreen.kt	身份证
+ui/screens/EntryEditScreen.kt	识别中…
+ui/screens/EntryEditScreen.kt	受保护的自由文本
+ui/screens/EntryEditScreen.kt	网络凭据与路由器信息
+ui/screens/EntryEditScreen.kt	无加密
+ui/screens/EntryEditScreen.kt	银行卡
+ui/screens/EntryEditScreen.kt	用于识别和查找此条目
+ui/screens/EntryEditScreen.kt	账号、密码与目标应用
+ui/screens/EntryEditScreen.kt	证件字段与正反面影像
+ui/screens/EntryEditScreen.kt	主机连接与认证信息
+ui/screens/EntryEditScreen.kt	自定义
+ui/screens/EntryEditScreen.kt	自由组合所需内容模块
+ui/screens/ModuleEditor.kt	港澳通行证
+ui/screens/ModuleEditor.kt	社保卡
+ui/screens/ModuleEditor.kt	身份证
+ui/screens/ModuleEditor.kt	无加密
+ui/screens/ModuleEditor.kt	银行卡
+ui/screens/ModuleEditor.kt	自定义
+ui/screens/RecoveryKeyDialogs.kt	无法写入恢复单文件
+ui/screens/SettingsScreen.kt	 · 更新 ${state.changedCount} 项
+ui/screens/SettingsScreen.kt	 · 已更新云端
+ui/screens/SettingsScreen.kt	${previewSeconds / 60} 分 ${previewSeconds % 60} 秒
+ui/screens/SettingsScreen.kt	${sliderDays / 7} 周
+ui/screens/SettingsScreen.kt	$sliderDays 天
+ui/screens/SettingsScreen.kt	安全
+ui/screens/SettingsScreen.kt	超过 $label 后重新检测
+ui/screens/SettingsScreen.kt	传输文本
+ui/screens/SettingsScreen.kt	导出
+ui/screens/SettingsScreen.kt	导出加密备份需要验证当前主密码。
+ui/screens/SettingsScreen.kt	导出压缩包需要验证当前主密码。
+ui/screens/SettingsScreen.kt	导出原始保险库文件需要验证当前主密码。
+ui/screens/SettingsScreen.kt	导入
+ui/screens/SettingsScreen.kt	等待接收
+ui/screens/SettingsScreen.kt	发送中
+ui/screens/SettingsScreen.kt	发送中断
+ui/screens/SettingsScreen.kt	高风险
+ui/screens/SettingsScreen.kt	关闭：这些条目与登录条目一样，解锁后直接可见，仅靠主入口的解锁保护。
+ui/screens/SettingsScreen.kt	关闭「敏感内容二次保护」会降低保护等级，需要验证当前主密码。
+ui/screens/SettingsScreen.kt	关闭自动锁定后，手动锁定前设备将保持解锁状态。如需保护，建议保持开启。
+ui/screens/SettingsScreen.kt	剪贴板自动清理
+ui/screens/SettingsScreen.kt	检测完成 ${state.leakCheckTotal}/${state.leakCheckTotal}
+ui/screens/SettingsScreen.kt	接收失败
+ui/screens/SettingsScreen.kt	接收中
+ui/screens/SettingsScreen.kt	每 ${sliderDays / 7} 周
+ui/screens/SettingsScreen.kt	每 $sliderDays 天
+ui/screens/SettingsScreen.kt	密钥版本
+ui/screens/SettingsScreen.kt	密钥更新时间
+ui/screens/SettingsScreen.kt	启用联网同步需要验证当前主密码。
+ui/screens/SettingsScreen.kt	删除「$target」是软删除，但仍需再次验证当前主密码。
+ui/screens/SettingsScreen.kt	尚未同步
+ui/screens/SettingsScreen.kt	生物识别解锁
+ui/screens/SettingsScreen.kt	同步未完成，本地数据已安全保留
+ui/screens/SettingsScreen.kt	同步已暂停 · ${state.message} · 点击处理
+ui/screens/SettingsScreen.kt	文件尚未传输完成
+ui/screens/SettingsScreen.kt	无法读取文本
+ui/screens/SettingsScreen.kt	显示后自动隐藏
+ui/screens/SettingsScreen.kt	修改主密码
+ui/screens/SettingsScreen.kt	需改进
+ui/screens/SettingsScreen.kt	已发送
+ui/screens/SettingsScreen.kt	已接收
+ui/screens/SettingsScreen.kt	已取消
+ui/screens/SettingsScreen.kt	已同步 · $time
+ui/screens/SettingsScreen.kt	已同步并通过安全校验 · $time
+ui/screens/SettingsScreen.kt	已允许系统截图和录屏；敏感内容可能被其他应用或旁观者保存。
+ui/screens/SettingsScreen.kt	云端
+ui/screens/SettingsScreen.kt	云端同步
+ui/screens/SettingsScreen.kt	云端硬盘
+ui/screens/SettingsScreen.kt	允许截屏录屏会使保险库内容暴露在截图/录屏/投屏中，需要验证当前主密码。
+ui/screens/SettingsScreen.kt	正在创建云端保险库文件…
+ui/screens/SettingsScreen.kt	正在读取并验证所选保险库文件…
+ui/screens/SettingsScreen.kt	正在检测 ${state.leakCheckChecked}/${state.leakCheckTotal}
+ui/screens/SettingsScreen.kt	正在检查所选云端目录…
+ui/screens/SettingsScreen.kt	正在上传并关联云端保险库…
+ui/screens/SettingsScreen.kt	正在识别远端保险库文件…
+ui/screens/SettingsScreen.kt	正在同步并关联云端保险库…
+ui/screens/SettingsScreen.kt	正在同步到 ${state.target}…
+ui/screens/SettingsScreen.kt	正在下载并关联云端保险库…
+ui/screens/SettingsScreen.kt	正在写入加密保险库文件…
+ui/screens/SettingsScreen.kt	自动检测已关闭
+ui/screens/SettingsScreen.kt	自动锁定
+ui/screens/SettingsScreen.kt	自动填充
+ui/screens/VaultListScreen.kt	动态码
+ui/screens/VaultListScreen.kt	即将到期
+ui/screens/VaultListScreen.kt	已过期
+ui/VaultViewModel.kt	保险库 ID
+ui/VaultViewModel.kt	保险库 id 不一致
+ui/VaultViewModel.kt	保险库会话已失效
+ui/VaultViewModel.kt	保险库会话已失效，请重新解锁后重试
+ui/VaultViewModel.kt	保险库已锁定
+ui/VaultViewModel.kt	备份设备
+ui/VaultViewModel.kt	本地 PMVE 身份认证失败
+ui/VaultViewModel.kt	本地保险库大小为 0 或超过 1 GB 安全限制
+ui/VaultViewModel.kt	本地保险库身份缺失
+ui/VaultViewModel.kt	本机存储
+ui/VaultViewModel.kt	不是同一份
+ui/VaultViewModel.kt	不是同一份 PMVE 保险库
+ui/VaultViewModel.kt	不属于本保险库
+ui/VaultViewModel.kt	不属于当前
+ui/VaultViewModel.kt	待导入媒体必须是字符串引用
+ui/VaultViewModel.kt	待导入媒体文件不存在
+ui/VaultViewModel.kt	当前保险库名称缺失
+ui/VaultViewModel.kt	等待连接超时
+ui/VaultViewModel.kt	等待网络连接
+ui/VaultViewModel.kt	等待主机确认导出超时
+ui/VaultViewModel.kt	访问权限
+ui/VaultViewModel.kt	接收文本
+ui/VaultViewModel.kt	仅支持 PMVE 生物识别凭据
+ui/VaultViewModel.kt	旧格式局域网同步已移除，仅支持 PMVE
+ui/VaultViewModel.kt	旧格式内联媒体已不支持，仅支持 PMVE 媒体引用
+ui/VaultViewModel.kt	旧格式云端同步已移除，仅支持 PMVE
+ui/VaultViewModel.kt	空间
+ui/VaultViewModel.kt	两端不是同一份 PMVE 保险库，已取消同步
+ui/VaultViewModel.kt	媒体导入分类无效
+ui/VaultViewModel.kt	内部存储/Download/Vaultshare/${cleanTransferName(name)}
+ui/VaultViewModel.kt	内部存储/Download/Vaultshare/$actualName
+ui/VaultViewModel.kt	权限
+ui/VaultViewModel.kt	生物识别凭据与当前保险库身份不匹配，已清除
+ui/VaultViewModel.kt	条目
+ui/VaultViewModel.kt	未授权
+ui/VaultViewModel.kt	未知的上传同步关系
+ui/VaultViewModel.kt	无标题
+ui/VaultViewModel.kt	无法创建公共下载目录
+ui/VaultViewModel.kt	无法创建下载文件
+ui/VaultViewModel.kt	无法读取云端文件
+ui/VaultViewModel.kt	无法判断待导入媒体类型
+ui/VaultViewModel.kt	无法写入下载文件
+ui/VaultViewModel.kt	无法写入云端文件
+ui/VaultViewModel.kt	应用存储/Download/Vaultshare/${fallback.name}
+ui/VaultViewModel.kt	远端 PMVE 身份或提交谱系无效
+ui/VaultViewModel.kt	远端 PMVE 身份或提交谱系无效，已取消同步
+ui/VaultViewModel.kt	远端 PMVE 文件认证失败
+ui/VaultViewModel.kt	远端保险库格式与本地 PMVE 不一致
+ui/VaultViewModel.kt	远端保险库格式与本地 PMVE 不一致，已取消同步
+ui/VaultViewModel.kt	远端不是同一份 PMVE 保险库
+ui/VaultViewModel.kt	远端文件大小尚未更新
+ui/VaultViewModel.kt	远端文件修改时间尚未更新
+ui/VaultViewModel.kt	远端文件已由其他设备更新
+ui/VaultViewModel.kt	远端文件无法认证或已损坏：${error.message ?: 
+ui/VaultViewModel.kt	远端文件未通过安全检查，本次同步已停止
+ui/VaultViewModel.kt	远端最终文件不属于当前保险库
+ui/VaultViewModel.kt	连接地址不完整，请从另一台设备重新复制
+ui/VaultViewModel.kt	连接地址已失效
+ui/VaultViewModel.kt	连接地址已失效，请从另一台设备重新复制
+ui/VaultViewModel.kt	连接失败：${it.message}
+ui/VaultViewModel.kt	连接已中断，请保持两台设备在同一局域网并重新尝试
+ui/VaultViewModel.kt	连接已中断，请确认两台设备仍在同一网络后重试
+ui/VaultViewModel.kt	连接已断开，传输中断
+ui/VaultViewModel.kt	连接码不正确，请重新扫描最新二维码
+ui/VaultViewModel.kt	连接码或配对地址已失效。请从对方设备重新建立传输站，并使用最新二维码或完整地址连接。
+ui/VaultViewModel.kt	连接等待时间过长，请确认两台设备在同一局域网后重试
+ui/VaultViewModel.kt	配对
+ui/VaultViewModel.kt	票据
+ui/VaultViewModel.kt	等待主机确认
+ui/VaultViewModel.kt	配额
+ui/VaultViewModel.kt	重命名失败
+ui/VaultViewModel.kt	重新生成失败，旧密钥仍有效：${it.message}
+ui/VaultViewModel.kt	需要有效的 6 位 PIN 码
+ui/media/AttachmentFiles.kt	无法创建文件
+ui/media/AttachmentFiles.kt	无法发布 PMVE 媒体暂存文件
+ui/media/AttachmentFiles.kt	无法读取附件
+ui/media/AttachmentFiles.kt	附件导出校验失败，数据可能已损坏
+ui/media/AttachmentFiles.kt	附件文件不存在
+ui/media/AttachmentFiles.kt	附件是空文件
+ui/media/AttachmentFiles.kt	附件超过允许的容量
+ui/media/Base64Image.kt	图片大小超过允许上限
+ui/media/Base64Image.kt	图片导入校验失败，图片可能已损坏
+ui/media/Base64Image.kt	图片文件不存在
+ui/media/Base64Image.kt	无法读取所选图片
+ui/media/ImageViewer.kt	关闭
+ui/media/ImageViewer.kt	图像解码失败：${t.message ?: 
+ui/media/ImageViewer.kt	图像预览失败：${t.message ?: 
+ui/media/ImageViewer.kt	图片数据为空
+ui/media/ImageViewer.kt	图片文件不存在
+ui/media/ImageViewer.kt	图片读取失败
+ui/media/ImageViewer.kt	无法创建图片查看缓存目录
+ui/media/ImageViewer.kt	无法隐藏图片查看缓存
+ui/media/ImageViewer.kt	预览图解码失败
+ui/media/ImportProgressDialog.kt	正在导入
+ui/media/MediaStoragePolicy.kt	图片和附件总容量不能超过 32 MB
+ui/media/PmvMediaUiSession.kt	PMVE RootKey 必须为 32 字节
+ui/media/PmvMediaUiSession.kt	PMVE staging kind 无效
+ui/media/PmvMediaUiSession.kt	PMVE 媒体会话未解锁
+ui/media/PmvMediaUiSession.kt	vaultName 不能为空
+ui/media/PmvMediaUiSession.kt	无法创建 PMVE 媒体暂存目录
+ui/screens/EditorVisuals.kt	显示
+ui/screens/EditorVisuals.kt	隐藏
+ui/screens/EntryDetailScreen.kt	(无标题)
+ui/screens/EntryDetailScreen.kt	HOTP · $algorithmLabel · ${current.digits} 位 · 计数器 ${current.counter}
+ui/screens/EntryDetailScreen.kt	TOTP · $algorithmLabel · ${current.digits} 位 · ${current.period} 秒
+ui/screens/EntryDetailScreen.kt	Wi-Fi 密码
+ui/screens/EntryDetailScreen.kt	主机 / IP
+ui/screens/EntryDetailScreen.kt	位数
+ui/screens/EntryDetailScreen.kt	依赖方域名
+ui/screens/EntryDetailScreen.kt	保存图片
+ui/screens/EntryDetailScreen.kt	关联程序包名
+ui/screens/EntryDetailScreen.kt	分行/支行
+ui/screens/EntryDetailScreen.kt	分行联行号
+ui/screens/EntryDetailScreen.kt	创建时间
+ui/screens/EntryDetailScreen.kt	到期日期
+ui/screens/EntryDetailScreen.kt	加密类型
+ui/screens/EntryDetailScreen.kt	动态码
+ui/screens/EntryDetailScreen.kt	卡号
+ui/screens/EntryDetailScreen.kt	卡号末四位
+ui/screens/EntryDetailScreen.kt	即将到期
+ui/screens/EntryDetailScreen.kt	发行方
+ui/screens/EntryDetailScreen.kt	取款密码
+ui/screens/EntryDetailScreen.kt	周期
+ui/screens/EntryDetailScreen.kt	国家 / 地区
+ui/screens/EntryDetailScreen.kt	城市
+ui/screens/EntryDetailScreen.kt	备注
+ui/screens/EntryDetailScreen.kt	复制图片
+ui/screens/EntryDetailScreen.kt	姓名
+ui/screens/EntryDetailScreen.kt	安全笔记内容
+ui/screens/EntryDetailScreen.kt	安全问题
+ui/screens/EntryDetailScreen.kt	完整卡号
+ui/screens/EntryDetailScreen.kt	密码
+ui/screens/EntryDetailScreen.kt	密钥
+ui/screens/EntryDetailScreen.kt	导出失败：${it.message}
+ui/screens/EntryDetailScreen.kt	已泄露 ${formatLeakCount(leakCount)} 次
+ui/screens/EntryDetailScreen.kt	已解锁敏感信息
+ui/screens/EntryDetailScreen.kt	已过期
+ui/screens/EntryDetailScreen.kt	开户行
+ui/screens/EntryDetailScreen.kt	持卡人
+ui/screens/EntryDetailScreen.kt	指纹
+ui/screens/EntryDetailScreen.kt	数据库名
+ui/screens/EntryDetailScreen.kt	数据库引擎
+ui/screens/EntryDetailScreen.kt	最后使用
+ui/screens/EntryDetailScreen.kt	有效期
+ui/screens/EntryDetailScreen.kt	服务
+ui/screens/EntryDetailScreen.kt	未设置密钥
+ui/screens/EntryDetailScreen.kt	查看 ${typeLabel(entry.secretType)} 的敏感信息需要验证当前主密码。
+ui/screens/EntryDetailScreen.kt	模块
+ui/screens/EntryDetailScreen.kt	用户名
+ui/screens/EntryDetailScreen.kt	用户名/AppId
+ui/screens/EntryDetailScreen.kt	省 / 州
+ui/screens/EntryDetailScreen.kt	私钥
+ui/screens/EntryDetailScreen.kt	端口
+ui/screens/EntryDetailScreen.kt	答案
+ui/screens/EntryDetailScreen.kt	签发日期
+ui/screens/EntryDetailScreen.kt	签发机关
+ui/screens/EntryDetailScreen.kt	签名计数
+ui/screens/EntryDetailScreen.kt	算法
+ui/screens/EntryDetailScreen.kt	管理密码
+ui/screens/EntryDetailScreen.kt	类型
+ui/screens/EntryDetailScreen.kt	网址
+ui/screens/EntryDetailScreen.kt	计数器
+ui/screens/EntryDetailScreen.kt	证件号码
+ui/screens/EntryDetailScreen.kt	证件类型
+ui/screens/EntryDetailScreen.kt	详细地址
+ui/screens/EntryDetailScreen.kt	账户
+ui/screens/EntryDetailScreen.kt	账户名
+ui/screens/EntryDetailScreen.kt	路由器管理地址
+ui/screens/EntryDetailScreen.kt	邮政编码
+ui/screens/EntryDetailScreen.kt	银行
+ui/screens/EntryDetailScreen.kt	附件已导出
+ui/screens/EntryEditScreen.kt	Base32 编码
+ui/screens/EntryEditScreen.kt	Google, GitHub 等
+ui/screens/EntryEditScreen.kt	Wi-Fi 密码
+ui/screens/EntryEditScreen.kt	YYYY-MM-DD 或 长期
+ui/screens/EntryEditScreen.kt	不属于字段的附加说明
+ui/screens/EntryEditScreen.kt	不是有效的 Wi-Fi 二维码
+ui/screens/EntryEditScreen.kt	不是有效的 otpauth:// 二维码
+ui/screens/EntryEditScreen.kt	主机 / IP
+ui/screens/EntryEditScreen.kt	主机连接与认证信息
+ui/screens/EntryEditScreen.kt	其他
+ui/screens/EntryEditScreen.kt	内容
+ui/screens/EntryEditScreen.kt	分行/支行
+ui/screens/EntryEditScreen.kt	分行联行号
+ui/screens/EntryEditScreen.kt	删除
+ui/screens/EntryEditScreen.kt	到期日期
+ui/screens/EntryEditScreen.kt	动态口令参数
+ui/screens/EntryEditScreen.kt	卡片信息与卡面影像
+ui/screens/EntryEditScreen.kt	卡面照片
+ui/screens/EntryEditScreen.kt	发行方
+ui/screens/EntryEditScreen.kt	取款密码
+ui/screens/EntryEditScreen.kt	受保护的自由文本
+ui/screens/EntryEditScreen.kt	周期
+ui/screens/EntryEditScreen.kt	图片数量已达理论上限
+ui/screens/EntryEditScreen.kt	图片解码失败
+ui/screens/EntryEditScreen.kt	基本信息
+ui/screens/EntryEditScreen.kt	处理失败
+ui/screens/EntryEditScreen.kt	姓名
+ui/screens/EntryEditScreen.kt	安全保存此条目
+ui/screens/EntryEditScreen.kt	完整卡号
+ui/screens/EntryEditScreen.kt	密码
+ui/screens/EntryEditScreen.kt	密钥
+ui/screens/EntryEditScreen.kt	已导入 OTP 配置
+ui/screens/EntryEditScreen.kt	已导入 Wi-Fi「${parsed.ssid}」
+ui/screens/EntryEditScreen.kt	已自动识别并填入 $count 个字段
+ui/screens/EntryEditScreen.kt	已识别并填入 ${parsed.size} 个字段
+ui/screens/EntryEditScreen.kt	开户行
+ui/screens/EntryEditScreen.kt	所需权限已被永久拒绝，请前往系统设置手动授权。
+ui/screens/EntryEditScreen.kt	护照
+ui/screens/EntryEditScreen.kt	拍照处理失败：$msg
+ui/screens/EntryEditScreen.kt	拍照识别证件（自动裁剪+OCR）
+ui/screens/EntryEditScreen.kt	拍照识别银行卡（自动裁剪+OCR）
+ui/screens/EntryEditScreen.kt	持卡人
+ui/screens/EntryEditScreen.kt	按需组合模块，长按模块可调整顺序
+ui/screens/EntryEditScreen.kt	接口身份与访问密钥
+ui/screens/EntryEditScreen.kt	无加密
+ui/screens/EntryEditScreen.kt	无法启动 Google 扫描，请尝试手动拍照后使用 OCR
+ui/screens/EntryEditScreen.kt	无法打开系统设置，请手动前往设置 → 应用管理 → 本应用 → 权限
+ui/screens/EntryEditScreen.kt	无法读取相机返回的图片
+ui/screens/EntryEditScreen.kt	有效期 (MM/YY)
+ui/screens/EntryEditScreen.kt	服务名称
+ui/screens/EntryEditScreen.kt	未命名二维码
+ui/screens/EntryEditScreen.kt	未识别到二维码
+ui/screens/EntryEditScreen.kt	未识别到关键字段
+ui/screens/EntryEditScreen.kt	本地字典匹配 + 该密码在 Pwned Passwords 中出现过 ${onlineBreaches} 次
+ui/screens/EntryEditScreen.kt	标签（逗号或空格分隔）
+ui/screens/EntryEditScreen.kt	标题
+ui/screens/EntryEditScreen.kt	正在导入图片
+ui/screens/EntryEditScreen.kt	港澳通行证
+ui/screens/EntryEditScreen.kt	用于识别和查找此条目
+ui/screens/EntryEditScreen.kt	用户名
+ui/screens/EntryEditScreen.kt	用户名 / AppId
+ui/screens/EntryEditScreen.kt	相册权限已被永久拒绝。请前往系统设置手动授予相册权限。
+ui/screens/EntryEditScreen.kt	相机权限已被永久拒绝。请前往系统设置手动授予相机权限。
+ui/screens/EntryEditScreen.kt	端口
+ui/screens/EntryEditScreen.kt	签发日期
+ui/screens/EntryEditScreen.kt	签发机关
+ui/screens/EntryEditScreen.kt	管理密码
+ui/screens/EntryEditScreen.kt	网址
+ui/screens/EntryEditScreen.kt	网络凭据与路由器信息
+ui/screens/EntryEditScreen.kt	自由组合所需内容模块
+ui/screens/EntryEditScreen.kt	补充内容
+ui/screens/EntryEditScreen.kt	补充额外说明
+ui/screens/EntryEditScreen.kt	计数器
+ui/screens/EntryEditScreen.kt	证件号
+ui/screens/EntryEditScreen.kt	证件字段与正反面影像
+ui/screens/EntryEditScreen.kt	证件照片（正反面）
+ui/screens/EntryEditScreen.kt	识别中…
+ui/screens/EntryEditScreen.kt	该密码在公开泄露中出现了 ${onlineBreaches} 次，强烈建议更换
+ui/screens/EntryEditScreen.kt	该密码在常见泄露 / 弱密码字典中，强烈建议更换
+ui/screens/EntryEditScreen.kt	请输入标题
+ui/screens/EntryEditScreen.kt	账号、密码与目标应用
+ui/screens/EntryEditScreen.kt	账户名
+ui/screens/EntryEditScreen.kt	路由器管理地址
+ui/screens/EntryEditScreen.kt	身份证
+ui/screens/EntryEditScreen.kt	附加内容
+ui/screens/EntryEditScreen.kt	需要使用此权限才能完成操作。
+ui/screens/EntryEditScreen.kt	需要使用相册权限来选取图片。
+ui/screens/EntryEditScreen.kt	需要使用相机权限来扫描二维码和拍摄文档。
+ui/screens/EntryEditScreen.kt	需要相册权限才能选取图片
+ui/screens/EntryEditScreen.kt	需要相机权限才能使用此功能
+ui/screens/EntryEditScreen.kt	驾照
+ui/screens/MasterPasswordDialog.kt	主密码不正确
+ui/screens/ModuleEditor.kt	无加密
+ui/screens/ModuleEditor.kt	身份证
+ui/screens/PasswordGeneratorDialog.kt	一般
+ui/screens/PasswordGeneratorDialog.kt	偏弱
+ui/screens/PasswordGeneratorDialog.kt	加长
+ui/screens/PasswordGeneratorDialog.kt	大写
+ui/screens/PasswordGeneratorDialog.kt	大写字母
+ui/screens/PasswordGeneratorDialog.kt	小写
+ui/screens/PasswordGeneratorDialog.kt	小写字母
+ui/screens/PasswordGeneratorDialog.kt	少于 1 秒
+ui/screens/PasswordGeneratorDialog.kt	强
+ui/screens/PasswordGeneratorDialog.kt	很强
+ui/screens/PasswordGeneratorDialog.kt	数字
+ui/screens/PasswordGeneratorDialog.kt	特殊符号
+ui/screens/PasswordGeneratorDialog.kt	符号
+ui/screens/PasswordGeneratorDialog.kt	约 ${(seconds / 3_600.0).toLong()} 小时
+ui/screens/PasswordGeneratorDialog.kt	约 ${(seconds / 60.0).toLong()} 分钟
+ui/screens/PasswordGeneratorDialog.kt	约 ${(seconds / 86_400.0).toLong()} 天
+ui/screens/PasswordGeneratorDialog.kt	约 ${formatChineseNumber(years / 10_000.0)} 万年
+ui/screens/PasswordGeneratorDialog.kt	约 ${formatChineseNumber(years / 100_000_000.0)} 亿年
+ui/screens/PasswordGeneratorDialog.kt	约 ${seconds.toLong().coerceAtLeast(1)} 秒
+ui/screens/PasswordGeneratorDialog.kt	约 ${years.toLong()} 年
+ui/screens/PasswordGeneratorDialog.kt	缩短
+ui/screens/PasswordGeneratorDialog.kt	超过 1 万亿年
+ui/screens/PasswordGeneratorDialog.kt	重新生成
+ui/screens/RecoveryKeyDialogs.kt	保存恢复单
+ui/screens/RecoveryKeyDialogs.kt	保存恢复密钥
+ui/screens/RecoveryKeyDialogs.kt	复制密钥
+ui/screens/RecoveryKeyDialogs.kt	密钥已复制。第 1 组 PMRK1 是格式标识，不参与校验；以下序号按完整密钥从左到右计算，每组从 5 个候选中选择。
+ui/screens/RecoveryKeyDialogs.kt	恢复单已保存或分享。第 1 组 PMRK1 是格式标识，不参与校验；以下序号按完整密钥从左到右计算，每组从 5 个候选中选择。
+ui/screens/RecoveryKeyDialogs.kt	无法写入恢复单文件
+ui/screens/RecoveryKeyDialogs.kt	第 ${index + 2} 组：$it
+ui/screens/RecoveryKeyDialogs.kt	第 ${it + 2} 组
+ui/screens/RecoveryKeyDialogs.kt	请选择第 ${index + 2} 组
+ui/screens/RecoveryKeyDialogs.kt	这是忘记主密码时的最终恢复方式。请离线保存；任何拿到它的人都可以重置主密码。
+ui/screens/RecoveryKeyDialogs.kt	验证错误：$labels 不正确，请重新核对
+ui/screens/RecoveryKeyDialogs.kt	验证错误：多次核对失败，已重新开始保存流程，请重新核对密钥。
+ui/screens/SecurityEntryListScreen.kt	全选
+ui/screens/SecurityEntryListScreen.kt	取消全选
+ui/screens/SettingsScreen.kt	 · 已更新云端
+ui/screens/SettingsScreen.kt	 · 更新 ${state.changedCount} 项
+ui/screens/SettingsScreen.kt	$previewSeconds 秒后清空
+ui/screens/SettingsScreen.kt	$previewSeconds 秒后隐藏
+ui/screens/SettingsScreen.kt	$sliderDays 天
+ui/screens/SettingsScreen.kt	${previewSeconds / 60} 分 ${previewSeconds % 60} 秒
+ui/screens/SettingsScreen.kt	${previewSeconds / 60} 分钟后清空
+ui/screens/SettingsScreen.kt	${previewSeconds / 60} 分钟后隐藏
+ui/screens/SettingsScreen.kt	${sliderDays / 7} 周
+ui/screens/SettingsScreen.kt	${sourceLabel}数据不带库谱系标识（可能是老版本或第三方导出）
+ui/screens/SettingsScreen.kt	${sourceLabel}的库标识：${incomingDeviceId.take(8)}…\n与当前账户库不一致
+ui/screens/SettingsScreen.kt	OAuth 2.0 访问令牌
+ui/screens/SettingsScreen.kt	WebDAV 文件夹地址无效
+ui/screens/SettingsScreen.kt	id 不重合时直接加入，可能让两个账户的内容混在一起。
+ui/screens/SettingsScreen.kt	「$name」将进入回收站，30 天后自动彻底清除。期间可在账户列表页恢复，原生物识别绑定保持有效。
+ui/screens/SettingsScreen.kt	不自动清空
+ui/screens/SettingsScreen.kt	与对方同步
+ui/screens/SettingsScreen.kt	两栏
+ui/screens/SettingsScreen.kt	二维码缺少有效的 HTTPS 配对信息
+ui/screens/SettingsScreen.kt	云盘未授予目录持久读写权限，可选择仅关联文件
+ui/screens/SettingsScreen.kt	云端
+ui/screens/SettingsScreen.kt	云端仅接收加密后的保险库文件，但数据安全仍依赖主密码强度、云端账户和设备安全。默认同步会先拉取并合并；「上传覆盖云端」会直接替换远端文件，可能丢失远端独有修改。请确认已了解这些密码数据安全与覆盖风险。
+ui/screens/SettingsScreen.kt	云端同步
+ui/screens/SettingsScreen.kt	云端文件已被同名文件替换，请重新关联并确认内容
+ui/screens/SettingsScreen.kt	云端文件状态异常
+ui/screens/SettingsScreen.kt	云端目录中出现多个同名文件，请重新关联
+ui/screens/SettingsScreen.kt	云端硬盘
+ui/screens/SettingsScreen.kt	仅关联文件
+ui/screens/SettingsScreen.kt	传输大文件
+ui/screens/SettingsScreen.kt	传输文本
+ui/screens/SettingsScreen.kt	传输目录：$directoryPath
+ui/screens/SettingsScreen.kt	修改主密码
+ui/screens/SettingsScreen.kt	修改主密码需要再次验证当前主密码。
+ui/screens/SettingsScreen.kt	停止传输站
+ui/screens/SettingsScreen.kt	允许发送账户数据？
+ui/screens/SettingsScreen.kt	允许截屏录屏会使保险库内容暴露在截图/录屏/投屏中，需要验证当前主密码。
+ui/screens/SettingsScreen.kt	允许此设备同步？
+ui/screens/SettingsScreen.kt	关于
+ui/screens/SettingsScreen.kt	关联云端文件/WebDAV，实现多设备数据同步
+ui/screens/SettingsScreen.kt	关联的云端文件已被删除，请重新关联
+ui/screens/SettingsScreen.kt	关闭「敏感内容二次保护」会降低保护等级，需要验证当前主密码。
+ui/screens/SettingsScreen.kt	关闭生物识别解锁
+ui/screens/SettingsScreen.kt	关闭生物识别解锁需要验证当前主密码。
+ui/screens/SettingsScreen.kt	关闭自动锁定后，手动锁定前设备将保持解锁状态。如需保护，建议保持开启。
+ui/screens/SettingsScreen.kt	关闭：这些条目与登录条目一样，解锁后直接可见，仅靠主入口的解锁保护。
+ui/screens/SettingsScreen.kt	再次确认本地数据风险
+ui/screens/SettingsScreen.kt	创建云端保险库文件
+ui/screens/SettingsScreen.kt	删除
+ui/screens/SettingsScreen.kt	删除「$target」是软删除，但仍需再次验证当前主密码。
+ui/screens/SettingsScreen.kt	删除账户
+ui/screens/SettingsScreen.kt	剪贴板自动清理
+ui/screens/SettingsScreen.kt	发送
+ui/screens/SettingsScreen.kt	发送中
+ui/screens/SettingsScreen.kt	取消
+ui/screens/SettingsScreen.kt	取消关联
+ui/screens/SettingsScreen.kt	可以仅关联刚才选择的文件并继续同步，但程序将无法可靠检测该文件在云端被删除、替换或出现同名冲突。建议返回并选择该文件所在目录。
+ui/screens/SettingsScreen.kt	同步与数据迁移
+ui/screens/SettingsScreen.kt	同步已暂停 · ${state.message} · 点击处理
+ui/screens/SettingsScreen.kt	同步未完成，本地数据已安全保留
+ui/screens/SettingsScreen.kt	启用生物识别失败
+ui/screens/SettingsScreen.kt	启用生物识别解锁
+ui/screens/SettingsScreen.kt	启用联网同步需要验证当前主密码。
+ui/screens/SettingsScreen.kt	启用通行密钥
+ui/screens/SettingsScreen.kt	回收站自动清理
+ui/screens/SettingsScreen.kt	外观
+ui/screens/SettingsScreen.kt	如继续合并，对方的 $incomingCount 条会按时间戳与当前账户的条目逐一比对。
+ui/screens/SettingsScreen.kt	安全
+ui/screens/SettingsScreen.kt	安全设置
+ui/screens/SettingsScreen.kt	客户端证书超过 1 MB 安全限制
+ui/screens/SettingsScreen.kt	客户端证书（mTLS）
+ui/screens/SettingsScreen.kt	密码安全
+ui/screens/SettingsScreen.kt	密钥更新时间
+ui/screens/SettingsScreen.kt	密钥版本
+ui/screens/SettingsScreen.kt	对方已关闭传输连接
+ui/screens/SettingsScreen.kt	导入
+ui/screens/SettingsScreen.kt	导入与导出
+ui/screens/SettingsScreen.kt	导出
+ui/screens/SettingsScreen.kt	导出加密备份需要验证当前主密码。
+ui/screens/SettingsScreen.kt	导出压缩包需要验证当前主密码。
+ui/screens/SettingsScreen.kt	导出原始保险库文件需要验证当前主密码。
+ui/screens/SettingsScreen.kt	导出可恢复备份，或从其他密码管理器导入数据
+ui/screens/SettingsScreen.kt	将从${pending.target}下载完整保险库并替换当前本地文件。此操作不会先执行合并。
+ui/screens/SettingsScreen.kt	将使用当前本地保险库完整覆盖${target}文件，云端独有或更新较新的内容将丢失。此操作不会先执行合并。
+ui/screens/SettingsScreen.kt	将清除当前设备与${target}的关联和本地连接信息，不会删除远端保险库文件。确认继续吗？
+ui/screens/SettingsScreen.kt	尚未同步
+ui/screens/SettingsScreen.kt	局域网
+ui/screens/SettingsScreen.kt	局域网同步
+ui/screens/SettingsScreen.kt	展开$title
+ui/screens/SettingsScreen.kt	已允许系统截图和录屏；敏感内容可能被其他应用或旁观者保存。
+ui/screens/SettingsScreen.kt	已同步 · $time
+ui/screens/SettingsScreen.kt	已同步并通过安全校验 · $time
+ui/screens/SettingsScreen.kt	已启用生物识别解锁
+ui/screens/SettingsScreen.kt	已知晓并启用
+ui/screens/SettingsScreen.kt	布局
+ui/screens/SettingsScreen.kt	应用语言
+ui/screens/SettingsScreen.kt	建立传输站，或扫码/手动连接进行同步与文件互传
+ui/screens/SettingsScreen.kt	开启
+ui/screens/SettingsScreen.kt	开启传输站
+ui/screens/SettingsScreen.kt	开启后本机将在局域网开放连接，其他设备扫码或手动输入地址和 PIN 后可同步保险库或互传文件。
+ui/screens/SettingsScreen.kt	开启：进入这些条目的敏感字段前需输入当前主密码（详情页内一次验证后缓存）。
+ui/screens/SettingsScreen.kt	开始传输
+ui/screens/SettingsScreen.kt	所选云端文件未授予持久读写权限，关联未保存
+ui/screens/SettingsScreen.kt	所选云端目录未授予持久读写权限，关联未保存
+ui/screens/SettingsScreen.kt	所选目录中没有发现 .pmv 文件。是否创建 ${pending.displayName}？
+ui/screens/SettingsScreen.kt	扫描二维码传输文件
+ui/screens/SettingsScreen.kt	扫描二维码同步
+ui/screens/SettingsScreen.kt	扫码同步要求两台设备连接同一局域网。跨网络或仅一端使用移动数据时无法连接。
+ui/screens/SettingsScreen.kt	扫码或输入地址连接后自动进入文件传输，双方互传文件与文本。
+ui/screens/SettingsScreen.kt	接收
+ui/screens/SettingsScreen.kt	接收中
+ui/screens/SettingsScreen.kt	等待接收
+ui/screens/SettingsScreen.kt	收起$title
+ui/screens/SettingsScreen.kt	收起认证方式
+ui/screens/SettingsScreen.kt	数据导入（导出）
+ui/screens/SettingsScreen.kt	文件互传
+ui/screens/SettingsScreen.kt	文件互传已连接，双方均可发送
+ui/screens/SettingsScreen.kt	文件尚未传输完成
+ui/screens/SettingsScreen.kt	无法加载 $asset
+ui/screens/SettingsScreen.kt	无法读取关联的云端目录，请检查云盘状态或重新关联
+ui/screens/SettingsScreen.kt	无法读取客户端证书
+ui/screens/SettingsScreen.kt	无法读取文本
+ui/screens/SettingsScreen.kt	无认证
+ui/screens/SettingsScreen.kt	显示
+ui/screens/SettingsScreen.kt	显示后自动隐藏
+ui/screens/SettingsScreen.kt	更新日志
+ui/screens/SettingsScreen.kt	未命名条目
+ui/screens/SettingsScreen.kt	未获得云端目录权限
+ui/screens/SettingsScreen.kt	本地独有条目、较新修改和本地删除记录都可能被远端版本覆盖。程序会保留 .download.bak 备份，但仍建议先导出备份。确定继续吗？
+ui/screens/SettingsScreen.kt	条目
+ui/screens/SettingsScreen.kt	查看密码健康状态并管理安全检测
+ui/screens/SettingsScreen.kt	检测中
+ui/screens/SettingsScreen.kt	检测完成 ${state.leakCheckTotal}/${state.leakCheckTotal}
+ui/screens/SettingsScreen.kt	检测设置
+ui/screens/SettingsScreen.kt	正在上传并关联云端保险库…
+ui/screens/SettingsScreen.kt	正在下载并关联云端保险库…
+ui/screens/SettingsScreen.kt	正在写入加密保险库文件…
+ui/screens/SettingsScreen.kt	正在创建云端保险库文件…
+ui/screens/SettingsScreen.kt	正在同步到 ${state.target}…
+ui/screens/SettingsScreen.kt	正在同步并关联云端保险库…
+ui/screens/SettingsScreen.kt	正在建立加密局域网连接…
+ui/screens/SettingsScreen.kt	正在检查保险库中的密码风险
+ui/screens/SettingsScreen.kt	正在检查所选云端目录…
+ui/screens/SettingsScreen.kt	正在检测 ${state.leakCheckChecked}/${state.leakCheckTotal}
+ui/screens/SettingsScreen.kt	正在识别远端保险库文件…
+ui/screens/SettingsScreen.kt	正在读取并验证所选保险库文件…
+ui/screens/SettingsScreen.kt	正在验证
+ui/screens/SettingsScreen.kt	此版本未提供更新说明。
+ui/screens/SettingsScreen.kt	每 $sliderDays 天
+ui/screens/SettingsScreen.kt	每 ${sliderDays / 7} 周
+ui/screens/SettingsScreen.kt	浅色
+ui/screens/SettingsScreen.kt	深色
+ui/screens/SettingsScreen.kt	点击复制文本
+ui/screens/SettingsScreen.kt	点击打开文件
+ui/screens/SettingsScreen.kt	生物密钥不可用：${e.message}
+ui/screens/SettingsScreen.kt	生物识别解锁
+ui/screens/SettingsScreen.kt	目录中发现 ${inspection.pmvCount} 个保险库文件，无法唯一确认目标，请改用「选择已有文件」
+ui/screens/SettingsScreen.kt	确认上传覆盖云端
+ui/screens/SettingsScreen.kt	确认下载覆盖
+ui/screens/SettingsScreen.kt	确认关闭传输站？
+ui/screens/SettingsScreen.kt	确认创建
+ui/screens/SettingsScreen.kt	确认取消关联
+ui/screens/SettingsScreen.kt	确认启用云端同步
+ui/screens/SettingsScreen.kt	确认结束传输？
+ui/screens/SettingsScreen.kt	确认覆盖本地
+ui/screens/SettingsScreen.kt	立即检测
+ui/screens/SettingsScreen.kt	简体中文
+ui/screens/SettingsScreen.kt	管理通行密钥
+ui/screens/SettingsScreen.kt	结束传输
+ui/screens/SettingsScreen.kt	继续
+ui/screens/SettingsScreen.kt	继续覆盖
+ui/screens/SettingsScreen.kt	自动填充
+ui/screens/SettingsScreen.kt	自动填充：已启用
+ui/screens/SettingsScreen.kt	自动填充：未启用
+ui/screens/SettingsScreen.kt	自动填充：系统不支持
+ui/screens/SettingsScreen.kt	自动检测已关闭
+ui/screens/SettingsScreen.kt	自动锁定
+ui/screens/SettingsScreen.kt	解锁时检查回收站，超过设定天数的条目将被自动彻底删除。
+ui/screens/SettingsScreen.kt	设备中登记的所有强生物特征均可解锁此保险库。确认风险后，需要再次验证当前主密码。
+ui/screens/SettingsScreen.kt	请先保存并复核新密钥。只有新密钥通过验证且写入成功后，旧密钥才会失效。
+ui/screens/SettingsScreen.kt	请先关联$autoTargetLabel
+ui/screens/SettingsScreen.kt	账户设置
+ui/screens/SettingsScreen.kt	超过 $label 后重新检测
+ui/screens/SettingsScreen.kt	跟随系统
+ui/screens/SettingsScreen.kt	返回
+ui/screens/SettingsScreen.kt	进入
+ui/screens/SettingsScreen.kt	连接保持开启，任意一方都可以发送
+ui/screens/SettingsScreen.kt	连接其他设备，或导入导出保险库数据
+ui/screens/SettingsScreen.kt	选择 PKCS#12 客户端证书
+ui/screens/SettingsScreen.kt	选择认证方式
+ui/screens/SettingsScreen.kt	配置泄露检测频率，开启联网密码泄露检查
+ui/screens/SettingsScreen.kt	重命名账户
+ui/screens/SettingsScreen.kt	重命名账户需要验证当前主密码。
+ui/screens/SettingsScreen.kt	重新生成恢复密钥
+ui/screens/SettingsScreen.kt	重新生成恢复密钥需要验证当前主密码。成功后旧密钥立即失效。
+ui/screens/SettingsScreen.kt	重新选择客户端证书
+ui/screens/SettingsScreen.kt	隐私政策
+ui/screens/SettingsScreen.kt	需改进
+ui/screens/SettingsScreen.kt	验证并连接
+ui/screens/SettingsScreen.kt	高风险
+ui/screens/TrashScreen.kt	${remainSec / 3600} 小时后自动删除
+ui/screens/TrashScreen.kt	${remainSec / 86400} 天后自动删除
+ui/screens/TrashScreen.kt	(无标题)
+ui/screens/TrashScreen.kt	全选
+ui/screens/TrashScreen.kt	即将自动删除
+ui/screens/TrashScreen.kt	取消全选
+ui/screens/TrashScreen.kt	彻底删除
+ui/screens/TrashScreen.kt	恢复
+ui/screens/VaultDialog.kt	取消
+ui/screens/VaultListScreen.kt	(无标题)
+ui/screens/VaultListScreen.kt	为已选 ${selectedIds.size} 条附加一个标签。
+ui/screens/VaultListScreen.kt	全选
+ui/screens/VaultListScreen.kt	到期 $it
+ui/screens/VaultListScreen.kt	动态码
+ui/screens/VaultListScreen.kt	即将到期
+ui/screens/VaultListScreen.kt	取消全选
+ui/screens/VaultListScreen.kt	取消选择
+ui/screens/VaultListScreen.kt	安全笔记
+ui/screens/VaultListScreen.kt	密钥
+ui/screens/VaultListScreen.kt	将已选 ${selectedIds.size} 条的所有标签替换为指定标签。
+ui/screens/VaultListScreen.kt	尚无条目，点击右下角新增
+ui/screens/VaultListScreen.kt	已过期
+ui/screens/VaultListScreen.kt	无匹配条目
+ui/screens/VaultListScreen.kt	服务器
+ui/screens/VaultListScreen.kt	添加标签
+ui/screens/VaultListScreen.kt	登录凭证
+ui/screens/VaultListScreen.kt	移入标签
+ui/screens/VaultListScreen.kt	自定义
+ui/screens/VaultListScreen.kt	证件
+ui/screens/VaultListScreen.kt	该类别下暂无条目
+ui/screens/VaultListScreen.kt	返回
+ui/screens/VaultListScreen.kt	重命名标签
+ui/screens/VaultListScreen.kt	银行卡
+ui/screens/EntryDetailScreen.kt	会员名称
+ui/screens/EntryDetailScreen.kt	会员等级
+ui/screens/EntryDetailScreen.kt	会员编号
+ui/screens/EntryDetailScreen.kt	卡片名称
+ui/screens/EntryDetailScreen.kt	卡片类型
+ui/screens/EntryDetailScreen.kt	社保号码
+ui/screens/EntryDetailScreen.kt	积分
+ui/screens/EntryDetailScreen.kt	签发地区
+ui/screens/EntryDetailScreen.kt	自定义卡片类型
+ui/screens/EntryEditScreen.kt	会员名称
+ui/screens/EntryEditScreen.kt	会员等级
+ui/screens/EntryEditScreen.kt	会员编号
+ui/screens/EntryEditScreen.kt	卡号
+ui/screens/EntryEditScreen.kt	卡片名称
+ui/screens/EntryEditScreen.kt	备注
+ui/screens/EntryEditScreen.kt	有效期
+ui/screens/EntryEditScreen.kt	社保号码
+ui/screens/EntryEditScreen.kt	积分
+ui/screens/EntryEditScreen.kt	签发地区
+ui/screens/EntryEditScreen.kt	自定义卡片类型
+ui/screens/EntryEditScreen.kt	银行
+ui/screens/VaultListScreen.kt	卡类
+ui/VaultViewModel.kt	对方已取消发送
+ui/VaultViewModel.kt	对方已取消发送该文件，已停止接收
+ui/VaultViewModel.kt	对方已取消或拒绝接收该文件，已停止发送
+ui/VaultViewModel.kt	有内容被对方取消或拒绝，其余已完成
+ui/AppRoot.kt	包含高风险问题的条目，请优先处理。
+ui/AppRoot.kt	无高风险问题，但仍有可改进之处。
+ui/AppRoot.kt	未发现本地问题；不代表密码从未泄露。
+ui/VaultViewModel.kt	主密码错误，还可尝试 ${remaining} 次
+ui/VaultViewModel.kt	加密备份已导出 ${aliveCount} 条
+ui/VaultViewModel.kt	压缩包已导出 ${stats.loginCount + stats.otherCount} 条，${stats.mediaCount} 个媒体
+ui/VaultViewModel.kt	双方提交分叉，可自动合并
+ui/VaultViewModel.kt	同步被拒绝：两端不是同一份保险库，保险库 ID 不一致。为防止跨账户数据混合，接收方未保存任何内容；请在两端打开同一账户，或先用数据导入复制完整账户。
+ui/VaultViewModel.kt	同步被拒绝：两端不是同一份保险库，保险库 ID 不一致。请在两端打开同一账户，或先通过数据导入复制完整账户后再同步。
+ui/VaultViewModel.kt	对方已同步：已采纳对方新版本 ${installed.payload.entries.size} 项
+ui/VaultViewModel.kt	已删除「$name」，30 天后自动清除，可在账户列表页恢复
+ui/VaultViewModel.kt	已清空回收站 ${old.entries.count { it.deletedAt != null }} 条
+ui/VaultViewModel.kt	数据检查未通过，正在自动重试 $attempt/$max
+ui/VaultViewModel.kt	数据检查未通过，正在自动重试 $attempt/$maxAttempts…
+ui/VaultViewModel.kt	文件检查未通过，正在自动重试 $attempt/$maxAttempts
+ui/VaultViewModel.kt	无标题
+ui/VaultViewModel.kt	本地数据刚刚更新，正在重新下载并合并 ${attempts + 1}/$MAX_CLOUD_SYNC_RETRY_ATTEMPTS…
+ui/VaultViewModel.kt	本地数据刚刚更新，正在重新下载并合并 ${attempts + 1}/$MAX_WEBDAV_SYNC_ATTEMPTS…
+ui/VaultViewModel.kt	远端数据刚刚更新，正在自动重试 ${attempts + 1}/$MAX_WEBDAV_SYNC_ATTEMPTS…
+ui/VaultViewModel.kt	远端数据刚刚更新，正在重新下载并合并 ${attempts + 1}/$MAX_CLOUD_SYNC_RETRY_ATTEMPTS…
+ui/screens/EntryDetailScreen.kt	无标题
+ui/screens/EntryEditScreen.kt	拍照识别证件
+ui/screens/EntryEditScreen.kt	拍照识别银行卡
+ui/screens/EntryEditScreen.kt	有效期 MM/YY
+ui/screens/EntryEditScreen.kt	标签
+ui/screens/EntryEditScreen.kt	证件照片
+ui/screens/SettingsScreen.kt	${sourceLabel}数据不带库谱系标识
+ui/screens/SettingsScreen.kt	客户端证书 mTLS
+ui/screens/SettingsScreen.kt	数据导入/导出
+ui/screens/TrashScreen.kt	无标题
+ui/screens/VaultListScreen.kt	无标题
+ui/screens/EntryEditScreen.kt	卡片/证件信息与正反面影像
+ui/screens/VaultListScreen.kt	卡证
+ui/MarkdownText.kt	暂不支持预览此图表类型，已显示源码
+ui/MarkdownText.kt	[图片:${node.childNodes().filterIsInstance<Text>().joinToString(
+ui/MarkdownText.kt	代码
+ui/VaultViewModel.kt	当前界面无法完成设备锁屏验证
+ui/screens/SettingsScreen.kt	Passkey 授权
+passkeys/PasskeyCredentialActivity.kt	保险库数据异常
+passkeys/PasskeyCredentialActivity.kt	通行密钥已存在
+ui/VaultViewModel.kt	${result.source}：$summary。导入文件含明文密码，请确认后安全删除
+ui/VaultViewModel.kt	PMVE RootKey 会话已失效
+ui/VaultViewModel.kt	PMVE 会话已失效
+ui/VaultViewModel.kt	PMVE 会话已锁定
+ui/VaultViewModel.kt	PMVE 安装后未返回 RootKey
+ui/VaultViewModel.kt	PMVE 生物识别凭据缺少身份绑定
+ui/VaultViewModel.kt	PMVE 解锁未返回保险库身份
+ui/VaultViewModel.kt	PMVE 认证结果缺少 identity
+ui/VaultViewModel.kt	PMVE 身份或提交谱系无效
+ui/VaultViewModel.kt	WebDAV 仍返回写入前版本
+ui/VaultViewModel.kt	WebDAV 保险库文件为空
+ui/VaultViewModel.kt	WebDAV 远端已由其他设备写入
+ui/VaultViewModel.kt	WebDAV 远端已由其他设备更新
+ui/VaultViewModel.kt	WebDAV 远端文件在同步期间变为空
+ui/VaultViewModel.kt	WebDAV未关联，自动同步已暂停
+ui/VaultViewModel.kt	下载覆盖失败，本地数据已保留：${it.message}
+ui/VaultViewModel.kt	主密码不匹配
+ui/VaultViewModel.kt	云端仍返回写入前版本
+ui/VaultViewModel.kt	云端保险库文件为空
+ui/VaultViewModel.kt	云端发布期间本地保险库已更新，等待重新合并
+ui/VaultViewModel.kt	云端回读文件为空
+ui/VaultViewModel.kt	云端文件不属于当前保险库，请重新关联正确文件
+ui/VaultViewModel.kt	云端文件超过 1 GB 安全限制
+ui/VaultViewModel.kt	云端硬盘
+ui/VaultViewModel.kt	云端硬盘同步失败
+ui/VaultViewModel.kt	云端硬盘未关联，自动同步已暂停
+ui/VaultViewModel.kt	保险库文件已导出
+ui/VaultViewModel.kt	写入云端硬盘失败：${it.message}
+ui/VaultViewModel.kt	压缩包导出失败：${it.message}
+ui/VaultViewModel.kt	备份口令错误或文件已损坏
+ui/VaultViewModel.kt	备份失败：${it.message}
+ui/VaultViewModel.kt	备份失败：${outcome.removePrefix(
+ui/VaultViewModel.kt	密码管理器数据导入失败：${it.message}
+ui/VaultViewModel.kt	导入失败
+ui/VaultViewModel.kt	导入文件中未识别到条目
+ui/VaultViewModel.kt	导出失败：${it.message}
+ui/VaultViewModel.kt	已下载并验证远端保险库，本地文件已原子替换
+ui/VaultViewModel.kt	已从 WebDAV 下载并验证保险库，本地文件已原子替换
+ui/VaultViewModel.kt	已彻底删除 ${ids.size} 条
+ui/VaultViewModel.kt	已彻底删除「${old.entryTitle(id)}」
+ui/VaultViewModel.kt	数据库清理完成
+ui/VaultViewModel.kt	数据库清理完成，历史空间已回收
+ui/VaultViewModel.kt	文件已写入；已按远端修改时间和大小确认，不再下载解密校验
+ui/VaultViewModel.kt	正在传输 $count 项 · ${percentOf(transferredBytes, totalBytes)}%
+ui/VaultViewModel.kt	正在传输 · ${percentOf(transferredBytes, totalBytes)}%
+ui/VaultViewModel.kt	正在发送数据给传输站…
+ui/VaultViewModel.kt	正在接收另一台设备的数据…
+ui/VaultViewModel.kt	没有需要检测的条目
+ui/VaultViewModel.kt	自动同步失败
+ui/VaultViewModel.kt	远端文件在同步期间变为空
+ui/VaultViewModel.kt	远端文件已由其他设备写入
+ui/screens/SettingsScreen.kt	关闭

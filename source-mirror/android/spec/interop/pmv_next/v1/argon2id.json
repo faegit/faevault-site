@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "suite": "PMV_NEXT_V1_SUITE_1",
+  "encoding": "lowercase hex",
+  "cases": [
+    {
+      "id": "argon2id_unicode_raw_utf8",
+      "profile": "STANDARD",
+      "passwordUtf8Hex": "e5af86e7a081f09f949043616665cc81",
+      "saltHex": "000102030405060708090a0b0c0d0e0f",
+      "version": 19,
+      "memoryKiB": 65536,
+      "iterations": 3,
+      "parallelism": 1,
+      "outputBytes": 32,
+      "derivedKekHex": "c4a8b185561c0385958f07d3a476b5e60ee5b98c537bba9121ef5167b4e4a1d1"
+    },
+    {
+      "id": "argon2id_hardened_unicode_raw_utf8",
+      "profile": "HARDENED",
+      "passwordUtf8Hex": "e5af86e7a081f09f949043616665cc81",
+      "saltHex": "000102030405060708090a0b0c0d0e0f",
+      "version": 19,
+      "memoryKiB": 131072,
+      "iterations": 4,
+      "parallelism": 1,
+      "outputBytes": 32,
+      "derivedKekHex": "cc998b0657849f3ebaac7a26e8ccca4490c029c413886eb6ddb8b1c682208f7f"
+    }
+  ]
+}

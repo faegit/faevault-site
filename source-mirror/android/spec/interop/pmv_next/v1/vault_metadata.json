@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "suite": "PMV_NEXT_V1_SUITE_1",
+  "cases": [
+    {
+      "id": "vault_metadata_unknown_extensions_unicode",
+      "blockType": "OBJECT_METADATA",
+      "metadata": {
+        "schema": "pmv-vault-metadata",
+        "version": 1,
+        "vault_id": "00112233-4455-6677-8899-aabbccddeeff",
+        "entry_order": ["10213243-5465-7687-98a9-bacbdcedfe0f"],
+        "trash_order": ["fedcba98-7654-4321-aaaa-bbbbbbbbbbbb"],
+        "sync_meta": {
+          "device_id": "11111111-2222-3333-4444-555555555555",
+          "future_counter": 2
+        },
+        "key_revision": 7,
+        "export_epoch": 1700000200.0,
+        "purge_tombstones": {
+          "fedcba98-7654-4321-aaaa-bbbbbbbbbbbb": 1700000100.25
+        },
+        "future_extension": {
+          "enabled": true,
+          "label": "保险库",
+          "nested": [1.2500, null, "扩展"]
+        },
+        "éclair": "utf8-order",
+        "扩展": {"nullable": null}
+      },
+      "expectedCanonicalJson": "{\"entry_order\":[\"10213243-5465-7687-98a9-bacbdcedfe0f\"],\"export_epoch\":1700000200,\"future_extension\":{\"enabled\":true,\"label\":\"保险库\",\"nested\":[1.25,null,\"扩展\"]},\"key_revision\":7,\"purge_tombstones\":{\"fedcba98-7654-4321-aaaa-bbbbbbbbbbbb\":1700000100.25},\"schema\":\"pmv-vault-metadata\",\"sync_meta\":{\"device_id\":\"11111111-2222-3333-4444-555555555555\",\"future_counter\":2},\"trash_order\":[\"fedcba98-7654-4321-aaaa-bbbbbbbbbbbb\"],\"vault_id\":\"00112233-4455-6677-8899-aabbccddeeff\",\"version\":1,\"éclair\":\"utf8-order\",\"扩展\":{\"nullable\":null}}",
+      "expectedLogicalDigestHex": "cd0b061735802ecf06b297d46ef17b3d773900ed831650074ecc281a568afe96"
+    }
+  ]
+}

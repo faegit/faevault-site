@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>保险库自动填充</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header><img src="icons/icon32.png" alt=""><strong>保险库自动填充</strong></header>
+  <div id="status" class="status">正在检测…</div>
+  <form id="unlock-form" hidden autocomplete="off">
+    <label for="master-password">主密码</label>
+    <div class="password-row">
+      <input id="master-password" type="password" maxlength="128" autocomplete="off" spellcheck="false" required>
+      <button id="toggle-password" class="icon-button" type="button" title="显示主密码" aria-label="显示主密码">&#128065;</button>
+    </div>
+    <div id="hint" class="hint" role="alert" aria-live="polite"></div>
+    <button id="unlock" class="primary" type="submit">解锁并填充</button>
+  </form>
+  <button id="refresh" type="button">重新检测</button>
+  <button id="lock" type="button">锁定浏览器会话</button>
+  <script src="i18n.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "name": "concurrent_platform_additions",
+      "local": {
+        "packages": [
+          "com.example.app"
+        ],
+        "hosts": [
+          "EXAMPLE.COM"
+        ]
+      },
+      "remote": {
+        "processes": [
+          "example.exe"
+        ],
+        "hosts": [
+          "other.example"
+        ]
+      },
+      "expected": {
+        "packages": [
+          "com.example.app"
+        ],
+        "hosts": [
+          "example.com",
+          "other.example"
+        ],
+        "processes": [
+          "example.exe"
+        ]
+      }
+    },
+    {
+      "name": "removal_does_not_resurrect",
+      "local": {
+        "hosts": [],
+        "states": {
+          "hosts:example.com": {
+            "updated_at": 20,
+            "deleted": true
+          }
+        }
+      },
+      "remote": {
+        "hosts": [
+          "example.com"
+        ],
+        "states": {
+          "hosts:example.com": {
+            "updated_at": 10,
+            "deleted": false
+          }
+        }
+      },
+      "expected": {
+        "packages": [],
+        "hosts": [],
+        "processes": []
+      }
+    },
+    {
+      "name": "explicit_readd_wins",
+      "local": {
+        "states": {
+          "hosts:example.com": {
+            "updated_at": 20,
+            "deleted": true
+          }
+        }
+      },
+      "remote": {
+        "hosts": [
+          "example.com"
+        ],
+        "states": {
+          "hosts:example.com": {
+            "updated_at": 30,
+            "deleted": false
+          }
+        }
+      },
+      "expected": {
+        "packages": [],
+        "hosts": [
+          "example.com"
+        ],
+        "processes": []
+      }
+    },
+    {
+      "name": "same_timestamp_delete_wins",
+      "local": {
+        "hosts": [
+          "example.com"
+        ],
+        "states": {
+          "hosts:example.com": {
+            "updated_at": 20,
+            "deleted": false
+          }
+        }
+      },
+      "remote": {
+        "states": {
+          "hosts:example.com": {
+            "updated_at": 20,
+            "deleted": true
+          }
+        }
+      },
+      "expected": {
+        "packages": [],
+        "hosts": [],
+        "processes": []
+      }
+    },
+    {
+      "name": "independent_hosts_are_preserved",
+      "local": {
+        "hosts": [
+          "a.example"
+        ],
+        "states": {
+          "hosts:a.example": {
+            "updated_at": 40,
+            "deleted": false
+          }
+        }
+      },
+      "remote": {
+        "hosts": [
+          "b.example"
+        ],
+        "states": {
+          "hosts:b.example": {
+            "updated_at": 50,
+            "deleted": false
+          }
+        }
+      },
+      "expected": {
+        "packages": [],
+        "hosts": [
+          "a.example",
+          "b.example"
+        ],
+        "processes": []
+      }
+    }
+  ]
+}

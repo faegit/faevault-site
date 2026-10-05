@@ -1,0 +1,308 @@
+{
+  "$schema_note": "互操作测试向量。桌面端与移动端的 merge() 实现都必须通过本文件全部用例。Entry 仅列出测试相关字段，其他业务字段实现时按各端 Schema 补齐（sameContent 必须忽略 id/createdAt/updatedAt/deletedAt）。",
+  "constants": {
+    "T0": 1700000000,
+    "T1": 1700000100,
+    "T2": 1700000200,
+    "T3": 1700000300
+  },
+  "fixtures": [
+    {
+      "name": "1_remote_only_new",
+      "description": "远端新增条目，本地没有",
+      "local": {
+        "entries": []
+      },
+      "incoming": [
+        {
+          "id": "00000000-0000-0000-0000-000000000001",
+          "createdAt": 1700000100,
+          "updatedAt": 1700000100,
+          "deletedAt": null,
+          "content": "X"
+        }
+      ],
+      "onConflict": null,
+      "expected": {
+        "entries": [
+          {
+            "id": "00000000-0000-0000-0000-000000000001",
+            "createdAt": 1700000100,
+            "updatedAt": 1700000100,
+            "deletedAt": null,
+            "content": "X"
+          }
+        ]
+      }
+    },
+    {
+      "name": "2_local_only_keep",
+      "description": "本地独有，远端没传",
+      "local": {
+        "entries": [
+          {
+            "id": "00000000-0000-0000-0000-000000000001",
+            "createdAt": 1700000100,
+            "updatedAt": 1700000100,
+            "deletedAt": null,
+            "content": "X"
+          }
+        ]
+      },
+      "incoming": [],
+      "onConflict": null,
+      "expected": {
+        "entries": [
+          {
+            "id": "00000000-0000-0000-0000-000000000001",
+            "createdAt": 1700000100,
+            "updatedAt": 1700000100,
+            "deletedAt": null,
+            "content": "X"
+          }
+        ]
+      }
+    },
+    {
+      "name": "3_remote_newer_wins",
+      "description": "远端 updatedAt 较大，取远端",
+      "local": {
+        "entries": [
+          {
+            "id": "00000000-0000-0000-0000-000000000001",
+            "createdAt": 1700000100,
+            "updatedAt": 1700000100,
+            "deletedAt": null,
+            "content": "old"
+          }
+        ]
+      },
+      "incoming": [
+        {
+          "id": "00000000-0000-0000-0000-000000000001",
+          "createdAt": 1700000100,
+          "updatedAt": 1700000200,
+          "deletedAt": null,
+          "content": "new"
+        }
+      ],
+      "onConflict": null,
+      "expected": {
+        "entries": [
+          {
+            "id": "00000000-0000-0000-0000-000000000001",
+            "createdAt": 1700000100,
+            "updatedAt": 1700000200,
+            "deletedAt": null,
+            "content": "new"
+          }
+        ]
+      }
+    },
+    {
+      "name": "4_local_newer_wins",
+      "description": "本地 updatedAt 较大，保留本地",
+      "local": {
+        "entries": [
+          {
+            "id": "00000000-0000-0000-0000-000000000001",
+            "createdAt": 1700000100,
+            "updatedAt": 1700000200,
+            "deletedAt": null,
+            "content": "local"
+          }
+        ]
+      },
+      "incoming": [
+        {
+          "id": "00000000-0000-0000-0000-000000000001",
+          "createdAt": 1700000100,
+          "updatedAt": 1700000100,
+          "deletedAt": null,
+          "content": "remote"
+        }
+      ],
+      "onConflict": null,
+      "expected": {
+        "entries": [
+          {
+            "id": "00000000-0000-0000-0000-000000000001",
+            "createdAt": 1700000100,
+            "updatedAt": 1700000200,
+            "deletedAt": null,
+            "content": "local"
+          }
+        ]
+      }
+    },
+    {
+      "name": "5_local_delete_propagates",
+      "description": "本地删除传到远端：本地墓碑较新，远端旧 → 取墓碑",
+      "local": {
+        "entries": [
+          {
+            "id": "00000000-0000-0000-0000-000000000001",
+            "createdAt": 1700000000,
+            "updatedAt": 1700000200,
+            "deletedAt": 1700000200,
+            "content": "X"
+          }
+        ]
+      },
+      "incoming": [
+        {
+          "id": "00000000-0000-0000-0000-000000000001",
+          "createdAt": 1700000000,
+          "updatedAt": 1700000000,
+          "deletedAt": null,
+          "content": "X"
+        }
+      ],
+      "onConflict": null,
+      "expected": {
+        "entries": [
+          {
+            "id": "00000000-0000-0000-0000-000000000001",
+            "createdAt": 1700000000,
+            "updatedAt": 1700000200,
+            "deletedAt": 1700000200,
+            "content": "X"
+          }
+        ]
+      }
+    },
+    {
+      "name": "6_remote_delete_propagates",
+      "description": "远端删除传到本地",
+      "local": {
+        "entries": [
+          {
+            "id": "00000000-0000-0000-0000-000000000001",
+            "createdAt": 1700000000,
+            "updatedAt": 1700000000,
+            "deletedAt": null,
+            "content": "X"
+          }
+        ]
+      },
+      "incoming": [
+        {
+          "id": "00000000-0000-0000-0000-000000000001",
+          "createdAt": 1700000000,
+          "updatedAt": 1700000100,
+          "deletedAt": 1700000100,
+          "content": "X"
+        }
+      ],
+      "onConflict": null,
+      "expected": {
+        "entries": [
+          {
+            "id": "00000000-0000-0000-0000-000000000001",
+            "createdAt": 1700000000,
+            "updatedAt": 1700000100,
+            "deletedAt": 1700000100,
+            "content": "X"
+          }
+        ]
+      }
+    },
+    {
+      "name": "7_resurrect_after_delete",
+      "description": "本地已删，远端在更晚时间编辑过 → 复活，取远端",
+      "local": {
+        "entries": [
+          {
+            "id": "00000000-0000-0000-0000-000000000001",
+            "createdAt": 1700000000,
+            "updatedAt": 1700000100,
+            "deletedAt": 1700000100,
+            "content": "X"
+          }
+        ]
+      },
+      "incoming": [
+        {
+          "id": "00000000-0000-0000-0000-000000000001",
+          "createdAt": 1700000000,
+          "updatedAt": 1700000200,
+          "deletedAt": null,
+          "content": "X-edited"
+        }
+      ],
+      "onConflict": null,
+      "expected": {
+        "entries": [
+          {
+            "id": "00000000-0000-0000-0000-000000000001",
+            "createdAt": 1700000000,
+            "updatedAt": 1700000200,
+            "deletedAt": null,
+            "content": "X-edited"
+          }
+        ]
+      }
+    },
+    {
+      "name": "8_same_second_conflict_keep_both",
+      "description": "同秒不同内容 → onConflict 返回 KEEP_BOTH，远端复制为新 id",
+      "local": {
+        "entries": [
+          {
+            "id": "00000000-0000-0000-0000-000000000001",
+            "createdAt": 1700000000,
+            "updatedAt": 1700000100,
+            "deletedAt": null,
+            "content": "A"
+          }
+        ]
+      },
+      "incoming": [
+        {
+          "id": "00000000-0000-0000-0000-000000000001",
+          "createdAt": 1700000000,
+          "updatedAt": 1700000100,
+          "deletedAt": null,
+          "content": "B"
+        }
+      ],
+      "onConflict": "KEEP_BOTH",
+      "expected_constraint": {
+        "entries_count": 2,
+        "entries_contains": [
+          {
+            "id": "00000000-0000-0000-0000-000000000001",
+            "content": "A"
+          },
+          {
+            "id": "*ANY_NEW_UUID*",
+            "content": "B",
+            "updatedAt": 1700000100
+          }
+        ]
+      }
+    }
+  ],
+  "clock_skew_test": {
+    "description": "exportEpoch 仅为文件元数据，不得改写 incoming 条目时间戳",
+    "header_exportEpoch": 1700000000,
+    "local_now": 1700000050,
+    "skew_expected": 0,
+    "incoming_raw": [
+      {
+        "id": "00000000-0000-0000-0000-000000000002",
+        "createdAt": 1699999000,
+        "updatedAt": 1699999500,
+        "deletedAt": 1699999800
+      }
+    ],
+    "incoming_calibrated_expected": [
+      {
+        "id": "00000000-0000-0000-0000-000000000002",
+        "createdAt": 1699999000,
+        "updatedAt": 1699999500,
+        "deletedAt": 1699999800
+      }
+    ]
+  }
+}

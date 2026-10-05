@@ -1,0 +1,785 @@
+{
+  "version": 1,
+  "policy_cases": [
+    {
+      "name": "safe_street_address",
+      "policy_class": "safe_internal_external",
+      "module_type": "address",
+      "field": "address",
+      "internal": true,
+      "external_default": true,
+      "verification": false,
+      "role": "street_address"
+    },
+    {
+      "name": "safe_postal_code",
+      "policy_class": "safe_internal_external",
+      "module_type": "address",
+      "field": "postal_code",
+      "internal": true,
+      "external_default": true,
+      "verification": false,
+      "role": "postal_code"
+    },
+    {
+      "name": "sensitive_card_cvv",
+      "policy_class": "sensitive_opt_in",
+      "module_type": "card_document",
+      "field": "cvv",
+      "internal": true,
+      "external_default": false,
+      "verification": true,
+      "role": "card_cvv"
+    },
+    {
+      "name": "excluded_withdrawal_password",
+      "policy_class": "permanently_excluded",
+      "module_type": "card_document",
+      "field": "withdrawal_password",
+      "internal": false,
+      "external_default": false,
+      "verification": true,
+      "role": null
+    },
+    {
+      "name": "excluded_passkey_private_key",
+      "policy_class": "permanently_excluded",
+      "module_type": "passkey",
+      "field": "private_key",
+      "internal": false,
+      "external_default": false,
+      "verification": true,
+      "role": null
+    },
+    {
+      "name": "excluded_otp_secret",
+      "policy_class": "permanently_excluded",
+      "module_type": "otp",
+      "field": "secret",
+      "internal": false,
+      "external_default": false,
+      "verification": true,
+      "role": null
+    },
+    {
+      "name": "computed_otp_code",
+      "policy_class": "computed_otp",
+      "module_type": "otp",
+      "field": "@computed/one_time_code",
+      "internal": true,
+      "external_default": true,
+      "verification": false,
+      "role": "one_time_code"
+    }
+  ],
+  "migration_cases": [
+    {
+      "name": "legacy_bound_otp",
+      "fields": {
+        "bound_otp_id": "otp-entry"
+      },
+      "expected_source_entry_id": "otp-entry",
+      "expected_source_key": "@computed/one_time_code",
+      "expected_role": "one_time_code"
+    }
+  ],
+  "normalization_cases": [
+    {
+      "name": "ascii_trim_and_hyphen",
+      "input": " Billing-email ",
+      "expected": "billingemail"
+    },
+    {
+      "name": "unicode_whitespace",
+      "input": "账单 邮箱",
+      "expected": "账单邮箱"
+    },
+    {
+      "name": "ascii_case_and_underscore",
+      "input": "BILLING_EMAIL",
+      "expected": "billingemail"
+    },
+    {
+      "name": "ascii_case_and_dot",
+      "input": "Billing.Email",
+      "expected": "billingemail"
+    },
+    {
+      "name": "ascii_slash",
+      "input": "billing/email",
+      "expected": "billingemail"
+    }
+  ],
+  "resolution_cases": [
+    {
+      "name": "priority_top_level_modules_external",
+      "input": {
+        "host_entry_id": "host-priority",
+        "entries": [
+          {
+            "id": "host-priority",
+            "type": "login",
+            "title": "Priority host",
+            "fields": {
+              "username": "host-user",
+              "autofill_links": [
+                {
+                  "id": "link-priority",
+                  "source_entry_id": "external-priority",
+                  "fields": [
+                    {
+                      "module_id": "external-login",
+                      "source_key": "username",
+                      "role": "username",
+                      "requires_verification": false
+                    },
+                    {
+                      "module_id": "external-email",
+                      "source_key": "value",
+                      "role": "email",
+                      "requires_verification": false
+                    },
+                    {
+                      "module_id": "external-phone",
+                      "source_key": "value",
+                      "role": "phone",
+                      "requires_verification": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "modules": [
+              {
+                "id": "host-login",
+                "type": "login_account",
+                "title": "Host account",
+                "fields": {
+                  "username": "module-user"
+                },
+                "config": {}
+              },
+              {
+                "id": "host-email",
+                "type": "email",
+                "title": "Host email",
+                "fields": {
+                  "value": "module@example.test"
+                },
+                "config": {}
+              }
+            ]
+          },
+          {
+            "id": "external-priority",
+            "type": "contact",
+            "title": "Priority external",
+            "fields": {},
+            "modules": [
+              {
+                "id": "external-login",
+                "type": "login_account",
+                "title": "External account",
+                "fields": {
+                  "username": "external-user"
+                },
+                "config": {}
+              },
+              {
+                "id": "external-email",
+                "type": "email",
+                "title": "External email",
+                "fields": {
+                  "value": "external@example.test"
+                },
+                "config": {}
+              },
+              {
+                "id": "external-phone",
+                "type": "phone",
+                "title": "External phone",
+                "fields": {
+                  "value": "+1-555-0100"
+                },
+                "config": {}
+              }
+            ]
+          }
+        ]
+      },
+      "expected": [
+        {
+          "role": "username",
+          "source_entry_id": "host-priority",
+          "module_id": null,
+          "source_key": "username",
+          "value": "host-user",
+          "requires_verification": false
+        },
+        {
+          "role": "email",
+          "source_entry_id": "host-priority",
+          "module_id": "host-email",
+          "source_key": "value",
+          "value": "module@example.test",
+          "requires_verification": false
+        },
+        {
+          "role": "phone",
+          "source_entry_id": "external-priority",
+          "module_id": "external-phone",
+          "source_key": "value",
+          "value": "+1-555-0100",
+          "requires_verification": false
+        }
+      ],
+      "expected_issues": [
+        "ROLE_SHADOWED",
+        "ROLE_SHADOWED",
+        "ROLE_SHADOWED"
+      ]
+    },
+    {
+      "name": "safe_external_value_selection",
+      "input": {
+        "host_entry_id": "host-safe-external",
+        "entries": [
+          {
+            "id": "host-safe-external",
+            "type": "login",
+            "title": "Safe external host",
+            "fields": {
+              "autofill_links": [
+                {
+                  "id": "link-safe-email",
+                  "source_entry_id": "contact-safe",
+                  "fields": [
+                    {
+                      "module_id": "contact-email",
+                      "source_key": "value",
+                      "role": "email",
+                      "requires_verification": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "modules": []
+          },
+          {
+            "id": "contact-safe",
+            "type": "contact",
+            "title": "Safe contact",
+            "fields": {},
+            "modules": [
+              {
+                "id": "contact-email",
+                "type": "email",
+                "title": "Email",
+                "fields": {
+                  "value": "safe.external@example.test"
+                },
+                "config": {}
+              }
+            ]
+          }
+        ]
+      },
+      "expected": [
+        {
+          "role": "email",
+          "source_entry_id": "contact-safe",
+          "module_id": "contact-email",
+          "source_key": "value",
+          "value": "safe.external@example.test",
+          "requires_verification": false
+        }
+      ],
+      "expected_issues": []
+    },
+    {
+      "name": "duplicate_role_shadowing",
+      "input": {
+        "host_entry_id": "host-duplicate",
+        "entries": [
+          {
+            "id": "host-duplicate",
+            "type": "login",
+            "title": "Duplicate role host",
+            "fields": {
+              "autofill_links": [
+                {
+                  "id": "link-first-email",
+                  "source_entry_id": "contact-first",
+                  "fields": [
+                    {
+                      "module_id": "email-first",
+                      "source_key": "value",
+                      "role": "email",
+                      "requires_verification": false
+                    }
+                  ]
+                },
+                {
+                  "id": "link-second-email",
+                  "source_entry_id": "contact-second",
+                  "fields": [
+                    {
+                      "module_id": "email-second",
+                      "source_key": "value",
+                      "role": "email",
+                      "requires_verification": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "modules": []
+          },
+          {
+            "id": "contact-first",
+            "type": "contact",
+            "title": "First contact",
+            "fields": {},
+            "modules": [
+              {
+                "id": "email-first",
+                "type": "email",
+                "title": "First email",
+                "fields": {
+                  "value": "first@example.test"
+                },
+                "config": {}
+              }
+            ]
+          },
+          {
+            "id": "contact-second",
+            "type": "contact",
+            "title": "Second contact",
+            "fields": {},
+            "modules": [
+              {
+                "id": "email-second",
+                "type": "email",
+                "title": "Second email",
+                "fields": {
+                  "value": "second@example.test"
+                },
+                "config": {}
+              }
+            ]
+          }
+        ]
+      },
+      "expected": [
+        {
+          "role": "email",
+          "source_entry_id": "contact-first",
+          "module_id": "email-first",
+          "source_key": "value",
+          "value": "first@example.test",
+          "requires_verification": false
+        }
+      ],
+      "expected_issues": [
+        "ROLE_SHADOWED"
+      ]
+    },
+    {
+      "name": "missing_source",
+      "input": {
+        "host_entry_id": "host-missing-source",
+        "entries": [
+          {
+            "id": "host-missing-source",
+            "type": "login",
+            "title": "Missing source host",
+            "fields": {
+              "autofill_links": [
+                {
+                  "id": "link-missing-source",
+                  "source_entry_id": "source-does-not-exist",
+                  "fields": [
+                    {
+                      "module_id": "missing-email",
+                      "source_key": "value",
+                      "role": "email",
+                      "requires_verification": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "modules": []
+          }
+        ]
+      },
+      "expected": [],
+      "expected_issues": [
+        "SOURCE_ENTRY_MISSING"
+      ]
+    },
+    {
+      "name": "missing_module",
+      "input": {
+        "host_entry_id": "host-missing-module",
+        "entries": [
+          {
+            "id": "host-missing-module",
+            "type": "login",
+            "title": "Missing module host",
+            "fields": {
+              "autofill_links": [
+                {
+                  "id": "link-missing-module",
+                  "source_entry_id": "contact-missing-module",
+                  "fields": [
+                    {
+                      "module_id": "module-does-not-exist",
+                      "source_key": "value",
+                      "role": "phone",
+                      "requires_verification": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "modules": []
+          },
+          {
+            "id": "contact-missing-module",
+            "type": "contact",
+            "title": "Contact without requested module",
+            "fields": {},
+            "modules": []
+          }
+        ]
+      },
+      "expected": [],
+      "expected_issues": [
+        "SOURCE_MODULE_MISSING"
+      ]
+    },
+    {
+      "name": "empty_field",
+      "input": {
+        "host_entry_id": "host-empty-field",
+        "entries": [
+          {
+            "id": "host-empty-field",
+            "type": "login",
+            "title": "Empty field host",
+            "fields": {
+              "autofill_links": [
+                {
+                  "id": "link-empty-email",
+                  "source_entry_id": "contact-empty",
+                  "fields": [
+                    {
+                      "module_id": "empty-email",
+                      "source_key": "value",
+                      "role": "email",
+                      "requires_verification": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "modules": []
+          },
+          {
+            "id": "contact-empty",
+            "type": "contact",
+            "title": "Empty contact",
+            "fields": {},
+            "modules": [
+              {
+                "id": "empty-email",
+                "type": "email",
+                "title": "Empty email",
+                "fields": {
+                  "value": ""
+                },
+                "config": {}
+              }
+            ]
+          }
+        ]
+      },
+      "expected": [],
+      "expected_issues": [
+        "SOURCE_FIELD_EMPTY"
+      ]
+    },
+    {
+      "name": "one_hop_only",
+      "input": {
+        "host_entry_id": "host-one-hop",
+        "entries": [
+          {
+            "id": "host-one-hop",
+            "type": "login",
+            "title": "One hop host",
+            "fields": {
+              "autofill_links": [
+                {
+                  "id": "link-direct",
+                  "source_entry_id": "contact-direct",
+                  "fields": [
+                    {
+                      "module_id": "direct-email",
+                      "source_key": "value",
+                      "role": "email",
+                      "requires_verification": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "modules": []
+          },
+          {
+            "id": "contact-direct",
+            "type": "contact",
+            "title": "Direct contact",
+            "fields": {
+              "autofill_links": [
+                {
+                  "id": "link-nested",
+                  "source_entry_id": "contact-nested",
+                  "fields": [
+                    {
+                      "module_id": "nested-phone",
+                      "source_key": "value",
+                      "role": "phone",
+                      "requires_verification": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "modules": [
+              {
+                "id": "direct-email",
+                "type": "email",
+                "title": "Direct email",
+                "fields": {
+                  "value": "direct@example.test"
+                },
+                "config": {}
+              }
+            ]
+          },
+          {
+            "id": "contact-nested",
+            "type": "contact",
+            "title": "Nested contact",
+            "fields": {},
+            "modules": [
+              {
+                "id": "nested-phone",
+                "type": "phone",
+                "title": "Nested phone",
+                "fields": {
+                  "value": "+1-555-0199"
+                },
+                "config": {}
+              }
+            ]
+          }
+        ]
+      },
+      "expected": [
+        {
+          "role": "email",
+          "source_entry_id": "contact-direct",
+          "module_id": "direct-email",
+          "source_key": "value",
+          "value": "direct@example.test",
+          "requires_verification": false
+        }
+      ],
+      "expected_issues": []
+    },
+    {
+      "name": "non_sensitive_custom_exact_name",
+      "input": {
+        "host_entry_id": "host-custom-text",
+        "entries": [
+          {
+            "id": "host-custom-text",
+            "type": "login",
+            "title": "Custom text host",
+            "fields": {},
+            "modules": [
+              {
+                "id": "billing-email-text",
+                "type": "text",
+                "title": " Billing-email ",
+                "fields": {
+                  "value": "billing@example.test"
+                },
+                "config": {}
+              }
+            ]
+          }
+        ],
+        "target_name": "billing_email"
+      },
+      "expected": [
+        {
+          "role": "custom_text",
+          "source_entry_id": "host-custom-text",
+          "module_id": "billing-email-text",
+          "source_key": "value",
+          "value": "billing@example.test",
+          "requires_verification": false
+        }
+      ],
+      "expected_issues": [],
+      "expected_normalized_name": "billingemail"
+    },
+    {
+      "name": "sensitive_custom_never_title_matched",
+      "input": {
+        "host_entry_id": "host-custom-sensitive",
+        "entries": [
+          {
+            "id": "host-custom-sensitive",
+            "type": "login",
+            "title": "Sensitive custom host",
+            "fields": {},
+            "modules": [
+              {
+                "id": "billing-email-sensitive",
+                "type": "password",
+                "title": "Billing email",
+                "fields": {
+                  "value": "VALUE_REDACTED"
+                },
+                "config": {}
+              }
+            ]
+          }
+        ],
+        "target_name": "billing_email"
+      },
+      "expected": [],
+      "expected_issues": []
+    },
+    {
+      "name": "computed_otp_only",
+      "input": {
+        "host_entry_id": "host-computed-otp",
+        "entries": [
+          {
+            "id": "host-computed-otp",
+            "type": "login",
+            "title": "Computed OTP host",
+            "fields": {
+              "autofill_links": [
+                {
+                  "id": "link-computed-otp",
+                  "source_entry_id": "otp-computed",
+                  "fields": [
+                    {
+                      "module_id": null,
+                      "source_key": "@computed/one_time_code",
+                      "role": "one_time_code",
+                      "requires_verification": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "modules": []
+          },
+          {
+            "id": "otp-computed",
+            "type": "otp",
+            "title": "Computed OTP source",
+            "fields": {
+              "@computed/one_time_code": "VALUE_REDACTED"
+            },
+            "modules": []
+          }
+        ]
+      },
+      "expected": [
+        {
+          "role": "one_time_code",
+          "source_entry_id": "otp-computed",
+          "module_id": null,
+          "source_key": "@computed/one_time_code",
+          "value": "VALUE_REDACTED",
+          "requires_verification": false
+        }
+      ],
+      "expected_issues": []
+    },
+    {
+      "name": "malformed_sibling_link_isolation",
+      "input": {
+        "host_entry_id": "host-malformed-sibling",
+        "entries": [
+          {
+            "id": "host-malformed-sibling",
+            "type": "login",
+            "title": "Malformed sibling host",
+            "fields": {
+              "autofill_links": [
+                {
+                  "id": "link-malformed",
+                  "source_entry_id": 7,
+                  "fields": "invalid"
+                },
+                {
+                  "id": "link-valid-sibling",
+                  "source_entry_id": "contact-valid-sibling",
+                  "fields": [
+                    {
+                      "module_id": "valid-email",
+                      "source_key": "value",
+                      "role": "email",
+                      "requires_verification": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "modules": []
+          },
+          {
+            "id": "contact-valid-sibling",
+            "type": "contact",
+            "title": "Valid sibling contact",
+            "fields": {},
+            "modules": [
+              {
+                "id": "valid-email",
+                "type": "email",
+                "title": "Valid sibling email",
+                "fields": {
+                  "value": "valid.sibling@example.test"
+                },
+                "config": {}
+              }
+            ]
+          }
+        ]
+      },
+      "expected": [
+        {
+          "role": "email",
+          "source_entry_id": "contact-valid-sibling",
+          "module_id": "valid-email",
+          "source_key": "value",
+          "value": "valid.sibling@example.test",
+          "requires_verification": false
+        }
+      ],
+      "expected_issues": []
+    }
+  ]
+}

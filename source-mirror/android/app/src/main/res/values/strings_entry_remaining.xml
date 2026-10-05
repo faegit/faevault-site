@@ -1,0 +1,102 @@
+<resources>
+    <string name="entry_remaining_title">标题</string>
+    <string name="entry_remaining_username">用户名</string>
+    <string name="entry_remaining_password">密码</string>
+    <string name="entry_remaining_website">网址</string>
+    <string name="entry_remaining_app_package">关联程序包名</string>
+    <string name="entry_remaining_cardholder">持卡人</string>
+    <string name="entry_remaining_full_card_number">完整卡号</string>
+    <string name="entry_remaining_bank">开户行</string>
+    <string name="entry_remaining_expiry">有效期</string>
+    <string name="entry_remaining_withdrawal_password">取款密码</string>
+    <string name="entry_remaining_member_name">会员名称</string>
+    <string name="entry_remaining_member_number">会员编号</string>
+    <string name="entry_remaining_membership_level">会员等级</string>
+    <string name="entry_remaining_points">积分</string>
+    <string name="entry_remaining_full_name">姓名</string>
+    <string name="entry_remaining_social_security_number">社保号码</string>
+    <string name="entry_remaining_issuing_region">签发地区</string>
+    <string name="entry_remaining_custom_card_type">自定义卡片类型</string>
+    <string name="entry_remaining_card_name">卡片名称</string>
+    <string name="entry_remaining_card_number">卡号</string>
+    <string name="entry_remaining_notes">备注</string>
+    <string name="entry_remaining_id_number">证件号</string>
+    <string name="entry_remaining_issue_authority">签发机关</string>
+    <string name="entry_remaining_issue_date">签发日期</string>
+    <string name="entry_remaining_expiry_date">到期日期</string>
+    <string name="entry_remaining_wifi_password">Wi-Fi 密码</string>
+    <string name="entry_remaining_security_type">加密类型</string>
+    <string name="entry_remaining_router_admin_url">路由器管理地址</string>
+    <string name="entry_remaining_admin_password">管理密码</string>
+    <string name="entry_remaining_service">服务</string>
+    <string name="entry_remaining_host">主机 / IP</string>
+    <string name="entry_remaining_port">端口</string>
+    <string name="entry_remaining_secret">密钥</string>
+    <string name="entry_remaining_issuer">发行方</string>
+    <string name="entry_remaining_account_name">账户名</string>
+    <string name="entry_remaining_period">周期</string>
+    <string name="entry_remaining_counter">计数器</string>
+    <string name="entry_remaining_module">模块</string>
+    <string name="entry_remaining_created">创建</string>
+    <string name="entry_remaining_last_used">最后使用</string>
+    <string name="entry_remaining_sign_count">签名计数</string>
+    <string name="entry_remaining_rp_domain">依赖方域名</string>
+    <string name="entry_remaining_account">账户</string>
+    <string name="entry_remaining_copy_image">复制图片</string>
+    <string name="entry_remaining_save_image">保存图片</string>
+    <string name="entry_remaining_no_title">无标题</string>
+    <string name="entry_remaining_expired">已过期</string>
+    <string name="entry_remaining_expiring">即将到期</string>
+    <string name="entry_remaining_exported">附件已导出</string>
+    <string name="entry_remaining_export_failed">导出失败：%1$s</string>
+    <string name="entry_remaining_leaked_count">已泄露 %1$s 次</string>
+    <string name="entry_remaining_totp_summary">TOTP · %1$s · %2$d 位 · %3$d 秒</string>
+    <string name="entry_remaining_hotp_summary">HOTP · %1$s · %2$d 位 · 计数器 %3$d</string>
+    <string name="entry_remaining_password_weak">偏弱</string>
+    <string name="entry_remaining_password_average">一般</string>
+    <string name="entry_remaining_password_strong">强</string>
+    <string name="entry_remaining_password_very_strong">很强</string>
+    <string name="entry_remaining_regenerate">重新生成</string>
+    <string name="entry_remaining_shorten">缩短</string>
+    <string name="entry_remaining_lengthen">加长</string>
+    <string name="entry_remaining_lowercase_short">小写</string>
+    <string name="entry_remaining_lowercase">小写字母</string>
+    <string name="entry_remaining_uppercase_short">大写</string>
+    <string name="entry_remaining_uppercase">大写字母</string>
+    <string name="entry_remaining_digits">数字</string>
+    <string name="entry_remaining_symbols_short">符号</string>
+    <string name="entry_remaining_symbols">特殊符号</string>
+    <string name="entry_remaining_importing_images">正在导入图片</string>
+    <string name="entry_remaining_import_failed">导出失败：%1$s</string>
+    <string name="entry_remaining_attachment_exported">附件已导出</string>
+    <string name="entry_remaining_password_leak_local">本地字典匹配 + 该密码在 Pwned Passwords 中出现过 %1$d 次</string>
+    <string name="entry_remaining_password_leak_dictionary">该密码在常见泄露 / 弱密码字典中，强烈建议更换</string>
+    <string name="entry_remaining_password_leak_online">该密码在公开泄露中出现了 %1$d 次，强烈建议更换</string>
+    <string name="entry_remaining_secure_note_content">安全笔记内容</string>
+    <string name="entry_remaining_tags">标签</string>
+    <string name="entry_remaining_content">内容</string>
+    <string name="entry_remaining_delete">删除</string>
+    <string name="entry_remaining_camera_permission">需要相机权限才能使用此功能</string>
+    <string name="entry_remaining_gallery_permission">需要相册权限才能选取图片</string>
+    <string name="entry_remaining_unreadable_camera_image">无法读取相机返回的图片</string>
+    <string name="entry_remaining_image_decode_failed">图片解码失败</string>
+    <string name="entry_remaining_unrecognized_qr">未识别到二维码</string>
+    <string name="entry_remaining_invalid_wifi_qr">不是有效的 Wi-Fi 二维码</string>
+    <string name="entry_remaining_invalid_otp_qr">不是有效的 otpauth:// 二维码</string>
+    <string name="entry_remaining_image_limit">图片数量已达理论上限</string>
+    <string name="entry_remaining_unrecognized_fields">未识别到关键字段</string>
+    <string name="entry_remaining_card_photo">卡面照片</string><string name="entry_remaining_id_photo">证件照片</string><string name="entry_remaining_scan_card">拍照识别银行卡</string><string name="entry_remaining_scan_id">拍照识别证件</string><string name="entry_remaining_username_appid">用户名 / AppId</string><string name="entry_remaining_note_extra">补充内容</string><string name="entry_remaining_tag_hint">标签（逗号或空格分隔）</string>
+    <string name="entry_remaining_wifi_imported">已导入 Wi-Fi「%1$s」</string><string name="entry_remaining_otp_imported">已导入 OTP 配置</string><string name="entry_remaining_auto_filled">已自动识别并填入 %1$d 个字段</string><string name="entry_remaining_recognized_fields">已识别并填入 %1$d 个字段</string><string name="entry_remaining_processing_failed">拍照处理失败：%1$s</string><string name="entry_remaining_processing">处理失败</string><string name="entry_remaining_google_scan_failed">无法启动 Google 扫描，请尝试手动拍照后使用 OCR</string><string name="entry_remaining_enter_title">请输入标题</string><string name="entry_remaining_settings_failed">无法打开系统设置，请手动前往设置 → 应用管理 → 本应用 → 权限</string>
+    <string name="entry_remaining_permission_required">需要权限</string><string name="entry_remaining_location_rationale">需要使用位置权限来获取当前位置。</string><string name="entry_remaining_location_denied">位置权限已被永久拒绝。请前往系统设置手动授权。</string><string name="entry_remaining_allow">允许</string><string name="entry_remaining_go_settings">前往设置</string>
+    <string name="entry_remaining_bank_branch">分行/支行</string><string name="entry_remaining_bank_branch_code">分行联行号</string><string name="entry_remaining_cvv">CVV</string><string name="entry_remaining_api_key">API Key</string><string name="entry_remaining_api_secret">API Secret</string><string name="entry_remaining_related_domains">关联域名</string>
+    <string name="entry_remaining_database_engine">数据库引擎</string><string name="entry_remaining_private_key">私钥</string><string name="entry_remaining_fingerprint">指纹</string><string name="entry_remaining_database_name">数据库名</string><string name="entry_remaining_algorithm">算法</string><string name="entry_remaining_digits_count">位数</string><string name="entry_remaining_type">类型</string>
+    <string name="entry_remaining_card_type">卡片类型</string><string name="entry_remaining_id_type">证件类型</string><string name="entry_remaining_id_number_full">证件号码</string><string name="entry_remaining_country">国家 / 地区</string><string name="entry_remaining_region">省 / 州</string><string name="entry_remaining_city">城市</string><string name="entry_remaining_address">详细地址</string><string name="entry_remaining_postal_code">邮政编码</string><string name="entry_remaining_question">安全问题</string><string name="entry_remaining_answer">答案</string>
+    <string name="entry_remaining_card_type_bank">银行卡</string><string name="entry_remaining_card_type_membership">会员卡</string><string name="entry_remaining_card_type_social_security">社保卡</string><string name="entry_remaining_card_type_custom">其他卡片</string><string name="entry_remaining_id_type_identity">身份证</string><string name="entry_remaining_id_type_passport">护照</string><string name="entry_remaining_id_type_driver_license">驾照</string><string name="entry_remaining_id_type_hk_macao">港澳通行证</string><string name="entry_remaining_id_type_other">其他</string><string name="entry_remaining_custom_id_type">自定义证件名称</string><string name="entry_remaining_custom_id_type_hint">请输入证件类型名称</string>
+    <string name="entry_remaining_expiry_month_year">有效期 MM/YY</string><string name="entry_remaining_date_or_long_term">YYYY-MM-DD 或 长期</string><string name="entry_remaining_base32_hint">Base32 编码</string><string name="entry_remaining_issuer_hint">Google, GitHub 等</string><string name="entry_remaining_unnamed_qr">未命名二维码</string>
+    <string name="entry_remaining_permission_camera_rationale">需要使用相机权限来扫描二维码和拍摄文档。</string><string name="entry_remaining_permission_gallery_rationale">需要使用相册权限来选取图片。</string><string name="entry_remaining_permission_other_rationale">需要使用此权限才能完成操作。</string><string name="entry_remaining_permission_wifi_location">需要位置或附近设备权限来读取当前连接的 Wi-Fi。</string><string name="entry_remaining_no_wifi_connection">未检测到已连接的 Wi-Fi。</string><string name="entry_remaining_permission_camera_denied">相机权限已被永久拒绝。请前往系统设置手动授予相机权限。</string><string name="entry_remaining_permission_gallery_denied">相册权限已被永久拒绝。请前往系统设置手动授予相册权限。</string><string name="entry_remaining_permission_other_denied">所需权限已被永久拒绝，请前往系统设置手动授权。</string>
+    <string name="entry_remaining_image_limit_two">最多添加 2 张照片</string><string name="entry_remaining_image_exists">该图片已存在</string><string name="entry_remaining_image_processing_failed">图片处理失败：%1$s</string><string name="entry_remaining_unable_read">无法读取</string><string name="entry_remaining_attachment_default_name">attachment.bin</string><string name="entry_remaining_attachment_count_limit">附件数量已达理论上限</string><string name="entry_remaining_attachment_too_large">%1$s 超过 %2$s</string><string name="entry_remaining_attachment_module_limit_pmve">附件模块总容量仅受可用空间限制</string><string name="entry_remaining_attachment_module_limit">附件模块总容量不能超过 32 MB</string><string name="entry_remaining_storage_insufficient">可用存储空间不足 %1$d MB，无法暂存附件</string><string name="entry_remaining_attachment_processing_failed">附件处理失败：%1$s</string><string name="entry_remaining_importing_attachments">正在导入附件</string>
+    <string name="entry_remaining_ocr_failed">扫描识别失败：%1$s</string><string name="entry_remaining_invalid_otp_qr_message">不是有效的 TOTP/HOTP 二维码</string><string name="entry_remaining_invalid_wifi_qr_message">不是有效的 Wi-Fi 二维码</string><string name="entry_remaining_unrecognized_fields_count">未识别到可填入字段</string>
+    <string name="entry_remaining_crack_estimate">预计破解时长</string><string name="entry_remaining_crack_under_second">少于 1 秒</string><string name="entry_remaining_crack_seconds">约 %1$s 秒</string><string name="entry_remaining_crack_minutes">约 %1$s 分钟</string><string name="entry_remaining_crack_hours">约 %1$s 小时</string><string name="entry_remaining_crack_days">约 %1$s 天</string><string name="entry_remaining_crack_years">约 %1$s 年</string><string name="entry_remaining_crack_thousand_years">约 %1$s 万年</string><string name="entry_remaining_crack_million_years">约 %1$s 亿年</string><string name="entry_remaining_crack_billion_years">约 %1$s 十亿年</string><string name="entry_remaining_crack_trillion_plus">超过一万亿年</string>
+    <string name="entry_remaining_digits_6">6 位</string><string name="entry_remaining_digits_7">7 位</string><string name="entry_remaining_digits_8">8 位</string><string name="entry_remaining_seconds_30">30 秒</string><string name="entry_remaining_seconds_60">60 秒</string><string name="entry_remaining_no_encryption">无加密</string>
+    <string name="entry_remaining_sensitive_unlocked">已解锁敏感内容</string><string name="entry_remaining_sensitive_verification_reason">操作 %1$s 的敏感内容需要验证主密码。</string>
+</resources>

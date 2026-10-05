@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Common: image viewer / dialogs -->
+    <string name="media_close">Close</string>
+    <string name="media_confirm">Confirm</string>
+    <string name="media_delete">Delete</string>
+    <string name="media_restore">Restore</string>
+    <string name="media_qr_code">QR code</string>
+    <string name="media_importing">Importing</string>
+    <string name="media_import_exit_warning">Exiting before completion discards this batch only; saved data is unaffected.</string>
+
+    <!-- Image viewer (tiled HD) -->
+    <string name="media_image_read_failed">Failed to read the image</string>
+    <string name="media_image_decode_failed">Image decode failed: %1$s</string>
+    <string name="media_image_too_large_or_unsupported">The image is too large or the format is unsupported</string>
+    <string name="media_image_preview_failed">Image preview failed: %1$s</string>
+    <string name="media_unsupported_format">The format is unsupported</string>
+
+    <!-- Image loading placeholders / hints -->
+    <string name="media_image_not_imported">Image import is not finished yet — check back shortly</string>
+    <string name="media_image_loading">Loading image</string>
+    <string name="media_image_still_loading_hint">If it stays loading for too long, close and reopen the image</string>
+
+    <!-- Image / attachment action toasts -->
+    <string name="media_import_verify_failed">Image import verification failed; the image may be corrupted</string>
+    <string name="media_image_verify_failed">Image data verification failed; it may be corrupted</string>
+    <string name="media_attachment_verify_failed">Attachment export verification failed; the data may be corrupted</string>
+    <string name="media_image_copied">Image copied — paste it into a gallery or chat</string>
+    <string name="media_copy_image_failed">Failed to copy image: %1$s</string>
+    <string name="media_image_saved">Image saved</string>
+    <string name="media_save_failed">Save failed: %1$s</string>
+    <string name="media_image_file_missing">Image file not found</string>
+    <string name="media_cannot_write_location">Could not write to the selected location</string>
+
+    <!-- Clipboard -->
+    <string name="clipboard_empty">"%1$s" is empty — nothing to copy</string>
+    <string name="clipboard_copied_no_ttl">Copied "%1$s" (not auto-cleaned)</string>
+    <string name="clipboard_copied_ttl">Copied "%1$s" (auto-cleaned in %2$d s)</string>
+
+    <!-- App picker -->
+    <string name="media_select_app">Select app to associate</string>
+    <string name="media_search_app_name">Search app name or package</string>
+    <string name="media_no_match">No matching results</string>
+    <string name="media_no_app_list">Could not load the app list</string>
+    <string name="media_app_list_permission">The system may have denied the "Read app list" permission.\nEnable it in the app permission settings.</string>
+    <string name="media_open_settings">Open settings</string>
+
+    <!-- Trash -->
+    <string name="trash_deselect">Deselect</string>
+    <string name="trash_select_all">Select all</string>
+    <string name="trash_deselect_all">Clear selection</string>
+    <string name="trash_count">%1$d total</string>
+    <string name="trash_selected">%1$d selected</string>
+    <string name="trash_empty">Trash is empty</string>
+    <string name="trash_clear_all">Empty trash</string>
+    <string name="trash_clear_all_confirm">This permanently deletes all %1$d items and cannot be undone.</string>
+    <string name="trash_next">Next</string>
+    <string name="trash_confirm_again">Confirm again</string>
+    <string name="trash_final_confirm">Final confirmation: these %1$d items cannot be recovered.</string>
+    <string name="trash_purge_all">Permanently empty</string>
+    <string name="trash_purge_item">Permanently delete item</string>
+    <string name="trash_purge_item_confirm">This permanently deletes "%1$s" and cannot be undone.</string>
+    <string name="trash_untitled">(Untitled)</string>
+    <string name="trash_purge">Permanently delete</string>
+    <string name="trash_purge_selected">Permanently delete selected items</string>
+    <string name="trash_purge_selected_confirm">This permanently deletes the %1$d selected items and cannot be undone.</string>
+    <string name="trash_deleting_soon">Deleting soon</string>
+    <string name="trash_delete_in_hours">Auto-delete in %1$d h</string>
+    <string name="trash_delete_in_days">Auto-delete in %1$d d</string>
+</resources>

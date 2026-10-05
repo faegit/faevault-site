@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "suite": "PMV_NEXT_V1_SUITE_1",
+  "encoding": {
+    "binary": "lowercase hex",
+    "integers": "big-endian",
+    "wireU64SemanticRange": "0..2^63-1; booleans are not integers",
+    "uuid": "RFC 4122 canonical text and raw 16-byte network order",
+    "password": "caller-supplied raw UTF-8 bytes; no normalization or trimming",
+    "canonicalJson": "UTF-8; object keys sorted by unsigned UTF-8 bytes; arrays preserve order; decimals strip trailing zeros and never use exponent; negative zero is zero"
+  },
+  "artifacts": [
+    {
+      "file": "argon2id.json",
+      "caseIds": ["argon2id_unicode_raw_utf8", "argon2id_hardened_unicode_raw_utf8"]
+    },
+    {
+      "file": "hkdf.json",
+      "caseIds": ["hkdf_suite1_hierarchy"]
+    },
+    {
+      "file": "block_aead.json",
+      "caseIds": ["entry_generation_7_aes256_gcm"]
+    },
+    {
+      "file": "container.json",
+      "caseIds": ["superblock_sequence_42"]
+    },
+    {
+      "file": "commit_entry_index.json",
+      "caseIds": ["two_leaf_logical_entry_root"]
+    },
+    {
+      "file": "vault_header.json",
+      "caseIds": ["vault_header_password_recovery_fixed_layout"]
+    },
+    {
+      "file": "entry_codec.json",
+      "caseIds": ["entry_all_fields_unicode_nested_json"]
+    },
+    {
+      "file": "vault_metadata.json",
+      "caseIds": ["vault_metadata_unknown_extensions_unicode"]
+    },
+    {
+      "file": "login_fast_index.json",
+      "caseIds": ["two_record_login_leaf_and_range_root"]
+    },
+    {
+      "file": "media_ref.json",
+      "caseIds": ["media_ref_entry_fields_v1"]
+    },
+    {
+      "file": "legacy_media_migration.json",
+      "caseIds": [
+        "inline_zero",
+        "chunk_boundary_8mib",
+        "duplicate_verified_content",
+        "missing_external",
+        "tampered_external_ciphertext",
+        "second_object_eof",
+        "cancelled",
+        "candidate_object_hash_mismatch",
+        "installed_object_hash_mismatch"
+      ]
+    },
+    {
+      "file": "compression.json",
+      "caseIds": ["zstd_frame_v1_repeated_utf8"]
+    },
+    {
+      "file": "tombstone.json",
+      "caseIds": ["purged_entry_tombstone_v1"]
+    },
+    {
+      "file": "sync_authorization.json",
+      "caseIds": ["vault_signed_device_and_write_challenge_v1", "legacy_undefined_permission_bits_stay_readable_v1"]
+    },
+    {
+      "file": "store_interop.json",
+      "caseIds": [
+        "android_writer_store_seq1",
+        "pc_writer_store_seq1",
+        "pc_continues_android_store_seq2",
+        "android_continues_pc_store_seq2"
+      ]
+    },
+    {
+      "file": "cloud_credentials.json",
+      "caseIds": ["webdav_password_field_v1"]
+    }
+  ]
+}

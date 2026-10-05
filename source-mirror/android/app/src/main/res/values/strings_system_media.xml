@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="system_media_attachment_too_large">附件超过允许的容量</string>
+    <string name="system_media_attachment_read_failed">无法读取附件</string>
+    <string name="system_media_attachment_empty">附件是空文件</string>
+    <string name="system_media_publish_staging_failed">无法发布 PMVE 媒体暂存文件</string>
+    <string name="system_media_attachment_file_missing">附件文件不存在</string>
+    <string name="system_media_attachment_export_corrupt">附件导出校验失败，数据可能已损坏</string>
+    <string name="system_media_attachment_create_failed">无法创建文件</string>
+    <string name="system_media_image_file_missing">图片文件不存在</string>
+    <string name="system_media_image_too_large">图片大小超过允许上限</string>
+    <string name="system_media_image_read_failed">无法读取所选图片</string>
+    <string name="system_media_image_import_corrupt">图片导入校验失败，图片可能已损坏</string>
+    <string name="system_media_total_capacity_exceeded">图片和附件总容量不能超过 32 MB</string>
+    <string name="system_media_importing">正在导入</string>
+    <string name="system_media_import_exit_warning">完成前退出将丢失本次添加内容，不影响已保存数据</string>
+    <string name="system_media_vault_name_empty">vaultName 不能为空</string>
+    <string name="system_media_root_key_invalid">PMVE RootKey 必须为 32 字节</string>
+    <string name="system_media_staging_kind_invalid">PMVE staging kind 无效</string>
+    <string name="system_media_session_locked">PMVE 媒体会话未解锁</string>
+    <string name="system_media_staging_directory_failed">无法创建 PMVE 媒体暂存目录</string>
+    <string name="system_media_close">关闭</string>
+    <string name="system_media_image_decode_failed">图像解码失败：%1$s</string>
+    <string name="system_media_image_format_unsupported">超大图片或格式不受支持</string>
+    <string name="system_media_image_preview_decode_failed">预览图解码失败</string>
+    <string name="system_media_image_preview_failed">图像预览失败：%1$s</string>
+    <string name="system_media_viewer_cache_directory_failed">无法创建图片查看缓存目录</string>
+    <string name="system_media_viewer_cache_hide_failed">无法隐藏图片查看缓存</string>
+    <string name="system_media_image_data_empty">图片数据为空</string>
+</resources>

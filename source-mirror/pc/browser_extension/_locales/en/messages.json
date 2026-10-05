@@ -1,0 +1,8 @@
+{
+  "extensionName": {
+    "message": "Vault Autofill"
+  },
+  "extensionDescription": {
+    "message": "Securely fill and save website logins using your encrypted local vault."
+  }
+}

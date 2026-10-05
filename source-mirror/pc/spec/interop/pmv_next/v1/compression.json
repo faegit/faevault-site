@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "suite": "PMV_NEXT_V1_SUITE_1",
+  "encoding": {
+    "binary": "lowercase hex",
+    "text": "UTF-8",
+    "frame": "one standard Zstandard frame, level 3, content-size present, no dictionary, no checksum, no trailing or concatenated frame"
+  },
+  "cases": [
+    {
+      "id": "zstd_frame_v1_repeated_utf8",
+      "inputs": {
+        "unitUtf8": "PMV compression interop\n",
+        "repeat": 256,
+        "codecId": 1,
+        "level": 3
+      },
+      "expected": {
+        "plainSize": 6144,
+        "compressedHex": "28b52ffd600017050100c0504d5620636f6d7072657373696f6e20696e7465726f700a010094dff6730c"
+      },
+      "rejects": [
+        "unknown codec",
+        "wrong declared plain size",
+        "truncated frame",
+        "trailing byte",
+        "concatenated frame",
+        "dictionary frame",
+        "checksum frame",
+        "decompression beyond 16 MiB"
+      ]
+    }
+  ]
+}

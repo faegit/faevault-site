@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.FAEVault" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@drawable/window_background</item>
+        <!-- 状态栏 / 导航栏透明：edgeToEdge 后由 Compose 端着色，避开顶部灰条 -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
+
+    <style name="Theme.FAEVault.Autofill" parent="Theme.FAEVault">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:colorAccent">#1A7DC4</item>
+    </style>
+</resources>

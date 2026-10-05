@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "suite": "PMV_NEXT_V1_SUITE_1",
+  "encoding": "lowercase hex",
+  "cases": [
+    {
+      "id": "hkdf_suite1_hierarchy",
+      "hash": "SHA-256",
+      "outputBytes": 32,
+      "vaultRootKeyHex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "vaultId": "00112233-4455-6677-8899-aabbccddeeff",
+      "rootKeys": {
+        "metadata": "91e9678dc61a69e56df84504321b7374ca101f2d671354978b1e15e93d780811",
+        "entryRoot": "5b046cdf2a18a32cc74cb71fc912d31851ea60620f78f4abc178149ee5802df5",
+        "attachmentRoot": "ae9b2d5d9b4ab7708076bf71cfc4c5930b58980cf92ad05c516638552dc5f3d6",
+        "index": "2da90d73e3d5b7365ae681fd5a1975258d88b33de0061c243b352412566b666f",
+        "searchIndex": "7471d6ee93777286839ee2d63998eeb2a10c246fdb14b52c7436a7443016407b",
+        "integrity": "bb354160c4d594af1d90ed5ee37a691e9cff9d9db449fbb9ad93faaa856cdb18",
+        "syncAuth": "a7240f45eb5585d42e9ec4e3688e3725f3a6b76527bebe030266b07ee257bbe6",
+        "keyWrap": "527d10724a7234575b711fa0a4d1d01083d63dc2dfd0ab417738858151c6a927"
+      },
+      "entryGeneration": {
+        "entryId": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "generation": 7,
+        "infoHex": "706d762f76312f656e7472792d67656e65726174696f6e000000000000000007",
+        "expectedKeyHex": "83f426974a2509bb3ef0d5171c47f39ffd66408be4023ad2fbdfb07962a6bc93"
+      },
+      "attachmentGeneration": {
+        "attachmentId": "fedcba98-7654-3210-fedc-ba9876543210",
+        "generation": 9,
+        "infoHex": "706d762f76312f6174746163686d656e742d67656e65726174696f6e000000000000000009",
+        "expectedKeyHex": "ac3055cf7dc4c14260ab2857de9689e6a2102646df3c045b301f50ac7204784e"
+      },
+      "chunk": {
+        "chunkIndex": 3,
+        "saltHex": "0000000000000000000000000000000000000000000000000000000000000000",
+        "infoHex": "706d762f76312f6368756e6b000000000000000003",
+        "expectedKeyHex": "a93095b973b156efc4e1e27c8c653e8f36ce274488547f1caa4683d0662c29e5"
+      },
+      "commitBlock": {
+        "parentKey": "integrity",
+        "commitId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "revision": 12,
+        "saltHex": "aaaaaaaabbbbccccddddeeeeeeeeeeee",
+        "infoHex": "706d762f76312f636f6d6d69742d626c6f636b2d6b657900000000000000000c",
+        "expectedKeyHex": "ef0fc3491503beb793fc4ac704c2abc7d523e877aab181707bfd063f787445bf"
+      },
+      "metadataBlock": {
+        "parentKey": "metadata",
+        "objectId": "00112233-4455-6677-8899-aabbccddeeff",
+        "generation": 12,
+        "saltHex": "00112233445566778899aabbccddeeff",
+        "infoHex": "706d762f76312f6d657461646174612d626c6f636b2d6b657900000000000000000c",
+        "expectedKeyHex": "12cf73fe605ee12d7b3bcf7c0a5a04c1daba3b9ba813267e80170759b9fd355f"
+      },
+      "indexPages": {
+        "parentKey": "index",
+        "objectId": "11223344-5566-7788-99aa-bbccddeeff00",
+        "generation": 11,
+        "saltHex": "112233445566778899aabbccddeeff00",
+        "cases": [
+          {
+            "pageType": "ENTRY_INDEX",
+            "domainAscii": "entry-index",
+            "infoHex": "706d762f76312f696e6465782d706167652d6b657900656e7472792d696e64657800000000000000000b",
+            "expectedKeyHex": "c96fffa076cc1d6f6200b68ec3a20abe1c2daf1a3820decaa1936ceb9eaed751"
+          },
+          {
+            "pageType": "VAULT_ROOT",
+            "domainAscii": "vault-root",
+            "infoHex": "706d762f76312f696e6465782d706167652d6b6579007661756c742d726f6f7400000000000000000b",
+            "expectedKeyHex": "cc374c498703c7cb5838bb1a4c2ee0e712287476703f678e178d4dcdb43be9bc"
+          },
+          {
+            "pageType": "LOGIN_INDEX",
+            "domainAscii": "login-index",
+            "infoHex": "706d762f76312f696e6465782d706167652d6b6579006c6f67696e2d696e64657800000000000000000b",
+            "expectedKeyHex": "6c3bffc1fd974052aa025c584e225ca7925f41e567e010a26e138b1395a89cc2"
+          },
+          {
+            "pageType": "OBJECT_INDEX",
+            "domainAscii": "object-index",
+            "infoHex": "706d762f76312f696e6465782d706167652d6b6579006f626a6563742d696e64657800000000000000000b",
+            "expectedKeyHex": "12bf54f71222df1112bffe62d1799f1efb11dccdac8a21a38eadd6d83ae86249"
+          },
+          {
+            "pageType": "CHUNK_INDEX",
+            "domainAscii": "chunk-index",
+            "infoHex": "706d762f76312f696e6465782d706167652d6b6579006368756e6b2d696e64657800000000000000000b",
+            "expectedKeyHex": "2b8b79318944dcd7bce271b8b8878daf80e56c217f63e466dcefd91711f9adec"
+          }
+        ]
+      }
+    }
+  ]
+}

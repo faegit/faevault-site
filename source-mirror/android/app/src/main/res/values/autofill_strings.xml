@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="autofill_service_label">保险库自动填充</string>
+    <string name="autofill_unlock">解锁保险库以填充</string>
+</resources>

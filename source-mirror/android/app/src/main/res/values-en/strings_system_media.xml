@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="system_media_attachment_too_large">Attachment exceeds the allowed size</string>
+    <string name="system_media_attachment_read_failed">Unable to read attachment</string>
+    <string name="system_media_attachment_empty">Attachment is empty</string>
+    <string name="system_media_publish_staging_failed">Unable to publish PMVE media staging file</string>
+    <string name="system_media_attachment_file_missing">Attachment file does not exist</string>
+    <string name="system_media_attachment_export_corrupt">Attachment export verification failed; the data may be corrupted</string>
+    <string name="system_media_attachment_create_failed">Unable to create file</string>
+    <string name="system_media_image_file_missing">Image file does not exist</string>
+    <string name="system_media_image_too_large">Image exceeds the allowed size</string>
+    <string name="system_media_image_read_failed">Unable to read the selected image</string>
+    <string name="system_media_image_import_corrupt">Image import verification failed; the image may be corrupted</string>
+    <string name="system_media_total_capacity_exceeded">Images and attachments cannot exceed 32 MB in total</string>
+    <string name="system_media_importing">Importing</string>
+    <string name="system_media_import_exit_warning">Leaving before completion will lose this addition; saved data is unaffected</string>
+    <string name="system_media_vault_name_empty">vaultName cannot be empty</string>
+    <string name="system_media_root_key_invalid">PMVE RootKey must be 32 bytes</string>
+    <string name="system_media_staging_kind_invalid">Invalid PMVE staging kind</string>
+    <string name="system_media_session_locked">PMVE media session is locked</string>
+    <string name="system_media_staging_directory_failed">Unable to create PMVE media staging directory</string>
+    <string name="system_media_close">Close</string>
+    <string name="system_media_image_decode_failed">Image decoding failed: %1$s</string>
+    <string name="system_media_image_format_unsupported">The image is too large or its format is unsupported</string>
+    <string name="system_media_image_preview_decode_failed">Preview image decoding failed</string>
+    <string name="system_media_image_preview_failed">Image preview failed: %1$s</string>
+    <string name="system_media_viewer_cache_directory_failed">Unable to create image viewer cache directory</string>
+    <string name="system_media_viewer_cache_hide_failed">Unable to hide image viewer cache</string>
+    <string name="system_media_image_data_empty">Image data is empty</string>
+</resources>

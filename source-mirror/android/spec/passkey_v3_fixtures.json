@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 3,
+  "testOnly": true,
+  "warning": "TEST VECTORS ONLY - NEVER USE THESE KEYS OR ENVELOPES IN PRODUCTION",
+  "records": [
+    {
+      "name": "syncable_directly_available_after_database_sync",
+      "availabilityAfterSync": "available",
+      "record": {
+        "schema_version": "3",
+        "rp_id": "example.com",
+        "rp_name": "Example",
+        "user_id": "dXNlci0x",
+        "user_name": "alice@example.com",
+        "user_display_name": "Alice",
+        "credential_id": "YW5kcm9pZC1jcmVkZW50aWFsLWlk",
+        "key_mode": "syncable",
+        "private_key": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGhRANCAARrF9Hy4SxCR_i85uVjpEDydwN9gS3rM6D0oTlF2JjClk_jQuL-Gn-bjufrSnwPnhYrzjNXazFezsu2QGg3v1H1",
+        "public_key": "pQECAyYgASFYIGsX0fLhLEJH-Lzm5WOkQPJ3A32BLeszoPShOUXYmMKWIlggT-NC4v4af5uO5-tKfA-eFivOM1drMV7Oy7ZAaDe_UfU",
+        "algorithm": "-7",
+        "transports": "internal",
+        "aaguid": "9a2289d0-7b7b-4c5d-8d77-5f7a0643cc82",
+        "discoverable": "true",
+        "backup_eligible": "true",
+        "backup_state": "false",
+        "counter_mode": "synced_zero",
+        "sign_count": "0",
+        "created_at": "2026-08-20T00:00:00Z",
+        "last_used_at": "",
+        "future_record_field": {
+          "revision": 1
+        }
+      }
+    },
+    {
+      "name": "device_bound_metadata_only",
+      "availabilityOnOtherDevice": "other_device",
+      "record": {
+        "schema_version": "3",
+        "rp_id": "example.com",
+        "rp_name": "Example",
+        "user_id": "dXNlci0y",
+        "user_name": "bob@example.com",
+        "user_display_name": "Bob",
+        "credential_id": "ZGV2aWNlLWJvdW5kLWNyZWRlbnRpYWw",
+        "key_mode": "device_bound",
+        "device_binding": {
+          "provider": "android_keystore",
+          "device_id": "e68e16cc-d6a0-4b20-bfb5-9c131f891b6d",
+          "binding_id": "Kk3a5wP6xG9mR2uQv8sT0A",
+          "key_generation": "1"
+        },
+        "public_key": "pQECAyYgASFYIGsX0fLhLEJH-Lzm5WOkQPJ3A32BLeszoPShOUXYmMKWIlggT-NC4v4af5uO5-tKfA-eFivOM1drMV7Oy7ZAaDe_UfU",
+        "algorithm": "-7",
+        "transports": "internal",
+        "aaguid": "9a2289d0-7b7b-4c5d-8d77-5f7a0643cc82",
+        "discoverable": "true",
+        "backup_eligible": "false",
+        "backup_state": "false",
+        "counter_mode": "synced_zero",
+        "sign_count": "0",
+        "created_at": "2026-08-20T00:00:00Z",
+        "last_used_at": ""
+      }
+    }
+  ],
+  "invalid": [
+    {
+      "name": "syncable_with_device_binding",
+      "reason": "dual_private_key_carriers"
+    },
+    {
+      "name": "envelope_keyset_mismatch",
+      "reason": "aad_identity_mismatch"
+    }
+  ],
+  "legacyV2": {
+    "schemaVersion": 2,
+    "valid": [
+      {
+        "name": "synced_zero_with_future_field",
+        "record": {
+          "schema_version": "2",
+          "rp_id": "example.com",
+          "rp_name": "Example",
+          "user_id": "dXNlci0x",
+          "user_name": "alice@example.com",
+          "user_display_name": "Alice",
+          "credential_id": "YW5kcm9pZC1jcmVkZW50aWFsLWlk",
+          "private_key": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGhRANCAARrF9Hy4SxCR_i85uVjpEDydwN9gS3rM6D0oTlF2JjClk_jQuL-Gn-bjufrSnwPnhYrzjNXazFezsu2QGg3v1H1",
+          "public_key": "pQECAyYgASFYIGsX0fLhLEJH-Lzm5WOkQPJ3A32BLeszoPShOUXYmMKWIlggT-NC4v4af5uO5-tKfA-eFivOM1drMV7Oy7ZAaDe_UfU",
+          "algorithm": "-7",
+          "transports": "internal",
+          "aaguid": "9a2289d0-7b7b-4c5d-8d77-5f7a0643cc82",
+          "discoverable": "true",
+          "backup_eligible": "true",
+          "backup_state": "true",
+          "counter_mode": "synced_zero",
+          "sign_count": "0",
+          "created_at": "2026-07-16T00:00:00Z",
+          "last_used_at": "",
+          "future_field": {
+            "revision": 7
+          }
+        }
+      }
+    ],
+    "mergeCases": [
+      {
+        "name": "same_key_synced_zero_stays_zero",
+        "expected": {
+          "sign_count": "0",
+          "counter_mode": "synced_zero"
+        }
+      },
+      {
+        "name": "same_credential_different_key_is_conflict",
+        "expected": {
+          "conflict": "key_mismatch",
+          "moduleCount": 2
+        }
+      }
+    ],
+    "invalid": [
+      {
+        "name": "synced_zero_nonzero_count",
+        "override": {
+          "sign_count": "1"
+        }
+      },
+      {
+        "name": "public_private_key_mismatch",
+        "replacePublicKey": true
+      }
+    ]
+  }
+}

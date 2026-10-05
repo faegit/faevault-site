@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {"id": "inline_zero", "size": 0, "encoding": "data-uri-base64"},
+    {"id": "chunk_boundary_8mib", "size": 8388608, "pattern": "index-mod-251"},
+    {"id": "duplicate_verified_content", "deduplicateBy": ["kind", "size", "sha256"]},
+    {"id": "missing_external", "outcome": "fail-closed"},
+    {"id": "tampered_external_ciphertext", "outcome": "fail-closed"},
+    {"id": "second_object_eof", "outcome": "rollback"},
+    {"id": "cancelled", "outcome": "rollback"},
+    {"id": "candidate_object_hash_mismatch", "outcome": "rollback"},
+    {"id": "installed_object_hash_mismatch", "outcome": "restore-backup"}
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "suite": "PMV_NEXT_V1_SUITE_1",
+  "cases": [
+    {
+      "id": "two_record_login_leaf_and_range_root",
+      "records": [
+        {
+          "entryId": "00000000-0000-0000-0000-000000000001",
+          "entryType": "LOGIN",
+          "state": "ACTIVE",
+          "lookupKind": "DOMAIN",
+          "lookupTokenHex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
+        },
+        {
+          "entryId": "00000000-0000-0000-0000-000000000002",
+          "entryType": "PASSKEY",
+          "state": "TOMBSTONE",
+          "lookupKind": "DOMAIN",
+          "lookupTokenHex": "202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f"
+        }
+      ],
+      "leaf": {
+        "expectedLogicalDigestHex": "86c17ae7d7fe06dc859174add3d7ac99b7b77e55b1877b4a94188e45ef924edd",
+        "expectedEncodedSha256Hex": "0d8a8a4b835a3c0de5189bfe274033b409e4fc58396e239e4cf8a86e46eead2e"
+      },
+      "root": {
+        "pageOffset": 20000,
+        "pageLength": 16528,
+        "expectedLogicalDigestHex": "662560ac7874bd1c1247c0326c930b6827d3aed5a84d485f8909a1c1e694cbc5",
+        "expectedEncodedSha256Hex": "f9f4ef46e23d31c4594e276e674a0154462ad7075d1549c3912360e168b8420a"
+      }
+    }
+  ]
+}

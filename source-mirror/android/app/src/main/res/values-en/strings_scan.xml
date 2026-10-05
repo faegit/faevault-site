@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Camera scan: viewfinder -->
+    <string name="scan_camera_start_failed">Camera start failed: %1$s</string>
+    <string name="scan_doc_detected_shot">Document detected — tap the shutter button</string>
+    <string name="scan_doc_place_in_frame">Place the document in view; it will be framed automatically</string>
+    <string name="scan_torch">Flashlight</string>
+    <string name="scan_torch_off">Turn off flashlight</string>
+    <string name="scan_torch_on">Turn on flashlight</string>
+    <string name="scan_capture_failed">Capture failed: %1$s</string>
+    <string name="scan_shoot">Capture</string>
+    <string name="scan_picking">Selecting…</string>
+    <string name="scan_pick_from_gallery">Choose QR code from gallery</string>
+
+    <!-- Camera scan: review / crop -->
+    <string name="scan_retake">Retake</string>
+    <string name="scan_drag_corners">Drag the corners to adjust the crop</string>
+    <string name="scan_no_crop_result">Could not return a crop result</string>
+    <string name="scan_crop_save_failed">Failed to save the crop</string>
+
+    <!-- QR recognition hints -->
+    <string name="scan_qr_no_wifi">No valid Wi-Fi QR code found in the image</string>
+    <string name="scan_qr_no_otp">No valid OTP QR code found in the image</string>
+    <string name="scan_qr_no_valid">No usable QR code was recognized in the image</string>
+    <string name="scan_detected_jumping">Recognized, opening…</string>
+    <string name="scan_multiple_qr">Multiple valid QR codes in frame; keep only one</string>
+    <string name="scan_not_lan_import">This is not a LAN import QR code. Generate a dedicated code from the other device\'s LAN Import → Send and try again</string>
+    <string name="scan_not_valid_sync">Recognized but not a valid sync QR code</string>
+    <string name="scan_aim_qr">Place the target QR code alone inside the frame</string>
+</resources>

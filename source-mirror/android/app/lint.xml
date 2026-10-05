@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- 方案2（资源化迁移）的强制机制：默认语言的文案必须提供英文翻译。 -->
+    <issue id="MissingTranslation" severity="error" />
+</lint>

@@ -1,0 +1,44 @@
+[project]
+name = "vault-pc"
+version = "4.6.6"
+description = "浅色/深色现代风格的桌面保险库：手动录入、浏览器导入、加密备份"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "cryptography>=48.0.1",
+    "rapidocr-onnxruntime>=1.4.4",
+    "pyside6>=6.11.1",
+    "qrcode>=8.0",
+    "pywin32>=311",
+    "requests>=2.32.0",
+    "requests-negotiate-sspi>=0.5.2; sys_platform == 'win32'",
+    "winrt-runtime>=2.0",
+    "winrt-windows-foundation>=2.0",
+    "winrt-windows-graphics-imaging>=2.0",
+    "winrt-windows-media-ocr>=2.0",
+    "winrt-windows-storage-streams>=2.0",
+    "winrt-windows-security-credentials-ui>=3.2.1",
+    "winrt-windows-devices-geolocation>=3.2.1",
+    "zxing-cpp>=2.3.0",
+    "uiautomation>=2.0.29",
+    "pycryptodome>=3.23.0",
+    "markdown>=3.6",
+    "zstandard==0.25.0",
+    "pyzipper>=0.4.0",
+    "pypinyin>=0.53.0",
+    "pillow>=12.2.0",
+    "zxcvbn==4.5.0",
+]
+
+[tool.uv]
+package = false
+
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.21.0",
+    "pytest>=9.0.3",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

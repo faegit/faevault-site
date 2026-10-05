@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 相机扫描：取景 -->
+    <string name="scan_camera_start_failed">相机启动失败：%1$s</string>
+    <string name="scan_doc_detected_shot">已检测到文档，按下方按钮拍摄</string>
+    <string name="scan_doc_place_in_frame">把文档放进画面，会自动框选</string>
+    <string name="scan_torch">闪光灯</string>
+    <string name="scan_torch_off">关闭闪光灯</string>
+    <string name="scan_torch_on">打开闪光灯</string>
+    <string name="scan_capture_failed">拍照失败：%1$s</string>
+    <string name="scan_shoot">拍摄</string>
+    <string name="scan_picking">正在选择…</string>
+    <string name="scan_pick_from_gallery">从相册选择二维码</string>
+
+    <!-- 相机扫描：复核/裁剪 -->
+    <string name="scan_retake">重拍</string>
+    <string name="scan_drag_corners">拖动四角调整裁剪范围</string>
+    <string name="scan_no_crop_result">无法返回裁剪结果</string>
+    <string name="scan_crop_save_failed">裁剪保存失败</string>
+
+    <!-- 二维码识别提示 -->
+    <string name="scan_qr_no_wifi">图片中没有有效的 Wi-Fi 二维码</string>
+    <string name="scan_qr_no_otp">图片中没有有效的 OTP 二维码</string>
+    <string name="scan_qr_no_valid">图片中没有识别到可用的二维码</string>
+    <string name="scan_detected_jumping">已识别，正在跳转…</string>
+    <string name="scan_multiple_qr">框内有多个有效二维码，请只保留一个</string>
+    <string name="scan_not_lan_import">这不是局域网导入二维码。请在对方设备使用「局域网导入 → 发送」生成专用二维码后再扫描</string>
+    <string name="scan_not_valid_sync">已识别但不是有效的同步二维码</string>
+    <string name="scan_aim_qr">将目标二维码单独置于框内</string>
+</resources>

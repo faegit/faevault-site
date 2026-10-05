@@ -1,0 +1,8 @@
+{
+  "extensionName": {
+    "message": "保险库自动填充"
+  },
+  "extensionDescription": {
+    "message": "使用本机加密保险库安全填充和保存网页登录凭据。"
+  }
+}

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="general_remaining_hide">隐藏</string>
+    <string name="general_remaining_show">显示</string>
+    <string name="general_remaining_back">返回</string>
+    <string name="general_remaining_rename_tag">重命名标签</string>
+    <string name="general_remaining_move_to_tag">移入标签</string>
+    <string name="general_remaining_add_tag">添加标签</string>
+    <string name="general_remaining_replace_tags_for_selected">将已选 %1$d 条的所有标签替换为指定标签。</string>
+    <string name="general_remaining_add_tag_for_selected">为已选 %1$d 条附加标签。</string>
+    <string name="general_remaining_untitled_entry">无标题</string>
+    <string name="general_remaining_expiry_date">到期 %1$s</string>
+    <string name="general_remaining_empty_add_hint">尚无条目，点击右下角新增</string>
+    <string name="general_remaining_empty_category">该类别下暂无条目</string>
+    <string name="general_remaining_empty_search">无匹配条目</string>
+    <string name="general_remaining_select_all">全选</string>
+    <string name="general_remaining_deselect_all">取消全选</string>
+    <string name="general_remaining_cancel_selection">取消选择</string>
+    <string name="general_remaining_cancel">取消</string>
+    <string name="general_remaining_move_to_trash_confirm">确定将“%1$s”移入回收站吗？</string>
+</resources>

@@ -1,0 +1,261 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "name": "empty_custom",
+      "secret_type": "custom",
+      "modules": []
+    },
+    {
+      "name": "secure_note_sensitive",
+      "secret_type": "secure_note",
+      "modules": [
+        {
+          "id": "note001",
+          "type": "multiline",
+          "title": "恢复资料",
+          "sensitive": true,
+          "required": true,
+          "config": {},
+          "value": "private recovery text",
+          "future": "preserve"
+        }
+      ]
+    },
+    {
+      "name": "server_mixed",
+      "secret_type": "server",
+      "modules": [
+        {
+          "id": "server001",
+          "type": "server_connection",
+          "title": "生产服务器",
+          "sensitive": false,
+          "required": true,
+          "config": {"sensitiveFields": ["username"], "futureConfig": 7},
+          "value": {"host": "prod.internal", "port": "22", "username": "root", "password": "secret"}
+        },
+        {
+          "id": "server001",
+          "type": "future_module",
+          "title": "未来模块",
+          "sensitive": false,
+          "required": false,
+          "config": {"future": true},
+          "value": {"opaque": "keep"}
+        }
+      ]
+    },
+    {
+      "name": "mandatory_sensitive_false",
+      "secret_type": "custom",
+      "modules": [
+        {
+          "id": "password001",
+          "type": "password",
+          "title": "密码",
+          "sensitive": false,
+          "required": false,
+          "config": {},
+          "value": "must-stay-hidden"
+        }
+      ]
+    },
+    {
+      "name": "otp_with_domains",
+      "secret_type": "login",
+      "modules": [
+        {
+          "id": "otp001",
+          "type": "otp",
+          "title": "动态码",
+          "sensitive": false,
+          "required": false,
+          "config": {},
+          "value": {
+            "counter": "0",
+            "digits": "6",
+            "issuer": "GitHub",
+            "label": "alice@example.com",
+            "otp_domains": "github.com,www.github.com",
+            "period": "30",
+            "secret": "JBSWY3DPEHPK3PXP",
+            "type": "totp"
+          }
+        }
+      ]
+    },
+    {
+      "name": "typed_boolean_datetime",
+      "secret_type": "custom",
+      "modules": [
+        {
+          "id": "boolean001",
+          "type": "boolean",
+          "title": "已验证",
+          "sensitive": false,
+          "required": false,
+          "config": {},
+          "value": true
+        },
+        {
+          "id": "datetime001",
+          "type": "datetime",
+          "title": "提醒时间",
+          "sensitive": false,
+          "required": false,
+          "config": {"mode": "datetime"},
+          "value": "2026-08-20T21:30"
+        }
+      ]
+    },
+    {
+      "name": "card_subtypes_preserve_unknown",
+      "secret_type": "credit_card",
+      "modules": [
+        {
+          "id": "card001",
+          "type": "card_document",
+          "title": "卡证",
+          "sensitive": false,
+          "required": false,
+          "config": {},
+          "value": {
+            "card_type": "membership_card",
+            "member_name": "城市会员",
+            "member_number": "M-100",
+            "future_field": "preserve",
+            "images": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "legacy_card_types_map_to_card_document",
+      "secret_type": "credit_card",
+      "modules": [
+        {
+          "id": "legacy001",
+          "type": "bank_card",
+          "title": "卡类",
+          "sensitive": false,
+          "required": false,
+          "config": {},
+          "value": {
+            "card_type": "bank_card",
+            "cardholder": "张三",
+            "card_number": "1234",
+            "images": []
+          }
+        },
+        {
+          "id": "legacy002",
+          "type": "identity_document",
+          "title": "证件",
+          "sensitive": false,
+          "required": false,
+          "config": {},
+          "value": {
+            "id_type": "身份证",
+            "full_name": "李四",
+            "id_number": "110101199001011234",
+            "images": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "autofill_contact_text_variants",
+      "secret_type": "custom",
+      "modules": [
+        {
+          "id": "email001",
+          "type": "text",
+          "title": "邮箱",
+          "sensitive": false,
+          "required": false,
+          "config": {"autofill_role": "email"},
+          "value": "person@example.com"
+        },
+        {
+          "id": "phone001",
+          "type": "text",
+          "title": "电话",
+          "sensitive": false,
+          "required": false,
+          "config": {"autofill_role": "phone"},
+          "value": "+1-555-0100"
+        },
+        {
+          "id": "postal001",
+          "type": "text",
+          "title": "邮编",
+          "sensitive": false,
+          "required": false,
+          "config": {"autofill_role": "postal_code"},
+          "value": "100000"
+        }
+      ]
+    },
+    {
+      "name": "custom_text_email_role",
+      "secret_type": "custom",
+      "modules": [
+        {
+          "id": "textemail001",
+          "type": "text",
+          "title": "备用邮箱",
+          "sensitive": false,
+          "required": false,
+          "config": {"autofill_role": "email"},
+          "value": "backup@example.com"
+        }
+      ]
+    },
+    {
+      "name": "custom_text_exact_name",
+      "secret_type": "custom",
+      "modules": [
+        {
+          "id": "textexact001",
+          "type": "text",
+          "title": "employee_code",
+          "sensitive": false,
+          "required": false,
+          "config": {},
+          "value": "EMP-100"
+        }
+      ]
+    },
+    {
+      "name": "custom_password_secret_role",
+      "secret_type": "custom",
+      "modules": [
+        {
+          "id": "passwordsecret001",
+          "type": "password",
+          "title": "应用密文",
+          "sensitive": true,
+          "required": false,
+          "config": {"autofill_role": "custom_secret"},
+          "value": "VALUE_REDACTED"
+        }
+      ]
+    },
+    {
+      "name": "custom_text_unknown_role",
+      "secret_type": "custom",
+      "modules": [
+        {
+          "id": "textunknown001",
+          "type": "text",
+          "title": "未来字段",
+          "sensitive": false,
+          "required": false,
+          "config": {"autofill_role": "future_role", "future_config": "keep"},
+          "value": "opaque"
+        }
+      ]
+    }
+  ]
+}

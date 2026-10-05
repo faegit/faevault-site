@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "suite": "PMV_NEXT_V1_SUITE_1",
+  "encoding": "lowercase hex",
+  "cases": [
+    {
+      "id": "entry_generation_7_aes256_gcm",
+      "vaultId": "00112233-4455-6677-8899-aabbccddeeff",
+      "keyHex": "83f426974a2509bb3ef0d5171c47f39ffd66408be4023ad2fbdfb07962a6bc93",
+      "header": {
+        "blockId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "blockType": "ENTRY",
+        "objectId": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "objectRevision": 7,
+        "chunkIndex": -1,
+        "flags": 5,
+        "cryptoSuiteId": 1,
+        "codecId": 0,
+        "plainSize": 30,
+        "cipherSize": 46,
+        "nonceHex": "101112131415161718191a1b"
+      },
+      "plaintextHex": "504d56206e6578742073686172656420626c6f636b20766563746f7200ff",
+      "expectedHeaderHex": "504d56420000000100000080aaaaaaaabbbbccccddddeeeeeeeeeeee00000001102132435465768798a9bacbdcedfe0f0000000000000007ffffffff000000050000000100000000000000000000001e000000000000002e101112131415161718191a1b00000000000000000000000000000000000000000000000000000000",
+      "expectedAadHex": "504d5620426c6f636b204141442076310000112233445566778899aabbccddeeff504d56420000000100000080aaaaaaaabbbbccccddddeeeeeeeeeeee00000001102132435465768798a9bacbdcedfe0f0000000000000007ffffffff000000050000000100000000000000000000001e000000000000002e101112131415161718191a1b00000000000000000000000000000000000000000000000000000000",
+      "expectedCiphertextHex": "f61c066f438a3bdf59081a4208733a3d6846103954b2e28d25db4e1375df28b2cbdb5ea92afbc79e81df2e31ea87"
+    }
+  ]
+}

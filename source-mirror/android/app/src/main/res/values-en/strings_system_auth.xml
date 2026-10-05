@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="system_auth_attempts_cooldown">Too many attempts. Try again later.</string>
+    <string name="system_auth_attempts_cooling">Too many attempts. Cooldown started.</string>
+    <string name="system_auth_wrong_password_remaining">Incorrect master password. %1$d attempts remaining.</string>
+    <string name="system_auth_vault_missing_deleted">Vault does not exist or was deleted.</string>
+    <string name="system_auth_vault_missing">Vault does not exist.</string>
+    <string name="system_auth_biometric_invalidated">Biometric binding is invalid. Use the master password.</string>
+    <string name="system_auth_biometric_unavailable">Biometrics unavailable. Use the master password.</string>
+    <string name="system_auth_biometric_unlock_failed">Biometric unlock failed. Use the master password.</string>
+    <string name="system_auth_request_failed">Request failed.</string>
+    <string name="system_auth_request_invalid">The request is invalid, expired, or unauthorized.</string>
+    <string name="system_auth_entry_changed_retry">Login entry changed. Try again.</string>
+    <string name="system_auth_vault_data_invalid">Vault data is invalid.</string>
+    <string name="system_auth_save_failed_detail">Save failed: %1$s</string>
+    <string name="system_auth_passkey_exists">Passkey already exists.</string>
+    <string name="system_auth_passkey_invalid">Passkey data is invalid.</string>
+    <string name="system_auth_passkey_not_found">No passkey in this vault can be used for this site.</string>
+    <string name="system_auth_generic_error">Operation failed. Try again.</string>
+    <string name="system_auth_vault_open_failed">Unable to open the vault. Try again.</string>
+    <string name="system_auth_device_binding_mismatch">Device unlock information is invalid. Use the master password.</string>
+    <string name="system_auth_mutation_baseline_missing">Vault state changed. Try again.</string>
+    <string name="system_auth_session_key_invalid">Session expired. Unlock again.</string>
+    <string name="system_auth_save_failed_generic">Save failed. Try again.</string>
+    <string name="system_auth_save_policy_origin_unknown">Unable to verify the login page source.</string>
+    <string name="system_auth_save_policy_password_mismatch">The passwords do not match.</string>
+    <string name="system_auth_save_policy_password_empty">Password is empty.</string>
+    <string name="system_auth_save_success">Login entry saved.</string>
+    <string name="system_auth_save_retry">Save failed. Try again.</string>
+    <string name="system_auth_credential_changed_retry">Credential state changed. Try again.</string>
+    <string name="system_auth_update_success">Login entry updated.</string>
+    <string name="system_auth_update_retry">Update failed. Try again.</string>
+    <string name="system_auth_entry_changed">Entry changed. Try again.</string>
+    <string name="system_auth_unchanged">Credential unchanged; nothing to save.</string>
+    <string name="system_auth_use_vault">Use vault</string>
+    <string name="system_auth_no_vault">No vault has been created.</string>
+    <string name="system_auth_choose_vault">Choose a vault</string>
+    <string name="system_auth_master_password">Master password</string>
+    <string name="system_auth_switch">Switch</string>
+    <string name="system_auth_unlock">Unlock</string>
+    <string name="system_auth_biometric">Biometrics</string>
+    <string name="system_auth_cancel">Cancel</string>
+</resources>

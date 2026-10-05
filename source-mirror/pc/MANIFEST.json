@@ -1,0 +1,1955 @@
+{
+  "schema": 1,
+  "snapshot_date": "2026-10-05",
+  "license": "Apache-2.0",
+  "platform": "pc",
+  "version": "4.6.6",
+  "source_commit": "689e6b3e5a2305c3a57ce082b9b46644cbe75461",
+  "working_tree_snapshot": true,
+  "files": [
+    {
+      "path": ".python-version",
+      "bytes": 6,
+      "sha256": "8dfda54ba2f66ab3a8ebab460f4338bbeea1fb1e0f85ce06fe3530aa3c64679b",
+      "kind": "source"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "kind": "publication-notice"
+    },
+    {
+      "path": "NOTICE",
+      "bytes": 619,
+      "sha256": "9069e6c5c03cae0222c9e018c7a351b1049ad221135d0517019edae92c760446",
+      "kind": "publication-notice"
+    },
+    {
+      "path": "OPEN_SOURCE_REVIEW.md",
+      "bytes": 3167,
+      "sha256": "9d09304716a27f638738f6f4296f2b8cee16593c641da1110e8ef2b83001ebbf",
+      "kind": "publication-notice"
+    },
+    {
+      "path": "README.md",
+      "bytes": 1062,
+      "sha256": "46ed991ea8fbc3c47766a8eb4161ef6387f931659b6e3b58bbd070090ab5a4d4",
+      "kind": "publication-notice"
+    },
+    {
+      "path": "__main__.py",
+      "bytes": 2716,
+      "sha256": "f1a23cef68a4619822a9d5eef13e0b66c2efbf642adf2da39738ced5009b8c5b",
+      "kind": "source"
+    },
+    {
+      "path": "browser_extension/_locales/en/messages.json",
+      "bytes": 183,
+      "sha256": "d42b07b266b451cf7bf293deec7df30644da945654718fa56735231fe0c44797",
+      "kind": "source"
+    },
+    {
+      "path": "browser_extension/_locales/zh_CN/messages.json",
+      "bytes": 188,
+      "sha256": "59f5998cea7b57863e7c6319b53ecc4001c97c750262a95a34a10c5f56c062d7",
+      "kind": "source"
+    },
+    {
+      "path": "browser_extension/background.js",
+      "bytes": 4082,
+      "sha256": "7f4c7874419f6f724b6e176bf52b5a0dc15eca3232f468d2e45a01f99b359272",
+      "kind": "source"
+    },
+    {
+      "path": "browser_extension/content.js",
+      "bytes": 14443,
+      "sha256": "c066f40b1e64d682526c493070708757a5167d15f51e282920ab189223134dfe",
+      "kind": "source"
+    },
+    {
+      "path": "browser_extension/content_logic.js",
+      "bytes": 3983,
+      "sha256": "6a5dfa62b84b0663aa0c3175dff5579eee6912933725ff10fbe3ba255d4606be",
+      "kind": "source"
+    },
+    {
+      "path": "browser_extension/i18n.js",
+      "bytes": 3795,
+      "sha256": "31802334f7e5af0c5eb167db4155906a475f7ae90093adfe97ab7d62355d5fb6",
+      "kind": "source"
+    },
+    {
+      "path": "browser_extension/manifest.firefox.json",
+      "bytes": 1312,
+      "sha256": "ccf94afb8866bb4c519440f7f7cde0bd82bc67c52b8093d0850800747e0221f9",
+      "kind": "source"
+    },
+    {
+      "path": "browser_extension/manifest.json",
+      "bytes": 1557,
+      "sha256": "c92b2f98e7b34e90a6741bef62a1e34eb23e5d8f3ca3bbf2b889af96320bdc4f",
+      "kind": "source"
+    },
+    {
+      "path": "browser_extension/popup.css",
+      "bytes": 1754,
+      "sha256": "22370e204f2388c8e2e6cce7e2c67e02aa3c061ce46e3ede8626be2d3616ea2f",
+      "kind": "source"
+    },
+    {
+      "path": "browser_extension/popup.html",
+      "bytes": 1177,
+      "sha256": "7fff049c05c4f4ee61339e67fa0d7455c339ba5958e5449b5c738167eb9ff3fc",
+      "kind": "source"
+    },
+    {
+      "path": "browser_extension/popup.js",
+      "bytes": 3520,
+      "sha256": "737a4a58f42ee0d9e1b09a119f79034c2115c77ec8955c261fe31983477e9bff",
+      "kind": "source"
+    },
+    {
+      "path": "browser_extension/protocol.js",
+      "bytes": 1736,
+      "sha256": "38cac4995f3c7082e686b9ace809a6a014d734a584489759050149cb1db1cf25",
+      "kind": "source"
+    },
+    {
+      "path": "browser_host.py",
+      "bytes": 10418,
+      "sha256": "872cedd938fa29768431f05d3492bba0d97e55376fc299ef9fba48049c27c8bc",
+      "kind": "source"
+    },
+    {
+      "path": "core/__init__.py",
+      "bytes": 92,
+      "sha256": "04de20cf684ecb41efa8c267d07d111b7e078679a78639bd199dbf331005b94a",
+      "kind": "source"
+    },
+    {
+      "path": "core/auto_cloud_sync.py",
+      "bytes": 10708,
+      "sha256": "b4134738c53aef8eec50fb07c4ccb7f0da6e8f93cfe762f1096c529c4d1e69aa",
+      "kind": "source"
+    },
+    {
+      "path": "core/autofill_exclusions.py",
+      "bytes": 4621,
+      "sha256": "c693eec45bc99012f6d07f0ad06a046bffe13f38e18dfc59de6d3ef602d58874",
+      "kind": "source"
+    },
+    {
+      "path": "core/autofill_otp.py",
+      "bytes": 3704,
+      "sha256": "cc0ce4f8a32843bef8ffc237d7c059b17326774d3d5f1a30a72ae401ac1835d2",
+      "kind": "source"
+    },
+    {
+      "path": "core/autofill_resolver.py",
+      "bytes": 7047,
+      "sha256": "0db4e1c57075215c3b4211482128abde2092813d09458acd6f61907390a312f9",
+      "kind": "source"
+    },
+    {
+      "path": "core/autofill_sources.py",
+      "bytes": 13915,
+      "sha256": "02d6420d61064cdc6a759a9cf4c78db803f6a35c5f9cf7ee3d7e099398749e73",
+      "kind": "source"
+    },
+    {
+      "path": "core/backup.py",
+      "bytes": 6832,
+      "sha256": "4681b724235e0a20e81c7a5465ba791512b6fe5289f0ad6d6340dce2770efe2d",
+      "kind": "source"
+    },
+    {
+      "path": "core/biometric.py",
+      "bytes": 11956,
+      "sha256": "edae4999cbdb96a3fdfb79263bb46701557012e5c99e18d5becc3533af771fcd",
+      "kind": "source"
+    },
+    {
+      "path": "core/browser_autofill.py",
+      "bytes": 11025,
+      "sha256": "ae2d4c9b5cf18edebb776afe14fb606feace9794d96f9b54724ca5ef8c1c0cc4",
+      "kind": "source"
+    },
+    {
+      "path": "core/browser_host.py",
+      "bytes": 13986,
+      "sha256": "66c07c71360b15d44250b76aaeedd723804c1c4346fc5cd3f1342234c3a3a2a5",
+      "kind": "source"
+    },
+    {
+      "path": "core/browser_install.py",
+      "bytes": 6789,
+      "sha256": "5240d2f7b3b71ba7e11059630a448e79d303301be5a2c8906797fc4315c6ae05",
+      "kind": "source"
+    },
+    {
+      "path": "core/cloud.py",
+      "bytes": 53468,
+      "sha256": "985b718e7341ae858974df859d9d52b7c3b88377ea1b19196a2742e79b351fce",
+      "kind": "source"
+    },
+    {
+      "path": "core/cloud_credential_crypto.py",
+      "bytes": 2764,
+      "sha256": "407fb4272361cb0a2e6458a76a6c324a15fa028d68bd075adda442c115b2a432",
+      "kind": "source"
+    },
+    {
+      "path": "core/cloud_sync_prefs.py",
+      "bytes": 8381,
+      "sha256": "47e9aa668c488dbe526273d065cbd41680504cb8617557a1cfa3048228572ef5",
+      "kind": "source"
+    },
+    {
+      "path": "core/config.py",
+      "bytes": 34297,
+      "sha256": "29a011e244a774819cb4b31f9119c244cf49a68db34aad1c69445400ae739a42",
+      "kind": "source"
+    },
+    {
+      "path": "core/crypto.py",
+      "bytes": 3704,
+      "sha256": "16644f8c31a19079c736617f72f34910170a75b2215785418174af8ab232840a",
+      "kind": "source"
+    },
+    {
+      "path": "core/device_auth_wire.py",
+      "bytes": 3850,
+      "sha256": "21f42631a89f5ad2d1e80029621a4a96c8a491797c87201035ee5192cab033b6",
+      "kind": "source"
+    },
+    {
+      "path": "core/device_identity.py",
+      "bytes": 3935,
+      "sha256": "0fae1dc15cbee929527d3fd493407fa078f09106bf44d9c1fc6a6de23207c250",
+      "kind": "source"
+    },
+    {
+      "path": "core/export_archive.py",
+      "bytes": 13608,
+      "sha256": "122cb9c907342fceed8875a64a67d30860f831d1c7801591eb3ac9a7256a0b10",
+      "kind": "source"
+    },
+    {
+      "path": "core/importers.py",
+      "bytes": 30685,
+      "sha256": "0f62ec5c41b0709100baffa83690b041a53892712cd6ecfa040d003dcf22a593",
+      "kind": "source"
+    },
+    {
+      "path": "core/leak.py",
+      "bytes": 8424,
+      "sha256": "4101a6918358f61276c5ebd2d459c92653d314da59e0f9cbf281160f2d0a68de",
+      "kind": "source"
+    },
+    {
+      "path": "core/local_backup.py",
+      "bytes": 21310,
+      "sha256": "206d40a96b0b87253ac81899074279545aa3e0c31794dae1ce3c29e13dedcdd2",
+      "kind": "source"
+    },
+    {
+      "path": "core/log.py",
+      "bytes": 3053,
+      "sha256": "dd764c53d4ecd8d1f0d0d47e9dffe42af89bea3881ae2d3ac915284457db37ce",
+      "kind": "source"
+    },
+    {
+      "path": "core/maintenance.py",
+      "bytes": 2948,
+      "sha256": "bad1096fdedc7220a9c688766d73d2081d4989ba313cc3dcac69d0eae6e19603",
+      "kind": "source"
+    },
+    {
+      "path": "core/markdown_html.py",
+      "bytes": 44241,
+      "sha256": "05e88a74cb3e8cc5fe7bf276fae0582fd3d1aae2fb80f651901a8e0244063838",
+      "kind": "source"
+    },
+    {
+      "path": "core/master_password_policy.py",
+      "bytes": 4678,
+      "sha256": "e6d205af0ba5151bcbfb7cbe21866c54204ea4f6dc8235f48aa4019e4ceb22eb",
+      "kind": "source"
+    },
+    {
+      "path": "core/media_files.py",
+      "bytes": 24345,
+      "sha256": "84e92c9e165b2c8c8b9ae3601c3b8b86b39e23ae6e7cb482c2a1565d8870e4fe",
+      "kind": "source"
+    },
+    {
+      "path": "core/models.py",
+      "bytes": 23687,
+      "sha256": "e53b8efe6abacb0cb1f3be17620a45bf59892748e54be359124cd42c5ad7813e",
+      "kind": "source"
+    },
+    {
+      "path": "core/modules.py",
+      "bytes": 19669,
+      "sha256": "e66ff397e0607d9b6a8a9d883d37d43af44125f1a68da356709307c05e0463c0",
+      "kind": "source"
+    },
+    {
+      "path": "core/native_autofill.py",
+      "bytes": 23246,
+      "sha256": "9b9c5cafbc3211a19375b506d7786a3c4188adf3c854108533e27a13a314daa5",
+      "kind": "source"
+    },
+    {
+      "path": "core/ocr.py",
+      "bytes": 18731,
+      "sha256": "a4e412901c91b5a288e165d7752d58658db537653374496300f25c2d205c9472",
+      "kind": "source"
+    },
+    {
+      "path": "core/otp.py",
+      "bytes": 6756,
+      "sha256": "13ea930a29dc6f5d5bc4c2a1c101d68305f0cafb0a0d18f16e451579e8d9089a",
+      "kind": "source"
+    },
+    {
+      "path": "core/passkey_broker.py",
+      "bytes": 7584,
+      "sha256": "bc0420367e8b3cdb01fe5d76487731291279d4dfb79f5f1890d0efdd0ce8060f",
+      "kind": "source"
+    },
+    {
+      "path": "core/passkey_broker_protocol.py",
+      "bytes": 5280,
+      "sha256": "d804cc7967efabc86865fe0d9f7338c2be27ff7dfc237279ced0ca3ea59a1e1e",
+      "kind": "source"
+    },
+    {
+      "path": "core/passkey_broker_server.py",
+      "bytes": 11080,
+      "sha256": "e8be5909a4a9054683c96455cd0b8516ed869e2051b1ac861ed2f7413f723b6e",
+      "kind": "source"
+    },
+    {
+      "path": "core/passkey_merge.py",
+      "bytes": 11516,
+      "sha256": "24ca114788e404b1b4d35f4ff8d8433db28e6ecafe87d5e75f1d816bb62b0da5",
+      "kind": "source"
+    },
+    {
+      "path": "core/passkey_provider_status.py",
+      "bytes": 5263,
+      "sha256": "c2747505c5dd7e8a648f8a972cf557f0783ecceddcc2595950d7b92212a5ebfd",
+      "kind": "source"
+    },
+    {
+      "path": "core/passkey_service.py",
+      "bytes": 6413,
+      "sha256": "e04c72a17d0ab7f17d5c655cf0572f31c1139ccbf03898ffc189412040f4ff87",
+      "kind": "source"
+    },
+    {
+      "path": "core/passkeys.py",
+      "bytes": 28096,
+      "sha256": "c5141de2f771de37decec4427b4795581deaeea683d4a0d94ab32e92b3213163",
+      "kind": "source"
+    },
+    {
+      "path": "core/password_health.py",
+      "bytes": 12983,
+      "sha256": "4d38aa04972d789c18f156f092b74dded5c15d63ae6aa152f79c1258fafd57da",
+      "kind": "source"
+    },
+    {
+      "path": "core/pinyin.py",
+      "bytes": 2007,
+      "sha256": "344defbaeb8d73202782a08470067aba01c96cf561bdce41fbe04171684fa354",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_append.py",
+      "bytes": 43739,
+      "sha256": "25713c248b87c9593fed337fdacfb70cf88a92652c62ef1508e355b1b36970c9",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_attachment.py",
+      "bytes": 10369,
+      "sha256": "923d07941feeea832866afdefdcb6ab40f9bde760609930b875f234ae96d6e6a",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_backup.py",
+      "bytes": 4209,
+      "sha256": "796975d397d36d2fa61e2ecb8db994b56a76aa26c2b43dc7b7ea97b6c36a4fc8",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_commit.py",
+      "bytes": 10079,
+      "sha256": "ac843d15f5ed6d70150725ef75fa12f178370c70eb285c788c23cd26696e5598",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_compact.py",
+      "bytes": 18327,
+      "sha256": "dc401719c5043fbcf12fdccb530939ce15c19de59a39cda79968f7954b49f62d",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_compression.py",
+      "bytes": 5182,
+      "sha256": "d136d2ac6fa612896e8d049ae58596de1edbeaeb0ade5cbbbc8af65422df71f5",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_container.py",
+      "bytes": 14054,
+      "sha256": "ca903691128e863e492bc9e64e55f82f3b31c87d5c51c627f2696c6c4f2e0f32",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_device_registry.py",
+      "bytes": 3963,
+      "sha256": "878d10501c09b5c226785290f9fb9cf63c321b867e134d028d0d050d17932133",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_entry_codec.py",
+      "bytes": 6845,
+      "sha256": "5b3a6ab77573abd7450972450cf243f99b0f5dd6d204e0f8ce6de4298628ea97",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_entry_index.py",
+      "bytes": 16433,
+      "sha256": "fdd179c580a690bb7bddc7b4b8666791bcc5b94dcd193c9e02a4ffe28f5d4a8a",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_entry_reader.py",
+      "bytes": 15927,
+      "sha256": "22141ddb06226df3924b675c026405c2acc016c9f1ca174100e41fac5e0dd6fb",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_integrity.py",
+      "bytes": 2336,
+      "sha256": "4138c563ef1c9c04ab6f3474c4ce084187c81e718aea91ad82b6033e536d4994",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_kdf_policy.py",
+      "bytes": 3937,
+      "sha256": "2ce8f5dadcc31659169bd171edc2bba0d4088562140ee48da4229a78bb35c51c",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_key_schedule.py",
+      "bytes": 7984,
+      "sha256": "d7bd5fe00425f6e7c24657b37493fbe916764d93b3c5fa3571c56d1b18be6a30",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_login_fast_index.py",
+      "bytes": 24088,
+      "sha256": "587200845f36395a59c5a08bcd29be35c40d81e78a1b72739ea4d84154b8c5f8",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_media_ref.py",
+      "bytes": 13806,
+      "sha256": "c90a66020e5efe31f61132eca06497ea0b45c139a25cfd57afcb79329b641c37",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_object_index.py",
+      "bytes": 11932,
+      "sha256": "218c6aaff61c3e7dbf9c36dea608fd640643c833ccc70b058dabc95cf77b2f1a",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_object_store.py",
+      "bytes": 11282,
+      "sha256": "e430a93123dc7db5c8f15da54400407b0a13ea3d74e4a6314c25cb1fe917468d",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_sync_authorization.py",
+      "bytes": 16477,
+      "sha256": "e3d7693c7ca4e8612d7a0cad771a64eadea5d11e74e0ea5fb27debc26ab94f4f",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_tombstone.py",
+      "bytes": 2196,
+      "sha256": "57259e01bbc8e932f552d6431cb7ca908b49d6a4d18ff58fb49ad25b76a4ddb1",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_vault_header.py",
+      "bytes": 20851,
+      "sha256": "a0d9921c3192074e6111c757ee7b9674fd450646a87ad0a0e504c1ad4db79c0f",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_vault_metadata.py",
+      "bytes": 6983,
+      "sha256": "0db3d3381be4ff8a453c8a07e4e80009f1ef073f8fef35f58bfbfe09e0ff4769",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_vault_root.py",
+      "bytes": 4898,
+      "sha256": "ea59c4f4ea8b4e36e2a7034831c16d2e9228f9618a212f930a90e8e8ec58a6e5",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmv_vault_store.py",
+      "bytes": 93985,
+      "sha256": "86dc63e4e0acb2bf7e808786e37bbc7b1348920aadfcc4b9634d9c47f5243bf3",
+      "kind": "source"
+    },
+    {
+      "path": "core/pmve_device_envelope.py",
+      "bytes": 7756,
+      "sha256": "639cbd4e08916cc040e4778e82859950b0a3ec869049df61af5ed95bdfb37387",
+      "kind": "source"
+    },
+    {
+      "path": "core/recovery_key.py",
+      "bytes": 2639,
+      "sha256": "8102ee06ab837289943ab9a0537ce2d7d037ee7a96f442ca647cc6f941a17d49",
+      "kind": "source"
+    },
+    {
+      "path": "core/spake2.py",
+      "bytes": 7127,
+      "sha256": "0894e3c8c25c2d8edf7a70d9c3df3fc7b7dc822bbab0d637a68512719db8dc7a",
+      "kind": "source"
+    },
+    {
+      "path": "core/storage.py",
+      "bytes": 94416,
+      "sha256": "af8e3f565d68326501577c6a4f0dbdf9400d0de9322457303b0f859e094426e8",
+      "kind": "source"
+    },
+    {
+      "path": "core/sync.py",
+      "bytes": 11138,
+      "sha256": "65e602e0e863c4936531373d5697761b015035e4ce71aa4776fb8638aea44156",
+      "kind": "source"
+    },
+    {
+      "path": "core/sync_client.py",
+      "bytes": 39905,
+      "sha256": "a59ce62332550cf9a6483a0ee3eafb86b15650d4960b2b3b8f4537cea64c6dd8",
+      "kind": "source"
+    },
+    {
+      "path": "core/sync_server.py",
+      "bytes": 82506,
+      "sha256": "69dc962a049b31296b58b89d8c8b57c56f2de8808a57594f3cd7ee6309d81322",
+      "kind": "source"
+    },
+    {
+      "path": "core/updates.py",
+      "bytes": 10023,
+      "sha256": "9d9fac0d43b6df4892a74bf36442d192e8b6ff09f3e3cd8e544988b94509bc0b",
+      "kind": "source"
+    },
+    {
+      "path": "core/utils.py",
+      "bytes": 1829,
+      "sha256": "bb8b4b0f39adef4a4d8a72faddb926eda87bb955a8e9665998423bca21f8c6b8",
+      "kind": "source"
+    },
+    {
+      "path": "core/window_tracker.py",
+      "bytes": 3994,
+      "sha256": "278e1041c7681f3c19c2cd4da67db247b783f3e9399de6dd23fd70b5c94d5d81",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/MICROSOFT_SAMPLE_LICENSE.txt",
+      "bytes": 1255,
+      "sha256": "49885c38b55a2020f72af1d4b3c76059a778bf2e2cb6871ed3e11c268995f98f",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/PasskeyCore.vcxproj",
+      "bytes": 1694,
+      "sha256": "51273e27149efb2ff2bb579389a31dd7b141a88559467cb04fbd745bd09e2abf",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/README.md",
+      "bytes": 2146,
+      "sha256": "e78f853935ab3aa6b98a0a18e9b01f0e0aeee413df772b9d2e75f9798829086c",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/App.idl",
+      "bytes": 128,
+      "sha256": "74e89319aad45980f463203200f53cc7916e7314cc240205f5f02b1cfc4434a0",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/App.xaml",
+      "bytes": 759,
+      "sha256": "f93b1ef797762976d79f1f10b23d52617e7a87d26457aeebcc65a869043cff74",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/App.xaml.cpp",
+      "bytes": 16446,
+      "sha256": "5a6f904ac2c0f41024c00a3ac852e1ab1c62d75df1c79e91acaf573b8a9cb48c",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/App.xaml.h",
+      "bytes": 4489,
+      "sha256": "516fa02c0b64fa2d2474639c18e366e55d428282fb1c8eebac9aa7ee9feab65d",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/Converter/BitwiseFlagToVisibilityConverter.cpp",
+      "bytes": 2209,
+      "sha256": "ca24097b0cab9f8654fe0681cfb8d96dfd06ec36d6c6c76c793e3da66da1c4e4",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/Converter/BitwiseFlagToVisibilityConverter.h",
+      "bytes": 1089,
+      "sha256": "9a35f6ec07b2bf6461af0dbcc4ae95557d4a8544ec6e0a7e1fc4d9527dc18b2e",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/Converter/Converters.idl",
+      "bytes": 229,
+      "sha256": "f976a93aea159779697ae47c6b097b65b346a207f30a62109e17ca2cc7232ab2",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/Credential.cpp",
+      "bytes": 1292,
+      "sha256": "254e41052f8dd2e1fc3a707cb4ec68350a76eec31a5b97963fd05d739c0075a6",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/Credential.h",
+      "bytes": 1098,
+      "sha256": "58308f322ba5d20940206c0cb743227aa61eaa32fdc2e6d20234183e08f574af",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/Credential.idl",
+      "bytes": 724,
+      "sha256": "8ac5f01c62d10c86f53e99d99b8aaa7e0bd76e9f0c3d4866337ae1ca6dbedecd",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/CredentialListViewModel.cpp",
+      "bytes": 512,
+      "sha256": "d4abf5fa1ecbe5975bf3e20bdd0c672b467fe28a8a2df1317b0679f016ba3a81",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/CredentialListViewModel.h",
+      "bytes": 736,
+      "sha256": "12a5e1ec7ca1c1bb3822b951f728d0dc9b52db2206c1621e6ff77a5a381d49d4",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/CredentialListViewModel.idl",
+      "bytes": 236,
+      "sha256": "c582ea6d7985ecce415c8ab84e0a9e1daccf39e8777cd6d21a2555debb674e17",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/DelayLoad.h",
+      "bytes": 18844,
+      "sha256": "e3a295e63d02facf31dec918ca77f951c8f5d31a74f631a3a2e93ca7074a1812",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/GetAssertion.idl",
+      "bytes": 323,
+      "sha256": "3a7962d9dbb7cb924f40799e2972c95cb44e8163babb42df45637d00d5449749",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/GetAssertion.xaml",
+      "bytes": 8386,
+      "sha256": "3bd68a333a913cdfe1e5659df8c1afa28c83f351559c1e36dfe2082810b2baca",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/GetAssertion.xaml.cpp",
+      "bytes": 6375,
+      "sha256": "5dcffe9c75e909b6f1c02bb5ec2560d025b84c9149c87e40f53fa7c6911b6ba2",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/GetAssertion.xaml.h",
+      "bytes": 2032,
+      "sha256": "a4b70fd4ef16ea88885959e33539961068930b581e4badd66fb61490111e735f",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/MainPage.idl",
+      "bytes": 250,
+      "sha256": "df9b7439cb160cc0e606a5aaa14b1c3302e9bfac54a4d5f8560d6636d1248484",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/MainPage.xaml",
+      "bytes": 16938,
+      "sha256": "e39656d79087d6cd77a8a2ce24cc3597da2787f3c592d29feb6772f8c2fa52a3",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/MainPage.xaml.cpp",
+      "bytes": 26705,
+      "sha256": "0575ff5df9d1ab0d92e00ba20c93b37cbc979fcfdb00ec93ce93e5dd35dc2935",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/MainPage.xaml.h",
+      "bytes": 5788,
+      "sha256": "c84778cf4b98c0fef2fd3dfed9d216377200910cd0164ac18912a882278e927d",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/MainWindow.idl",
+      "bytes": 246,
+      "sha256": "894c5aaa3861cd05e26ccdaa12b2d364ec832d123ab72c8b68f47a14012761dd",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/MainWindow.xaml",
+      "bytes": 608,
+      "sha256": "860f8f2ccee3d644ec2bc34b258e8c56a821186422a48994e4f7151e4258c0f4",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/MainWindow.xaml.cpp",
+      "bytes": 7189,
+      "sha256": "484c68197392e8594cb4e4bb1d139ab14a754544ee169bc2923cb5ccd1bab121",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/MainWindow.xaml.h",
+      "bytes": 1344,
+      "sha256": "4916d8809a2de6470a3899fe5346108088d88cdb58717fc4223f6850004a357d",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/MakeCredentialPage.idl",
+      "bytes": 244,
+      "sha256": "79ad63417692c2296715a807cf3dc68a2151d9c401222a8e875bb9dc519c7e02",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/MakeCredentialPage.xaml",
+      "bytes": 5551,
+      "sha256": "4db1d8fb35c4f8973425506c79d6d43c473b2b7f289cdcaca6c3ea1f4b4d462f",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/MakeCredentialPage.xaml.cpp",
+      "bytes": 2222,
+      "sha256": "dca0fe0710cf70899f896462108b26293bc442ffe709c1f6ca49109498e378b6",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/MakeCredentialPage.xaml.h",
+      "bytes": 1440,
+      "sha256": "2d78c4cf525822c280ea55e8da8f518f79aad49d8bce93c50d99261febd34805",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/Package.Host.Development.appxmanifest",
+      "bytes": 1997,
+      "sha256": "0c5413d37a279e58d3e25a473a079b9c8c2238a79644169a08bbc38d3b9a0bfc",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/Package.Host.appxmanifest",
+      "bytes": 2056,
+      "sha256": "b2407caa14d014c904d0ac50683b1570cdf7e7bc8b8fdbdef16c44f5401938f4",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/Package.appxmanifest",
+      "bytes": 2154,
+      "sha256": "04dde1f65b5ecdb04aa27b83f5cc81397a3f7190a1c113fdb773f749aa374410",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/PasskeyManager.sln",
+      "bytes": 2430,
+      "sha256": "0076fce007ef5132e14be085b7520dea4acd585c0d04d78b0174fc1478c8c3c0",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/PasskeyManager.vcxproj",
+      "bytes": 26514,
+      "sha256": "6db1fd6dc03d401dbeabec4b6acc843b7c892d06b47a987aa94bd4303de2e0f5",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/PasskeyManager.vcxproj.filters",
+      "bytes": 4012,
+      "sha256": "091bf0161d6ba2469c78e9e8e4dabeb8f1ccf33685cabce4b35fa2b2d4efd261",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/PluginAuthenticator/PluginAuthenticatorImpl.cpp",
+      "bytes": 40158,
+      "sha256": "864f290278698d1c8ad6cfc1fb32dc4d27b1a60ca0fb6f0db82ae0c48b90f088",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/PluginAuthenticator/PluginAuthenticatorImpl.h",
+      "bytes": 3189,
+      "sha256": "48cd6d1e0f79282101edd6dd89a0b561714a2abdacbbc78d49db3d77ee233f06",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/PluginManagement/PluginCredentialManager.cpp",
+      "bytes": 36842,
+      "sha256": "8dae097ea478d80b5512cce5aa3a2bc9d81dd9ee204d366701783099f2458d5e",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/PluginManagement/PluginCredentialManager.h",
+      "bytes": 8268,
+      "sha256": "2a23a0d8de37c922cd0671356b520f6c47aabc62949c6f20bdecc4f076ddbd0d",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/PluginManagement/PluginRegistrationManager.cpp",
+      "bytes": 24211,
+      "sha256": "8775a1448e7565a3b0a7f5a717799acb01c6c3b3d94d6288f99ace804f7d067f",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/PluginManagement/PluginRegistrationManager.h",
+      "bytes": 4127,
+      "sha256": "3a6953344e0e2a7289efc7e9a8e5c9c7a8105afcad0486abb2682e90e98737eb",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/PluginOperationPage.idl",
+      "bytes": 162,
+      "sha256": "daf1c40d86267238cc8477250bf5c04dbfa2caa8125eef3f753eb39c08d89307",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/ProviderHost.cpp",
+      "bytes": 6638,
+      "sha256": "c1415fb620cd4131c2dbbf435d1a0d22da32e47d9168e5995e0d66813042405c",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/ProviderIdentity.h",
+      "bytes": 666,
+      "sha256": "d761851aaaed31561e10c6f3319135e0e80f088a41dc7f37ac70b3eaf5f2f902",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/VaultBrokerClient.cpp",
+      "bytes": 14581,
+      "sha256": "967a0eb4e29f4689d2dac4a945b548fa9a552231ec713cbcaebb9a251d95c606",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/VaultBrokerClient.h",
+      "bytes": 1941,
+      "sha256": "d607fc10fcdd016b61453e7ac0a75193ed894dc7a0b01d76a31f924a02aab0d2",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/app.manifest",
+      "bytes": 1322,
+      "sha256": "8433c77fb14486d47417c861e1746c1d6022e8d655a074dc02e8805f647110d5",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/helpers/buffer_read_write.h",
+      "bytes": 1751,
+      "sha256": "45cc19d0b1ffaf98cdf49e2ceba56c1f4641e67247b25e540eb9d9e89dc4eac4",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/packages.config",
+      "bytes": 558,
+      "sha256": "4c89aecda8554f935d5bcd2e5b69c176fd790e15645eb8d6e7541b6277c54434",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/pch.cpp",
+      "bytes": 461,
+      "sha256": "88ccaba05b83ae85089817cc9e3c1c34c635b15f81b7787c20298e6687c22e1b",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/pch.h",
+      "bytes": 2925,
+      "sha256": "c013a0a68584b0add911b6743e34caf145d4c6ff63d79a018205509ae2c6ad1b",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/app/resource.h",
+      "bytes": 408,
+      "sha256": "3dc415b04cd355d941a3e08f7518130239e58b7457762b85bf1a4f164f961c5e",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/core/SecureBuffer.h",
+      "bytes": 1543,
+      "sha256": "b1a99fdb76776c1201a814f4b78f694b78c4235e1f928563fadc7ad45d01f932",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/core/WebAuthnCrypto.cpp",
+      "bytes": 14621,
+      "sha256": "2cc3d0a2138a3ee9f3f34b76b4a7b5ac5c73c829081324f68ba5e84f8fca05d5",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/core/WebAuthnCrypto.h",
+      "bytes": 1271,
+      "sha256": "5beedc6903fb02d713d1fc0b22d491b594b0bb37ed7dd3204b3442de37b3c96f",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/core_tests/main.cpp",
+      "bytes": 1947,
+      "sha256": "c98a74d1d9c0b5f370011a2c8765df66345e9758e237548ac454c09ef6734def",
+      "kind": "source"
+    },
+    {
+      "path": "native/passkey_provider/shared/BrokerProtocol.h",
+      "bytes": 665,
+      "sha256": "5dd21ef434d9093d0c13eb00efa860bc1804aa80410517c15c597aa7c6131778",
+      "kind": "source"
+    },
+    {
+      "path": "pyproject.toml",
+      "bytes": 1107,
+      "sha256": "9e0a613a654b08a94250b0b411bbb39ee90d7f6b3427c069b83bdb63aa8ed876",
+      "kind": "source"
+    },
+    {
+      "path": "spec/ACCOUNT_LIFECYCLE.md",
+      "bytes": 4461,
+      "sha256": "3f94794267d3bdbd457861581df8f1ae26fa236e9a6456ddc655101636bfec3e",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/AUTOFILL_EXCLUSIONS_V1.md",
+      "bytes": 1401,
+      "sha256": "a094329b428f8010bea33ff077d2e81a7c59e0ab65f92c7539a35e626c6e8d66",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/SYNC_V2.md",
+      "bytes": 8567,
+      "sha256": "d4d4678c51b79acc231ed4964d479496c2335064ce183a0d6931715b5ed8ea3e",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/VAULT_FORMAT.md",
+      "bytes": 6031,
+      "sha256": "a55e0aecffc0600831223afeb76317f18c8ed88c3f9a3e7e1563fd09d081bdfe",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/autofill_exclusions_v1_fixtures.json",
+      "bytes": 3021,
+      "sha256": "dab835824ad53c2f8d3f77bc4e65d6b4855d26514686309963b802ae90469642",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/autofill_sources_v1_fixtures.json",
+      "bytes": 22415,
+      "sha256": "d0b7e24a024934c3c923436c682e7b49d84f8ae63267049c2f6c5dfb7815bb2a",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/backup_v2_fixture.json",
+      "bytes": 883,
+      "sha256": "9b560385cbf6f1d056d71cd691432063cde94ece47102b33d04477a80e191063",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/interop/pmv_next/v1/argon2id.json",
+      "bytes": 960,
+      "sha256": "eb49ef38b4a88a334f3906d64dbda4b34c91747fe6fb78d14dc094faa26576f4",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/interop/pmv_next/v1/blobs/store_android_from_pc_seq2.pmv",
+      "bytes": 186658,
+      "sha256": "4ae3a83c83dd79273aa7f261b03680a42e7fa8381e7aa540de5f6a28c03e0567",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/interop/pmv_next/v1/blobs/store_android_seq1.pmv",
+      "bytes": 101541,
+      "sha256": "a8a4183082d1b8f1ec1ef6d66151ad289d4d746cddbf8a25176520e0f589c349",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/interop/pmv_next/v1/blobs/store_pc_from_android_seq2.pmv",
+      "bytes": 186715,
+      "sha256": "89c580ab70b395e57047be30eec35978ba786bda2c77bf62d8d83fc13a48c3a7",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/interop/pmv_next/v1/blobs/store_pc_seq1.pmv",
+      "bytes": 101505,
+      "sha256": "1198966ad5da90069650e05518002b081b426227bc45cd92e851c993ea2d1b4e",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/interop/pmv_next/v1/block_aead.json",
+      "bytes": 1554,
+      "sha256": "a9cab00260ee7868ae921e3b0ffa2c85745c57db0e0b07cc3c5bbfb6b0718e52",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/interop/pmv_next/v1/cloud_credentials.json",
+      "bytes": 731,
+      "sha256": "7d1fc7d991e401fe372ae591b1d14f3852f8243f9ff217ce83b17975226e6ccf",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/interop/pmv_next/v1/commit_entry_index.json",
+      "bytes": 4608,
+      "sha256": "850eb3364a4cf0a4f9e1238fc8978b1190cabb16372a369ea8ce6d04ace9720c",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/interop/pmv_next/v1/compression.json",
+      "bytes": 914,
+      "sha256": "8fc5d19d7d6ecdd6e19230996acb42a872334adc5e8b244f0c320b2a818de8b1",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/interop/pmv_next/v1/container.json",
+      "bytes": 943,
+      "sha256": "d31eb8d8e5cbbf716a7c5da7b00c3e449b87edd90d395ed2a65dcc952cadb7ad",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/interop/pmv_next/v1/entry_codec.json",
+      "bytes": 1568,
+      "sha256": "bc03db9f39ee0168f98c6517b04c985d21a9d5be05d7f0873ab3d0cd14cf5597",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/interop/pmv_next/v1/hkdf.json",
+      "bytes": 4588,
+      "sha256": "2520b821223fb3afa9d5cffcc178cdaf5adade59bf4bca2d313f108e210081d0",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/interop/pmv_next/v1/legacy_media_migration.json",
+      "bytes": 654,
+      "sha256": "f12a289ab29ea82cebcd1d3184e551fada418962cda4204420ede9be1ad0e549",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/interop/pmv_next/v1/login_fast_index.json",
+      "bytes": 1238,
+      "sha256": "7e3462168733b8c145f7f1756c7f8174093e6e35c580f7d74efa24f05b4d0d04",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/interop/pmv_next/v1/manifest.json",
+      "bytes": 2746,
+      "sha256": "7ab49de85167f6f135a94391e3d992ad649c0c2af9bdbc48dec0ce9b1c70f9d3",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/interop/pmv_next/v1/media_ref.json",
+      "bytes": 3500,
+      "sha256": "91482f9836d1dc88c246f970d706ce44f4dc29b19223096d7364f640ca1aae13",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/interop/pmv_next/v1/store_interop.json",
+      "bytes": 4127,
+      "sha256": "b8b7d1dd371a4e023c9172b29c3a1d82b63fc39e67d5cd6834c48236bba95219",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/interop/pmv_next/v1/sync_authorization.json",
+      "bytes": 5775,
+      "sha256": "e31ca8c659444ef33b161ef63473cc40f8db0c72090956eb8207626b3e9fa232",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/interop/pmv_next/v1/tombstone.json",
+      "bytes": 851,
+      "sha256": "c82f0949baf94e27abd3debf68b955d34bbb993b90a904d8989c470a980e408a",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/interop/pmv_next/v1/vault_header.json",
+      "bytes": 1932,
+      "sha256": "f4f2c334ebad2c713afa3aae5edf60188bac78cb71034b2fba903780d3696168",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/interop/pmv_next/v1/vault_metadata.json",
+      "bytes": 1707,
+      "sha256": "6fb6e57a0ca01ecda105b5c8875771c71a533f204f2f3d9208f0785253d81fe6",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/modules_v1_fixtures.json",
+      "bytes": 6783,
+      "sha256": "0ccab320bf09834229b38dfa8a5515f10abcbca801e76bed6f477fd3e069e48c",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/passkey_v3_fixtures.json",
+      "bytes": 4689,
+      "sha256": "1abe33754d2c07ec8bb096d15be39f5d014283b99e797dc7d81559cc46243b46",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "spec/sync_v2_fixtures.json",
+      "bytes": 8436,
+      "sha256": "b192c1200fe5f972c85fe5a3ac26cf3c2c4d411891ad6e01833d6db157f34937",
+      "kind": "shared-fixture"
+    },
+    {
+      "path": "tests/conftest.py",
+      "bytes": 1544,
+      "sha256": "14e35e771a5fd813962e0e5bd425884bc22cd399b50430d398cd711fe288b655",
+      "kind": "source"
+    },
+    {
+      "path": "tests/js/test_background_unlock.js",
+      "bytes": 2260,
+      "sha256": "a3964da2f2fcd066045e9b8f90d869efb8521ce0d29210347a4cb38db5ce707c",
+      "kind": "source"
+    },
+    {
+      "path": "tests/js/test_extension.js",
+      "bytes": 2406,
+      "sha256": "624020dc222b3744bc0a84909e0d81f810cb19d8db8eae4b012963138c7918ce",
+      "kind": "source"
+    },
+    {
+      "path": "tests/js/test_extension_integration.mjs",
+      "bytes": 7981,
+      "sha256": "b63384217ee8c4cee82ad07e839c74648c47148633e52e70677573c552aff369",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_auto_compact.py",
+      "bytes": 14852,
+      "sha256": "75322c0d3295412688d1e2e5ee0f6e964cb8241ff0332a00474169892ec23e0a",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_autofill_exclusions.py",
+      "bytes": 13111,
+      "sha256": "a7e18e7c4b1f493bc6a12caf2436500d552b16ef8733917616750aa367d0d457",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_autofill_fixture_shape.py",
+      "bytes": 11611,
+      "sha256": "71372b56ff2b70276b0f6412ee3caf8ce206d2b95975cd325223793ef488cc30",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_autofill_otp.py",
+      "bytes": 3660,
+      "sha256": "36fa9525556bb995645f8c2740e70b2ab24d51834bdb55a3ec8b0f33a13be086",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_autofill_resolver.py",
+      "bytes": 4196,
+      "sha256": "99883dea11b5cfaf40b3883a94d2daed4a8a14743d443a627dab2848f00a0d32",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_autofill_sources.py",
+      "bytes": 15780,
+      "sha256": "58f16956f2add810b4474284eb2631c40432e42ae766c570f33251a8bc9fc8e3",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_backup_v2_vectors.py",
+      "bytes": 3289,
+      "sha256": "f26f756d861347acb14eb817bce90df0c78873835dafbd3b95d9461a6d2e87b7",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_browser_autofill.py",
+      "bytes": 6853,
+      "sha256": "82aa873f1dc8cc3fa39551d4dabd8acbb016df7468a666d657b3924b1e7da10e",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_browser_host.py",
+      "bytes": 20135,
+      "sha256": "48dfdef48f2c589b673bb506becfd26d7a76b52ad597ca92d75ddc16dcb37dee",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_browser_host_transport.py",
+      "bytes": 1669,
+      "sha256": "44edcb8a4523943353d6369171e5ebe78160844fa3efb0886d43547306001c42",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_browser_install.py",
+      "bytes": 1467,
+      "sha256": "58560d2d8ee092f047849256aef2e5b997852c064828a6e2988f2f708e702f9d",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_browser_popup_unlock.py",
+      "bytes": 5044,
+      "sha256": "a191e8d6c51668dba8c73e2ee5d789e45f5ac90242d8287ed5955df2992abed8",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_category_switch.py",
+      "bytes": 5495,
+      "sha256": "9681e61bbe49be1f67e1020b2ff0bc46b6ecacf9fc8d6ed32efa21dfa1be1f8e",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_clipboard_recovery.py",
+      "bytes": 1355,
+      "sha256": "296fdf47c946849362848f6b6cacfb61b44bc85646d98c285d8eeaf587f319de",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_cloud.py",
+      "bytes": 27063,
+      "sha256": "749783f1b9b11139c997900f01bc331091b8e491abe1c0df01099669bdaed608",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_cloud_credential_crypto.py",
+      "bytes": 1417,
+      "sha256": "2842d373d14c13b5722263902a04d837a4ad4bc60256545dd5bff790ad1c8d5c",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_cloud_sync_prefs.py",
+      "bytes": 5364,
+      "sha256": "8fc8eeaa89935935f921c72b09bb9a7dfde8f6d30255d770bafc97b2d88437d5",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_cloud_sync_scheduler.py",
+      "bytes": 2674,
+      "sha256": "110a35e0e1f093c02432afd3e1f4627a0b911d5dbbf3e2fa1fe9c0a46bdf9a7a",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_core.py",
+      "bytes": 60486,
+      "sha256": "89ffded0829cb194c9428ea8507d53ee41f0c9a7a0a0a3e9f7a224bd613ee7a0",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_crypto_hardening.py",
+      "bytes": 1647,
+      "sha256": "ca956742c475a5138d082acac062861cdbf93556bfe9df989a35a080cba1d7fc",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_device_auth_sync.py",
+      "bytes": 7208,
+      "sha256": "9dac596d01d01dcaceac8ba0d5700c4f2a2746c61bfd6cacd8ed3a64f2dd5eea",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_device_identity.py",
+      "bytes": 2930,
+      "sha256": "3c7476a2e3ed7fa891098028e715abeaf4e8439f17b069e4f0d2643ffd3fb18e",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_dialog_responsiveness.py",
+      "bytes": 4863,
+      "sha256": "b24827941a0e179063f2a07fe3e2611bb340a163cb647de71db941944e41ef05",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_document_performance.py",
+      "bytes": 6790,
+      "sha256": "8e88925f7e3b488cdee13a4571b397c386a80f36b8633b58ed29d13f31890346",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_document_scanner.py",
+      "bytes": 5863,
+      "sha256": "fb42b802f368b5716d6a503678cb9132852b2ed2bdd17c075d77fcc617705c0a",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_editor_workspace.py",
+      "bytes": 84486,
+      "sha256": "0ae63b336edc357299e723f535d962d2aedd8a17302153c351753a479be0b004",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_entry_add_selection.py",
+      "bytes": 1580,
+      "sha256": "f55430ddbbff1392873e6a5820326e746a2389e66ba1718d15caaf5c0b9942b8",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_export_archive.py",
+      "bytes": 8431,
+      "sha256": "940e713cfc35e196943392e5d691ebcc27e92ffa8f8c3b5d9dca215b77fb47df",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_floating_actions.py",
+      "bytes": 10492,
+      "sha256": "6819b23a8b6b945c058c0988eaad20e645ddb15c954c73a642896f68ddce4f3f",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_image_preview.py",
+      "bytes": 5413,
+      "sha256": "066aedd32b2b91c22b510ea6c83a6687147e957af447e66ac98f0f1abedf6c7c",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_image_viewer_policy.py",
+      "bytes": 15168,
+      "sha256": "74e1df09cf742d7b90433a5d381767cf5f22fa3e5efc3b15e97ee2140a20d77d",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_key_convergence.py",
+      "bytes": 11214,
+      "sha256": "76076bc4b4899230437a5876e16e972aade3b8f648a4aac8607c0fcf8fab7a25",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_lan_channel_isolation.py",
+      "bytes": 23363,
+      "sha256": "af9eaf3fb4128f3114e4b4ea34c9db7638c3b813098d6df8f71c368069903ce9",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_local_backup.py",
+      "bytes": 7119,
+      "sha256": "9aa91f3c977d827a9a4001b052c47b9e4c4d2dfd73d22130a98878e3d9512117",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_markdown_module.py",
+      "bytes": 23677,
+      "sha256": "fc6f6c2859058d1f4e2657c92a172b60e032b3aef1476538f44025ed2daca609",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_master_password_policy.py",
+      "bytes": 2049,
+      "sha256": "30f3d7f00f94a8c7d8f95bf1598f02dc8d493e69b8645fdeb50aa2e6657dfacb",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_media_files.py",
+      "bytes": 9741,
+      "sha256": "4dea19901e72423bd7a563e86b4235db979a6ab0bd13ee09f662bce53f3d9214",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_module_fixtures.py",
+      "bytes": 2720,
+      "sha256": "1c7d13bce326cc048d0491ddca63a63dfa606d3b55d4a1bb3389a684623c5fed",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_modules.py",
+      "bytes": 18196,
+      "sha256": "eeaf46ba2fc0149cd2c455a628a0f54a576a3f79d162f7ad5296d4334451bdff",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_native_autofill.py",
+      "bytes": 15768,
+      "sha256": "e947f28e852f1aa51286f8925a4f6085e5f2249f4c3cbcd5293d47139a13caf4",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_native_word_candidate_ui.py",
+      "bytes": 2262,
+      "sha256": "3bfd95b59830f535be5f727bcd6fe6f69d5f2d2696584c74befceb5740d1f23b",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_passkey_broker.py",
+      "bytes": 4580,
+      "sha256": "2fdece7e73913c1e6c848a1e9497ac62773788875c0774d9bfb45471d1ea2c4b",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_passkey_broker_protocol.py",
+      "bytes": 2366,
+      "sha256": "f775dd5dc65353b1daaf37bd6a1f6fe86aec66052f76c45929b5318124ffe496",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_passkey_broker_server.py",
+      "bytes": 2919,
+      "sha256": "82e56d8dc96c4c924cfdd0568d32bf7b32dba108572e4d69de4b7be9279ba985",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_passkey_fixtures.py",
+      "bytes": 3031,
+      "sha256": "190b41f8fac25c2fdc8ad8e1f900546086687de33fa332bf33e6e60b956f07fd",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_passkey_provider_layout.py",
+      "bytes": 3393,
+      "sha256": "6fdcf0f048b0dcb24cfc3a386560501c63b0a7e271f46ac3c98d36389c03df70",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_passkey_provider_status.py",
+      "bytes": 4624,
+      "sha256": "bac8da93b2bc65b11bfba4e620c9677ca95f184f069e30078a2c842712663f20",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_passkey_roundtrip.py",
+      "bytes": 13463,
+      "sha256": "7088e138ca29b48c335a4e63ac9a166ce8f9d95f128b76865245fb59fdbda528",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_passkey_service.py",
+      "bytes": 3409,
+      "sha256": "4857cf41ca5206f9464c2f4a37befcd6a5aad28fceb535a1a4a7ccd0d5b8f782",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_passkey_sync.py",
+      "bytes": 19404,
+      "sha256": "a3c39ec29ef478d99848406696b4662cfc42de8284fe0a4f241cc98f98c0da4d",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_passkey_unlock_activation.py",
+      "bytes": 673,
+      "sha256": "47ee3cc29ded58d0cdce3cb545069cc402fdee2090def34fb553e90c5686df72",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_passkey_v3.py",
+      "bytes": 3937,
+      "sha256": "45a12d0991211bcdb80699236aa8e8c3064f07d4fe1715426ba4f282b25b7e1b",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_passkeys.py",
+      "bytes": 24459,
+      "sha256": "c6fb7e15c37e16feb93b23f31692dcf2ad63036095fa7a898a09dbfcf835d61d",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_password_cooldown.py",
+      "bytes": 3910,
+      "sha256": "3319ed3531cf92320924216146a35daa9cb311d62df6574ba8bf910acaecaa84",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_password_health.py",
+      "bytes": 2304,
+      "sha256": "bcef7006a38175956de85cdf5a25abb095b542a2f3ed15d2c8331e90e792b0e4",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_password_health_parity.py",
+      "bytes": 311,
+      "sha256": "86de45ed618c0f8706760d848e1975dbb46e4b4f4d87a64f0cfc071eef316f0a",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_performance_regressions.py",
+      "bytes": 514,
+      "sha256": "7bd562837f4c73ad1673954916c319da5417f813cbce32cbd8793b28ac648e05",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pinyin.py",
+      "bytes": 2273,
+      "sha256": "e14d329c956790ff4a8ab01f87719a1105f4e87f94d3b70d5ba1546b6bd75c9e",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmv_append_reader.py",
+      "bytes": 24811,
+      "sha256": "2063025f0655857543d916646265c38ffc6db7588e88df361ea8b3b43cb44f9f",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmv_attachment.py",
+      "bytes": 3445,
+      "sha256": "f59a7f4fa8afd053555de146d2c1dc8f90861e696b516a435bbb6eebde267c5f",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmv_commit.py",
+      "bytes": 5598,
+      "sha256": "56666bc4dbead54e2178db8bc233f89278d814cb3b13c577723c93106001e5db",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmv_compression.py",
+      "bytes": 2605,
+      "sha256": "34a8a83a239e36e167c14784328da594f7e5b93a7a92568afc327d37c6e4e935",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmv_device_registry.py",
+      "bytes": 4934,
+      "sha256": "e8056e4c79eb8be1aef4b97fedaa801e3a402717d7f61d797d1dce45da982e9d",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmv_entry_codec.py",
+      "bytes": 3256,
+      "sha256": "2a8d30386ebc1b2533e2d8c3c54098b2c1f6e28cdad80258efcf54d5a5e8abc3",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmv_kdf_policy.py",
+      "bytes": 1634,
+      "sha256": "144bb6b77fe1d0aa537e024f5a3904c553b2107fcdff2f7a42128c26519802b9",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmv_login_fast_index.py",
+      "bytes": 7642,
+      "sha256": "789205b80be6158058026af228887207747fd0b0dcfd8c2a7ffae50d055fd1cd",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmv_media_ref.py",
+      "bytes": 6533,
+      "sha256": "3110414102e4591358374d9b5930eef269562abc7080250707f042590a2942a8",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmv_merge_media.py",
+      "bytes": 4601,
+      "sha256": "f6a2ebf511101bd1e4d2701c2957f868396f931ab9feafd3c37a21831cb15c84",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmv_next_format.py",
+      "bytes": 12381,
+      "sha256": "05ad3f0450569529540b1332d1282cb2fb455b7753b1a9fe204db11fda2d664d",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmv_next_vectors.py",
+      "bytes": 24057,
+      "sha256": "f4c6299bf7834f9acd8edd8fad3b70dfb0b84dbd2d80a5cd77c63017bce05022",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmv_object_store.py",
+      "bytes": 5286,
+      "sha256": "12b1bbedc4217128e9934fb6db4bec96310931c1bd8480dcbdfabcbfa3873de3",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmv_stream_transaction.py",
+      "bytes": 4631,
+      "sha256": "ff32e5d9be6b3332fda28442484fb75a6f14e6e4f029db9a3cae5aa137204e1d",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmv_sync_authorization.py",
+      "bytes": 9616,
+      "sha256": "385bdd5ecd3285d0c96afda81833079a483ff7d326e08b6aa1df0853f720e8f0",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmv_tombstone.py",
+      "bytes": 4773,
+      "sha256": "e0da6e4e14814fd4d06ffbee86a57af8fc2379d763f37c836c0380539f2b789c",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmv_vault_header.py",
+      "bytes": 7468,
+      "sha256": "8cc8893cb8461fc126e27b708c40572374ab9d6a007dff8501562022d0465899",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmv_vault_metadata.py",
+      "bytes": 2484,
+      "sha256": "29ffeb670603e2c532c290e3c4cb13b7af73a89b7609d6e0534eacbe53845461",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmv_vault_root_object_index.py",
+      "bytes": 5468,
+      "sha256": "8310032bc8efffd8130b6a3c09b53b2e29bf0e55049c4db9f05727aef691afac",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmv_vault_store.py",
+      "bytes": 27631,
+      "sha256": "90685fcaa2d61e72f03695b5a2f1e908c28c9e9adba66d0220a58d30e84f7d83",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmv_vault_store_interop.py",
+      "bytes": 2748,
+      "sha256": "e4e6912f5be6b3dc4765307045a8fc10c13022e37fcf23c62455b6644ce080ef",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmv_vault_store_objects.py",
+      "bytes": 5657,
+      "sha256": "7b6a9274c622c6ee514267e08ba3f67e2158572368e39dc21b5a4386dde29cf8",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmve_cloud_sync.py",
+      "bytes": 23578,
+      "sha256": "fe4a63e81a2588bf45180d05c1b5b53dd3aab9ef58cb7e85926f51a5189cdf2e",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmve_device_envelope.py",
+      "bytes": 6178,
+      "sha256": "d48498ebfa1331a07dedeb2f0146e6b77f064a3065ebc009e594a2372ca11b0e",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmve_lan_lineage.py",
+      "bytes": 19481,
+      "sha256": "b29e6d6ee9a0a734dcaa534bdf93a29874ee92851a8f70592add09e8befcdf5e",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_pmve_merge_adopt.py",
+      "bytes": 7571,
+      "sha256": "88f4e19a63609f34b2f4acf0b73a5082fad7abf1d7fa268ff115d690184f0158",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_release_scripts.py",
+      "bytes": 2916,
+      "sha256": "177f8eaebee969cf84a844a67ea0df3bdb78026d78c58704b2110db05ac26f86",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_release_windows_runtime.py",
+      "bytes": 872,
+      "sha256": "7201036a33f989d5498090789d5eb809e61cc51d0b081f8909dd17dd173ee9cf",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_security_cloud_redesign.py",
+      "bytes": 26722,
+      "sha256": "d0344b6498c540a3cf9e2ee76d727e28fd11de4291c076312db8bbe016320bb8",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_smooth_scroll.py",
+      "bytes": 4111,
+      "sha256": "791ecf107eb4d8c2a605a89fb9928f98f32750ab9ef39a4ef077120c201dc1bc",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_spake2.py",
+      "bytes": 1443,
+      "sha256": "7959fe9bc3f4f1b4179fa1c3e53d60693897709f44db1c0f8d31c7b1b83a94e4",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_startup_imports.py",
+      "bytes": 2104,
+      "sha256": "301a800a71a42747f836ea6497da2d095f19038c3ce0be1c8db5a19fa666bf33",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_storage_pmve_backend.py",
+      "bytes": 11259,
+      "sha256": "b55c868d6b8d2d2b2c633c797e150150d53a862af18f8956288f6f3b2d162923",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_sync_client.py",
+      "bytes": 14677,
+      "sha256": "f03d1778b2ffd16bfa20f40dd6c031d90219a82ca107bdd33a0e5640d6d50dcb",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_sync_server_security.py",
+      "bytes": 35854,
+      "sha256": "115620a6da78961c70b4ba587dc5344b0e9d8aa88fb5dab6f8870f603f3dbabb",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_tag_management.py",
+      "bytes": 10373,
+      "sha256": "f8299a3b49b7d16398e6edb97fca287c6eda8d73d0d3d98dbc191749e889cdf0",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_theme.py",
+      "bytes": 1305,
+      "sha256": "ad58f99e4b5d1d737185b90dc09bd0d3c617fc81e979eda299b29f5d4e6e93a9",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_theme_reveal.py",
+      "bytes": 925,
+      "sha256": "272d1abb7b5ae5e14ceb215781b6fa8da464b69cc9b334c2a193307cd67ff610",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_ui_regressions.py",
+      "bytes": 168129,
+      "sha256": "3a47d06f783e1fbe6482f240cb087a943a96e12037b63c43170e3dbc08798d7d",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_unlock_spinner.py",
+      "bytes": 17794,
+      "sha256": "c3cc475bcdb221f3b3ae225c18136dbe09e63783d9ff512f52e5eec4142563fb",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_updates.py",
+      "bytes": 5601,
+      "sha256": "f1c377038043971ba42014b245bbf7280f530bbe6859e4455dfd739fa9913cb2",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_upward_menu.py",
+      "bytes": 1175,
+      "sha256": "53c4596b61d4ca648c486cb2db89ed4ade2f283a336aca4d7b145548c3340ad1",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_window_chrome.py",
+      "bytes": 9623,
+      "sha256": "f79f254eb61621074db4f0a0a21c6ca52a17d34547473c3827bd530cbca6c16b",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_window_lifecycle.py",
+      "bytes": 3992,
+      "sha256": "1a6a92b0ef5425b4341139c3082812ef94afdd90e50546b22a3f9825c98f2a6a",
+      "kind": "source"
+    },
+    {
+      "path": "ui/__init__.py",
+      "bytes": 61,
+      "sha256": "ee82a95a585e697b341449a3f87e77654291a9ceb4dc0e091549a44ab40fb652",
+      "kind": "source"
+    },
+    {
+      "path": "ui/_clipboard.py",
+      "bytes": 5592,
+      "sha256": "9fc549cb15137cb1aa66ad382edc1104d0232fc89ae9a7ef5b36b11b8e53f378",
+      "kind": "source"
+    },
+    {
+      "path": "ui/app.py",
+      "bytes": 248116,
+      "sha256": "ee084b500f120476db039479ee24bca361dbaa54cbc9e4e73dea9aa6a908c311",
+      "kind": "source"
+    },
+    {
+      "path": "ui/cloud_sync_controller.py",
+      "bytes": 61435,
+      "sha256": "e9584463fcc279fb31de757d00d75a38ae636066fcb7f751a0b413a88c42fc32",
+      "kind": "source"
+    },
+    {
+      "path": "ui/cloud_sync_page.py",
+      "bytes": 9773,
+      "sha256": "af1857526bc374e4ee4d165aac8f89649dfd8e11dd1e341e958e943f664e0773",
+      "kind": "source"
+    },
+    {
+      "path": "ui/dialogs.py",
+      "bytes": 237449,
+      "sha256": "d17b892d9d0d29fef4efe178f48e83796cd6490bf9475e282b7ac880c954548a",
+      "kind": "source"
+    },
+    {
+      "path": "ui/document_scanner.py",
+      "bytes": 12631,
+      "sha256": "7ffd6d5d1486c1b112687fde1d81fde152837904d98557671d91615e2dbbde32",
+      "kind": "source"
+    },
+    {
+      "path": "ui/editor_workspace.py",
+      "bytes": 9145,
+      "sha256": "c46cc838713a128c08c5bfdc17106d577b6761a5e1c757682ca2ca9cbf61e4e4",
+      "kind": "source"
+    },
+    {
+      "path": "ui/encrypted_document_cache.py",
+      "bytes": 3330,
+      "sha256": "ad20ef49022449fc2ef635f49ae48b6f7b52352a6d99ceb5d861f1f60a9c0cfa",
+      "kind": "source"
+    },
+    {
+      "path": "ui/encrypted_thumbnail_cache.py",
+      "bytes": 3385,
+      "sha256": "5099e0549eb429ed6100efd48d1c0f88a05edbf6d4dab707f1a7422cbe79c180",
+      "kind": "source"
+    },
+    {
+      "path": "ui/floating_actions.py",
+      "bytes": 7288,
+      "sha256": "bcb1abfdad14503ae921dca6c0b4396c61fef637e9eae889cce6f4f79ea7d008",
+      "kind": "source"
+    },
+    {
+      "path": "ui/i18n.py",
+      "bytes": 70997,
+      "sha256": "f64b68d2e514a89e053846c0a1cdb9a576d8aa6c3c24ff02e318d31020a7e064",
+      "kind": "source"
+    },
+    {
+      "path": "ui/i18n_en_complete.py",
+      "bytes": 128295,
+      "sha256": "56af3c9d4e8214ae4b9e867dc28e44d4988a1637255718d360a6a84fee98eea4",
+      "kind": "source"
+    },
+    {
+      "path": "ui/image_preview.py",
+      "bytes": 4756,
+      "sha256": "673e85e56be67b480fc6c3296351a142533d47cb2ffe14607e5dd4a06e969f3e",
+      "kind": "source"
+    },
+    {
+      "path": "ui/lan_panels.py",
+      "bytes": 22052,
+      "sha256": "a3155f9093124e81dbb1c3ac9d78e3a4caac45774336260d3cffb6e3a7244a27",
+      "kind": "source"
+    },
+    {
+      "path": "ui/large_image_decode.py",
+      "bytes": 2976,
+      "sha256": "940de6d46d55cf553d93c069afd4f82a6c2a3d99f3bc6670ef7a8eec278eba00",
+      "kind": "source"
+    },
+    {
+      "path": "ui/maintenance_pages.py",
+      "bytes": 35202,
+      "sha256": "4a51a6d1bb8ace2f62c2879b315356067bba7554b69b3bf19fc7b34dcc0e1adb",
+      "kind": "source"
+    },
+    {
+      "path": "ui/module_editor.py",
+      "bytes": 76797,
+      "sha256": "54f4f31ed47dc885ffce0b84639a97562386a7c2b1f5bd4eb29d6f746a8fa7e0",
+      "kind": "source"
+    },
+    {
+      "path": "ui/render_jobs.py",
+      "bytes": 1070,
+      "sha256": "9a91cd558ae42c169f240426c9ced73bf1c009d9ef85a99e399efb0da9df3c8c",
+      "kind": "source"
+    },
+    {
+      "path": "ui/screen_capture.py",
+      "bytes": 1806,
+      "sha256": "f46bffe95f7eee46935bdaecbbd7202b0e149702c81a66337ebdb34857f764d4",
+      "kind": "source"
+    },
+    {
+      "path": "ui/security_page.py",
+      "bytes": 18218,
+      "sha256": "93dd5027802e6afe901a1094f2b0147e12679b147f081762fb2c200c3d782eba",
+      "kind": "source"
+    },
+    {
+      "path": "ui/security_results.py",
+      "bytes": 4524,
+      "sha256": "80bbeae25076d927e94fbf1d26d74ce73b84219428e746df005e0e0b57c92c3d",
+      "kind": "source"
+    },
+    {
+      "path": "ui/settings_page.py",
+      "bytes": 53064,
+      "sha256": "5a1bb1977858da64719ac1a55a4697d17ecf1d71f8023ab1c425401b89695f3b",
+      "kind": "source"
+    },
+    {
+      "path": "ui/smooth_scroll.py",
+      "bytes": 3722,
+      "sha256": "c271e35bce89d38cc1d67e59448615718ef6ac81985751b0b079fd1344cb4224",
+      "kind": "source"
+    },
+    {
+      "path": "ui/sync_pages.py",
+      "bytes": 149869,
+      "sha256": "8fb46339801093bf4bb3cde0c2419ff84aa13756f29c3fb5805c9c52c7ce6033",
+      "kind": "source"
+    },
+    {
+      "path": "ui/tag_popup.py",
+      "bytes": 5244,
+      "sha256": "d790df561e7395f47f75bcda77232386af4109f2f2b51c225c697f01263d9bcd",
+      "kind": "source"
+    },
+    {
+      "path": "ui/theme.py",
+      "bytes": 42434,
+      "sha256": "4674706a9e9f040f1a62e6731e690f5599c4d617e00be0eec8f1b7c4e7076216",
+      "kind": "source"
+    },
+    {
+      "path": "ui/theme_reveal.py",
+      "bytes": 2637,
+      "sha256": "9d62a494111a9fa2e6c3bde8eb09b8ecb0ab47faae7ded90e8c5f00a21bba74c",
+      "kind": "source"
+    },
+    {
+      "path": "ui/tray.py",
+      "bytes": 2180,
+      "sha256": "e02598d328786e2c90e01d6b19b29cdd1216374c4fa6ead386544e0dc588207c",
+      "kind": "source"
+    },
+    {
+      "path": "ui/widgets.py",
+      "bytes": 63277,
+      "sha256": "a3bee0e7d17d901893bd176c927908a0ba2ca9f73fb60acbef448c4a2b5cb96f",
+      "kind": "source"
+    },
+    {
+      "path": "uv.lock",
+      "bytes": 223799,
+      "sha256": "a48828e38fecec8e318107ebc575572586d3e46cb972dd72df146448d5ea6f9d",
+      "kind": "source"
+    }
+  ]
+}

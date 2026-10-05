@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<autofill-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:settingsActivity="com.vault.MainActivity"
+    android:supportsInlineSuggestions="true">
+    <!-- Chrome 137+ uses native Android Autofill; compatibility mode is capped
+         to the last legacy-compatible build to avoid duplicate UI and crashes. -->
+    <compatibility-package android:name="com.android.chrome" android:maxLongVersionCode="711900039" />
+    <compatibility-package android:name="com.chrome.beta" android:maxLongVersionCode="711900039" />
+    <compatibility-package android:name="com.chrome.dev" android:maxLongVersionCode="711900039" />
+    <compatibility-package android:name="com.chrome.canary" android:maxLongVersionCode="711900039" />
+    <compatibility-package android:name="org.mozilla.firefox" android:maxLongVersionCode="9999999999" />
+    <compatibility-package android:name="org.mozilla.firefox_beta" android:maxLongVersionCode="9999999999" />
+    <compatibility-package android:name="com.microsoft.emmx" android:maxLongVersionCode="9999999999" />
+    <compatibility-package android:name="com.brave.browser" android:maxLongVersionCode="711900039" />
+    <compatibility-package android:name="com.opera.browser" android:maxLongVersionCode="9999999999" />
+</autofill-service>

@@ -1,0 +1,3 @@
+<resources>
+    <string name="import_file_invalid">Cannot import: the file is unreadable, damaged, or unsupported.</string>
+</resources>

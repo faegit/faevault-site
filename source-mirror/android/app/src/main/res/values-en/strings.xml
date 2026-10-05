@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="app_name">FAEVault</string><string name="autofill_service_label">FAEVault Autofill</string><string name="autofill_unlock">Unlock FAEVault to autofill</string>
+<string name="unlock_vault">Unlock your vault</string>
+<string name="master_password">Master password</string>
+<string name="unlock">Unlock</string><string name="unlocking_progress">Unlocking…</string>
+<string name="unlock_biometric">Unlock with biometrics</string><string name="cooling_notice_seconds">Too many attempts. Retry in %1$d seconds</string><string name="cooling_notice_biometric_hint">You can still unlock with your fingerprint during the cooldown</string><string name="waiting_for_verification">Waiting for verification…</string><string name="forgot_password">Forgot your password?</string>
+<string name="add_account">Add vault</string><string name="create_account">Create vault</string><string name="import_pmv">Import from file</string>
+<string name="nav_home">Home</string><string name="nav_trash">Trash</string><string name="nav_maintenance">Tools</string><string name="nav_security">Security</string><string name="nav_sync">Sync</string><string name="nav_settings">Settings</string><string name="lock">Lock</string>
+<string name="add">New item</string><string name="item_count">%1$d items</string>
+<string name="category_login">Logins</string><string name="category_wifi">Wi-Fi</string><string name="category_card_document">Cards &amp; documents</string><string name="category_key">Keys</string><string name="category_otp">One-time codes</string><string name="category_secure_note">Secure notes</string><string name="category_server">Servers</string><string name="category_custom">Custom</string><string name="category_passkey">Passkeys</string>
+<string name="biometric_enable_title">Enable biometric unlock</string>
+<string name="biometric_enable_subtitle">Verify to protect the vault encryption key</string>
+<string name="biometric_unlock_title">Unlock with biometrics</string>
+<string name="biometric_unlock_subtitle">Verify to unlock FAEVault</string>
+<string name="biometric_cancel">Cancel</string>
+<string name="biometric_not_enabled">Biometric unlock is not enabled</string>
+<string name="biometric_binding_changed">Your biometric enrollment changed, so the previous binding is no longer valid</string>
+<string name="biometric_key_unavailable">The biometric key is unavailable. Enable biometric unlock again.</string>
+<string name="biometric_legacy_binding_invalid">The legacy biometric binding is no longer valid. Unlock with the master password and enable it again.</string>
+<string name="biometric_cipher_missing">Biometric authentication did not return the required encryption data</string>
+<string name="passkey_verify_title">Verify passkey action</string>
+<string name="passkey_verify_subtitle">Use strong biometrics or your device screen lock</string>
+<string name="default_name">Default</string>
+<string name="camera_permission_denied">Camera permission was permanently denied. Grant it manually in system settings.</string>
+<string name="camera_permission_required">Camera permission is required to scan</string>
+<string name="lan_import">Local network import</string>
+<string name="next_step">Next</string>
+<string name="account_index_name">Vault %1$d</string>
+<string name="import_to_new_vault">Import into a new vault</string>
+<string name="import_action">Import</string>
+<string name="verify_deleted_vault">Verify a deleted vault</string>
+<string name="deleted_vault_verify_text">“%1$s” is marked as deleted. Enter its original master password to verify ownership; the vault will be restored and the selected file imported.</string>
+<string name="original_master_password">Original master password</string>
+<string name="verify_and_import">Verify and import</string>
+<string name="cancel">Cancel</string>
+<string name="biometric_changed_error">Biometrics changed; the previous binding is no longer valid. Unlock with the master password and re-enable biometric unlock in Settings.</string>
+<string name="biometric_unlock_failed">Biometric unlock failed</string>
+<string name="no_vault">No vault</string>
+<string name="no_vault_hint">No vault yet. Tap the button on the right to add one.</string>
+<string name="scan_qr_import">Scan a QR code to import</string>
+<string name="manual_station_address">Enter the full transfer station address</string>
+<string name="station_address">Transfer station address</string>
+<string name="start_import">Start import</string>
+<string name="invalid_station_qr">Not a valid transfer station QR code</string>
+<string name="local_encrypted_desktop">Encrypted locally · works with the desktop .pmv format</string>
+<string name="create_empty_vault">Create an empty vault</string>
+<string name="waiting_other_device">Waiting for the other device to confirm</string>
+<string name="receiving_vault_data">Receiving vault data</string>
+<string name="checking_received_data">Checking received data</string>
+<string name="saving_vault">Saving vault</string>
+<string name="confirm_on_other_device">Confirm sending on the other device. No data is transferred until confirmed.</string>
+<string name="copy_only_note">This only copies the vault; nothing is deleted or changed on the other device.</string>
+<string name="receiving_progress">Received %1$d%%</string>
+<string name="receiving">Receiving…</string>
+<string name="verifying_received_data">Verifying the received data is complete and unchanged.</string>
+<string name="verified_adding">Check passed. Adding to the vault list.</string>
+<string name="incomplete_data_title">Received data is incomplete</string>
+<string name="corrupted_data_note">The transfer may have been interrupted and corrupted. To protect your vault, this data will not be saved.</string>
+<string name="retry_receive_note">You can receive it again, attempt %1$d/%2$d. Data on the other device is not affected.</string>
+<string name="retry_receive">Receive again</string>
+<string name="stop_receiving">Stop receiving</string>
+<string name="same_vault_title">Same vault detected</string>
+<string name="vault_name_conflict">Vault name conflict</string>
+<string name="same_vault_note">The received vault “%1$s” and local “%2$s” are the same vault.</string>
+<string name="existing_vault_note">A different vault named “%1$s” already exists on this device.</string>
+<string name="import_separately_note">If you continue, it will be imported separately as “%1$s”; no existing vault will be overwritten.</string>
+<string name="import_anyway">Import anyway</string>
+<string name="account_name_label">Vault name</string>
+<string name="deleted_vault_restore_hint">“%1$s” is marked as deleted and can be recovered within 30 days. Tap Restore to recover the original data, or choose another name to create a new vault.</string>
+<string name="master_password_min">Master password</string>
+<string name="confirm_password_again">Re-enter</string>
+<string name="unlock_with_desktop_password">Unlock with the desktop vault\'s master password after import.</string>
+<string name="restore_vault">Restore vault</string>
+<string name="maintenance_title">Vault maintenance</string>
+<string name="maintenance_subtitle">Organize data and manage automatic cleanup</string>
+<string name="dedup_title">Merge duplicate entries</string>
+<string name="dedup_scan_summary">%1$d groups can be merged, %2$d with different passwords</string>
+<string name="dedup_compare">Merge duplicates</string>
+<string name="loading">Loading…</string>
+<string name="same_service_title">Merge same-service items</string>
+<string name="same_service_detected">%1$d groups may share the same service</string>
+<string name="same_service_compare">Merge same-service items</string>
+<string name="no_same_service">No same-service items found.</string>
+<string name="cleanup_title">Clean up and compress</string>
+<string name="trash_retention_title">Automatic trash cleanup</string>
+<string name="cleanup_scope">Cleanup targets: leftover temporary files from import/export, expired staged media, and unused data space from old commits. No valid entries or attachments are deleted.</string>
+<string name="cleanup_rules_title">Automatic cleanup rules</string>
+<string name="cleanup_rule_trash">Trash items are permanently deleted after the set period</string>
+<string name="cleanup_rule_auto_compact">Auto-compress after %1$d commits and file growth over 1 MB</string>
+<string name="cleanup_rule_interval">Auto-compression runs at least 24h apart and is skipped within 24h after import</string>
+<string name="cleanup_rule_sync_compact">The vault is compacted automatically before cloud sync upload to reclaim history space and reduce upload size</string>
+<string name="cleanup_rule_trash_purge">The vault is compacted immediately when the trash is emptied, reclaiming history space</string>
+<string name="last_cleanup_temp">Last cleanup: %1$d temp files, %2$s reclaimed</string>
+<string name="last_cleanup_compacted">; %1$s reclaimed by compression</string>
+<string name="cleanup_running">Cleaning…</string>
+<string name="cleanup_start">Start cleanup</string>
+<string name="retention_year">%1$d year</string>
+<string name="retention_months">%1$d months</string>
+<string name="retention_weeks">%1$d weeks</string>
+<string name="retention_days">%1$d days</string>
+<string name="retention_summary">Items older than %1$s are permanently deleted</string>
+<string name="dedup_sub_desc">Merges login entries with the same title and username, keeping the most recently updated version.</string>
+<string name="merge_confirm">Confirm merge</string>
+<string name="no_mergeable_dupes">No duplicate entries can be merged right now.</string>
+<string name="pw_conflict">Password conflicts</string>
+<string name="group_count">%1$d groups</string>
+<string name="unnamed_entry">Untitled item</string>
+<string name="group_records_note">%1$d records, keeps the most recently updated version</string>
+<string name="keep">Keep</string>
+<string name="merge">Merge</string>
+<string name="no_account">No username</string>
+<string name="no_target_app">No linked package</string>
+<string name="pkg_password_note">Package: %1$s · Password: %2$s</string>
+<string name="pw_blank_short">empty</string>
+<string name="password_set">set</string>
+<string name="identical">Identical</string>
+<string name="same_service_sub_desc">Tap a group title to select the whole group, or use the checkboxes to select individually.</string>
+<string name="merge_selected_count">Merge %1$d selected</string>
+<string name="password_empty">Password empty</string>
+<string name="merge_conflict_confirm">Confirm merge</string>
+<string name="merge_conflict_desc">The selected items have different titles, usernames, or passwords. Choose which to keep after merging.</string>
+<string name="merge_title_label">Merged title</string>
+<string name="merge_username_label">Merged username</string>
+<string name="merge_password_label">Merged password</string>
+<string name="back">Back</string>
+<string name="back_to_edit">Back to edit</string>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <string name="settings_kdf_title">KDF security level</string>
+    <string name="settings_kdf_desc">Master password derivation (Argon2id) strength. Raising the level rewraps the data key automatically after unlock.</string>
+    <string name="settings_kdf_level">Security level</string>
+    <string name="settings_kdf_status">Current status</string>
+    <string name="settings_kdf_current_ok">Already at the latest level (selected level equals current).</string>
+    <string name="settings_kdf_upgrade">Upgrade available: the vault will be rewrapped to the selected level on next unlock.</string>
+    <string name="settings_kdf_unsupported">Current parameters are unsupported (written by a newer version). Update the app.</string>
+    <string name="settings_kdf_recommend">Recommend by device performance</string>
+    <string name="settings_kdf_calibrating">Calibrating…</string>
+    <string name="settings_kdf_standard">Standard</string>
+    <string name="settings_kdf_hardened">Hardened</string>
+    <string name="settings_kdf_profile_summary">Memory %1$d KiB · iterations %2$d · parallelism %3$d</string>
+    <string name="cooling_retry_button">Retry in %1$d s</string>
+</resources>

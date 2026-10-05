@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "suite": "PMV_NEXT_V1_SUITE_1",
+  "encoding": "lowercase hex",
+  "cases": [
+    {
+      "id": "superblock_sequence_42",
+      "authenticationKeyHex": "bb354160c4d594af1d90ed5ee37a691e9cff9d9db449fbb9ad93faaa856cdb18",
+      "superblock": {
+        "vaultId": "00112233-4455-6677-8899-aabbccddeeff",
+        "sequence": 42,
+        "latestCommitOffset": 16384,
+        "latestIndexOffset": 24576,
+        "committedFileEnd": 32768,
+        "kdfParametersOffset": 16384,
+        "featureFlags": 5
+      },
+      "expectedEncodedBytes": 4096,
+      "expectedPrefixHex": "504d56530000000100112233445566778899aabbccddeeff000000000000002a00000000000040000000000000006000000000000000800000000000000040000000000000000005",
+      "expectedAuthTagHex": "897a45f3cb6c737f22b1b74be9d163139a604d6810751fb2c676b881e51a21ad",
+      "expectedSha256Hex": "aad2eb3487c5bd9bbd45f4e8de70e8111b74f0deac001f76cdf34da41db7c7c8"
+    }
+  ]
+}

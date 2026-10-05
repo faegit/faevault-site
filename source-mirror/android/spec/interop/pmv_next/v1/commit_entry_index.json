@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "suite": "PMV_NEXT_V1_SUITE_1",
+  "encoding": "lowercase hex",
+  "logicalDigestExcludes": ["record.offset", "record.length", "page.nextPageOffset", "root.pageOffset"],
+  "cases": [
+    {
+      "id": "two_leaf_logical_entry_root",
+      "records": [
+        {
+          "id": "login-active",
+          "entryId": "10213243-5465-7687-98a9-bacbdcedfe0f",
+          "entryType": "login",
+          "revision": 7,
+          "offset": 16384,
+          "length": 174,
+          "state": "ACTIVE",
+          "displayTitle": "示例 Login",
+          "favorite": true,
+          "iconObjectId": "99999999-8888-7777-6666-555555555555",
+          "modifiedAtEpochMillis": 1700000000123,
+          "contentDigestHex": "0ce0080fd0dda7b88a0635a8d32d05ab7331f46a219ba2264a8d3d171ee15f61",
+          "expectedRecordDigestHex": "ce7a8897b95eee9d9ad2ff768542b57a6534ab08bfd420c3192e93dff52e7dc8"
+        },
+        {
+          "id": "note-tombstone",
+          "entryId": "20213243-5465-7687-98a9-bacbdcedfe0f",
+          "entryType": "secure_note",
+          "revision": 2,
+          "offset": 24576,
+          "length": 256,
+          "state": "TOMBSTONE",
+          "displayTitle": "",
+          "favorite": false,
+          "iconObjectId": null,
+          "modifiedAtEpochMillis": 1700000000999,
+          "contentDigestHex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+          "expectedRecordDigestHex": "d12d2359b120ca81fc7c6952d2e2fd43f492245ae301a12f685da4409a0dff93"
+        }
+      ],
+      "pages": [
+        {
+          "recordIds": ["login-active"],
+          "nextPageOffset": 24576,
+          "expectedLogicalDigestHex": "884aea584d4390368cf9c5e6b8b895186c453954c5c3a78d641145754387f192",
+          "expectedEncodedSha256Hex": "01b9f9dde7908e2fd7e68b16aa7d2ac865c4e891e7c1d100014ec207935364c4"
+        },
+        {
+          "recordIds": ["note-tombstone"],
+          "nextPageOffset": 0,
+          "expectedLogicalDigestHex": "0a9f672e01d664a3b3cbb33e2f9d461993306231a9658675385b8d9da1376a68",
+          "expectedEncodedSha256Hex": "c2eb89c75ff247537507d4a604257e54638cc92aced60e1bea4b0d9c4af04f90"
+        }
+      ],
+      "root": {
+        "records": [
+          {
+            "minEntryId": "10213243-5465-7687-98a9-bacbdcedfe0f",
+            "maxEntryId": "10213243-5465-7687-98a9-bacbdcedfe0f",
+            "pageOffset": 16384,
+            "pageDigestHex": "884aea584d4390368cf9c5e6b8b895186c453954c5c3a78d641145754387f192"
+          },
+          {
+            "minEntryId": "20213243-5465-7687-98a9-bacbdcedfe0f",
+            "maxEntryId": "20213243-5465-7687-98a9-bacbdcedfe0f",
+            "pageOffset": 24576,
+            "pageDigestHex": "0a9f672e01d664a3b3cbb33e2f9d461993306231a9658675385b8d9da1376a68"
+          }
+        ],
+        "expectedLogicalDigestHex": "5f18b69c7b1b4c644a8aa82ef04895f2c1c51b3deb0d4a065d9f134fbe501208",
+        "expectedEncodedSha256Hex": "8954dca49d95cabd3b88b2bdde61e11cfc976512f24c9a14ba3ba3c7e6f35c8f"
+      },
+      "commit": {
+        "vaultId": "00112233-4455-6677-8899-aabbccddeeff",
+        "commitId": "31415926-5358-9793-2384-626433832795",
+        "parentCommitId": "27182818-2845-9045-2353-602874713526",
+        "revision": 42,
+        "indexRootOffset": 32768,
+        "indexRootLength": 16528,
+        "rootDigestHex": "5f18b69c7b1b4c644a8aa82ef04895f2c1c51b3deb0d4a065d9f134fbe501208",
+        "privateSeedHex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+        "expectedPublicKeyHex": "03a107bff3ce10be1d70dd18e74bc09967e4d6309ba50d5f1ddc8664125531b8",
+        "expectedCanonicalSigningBytesHex": "706d762f76312f636f6d6d69740000112233445566778899aabbccddeeff314159265358979323846264338327950127182818284590452353602874713526000000000000002a5f18b69c7b1b4c644a8aa82ef04895f2c1c51b3deb0d4a065d9f134fbe501208",
+        "expectedSignatureHex": "784da5ce55411cdcca7007796f3fe19023acd6251d86879978f0951a156a38b4353fbfa1e053583cf4f7eb0200ad1413edb2ac1985292939cbd63ad41c5a1306",
+        "expectedEncodedHex": "504d564300000001000000e00000000000112233445566778899aabbccddeeff31415926535897932384626433832795010000000000000027182818284590452353602874713526000000000000002a000000000000800000000000000040905f18b69c7b1b4c644a8aa82ef04895f2c1c51b3deb0d4a065d9f134fbe50120803a107bff3ce10be1d70dd18e74bc09967e4d6309ba50d5f1ddc8664125531b8784da5ce55411cdcca7007796f3fe19023acd6251d86879978f0951a156a38b4353fbfa1e053583cf4f7eb0200ad1413edb2ac1985292939cbd63ad41c5a1306",
+        "expectedEncodedSha256Hex": "2ffdef53834685642ea4d12ecfe965fc084938438c4c9c1e7e86459688498058"
+      }
+    }
+  ]
+}

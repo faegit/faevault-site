@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "suite": "PMV_NEXT_V1_SUITE_1",
+  "encoding": "canonical UTF-8 JSON; object keys sorted by unsigned UTF-8 bytes; plain normalized decimal numbers",
+  "cases": [
+    {
+      "id": "entry_all_fields_unicode_nested_json",
+      "entry": {
+        "title": "跨端🔐",
+        "username": "用户",
+        "password": "päss\n密钥",
+        "url": "https://例子.test",
+        "target_app": "com.example",
+        "notes": "",
+        "tags": ["甲", "乙"],
+        "id": "10213243-5465-7687-98a9-bacbdcedfe0f",
+        "created_at": 1700000000.0,
+        "updated_at": 1700000100.5000,
+        "secret_type": "login",
+        "fields": {
+          "é": {
+            "private_key": "秘密",
+            "array": [true, 1.2300, null]
+          },
+          "z": null
+        },
+        "deleted_at": null,
+        "leak_check_revision": null,
+        "leak_pwned_count": 7,
+        "leak_common_weak": false,
+        "leak_checked_at": 1700000200.0
+      },
+      "expectedCanonicalJson": "{\"created_at\":1700000000,\"deleted_at\":null,\"fields\":{\"z\":null,\"é\":{\"array\":[true,1.23,null],\"private_key\":\"秘密\"}},\"id\":\"10213243-5465-7687-98a9-bacbdcedfe0f\",\"leak_check_revision\":null,\"leak_checked_at\":1700000200,\"leak_common_weak\":false,\"leak_pwned_count\":7,\"notes\":\"\",\"password\":\"päss\\n密钥\",\"secret_type\":\"login\",\"tags\":[\"甲\",\"乙\"],\"target_app\":\"com.example\",\"title\":\"跨端🔐\",\"updated_at\":1700000100.5,\"url\":\"https://例子.test\",\"username\":\"用户\"}"
+    }
+  ]
+}
