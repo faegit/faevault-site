@@ -649,7 +649,7 @@ def test_settings_consolidates_groups_and_can_expand_advanced_options(window_stu
     groups = [page._content_lay.itemAt(i).widget() for i in range(page._content_lay.count())]
     groups = [group for group in groups if group is not None]
     titles = [group.layout().itemAt(0).widget().text() for group in groups]
-    assert titles == ["外观", "账户与解锁", "隐私与安全", "自动填充与通行密钥", "关于与支持"]
+    assert titles == ["外观", "账户与解锁", "隐私与安全", "自动填充与通行密钥", "启动与后台", "关于与支持"]
     by_title = dict(zip(titles, groups))
     assert by_title["账户与解锁"].isAncestorOf(page.hello_enabled)
     assert by_title["账户与解锁"].isAncestorOf(page._recovery_box.itemAt(0).widget())
@@ -658,6 +658,8 @@ def test_settings_consolidates_groups_and_can_expand_advanced_options(window_stu
     assert integration.isAncestorOf(page.native_autofill_enabled)
     assert integration.isAncestorOf(page._browser_autofill_install)
     assert integration.isAncestorOf(page._passkey_provider_status)
+    assert by_title["启动与后台"].isAncestorOf(page.start_at_login)
+    assert by_title["启动与后台"].isAncestorOf(page.silent_start)
     assert any(button.text() == "打开赞助页面" for button in by_title["关于与支持"].findChildren(QPushButton))
     assert page._advanced_content.isHidden()
     page._advanced_toggle.click()
@@ -2123,3 +2125,22 @@ def test_exiting_host_mode_restores_the_connector_entry(lan_context):
     finally:
         conn._state["client"] = None
         _close(page)
+
+
+def test_startup_controls_apply_registration_and_flush_silent_preference(window_stub, monkeypatch):
+    from core import config, startup
+    from ui.settings_page import SettingsPage
+    _app()
+    registrations, staged, saved = [], [], []
+    monkeypatch.setattr(startup, "is_enabled", lambda: False)
+    monkeypatch.setattr(startup, "set_enabled", registrations.append)
+    monkeypatch.setattr(config, "stage_many", staged.append)
+    monkeypatch.setattr(config, "set_many", saved.append)
+    page = SettingsPage(window_stub)
+    page.start_at_login.setChecked(True)
+    assert registrations == [True]
+    value = not page.silent_start.isChecked()
+    page.silent_start.setChecked(value)
+    assert staged[-1] == {"silent_start": value}
+    page.close_page("test")
+    assert saved[-1] == {"silent_start": value}

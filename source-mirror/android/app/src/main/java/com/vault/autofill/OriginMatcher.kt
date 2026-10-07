@@ -10,12 +10,9 @@ import kotlinx.serialization.json.contentOrNull
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import java.net.IDN
 import java.net.URI
-import java.text.Normalizer
 import java.util.Locale
 
 object OriginMatcher {
-    private val wordPattern = Regex("[\\p{L}\\p{N}]+")
-    private val genericOriginWords = setOf("com", "org", "net", "www", "app", "apps", "android", "login", "auth")
     private val packagePattern = Regex("^[a-zA-Z][a-zA-Z0-9_]*(?:\\.[a-zA-Z0-9_]+)+$")
     private val deniedPackages = setOf(
         "com.android.settings",
@@ -139,47 +136,73 @@ object OriginMatcher {
         return values
     }
 
-    /** Suggestions for an explicit picker only; never proof that a credential belongs to an origin. */
+    /** Suggestions for an explicit picker only; never origin authorization. */
     fun fillCandidateLevel(target: TargetOrigin, entry: Entry, appName: String? = null): OriginMatchLevel {
-        val verified = matchLevel(target, entry)
-        if (verified != OriginMatchLevel.NONE) return verified
-        // Do not turn a known application's signer mismatch into a word suggestion.
-        if (target is TargetOrigin.AndroidPackage && AutofillOriginMetadata.androidIdentities(entry).any {
-                it.packageName == target.packageName &&
-                    it.signingCertificateSha256.intersect(target.signingCertificateSha256).isEmpty()
-            }) return OriginMatchLevel.NONE
-        val targetWords = when (target) {
-            is TargetOrigin.AndroidPackage -> words(target.packageName) + words(appName.orEmpty())
-            is TargetOrigin.Web -> {
-                val host = webHost(target.host) ?: return OriginMatchLevel.NONE
-                val registrable = runCatching { "https://$host".toHttpUrl().topPrivateDomain() }.getOrNull()
-                    ?: return OriginMatchLevel.NONE
-                // Exclude the public/private suffix: sharing "com" or "co.uk" is not a service match.
-                words(host.removeSuffix(".${registrable.substringAfter('.')}"))
-            }
-        }.filterNot { it in genericOriginWords }.toSet()
-        if (targetWords.isEmpty()) return OriginMatchLevel.NONE
-        val labels = buildList {
-            add(entry.title)
-            add(entry.url)
-            add(entry.targetApp)
-            addAll(moduleValues(entry, "url"))
-            addAll(moduleValues(entry, "target_app"))
-            addAll(AutofillOriginMetadata.webHosts(entry))
-            addAll(AutofillOriginMetadata.androidIdentities(entry).map { it.packageName })
-        }
-        return if (labels.any { label -> words(label).any(targetWords::contains) }) {
-            OriginMatchLevel.WORD_CANDIDATE
-        } else OriginMatchLevel.NONE
+        val strict = matchLevel(target, entry)
+        if (strict != OriginMatchLevel.NONE) return strict
+        return if (fillCandidateReason(target, entry, appName) != null) OriginMatchLevel.WORD_CANDIDATE
+        else OriginMatchLevel.NONE
     }
 
-    private fun words(value: String): Set<String> = wordPattern.findAll(
-        Normalizer.normalize(value, Normalizer.Form.NFKC).lowercase(Locale.ROOT),
-    ).map { it.value }.toSet()
+    fun fillCandidateReason(target: TargetOrigin, entry: Entry, appName: String? = null): AutofillCandidateReason? {
+        if (target is TargetOrigin.AndroidPackage) {
+            val identities = AutofillOriginMetadata.androidIdentities(entry).filter { it.packageName == target.packageName }
+            if (identities.any { it.signingCertificateSha256.intersect(target.signingCertificateSha256).isNotEmpty() }) {
+                return AutofillCandidateReason.CONFIRMED_BINDING
+            }
+            // A known package signed by a different key cannot fall back to label discovery.
+            if (identities.isNotEmpty()) return null
+        } else if (target is TargetOrigin.Web && AutofillOriginMetadata.webHosts(entry).any {
+                webHost(it) == target.host
+            }) return AutofillCandidateReason.CONFIRMED_BINDING
 
-    fun rank(entries: List<Entry>, origin: TargetOrigin, limit: Int = 8): List<CredentialMatch> =
+        val labels = sourceLabels(entry)
+        if (labels.any { matchLevel(target, it) == OriginMatchLevel.EXACT }) {
+            return AutofillCandidateReason.EXACT_SOURCE
+        }
+        if (target is TargetOrigin.Web) {
+            val site = registrableDomain(target.host)
+            if (site != null && labels.mapNotNull(::webHost).any { registrableDomain(it) == site }) {
+                return AutofillCandidateReason.SAME_SITE
+            }
+        }
+        val targetLabels = when (target) {
+            is TargetOrigin.AndroidPackage -> listOf(target.packageName, appName.orEmpty())
+            is TargetOrigin.Web -> {
+                val site = registrableDomain(target.host) ?: return null
+                // Omit the PSL suffix so different tenants never match by github.io or co.uk.
+                listOf(target.host.removeSuffix(".${site.substringAfter('.')}"))
+            }
+        }
+        return if (targetLabels.any { name -> labels.any { AutofillMatchingPolicy.relatedNames(name, it) } }) {
+            AutofillCandidateReason.RELATED_NAME
+        } else null
+    }
+
+    private fun sourceLabels(entry: Entry): List<String> = buildList {
+        add(entry.title)
+        add(entry.url)
+        add(entry.targetApp)
+        addAll(moduleValues(entry, "url"))
+        addAll(moduleValues(entry, "target_app"))
+        addAll(AutofillOriginMetadata.webHosts(entry))
+        addAll(AutofillOriginMetadata.androidIdentities(entry).map { it.packageName })
+    }
+
+    private fun registrableDomain(host: String): String? = runCatching {
+        "https://$host".toHttpUrl().topPrivateDomain()
+    }.getOrNull()
+
+    fun rank(
+        entries: List<Entry>, origin: TargetOrigin, limit: Int = 8,
+        hasFillableValues: (Entry) -> Boolean = { entry ->
+            AutofillSourceResolver.resolve(entry, listOf(entry), 0).values.values.any {
+                it.value.isNotEmpty() && it.role != com.vault.model.autofill.AutofillRole.NONE
+            }
+        },
+    ): List<CredentialMatch> =
         entries.asSequence()
-            .filter { it.deletedAt == null && it.secretType == SecretType.LOGIN && it.password.isNotEmpty() }
+            .filter { it.deletedAt == null && it.secretType == SecretType.LOGIN && hasFillableValues(it) }
             .mapNotNull { entry ->
                 val level = matchLevel(origin, entry)
                 if (level == OriginMatchLevel.NONE) null

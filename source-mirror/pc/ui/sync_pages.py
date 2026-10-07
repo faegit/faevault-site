@@ -108,10 +108,34 @@ class CloudSyncWorkspacePage(EditorPage):
                         active.stateChanged.emit()
 
                 self.controller.settled.connect(refresh_session)
+        if self._window is not None and hasattr(self._window, "_connect_remote_notifications"):
+            self._window._connect_remote_notifications(self.controller)
         self._busy_targets: set[str] = set()
         self._subscriptions = []
         self._view_detached = False
         self._build_cloud_ui()
+        from core import remote_update
+        import datetime
+        for target, controls in (("drive", self.ui.drive), ("webdav", self.ui.webdav)):
+            controls.detection_toggle.setChecked(remote_update.enabled(context.cloud_vault_id, target))
+            controls.detection_toggle.toggled.connect(lambda enabled, t=target: self.controller.set_remote_detection(t, enabled))
+            controls.update_sync.clicked.connect(controls.sync.click)
+            controls.update_later.clicked.connect(lambda _checked=False, t=target: self.controller.snooze_remote_update(t))
+
+        def refresh_remote_updates():
+            for target, controls in (("drive", self.ui.drive), ("webdav", self.ui.webdav)):
+                state = self.controller.remote_update_state(target)
+                connected = self.controller.drive_connected if target == "drive" else self.controller.webdav_connected
+                controls.detection_toggle.setEnabled(connected and not self.controller.any_busy)
+                controls.update_card.setVisible(bool(state.pending))
+                controls.update_sync.setEnabled(self.controller.can_start(target))
+                if state.pending:
+                    found = datetime.datetime.fromtimestamp(state.detected_at / 1000).strftime("%Y-%m-%d %H:%M")
+                    controls.update_detail.setText(i18n.tr("远端文件已变化，尚未同步到本机") + "\n" + i18n.tr("发现时间：{time}").format(time=found))
+
+        self._subscribe(self.controller.stateChanged, refresh_remote_updates)
+        refresh_remote_updates()
+        QTimer.singleShot(0, self.controller.check_remote_updates)
         if not self.controller.loaded:
             QTimer.singleShot(0, self.controller.load_async)
 

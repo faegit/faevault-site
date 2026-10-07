@@ -332,7 +332,7 @@ private fun QrScanUi(purpose: String, analysisExecutor: Executor, onClose: () ->
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
                 )
             }
-            Text(uiText("轻触画面对焦 · 双指缩放"), color = Color.White.copy(alpha = 0.7f), fontSize = 12.sp)
+            Text(uiText("轻触画面对焦 · 双指缩放 · 点倍率切远近"), color = Color.White.copy(alpha = 0.7f), fontSize = 12.sp)
             Spacer(Modifier.height(14.dp))
             VaultButton(
                 onClick = {

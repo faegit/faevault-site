@@ -103,6 +103,7 @@ _GLOBAL_CONFIG_KEYS = frozenset(
         "pmve_compact_state",
         "list_pane_ratio",
         "clipboard_cleanup",
+        "silent_start",
     }
 )
 

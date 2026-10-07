@@ -159,7 +159,7 @@ class AutofillVaultGateway(
     }
 
     fun findMatches(session: AutofillVaultSession, origin: TargetOrigin): List<CredentialMatch> {
-        return OriginMatcher.rank(findMatchingEntries(session, origin), origin)
+        return OriginMatcher.rank(findMatchingEntries(session, origin), origin, hasFillableValues = { isFillableLogin(session, it) })
     }
 
     fun isOriginExcluded(origin: TargetOrigin, session: AutofillVaultSession? = null): Boolean {
@@ -177,19 +177,16 @@ class AutofillVaultGateway(
     /** Explicit fill picker only. Saving, automatic filling and Credential Manager use strict matches. */
     fun findFillCandidates(session: AutofillVaultSession, origin: TargetOrigin): List<Entry> {
         if (isOriginExcluded(origin, session)) return emptyList()
-        val verified = findMatchingEntries(session, origin)
-        val verifiedIds = verified.mapTo(hashSetOf()) { it.id }
         val appName = (origin as? TargetOrigin.AndroidPackage)?.let { appNameResolver(it.packageName) }
-        val suggestions = session.querySession.listSummaries().orEmpty().asSequence()
-            .filter { it.entryType == SecretType.LOGIN && it.entryId !in verifiedIds }
+        return session.querySession.listSummaries().orEmpty().asSequence()
+            .filter { it.entryType == SecretType.LOGIN }
             .mapNotNull { session.querySession.readEntry(it.entryId) }
-            .filter {
-                it.deletedAt == null && it.secretType == SecretType.LOGIN && it.password.isNotEmpty() &&
-                    OriginMatcher.fillCandidateLevel(origin, it, appName) == OriginMatchLevel.WORD_CANDIDATE
-            }
-            .sortedWith(compareBy<Entry> { it.titleLower }.thenBy { it.id })
-            .toList()
-        return verified + suggestions
+            .distinctBy { it.id }
+            .filter { isFillableLogin(session, it) }
+            .mapNotNull { entry -> OriginMatcher.fillCandidateReason(origin, entry, appName)?.let { entry to it } }
+            .sortedWith(compareByDescending<Pair<Entry, AutofillCandidateReason>> { it.second.score }
+                .thenBy { it.first.titleLower }.thenBy { it.first.id })
+            .map { it.first }.toList()
     }
 
     /** 仅返回 LoginFastIndex 候选（PMVE 权威入口）。 */
@@ -204,7 +201,7 @@ class AutofillVaultGateway(
         // PMVE 中 LoginFastIndex 是自动填充的权威候选入口。索引未命中必须返回空，
         // 不能为了兼容旧提交而解密整库；旧提交会在正常保存/迁移时确定性重建索引。
         return candidates.filter {
-            it.deletedAt == null && it.secretType == SecretType.LOGIN && it.password.isNotEmpty() &&
+            isFillableLogin(session, it) &&
                 OriginMatcher.matchLevel(origin, it) != OriginMatchLevel.NONE
         }
     }
@@ -260,7 +257,7 @@ class AutofillVaultGateway(
         return query.listSummaries().orEmpty().asSequence()
             .filter { it.entryType == SecretType.LOGIN }
             .mapNotNull { query.readEntry(it.entryId) }
-            .filter { it.deletedAt == null && it.password.isNotEmpty() }
+            .filter { isFillableLogin(session, it) }
             .toList()
     }
 
@@ -320,7 +317,7 @@ class AutofillVaultGateway(
         val entry = query.readEntry(entryId) ?: return null
         return entry.takeIf {
             it.updatedAt == expectedUpdatedAt && it.deletedAt == null &&
-                it.secretType == SecretType.LOGIN && it.password.isNotEmpty()
+                isFillableLogin(session, it)
         }
     }
 
@@ -329,6 +326,68 @@ class AutofillVaultGateway(
             session.querySession.readEntry(link.sourceEntryId)
         }
         return AutofillSourceResolver.resolve(entry, listOf(entry) + linkedEntries, clock().toLong())
+    }
+
+    /** Rechecked at explicit selection and release, including entries discovered through manual search. */
+    fun allowedForExplicitFill(session: AutofillVaultSession, entry: Entry, origin: TargetOrigin): Boolean =
+        !isOriginExcluded(origin, session) && isFillableLogin(session, entry) && !hasKnownSignerMismatch(entry, origin)
+
+    private fun isFillableLogin(session: AutofillVaultSession, entry: Entry): Boolean =
+        entry.deletedAt == null && entry.secretType == SecretType.LOGIN &&
+            resolveAutofillValues(session, entry).values.values.any { it.value.isNotEmpty() && it.role != AutofillRole.NONE }
+
+    /** Persist explicit user approval without rewriting module passwords or linked field mappings. */
+    fun rememberOriginBinding(session: AutofillVaultSession, entryId: String, origin: TargetOrigin): VaultWriteResult {
+        val existing = entry(session, entryId) ?: return VaultWriteResult.Missing
+        if (!isFillableLogin(session, existing)) return VaultWriteResult.Missing
+        if (hasKnownSignerMismatch(existing, origin)) return VaultWriteResult.Failure(AutofillErrorCode.UNKNOWN)
+        val changed = existing.copy(fields = AutofillOriginMetadata.addBinding(existing.fields, origin), updatedAt = clock())
+        return saveFast(session, changed) { current ->
+            val latest = current.entries.firstOrNull { it.id == entryId } ?: throw MutationAbort(VaultWriteResult.Missing)
+            if (latest.deletedAt != null || latest.updatedAt != existing.updatedAt) throw MutationAbort(VaultWriteResult.Stale)
+            current.copy(entries = current.entries.map { if (it.id == entryId) changed else it })
+        }
+    }
+
+    fun forgetOriginPreferences(session: AutofillVaultSession, entryId: String, origin: TargetOrigin): VaultWriteResult {
+        val existing = entry(session, entryId) ?: return VaultWriteResult.Missing
+        if (hasKnownSignerMismatch(existing, origin)) return VaultWriteResult.Failure(AutofillErrorCode.UNKNOWN)
+        val fields = AutofillFieldMappingMetadata.remove(AutofillOriginMetadata.removeBinding(existing.fields, origin), origin)
+        val changed = existing.copy(fields = fields, updatedAt = clock())
+        return saveFast(session, changed) { current ->
+            val latest = current.entries.firstOrNull { it.id == entryId } ?: throw MutationAbort(VaultWriteResult.Missing)
+            if (latest.deletedAt != null || latest.updatedAt != existing.updatedAt) throw MutationAbort(VaultWriteResult.Stale)
+            current.copy(entries = current.entries.map { if (it.id == entryId) changed else it })
+        }
+    }
+
+    private fun hasKnownSignerMismatch(entry: Entry, origin: TargetOrigin): Boolean {
+        if (origin !is TargetOrigin.AndroidPackage) return false
+        if (origin.signingCertificateSha256.isEmpty()) return true
+        val identities = AutofillOriginMetadata.androidIdentities(entry).filter { it.packageName == origin.packageName }
+        return identities.isNotEmpty() && identities.none {
+            it.signingCertificateSha256.intersect(origin.signingCertificateSha256).isNotEmpty()
+        }
+    }
+
+    fun fieldMappings(session: AutofillVaultSession, entryId: String, origin: TargetOrigin): Map<String, String> =
+        entry(session, entryId)?.let { AutofillFieldMappingMetadata.mappings(it.fields, origin) }.orEmpty()
+
+    fun rememberFieldMapping(
+        session: AutofillVaultSession, entryId: String, origin: TargetOrigin, fieldKey: String, role: String,
+    ): VaultWriteResult {
+        val existing = entry(session, entryId) ?: return VaultWriteResult.Missing
+        if (!isFillableLogin(session, existing)) return VaultWriteResult.Missing
+        if (hasKnownSignerMismatch(existing, origin)) return VaultWriteResult.Failure(AutofillErrorCode.UNKNOWN)
+        val updatedFields = runCatching { AutofillFieldMappingMetadata.add(existing.fields, origin, fieldKey, role) }
+            .getOrElse { return VaultWriteResult.Failure(AutofillErrorCode.UNKNOWN) }
+        if (updatedFields == existing.fields) return VaultWriteResult.Failure(AutofillErrorCode.UNKNOWN)
+        val changed = existing.copy(fields = updatedFields, updatedAt = clock())
+        return saveFast(session, changed) { current ->
+            val latest = current.entries.firstOrNull { it.id == entryId } ?: throw MutationAbort(VaultWriteResult.Missing)
+            if (latest.deletedAt != null || latest.updatedAt != existing.updatedAt) throw MutationAbort(VaultWriteResult.Stale)
+            current.copy(entries = current.entries.map { if (it.id == entryId) changed else it })
+        }
     }
 
     fun createLogin(

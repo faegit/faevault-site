@@ -180,7 +180,7 @@ internal fun autofillSourceEntries(
     .toList()
 
 @Composable
-fun AppRoot() {
+internal fun AppRoot(remoteUpdateRequest: RemoteUpdateOpenRequest? = null, onRemoteUpdateRequestHandled: () -> Unit = {}) {
     FAEVaultTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = androidx.compose.material3.MaterialTheme.colorScheme.background) {
             val vm: VaultViewModel = viewModel()
@@ -218,6 +218,24 @@ fun AppRoot() {
                 mutableStateOf<Route>(Route.Root)
             }
             var selectedRootPage by rememberSaveable { mutableStateOf(RootPage.HOME.ordinal) }
+            var remoteUpdateOpenTarget by rememberSaveable { mutableStateOf<String?>(null) }
+            var remoteUpdateOpenVault by rememberSaveable { mutableStateOf<String?>(null) }
+            var remoteUpdateOpenSignal by rememberSaveable { mutableIntStateOf(0) }
+            LaunchedEffect(remoteUpdateRequest, state.phase, currentVault) {
+                val request = remoteUpdateRequest ?: return@LaunchedEffect
+                when (remoteUpdateNavigationDecision(request, currentVault, state.phase == Phase.UNLOCKED)) {
+                    RemoteUpdateNavigationDecision.WAIT_FOR_UNLOCK -> Unit
+                    RemoteUpdateNavigationDecision.DROP -> onRemoteUpdateRequestHandled()
+                    RemoteUpdateNavigationDecision.OPEN -> {
+                        route = Route.Root
+                        selectedRootPage = RootPage.SYNC.ordinal
+                        remoteUpdateOpenVault = request.vault
+                        remoteUpdateOpenTarget = request.target
+                        remoteUpdateOpenSignal++
+                        onRemoteUpdateRequestHandled()
+                    }
+                }
+            }
             var homeTopSignal by remember { mutableIntStateOf(0) }
             var trashTopSignal by remember { mutableIntStateOf(0) }
             var securityTopSignal by remember { mutableIntStateOf(0) }
@@ -232,7 +250,10 @@ fun AppRoot() {
             LaunchedEffect(activity, backgroundHideEnabled) {
                 WindowSecurity.applyTo(activity)
             }
-            LaunchedEffect(currentVault) { editDraft = null }
+            LaunchedEffect(currentVault) {
+                editDraft = null
+                if (remoteUpdateOpenVault != currentVault) remoteUpdateOpenTarget = null
+            }
 
             LaunchedEffect(event) {
                 val e = event ?: return@LaunchedEffect
@@ -519,6 +540,9 @@ fun AppRoot() {
                                                     vm = vm,
                                                     isActive = selectedRootPage == RootPage.SYNC.ordinal,
                                                     contentMode = SettingsContentMode.TRANSFER,
+                                                    remoteUpdateOpenTarget = remoteUpdateOpenTarget.takeIf { remoteUpdateOpenVault == currentVault },
+                                                    onRemoteUpdateOpened = { remoteUpdateOpenTarget = null },
+                                                    remoteUpdateOpenSignal = remoteUpdateOpenSignal,
                                                     scrollToTopSignal = syncTopSignal,
                                                 )
                                             },

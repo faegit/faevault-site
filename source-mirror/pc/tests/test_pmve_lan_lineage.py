@@ -207,6 +207,36 @@ def test_replace_authenticated_file_rejects_every_non_descendant_lineage(
     vault.close()
 
 
+def test_lan_sync_retains_exclusions_from_both_platforms(tmp_path, monkeypatch) -> None:
+    seq1, _, password = _fixture_pair("android")
+    server_path = tmp_path / "server.pmv"
+    client_path = tmp_path / "client.pmv"
+    shutil.copy2(seq1, server_path)
+    shutil.copy2(seq1, client_path)
+    server_vault = Vault.open(server_path, password)
+    client_vault = Vault.open(client_path, password)
+    server_vault.set_autofill_exclusions("packages", ["com.example.app"])
+    client_vault.set_autofill_exclusions("processes", ["example.exe"])
+    client_vault.set_autofill_exclusions("hosts", ["example.com"])
+    monkeypatch.setattr(sync_server, "PORT", 0)
+    monkeypatch.setattr(sync_server, "_local_ip", lambda: "127.0.0.1")
+    server = sync_server.SyncServer(server_vault, lambda **_: False)
+    try:
+        pairing_url, pin = server.start()
+        result = LanSyncClient(pairing_url, pin).sync_vault(client_vault)
+        assert result["verified"] is True
+        for vault in (server_vault, client_vault):
+            assert vault.autofill_exclusions["packages"] == ["com.example.app"]
+            assert vault.autofill_exclusions["processes"] == ["example.exe"]
+            assert vault.autofill_exclusions["hosts"] == ["example.com"]
+    finally:
+        server.stop()
+        if server._thread:
+            server._thread.join(timeout=2)
+        client_vault.close()
+        server_vault.close()
+
+
 def test_lan_v2_pushes_direct_descendant_as_file_without_bytes_merge(tmp_path, monkeypatch) -> None:
     seq1, seq2, password = _fixture_pair("android")
     server_path = tmp_path / "server.pmv"

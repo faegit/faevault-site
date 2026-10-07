@@ -36,8 +36,8 @@ function isVisible(field) {
 }
 
 function formFields(passwordField) {
-  const root = passwordField.form || document;
-  return [...root.querySelectorAll("input")].filter(isVisible);
+  const root = passwordField.form || passwordField.getRootNode();
+  return [...root.querySelectorAll("input,textarea")].filter(isVisible);
 }
 
 function passwordFields(passwordField) {
@@ -56,6 +56,8 @@ function fieldDescription(field) {
     id: field.id,
     placeholder: field.placeholder,
     ariaLabel: field.getAttribute("aria-label"),
+    labelText: [...(field.labels || [])].map((label) => label.textContent || "").join(" "),
+    ariaLabelledByText: (field.getAttribute("aria-labelledby") || "").split(/\s+/).map((id) => field.getRootNode().getElementById?.(id)?.textContent || "").join(" "),
     disabled: field.disabled,
     readOnly: field.readOnly,
     visible: isVisible(field),
@@ -104,7 +106,7 @@ function ensureUi() {
 }
 
 function positionUi() {
-  if (!anchor || !activePassword || !document.contains(activePassword)) return hideUi();
+  if (!anchor || !activePassword || !activePassword.isConnected) return hideUi();
   const rect = activePassword.getBoundingClientRect();
   anchor.style.left = `${Math.max(4, rect.right - 34)}px`;
   anchor.style.top = `${Math.max(4, rect.top + (rect.height - 30) / 2)}px`;
@@ -175,14 +177,14 @@ async function togglePanel(shadow, autoFillSingle = false) {
     return;
   }
   const credentials = response.result.credentials || [];
-  if (autoFillSingle && credentials.length === 1 && !credentials[0].requiresSelection) {
+  if (autoFillSingle && activePassword?.type === "password" && credentials.length === 1 && !credentials[0].requiresSelection) {
     await fillCredential(credentials[0].id);
     return;
   }
   renderCredentials(panel, credentials);
 }
 
-function renderCredentials(panelNode, credentials) {
+function renderCredentials(panelNode, credentials, query = "") {
   if (otpCountdownTimer) clearInterval(otpCountdownTimer);
   otpCountdownTimer = null;
   panelNode.replaceChildren();
@@ -190,6 +192,17 @@ function renderCredentials(panelNode, credentials) {
   head.className = "head";
   head.textContent = tr("登录账号");
   panelNode.appendChild(head);
+  const search = document.createElement("input");
+  search.type = "search";
+  search.placeholder = tr("搜索保险库条目");
+  search.value = query;
+  search.addEventListener("keydown", async (event) => {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    const response = await send({action: "list", query: search.value.trim().slice(0, 80)});
+    if (panel === panelNode && response.ok) renderCredentials(panelNode, response.result.credentials || [], search.value);
+  });
+  panelNode.appendChild(search);
   if (!credentials.length) status(panelNode, tr("此网站没有匹配条目"));
   for (const credential of credentials) {
     const button = document.createElement("button");
@@ -201,6 +214,11 @@ function renderCredentials(panelNode, credentials) {
     account.className = "account";
     account.textContent = credential.username || tr("未填写用户名");
     button.append(title, account);
+    const reason = document.createElement("span");
+    reason.className = "account";
+    const reasons = {confirmed: "已记住关联", exact: "网址匹配", same_site: "同站点候选", name: "名称相关", manual: "手动搜索"};
+    reason.textContent = tr(reasons[credential.matchReason] || "网址匹配");
+    button.appendChild(reason);
     if (credential.otp?.code) {
       const code = document.createElement("span");
       code.className = "otp";
@@ -215,7 +233,7 @@ function renderCredentials(panelNode, credentials) {
       button.appendChild(code);
     }
     button.addEventListener("mousedown", (event) => event.preventDefault());
-    button.addEventListener("click", () => fillCredential(credential.id));
+    button.addEventListener("click", () => fillCredential(credential.id, Boolean(credential.manualSelection)));
     panelNode.appendChild(button);
   }
   if (activePassword && passwordFields(activePassword).length) {
@@ -251,10 +269,10 @@ function renderCredentials(panelNode, credentials) {
   }
 }
 
-async function fillCredential(credentialId) {
+async function fillCredential(credentialId, manualSelection = false) {
   if (!activePassword) return;
   status(panel, tr("正在读取凭据…"));
-  const response = await send({action: "get", credentialId});
+  const response = await send({action: "get", credentialId, manualSelection});
   if (!response.ok) return status(panel, response.error?.message || tr("读取失败"), true);
   const fields = formFields(activePassword);
   const descriptions = fields.map(fieldDescription);
@@ -264,23 +282,63 @@ async function fillCredential(credentialId) {
   const fillPasswords = VaultContentLogic.selectFillPasswordFields(
     passwordFields(activePassword).map(fieldDescription),
   );
-  for (const field of fillPasswords) setNativeValue(field.node, response.result.password);
+  if (response.result.password) {
+    for (const field of fillPasswords) setNativeValue(field.node, response.result.password);
+  }
   const otpTargets = otpFields(activePassword);
   if (response.result.otp?.code) {
     for (const field of otpTargets) setNativeValue(field, response.result.otp.code);
   }
   const roleValues = response.result.fields || {};
   for (const description of descriptions) {
-    const role = VaultContentLogic.autofillRole(description);
-    if (role && roleValues[role] && role !== "password" && role !== "one_time_code") {
-      setNativeValue(description.node, roleValues[role]);
-    }
+    const effectiveRole = VaultContentLogic.resolvedFieldRole(description, response.result.fieldMappings, fieldKey(description.node));
+    const effectiveValue = effectiveRole === "one_time_code" ? response.result.otp?.code || roleValues.one_time_code : roleValues[effectiveRole];
+    if (effectiveRole && effectiveValue) setNativeValue(description.node, effectiveValue);
   }
+  const unknown = descriptions.filter((item) => !VaultContentLogic.autofillRole(item) && VaultContentLogic.isMappableField(item) && fieldKey(item.node));
+  if (unknown.length) return renderFieldMapping(panel, credentialId, unknown, roleValues);
   panel?.remove();
   if (otpCountdownTimer) clearInterval(otpCountdownTimer);
   otpCountdownTimer = null;
   panel = null;
   activePassword.focus();
+}
+
+function fieldKey(field) {
+  const key = JSON.stringify([location.pathname, field.type || "text", field.id || "", field.name || ""]);
+  const siblings = formFields(field).filter((item) => item.type === field.type && item.id === field.id && item.name === field.name);
+  return key.length <= 256 && siblings.length === 1 ? key : "";
+}
+
+function renderFieldMapping(panelNode, credentialId, unknown, values) {
+  status(panelNode, tr("已填充可识别字段；其他输入框可手动映射"));
+  const field = document.createElement("select");
+  for (const description of unknown) {
+    const option = document.createElement("option");
+    option.value = fieldKey(description.node);
+    option.textContent = description.labelText || description.ariaLabel || description.placeholder || description.name || description.id || tr("未识别输入框");
+    field.appendChild(option);
+  }
+  const role = document.createElement("select");
+  const labels = {username:"账号", password:"密码", custom_text:"自定义文本", custom_secret:"自定义密码", email:"邮箱", one_time_code:"动态码"};
+  for (const name of Object.keys(values)) {
+    const option = document.createElement("option"); option.value = name; option.textContent = tr(labels[name] || name); role.appendChild(option);
+  }
+  const save = document.createElement("button"); save.className = "command"; save.textContent = tr("记住输入框映射");
+  save.disabled = !role.options.length;
+  save.addEventListener("click", async () => {
+    const response = await send({action:"map_field",credentialId,fieldKey:field.value,fieldRole:role.value});
+    if (!response.ok) return status(panelNode,response.error?.message || tr("映射保存失败"),true);
+    const target = unknown.find((description) => fieldKey(description.node) === field.value);
+    if (target && values[role.value]) setNativeValue(target.node,values[role.value]);
+    status(panelNode,tr("输入框映射已保存"));
+  });
+  const clear = document.createElement("button"); clear.className = "command"; clear.textContent = tr("移除输入框映射");
+  clear.addEventListener("click", async () => {
+    const response = await send({action:"map_field",credentialId,fieldKey:field.value,fieldRole:""});
+    status(panelNode,response.ok ? tr("输入框映射已移除") : response.error?.message || tr("映射保存失败"),!response.ok);
+  });
+  panelNode.append(field,role,save,clear);
 }
 
 async function saveCurrent() {
@@ -300,10 +358,10 @@ async function saveCurrent() {
 }
 
 document.addEventListener("focusin", (event) => {
-  const field = event.target;
-  if (!(field instanceof HTMLInputElement) || !isVisible(field)) return;
+  const field = event.composedPath().find((node) => node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement) || event.target;
+  if (!(field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) || !isVisible(field) || field.disabled || field.readOnly) return;
   const description = fieldDescription(field);
-  if (field.type !== "password" && !VaultContentLogic.isOtpField(description)) return;
+  if (["hidden", "button", "submit", "checkbox", "radio", "file", "search"].includes(field.type)) return;
   ensureUi();
   activePassword = field;
   anchor.style.display = "block";

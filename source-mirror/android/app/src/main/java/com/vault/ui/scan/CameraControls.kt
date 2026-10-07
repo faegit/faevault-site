@@ -20,7 +20,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import java.util.concurrent.TimeUnit
 
@@ -103,26 +105,46 @@ internal fun CameraFocusIndicator(point: Offset?) {
     }
 }
 
+/**
+ * 倍率控件：单个胶囊显示当前倍率，点击在近/远两档之间切换。
+ *
+ * 此前是 0.5x/1x/2x 三个并排圆点，而多数设备的 minZoomRatio 就是 1.0，0.5x 会被过滤掉，
+ * 实际只剩 1x 与 2x 两颗——两档却摆两颗按钮，不如合成一个：默认 1x，点一下到 2x，再点回来。
+ *
+ * 显示的是**实时倍率**而不是档位名：双指缩放过程中 [CameraGestures] 每帧回报 zoomRatio，
+ * 指示器必须跟着手指走，否则用户捏到 1.4x 却仍显示 1x。点击目标按当前值落在两档的哪一侧决定。
+ *
+ * 设备不支持二倍变焦（maxZoomRatio 不足）时整体不显示——此时这颗按钮没有意义。
+ */
 @Composable
 internal fun CameraZoomControls(camera: Camera?, ratio: Float, onZoom: (Float) -> Unit, modifier: Modifier = Modifier) {
     val zoom = camera?.cameraInfo?.zoomState?.value ?: return
-    val choices = listOf(0.5f, 1f, 2f).filter { it in zoom.minZoomRatio..zoom.maxZoomRatio }
-    Row(modifier.background(Color.Black.copy(alpha = 0.45f), CircleShape).padding(4.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-        choices.forEach { value ->
-            val selected = kotlin.math.abs(value - ratio) < 0.1f
-            Box(Modifier.size(40.dp).background(if (selected) Color.White.copy(alpha = 0.2f) else Color.Transparent, CircleShape)
-                // 倍率按钮是圆形，默认 ripple 会被裁成矩形色块，这里只保留圆形背景高亮。
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                ) {
-                    camera.cameraControl.setZoomRatio(value)
-                    onZoom(value)
-                }, contentAlignment = Alignment.Center) {
-                Text(if (selected) String.format(java.util.Locale.ROOT, "%.1f×", ratio) else "${value.toString().removeSuffix(".0")}×",
-                    color = if (selected) com.vault.ui.BrandPrimary else Color.White)
-            }
-        }
+    // 1x 不可达时退到设备最小倍率，2x 不可达时退到设备上限。
+    val near = maxOf(1f, zoom.minZoomRatio)
+    val far = minOf(2f, zoom.maxZoomRatio)
+    // 两档几乎重合（设备不支持变焦）就没有切换的意义，直接不画。
+    if (far - near < 0.15f) return
+    val target = if (ratio < (near + far) / 2f) far else near
+    Box(
+        modifier = modifier
+            .background(Color.Black.copy(alpha = 0.45f), CircleShape)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+            ) {
+                camera.cameraControl.setZoomRatio(target)
+                onZoom(target)
+            },
+        contentAlignment = Alignment.Center,
+    ) {
+        // min 宽度固定，1x → 1.5x 的位数变化不会让胶囊左右抖动。
+        Text(
+            // 整数档去掉 ".0"：1x 而不是 1.0x，与原来的按钮文案一致。
+            String.format(java.util.Locale.ROOT, "%.1f×", ratio).removeSuffix(".0×"),
+            color = Color.White,
+            fontSize = 14.sp,
+            modifier = Modifier.widthIn(min = 56.dp).padding(horizontal = 16.dp, vertical = 10.dp),
+            textAlign = TextAlign.Center,
+        )
     }
 }

@@ -46,6 +46,20 @@ def current_locale() -> str:
 
 
 _EN = {
+    "输入排除项，例如 chrome.exe 或 example.com": "Enter an exclusion, such as chrome.exe or example.com",
+    "从运行中的程序选择…": "Choose a running app…",
+    "选择正在运行的程序，包含后台程序": "Choose a running app, including background apps",
+    "选择排除程序": "Choose an app to exclude",
+    "请输入程序名（如 chrome.exe）或有效的网站域名": "Enter a process name (such as chrome.exe) or a valid website domain",
+    "添加排除项后，对应目标将不再显示自动填充建议。": "Excluded targets will no longer show autofill suggestions.",
+    "暂未添加排除项": "No exclusions yet",
+    "启动与后台": "Startup and background",
+    "开机启动": "Start at sign-in",
+    "静默启动": "Start quietly",
+    "登录 Windows 后自动运行，适用于当前 Windows 用户。": "Run automatically when the current Windows user signs in.",
+    "下次启动时仅显示托盘图标；保险库保持锁定，点击托盘后显示解锁窗口。托盘不可用时仍显示窗口。": "Start in the system tray next time, with the vault locked. Click the tray icon to unlock. If the tray is unavailable, the unlock window opens.",
+    "已开启开机启动，下次登录 Windows 后自动运行。": "Startup enabled. Vault will run when you next sign in to Windows.",
+    "已关闭开机启动。": "Startup disabled.",
     "保险库": "Vault", "解锁保险库": "Unlock your vault", "选择用户并输入主密码以解锁。": "Choose a vault and enter its master password.",
     "＋ 新建": "+ Add", "新建账户": "Create vault", "导入 .pmv 文件": "Import .pmv file", "主密码": "Master password",
     "解锁": "Unlock",     "使用生物识别解锁": "Unlock with biometric", "忘记密码？": "Forgot your password?",
@@ -200,6 +214,7 @@ _EN.update({
     "新建当前账号": "Save as new account",
     "更新所选账号": "Update selected account",
     "分别管理原生程序和网站；排除后不会显示对应的自动填充建议。": "Manage excluded desktop apps and websites. Excluded targets do not receive autofill suggestions.",
+    "安卓应用排除（随保险库同步）": "Excluded Android apps (synced with vault)",
     "网站排除": "Excluded websites",
     "输入网站，例如 example.com": "Enter a website, such as example.com",
     "移除所选网站": "Remove selected website",
@@ -611,6 +626,39 @@ _EN.update({
     "启用后，“同步”下拉菜单将显示“云端同步”入口，可在其中关联云端硬盘或 WebDAV。": "When enabled, the Sync menu shows the Cloud sync entry, where you can connect a cloud drive or WebDAV.",
     "浏览器自动填充 - 解锁保险库": "Browser autofill — Unlock Vault",
 })
+
+_EN.update({'请确认当前网站可以接收所选条目的填充内容。': 'Confirm that this website may receive the selected item’s autofill data.', '记住此网站与条目的关联': 'Remember this website association', '允许填充': 'Allow fill', '确认输入框映射': 'Confirm field mapping', '此设置仅适用于当前网站和所选条目。': 'This setting applies only to this website and the selected item.', '移除映射': 'Remove mapping', '记住此程序与条目的关联': 'Remember this application association', '已记住关联': 'Remembered association', '程序匹配': 'Application match', '名称相关': 'Related name', '手动搜索': 'Manual search'})
+
+_EN.update({'记住此输入框的字段类型': 'Remember this field type', '填入当前输入框': 'Fill selected field', '自动填充记忆': 'Autofill memory', '移除已记住的关联或字段类型，下次填充时将重新选择。': 'Remove remembered associations or field types to choose again next time.', '移除所选记忆': 'Remove selected memory', '没有已记住的自动填充关联或字段类型。': 'No remembered autofill associations or field types.', '移除失败，条目可能已更新。请关闭后重新打开。': 'Could not remove: the item may have changed. Close and reopen this dialog.', '已移除所选记忆。': 'Selected memory removed.', '程序关联': 'Application association', '网站关联': 'Website association', '所选字段内容已不可用，请重新选择': 'The selected field value is unavailable. Choose again.', '此输入框没有稳定标识，无法记住映射': 'This field has no stable identifier; its mapping cannot be remembered.', '已填充所选字段': 'Selected field filled', '自动填充记忆已更新': 'Autofill memory updated'})
+
+_EN.update({'选择状态无效': 'Invalid selection state', '字段角色无效': 'Invalid field role', '凭据不存在': 'Credential not found', '条目没有此字段角色': 'This item has no value for this field role', '未允许保存字段映射': 'Field mapping was not approved', '字段来源已变化，请重试': 'The field source changed. Try again.', '无法确认程序路径，请重试': 'Could not verify the application path. Try again.', '条目或程序身份已变化，请重试': 'The item or application identity changed. Try again.', '程序身份已变化，请重试': 'The application identity changed. Try again.', '目标窗口已关闭，请重新触发自动填充': 'The target window closed. Trigger autofill again.', '请松开快捷键后重新触发自动填充': 'Release the shortcut keys and trigger autofill again.', '填充过程中目标窗口失焦，已停止输入': 'The target lost focus during filling. Input stopped.', '开机启动仅支持 Windows': 'Startup launch is supported only on Windows.', '已准备填充：请在 30 秒内点回并清空目标输入框，再按自动填充快捷键': 'Ready to fill: return to and clear the target field within 30 seconds, then press the autofill shortcut again.', '待填充操作已取消，请在目标程序重新触发自动填充': 'The pending fill was cancelled. Trigger autofill again in the target app.'})
+
+_EN.update({'检测远端更新': 'Check for remote updates', '每5分钟检查远端文件，仅提醒，不会自动同步。': 'Checks the remote file every 5 minutes. Only notifies; does not sync automatically.', '远端有更新': 'Remote update available', '远端文件已变化，尚未同步到本机': 'The remote file changed and has not been synced to this device.', '立即同步': 'Sync now', '稍后处理': 'Later', '发现时间：{time}': 'Detected: {time}', '远端更新检测失败': 'Could not check for remote updates', '远端文件已删除': 'The remote file was deleted'})
+
+_EN.update({
+    "设备与历史": "Devices and history",
+    "本地保留最近 20 个加密版本，无需配置云端同步。": "Keeps the latest 20 encrypted versions locally. No cloud setup required.",
+    "设备": "Devices", "本机": "This device", "未知": "Unknown", "未知设备": "Unknown device",
+    "已授权": "Authorized", "无有效授权记录": "No valid authorization record",
+    "重命名本机": "Rename this device", "设备名称（1–64 个字符）": "Device name (1–64 characters)",
+    "授权状态来自保险库现有记录；此处不能撤销其他设备的云端访问权限。": "Authorization status comes from existing vault records. This page cannot revoke another device's cloud access.",
+    "历史版本": "Version history", "保存当前版本": "Save current version",
+    "预览所选版本": "Preview selected version", "恢复所选条目": "Restore selected entries",
+    "历史版本密码": "Historical version password",
+    "此版本使用旧主密码，请输入以解密。": "This version uses an older master password. Enter it to decrypt.",
+    "将以历史内容更新所选条目，保留其他当前条目。恢复前自动保存当前版本，并创建新提交。": "Updates selected entries using historical contents and keeps all other current entries. Saves the current version first, then creates a new commit.",
+    "保险库已变化，请刷新后重试。": "The vault changed. Refresh and try again.",
+    "正在处理…": "Processing…", "保险库已更新。": "Vault updated.",
+    "操作完成。": "Done.", "操作失败，请刷新后重试。": "Operation failed. Refresh and try again.",
+    "最近写入设备：{name}": "Last writer: {name}",
+    "写入设备仅在验证此远端版本后显示；旧版本可能无法识别设备。": "The writer is shown after this remote version is verified. Older versions may have an unknown device.",
+})
+
+_EN.update({'远端版本已变化，请重新验证设备信息': 'The remote version changed. Verify it again to view device information.', '本地保留20个常规加密版本及恢复前安全版本，无需配置云端同步。': 'Keeps 20 regular encrypted versions and pre-restore safety versions locally. Cloud setup is not required.', '历史恢复暂不支持通行密钥和已永久删除的条目': 'History restore currently excludes Passkeys and permanently deleted entries.', '历史恢复已取消': 'History restore cancelled.', '历史预览内容已变化，请重新预览': 'The history preview changed. Verify it again.', '通行密钥条目暂不支持历史恢复': 'Passkey entries cannot currently be restored from history.', '已永久删除的条目不能从历史恢复': 'Permanently deleted entries cannot be restored from history.', '设备记录由新版客户端管理，请升级后修改名称': 'Device records use a newer format. Update the app before editing names.'})
+
+_EN.update({'只能重命名本机': 'Only this device can be renamed', '设备名称须为 1–64 个字符': 'Device names must contain 1–64 characters', '无效历史路径': 'Invalid history path', '历史文件不能为链接': 'History files cannot be links', '历史路径越界': 'History path escapes the archive', '历史快照不存在': 'History snapshot not found', '历史快照完整性验证失败': 'History snapshot integrity verification failed', '请选择恢复条目': 'Select entries to restore', '只能恢复预览中的有效条目': 'Only valid previewed entries can be restored', '历史目录不能为链接': 'History directories cannot be links', '历史快照属于其他保险库': 'The snapshot belongs to another vault', '保险库已变化，请重新预览': 'The vault changed. Preview again', '历史预览来源不匹配': 'History preview source does not match', '历史快照已被修改': 'The history snapshot was modified', '保险库标识不匹配': 'Vault identity does not match', '此快照需要创建时的主密码': 'This snapshot requires its original master password'})
+
+_EN.update({"历史索引格式无效": "Invalid history index format"})
 
 _CATALOGS = {"en": _EN}
 

@@ -18,6 +18,38 @@ internal fun localizeUiText(source: String, languageTag: String): String {
     return source
 }
 
+/** Only generated fallback volume labels are translated; user-defined names remain untouched. */
+internal fun localizeBackupDeviceLabel(source: String, languageTag: String): String {
+    val match = Regex("^(.+?)[（(](VOL-[A-Za-z0-9]+)[）)](.*)$").matchEntire(source)
+        ?: return localizeUiText(source, languageTag)
+    val canonical = when (match.groupValues[1]) {
+        "备份设备", "Backup device" -> "备份设备"
+        "本机存储", "Local storage" -> "本机存储"
+        else -> return source
+    }
+    val english = languageTag.startsWith("en", true)
+    val name = localizeUiText(canonical, languageTag)
+    return name + (if (english) "(" else "（") + match.groupValues[2] +
+        (if (english) ")" else "）") + match.groupValues[3]
+}
+
+/** Persisted sync messages can contain independently localized status and error segments. */
+internal fun localizeCloudSyncStatus(source: String, languageTag: String): String {
+    if (!languageTag.startsWith("en", true)) return source
+    val match = Regex("^(自动同步失败|自动同步已暂停)[：:]\\s*(.+)$").matchEntire(source)
+        ?: return localizeUiText(source, languageTag)
+    return localizeUiText(match.groupValues[1], languageTag) + ": " +
+        localizeUiText(match.groupValues[2], languageTag)
+}
+
+@Composable
+internal fun uiBackupDeviceLabel(source: String): String =
+    localizeBackupDeviceLabel(source, LocalConfiguration.current.locales[0].toLanguageTag())
+
+@Composable
+internal fun uiCloudSyncStatus(source: String): String =
+    localizeCloudSyncStatus(source, LocalConfiguration.current.locales[0].toLanguageTag())
+
 /** Locale-aware lookup for non-composable contexts (Toast/Notification/Activity callbacks). */
 internal fun localizeUiTextFor(context: android.content.Context, source: String): String {
     val locales = context.resources.configuration.locales
@@ -739,6 +771,7 @@ private val UI_COPY = mapOf(
         "操作敏感内容前验证主密码" to listOf("Verify the master password before operating on sensitive content"),
     "所有图像显示均进行模糊处理，保护图像隐私。" to listOf("All image displays are blurred to protect image privacy."),
     "轻触画面对焦 · 双指缩放" to listOf("Tap to focus · Pinch to zoom"),
+    "轻触画面对焦 · 双指缩放 · 点倍率切远近" to listOf("Tap to focus · Pinch to zoom · Tap the ratio to switch"),
     "拍照获取图像" to listOf("Capture image"),
     "关闭图像模糊需要验证当前主密码。" to listOf("Verify your current master password to turn off image blur."),
     "请输入有效日期（YYYY-MM-DD）。" to listOf("Enter a valid date (YYYY-MM-DD)."),

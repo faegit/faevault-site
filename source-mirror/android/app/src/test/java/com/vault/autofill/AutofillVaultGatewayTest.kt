@@ -478,7 +478,7 @@ class AutofillVaultGatewayTest {
     }
 
     @Test
-    fun `find all login entries returns non deleted logins with password`() {
+    fun `find all login entries returns non deleted logins with actual fillable values`() {
         val loginA = entry("11111111-1111-4111-8111-111111111111", "https://example.com")
         val noPassword = entry("22222222-2222-4222-8222-222222222222", "https://example.com").copy(password = "")
         val deleted = entry("33333333-3333-4333-8333-333333333333", "https://example.com").copy(deletedAt = 5.0)
@@ -491,7 +491,7 @@ class AutofillVaultGatewayTest {
         val gateway = AutofillVaultGateway(source, NoopAttemptPolicy)
         val session = (gateway.authenticate("main", "master".toCharArray()) as VaultAuthResult.Success).session
 
-        assertEquals(listOf(loginA.id), gateway.findAllLoginEntries(session).map { it.id })
+        assertEquals(listOf(loginA.id, noPassword.id), gateway.findAllLoginEntries(session).map { it.id })
     }
 
     @Test
@@ -856,6 +856,109 @@ class AutofillVaultGatewayTest {
         createdAt = 1.0,
         updatedAt = 1.0,
     )
+
+    @Test
+    fun unifiedCandidatesRankAllReasonsAndIncludeModulePasswords() {
+        val origin = TargetOrigin.Web("login.example.com")
+        val confirmed = entry("confirmed", "").copy(title = "Z", fields = AutofillOriginMetadata.addBinding(emptyMap(), origin))
+        val exact = entry("exact-source", "https://login.example.com").copy(title = "Y")
+        val site = entry("same-site", "https://accounts.example.com").copy(title = "B")
+        val named = entry("named", "").copy(title = "A Example")
+        val module = entry("module", "https://login.example.com").copy(title = "X", password = "",
+            fields = mapOf(EntryModules.FIELD_KEY to Json.parseToJsonElement(
+                """[{"id":"secret","type":"password","value":"module-secret","config":{"autofill_role":"password"}}]""").jsonArray))
+        val empty = entry("empty", "https://login.example.com").copy(password = "", username = "")
+        val query = RecordingQuerySession(listOf(named, site, exact, confirmed, module, empty).associateBy { it.id })
+            .apply { domainCandidates[origin.host] = listOf(exact.id, module.id, empty.id) }
+        val gateway = AutofillVaultGateway(QuerySource(query), NoopAttemptPolicy)
+        val session = (gateway.authenticate("main", "master".toCharArray()) as VaultAuthResult.Success).session
+        assertEquals(listOf("confirmed", "module", "exact-source", "same-site", "named"), gateway.findFillCandidates(session, origin).map { it.id })
+        assertEquals(listOf("exact-source", "module"), gateway.findMatchingEntries(session, origin).map { it.id })
+        assertEquals("module-secret", gateway.resolveAutofillValues(session, module).values[AutofillRole.PASSWORD]?.value)
+        assertEquals(module, gateway.credential(session, module.id, module.updatedAt))
+    }
+
+    @Test
+    fun rememberingOriginBindingPreservesModuleSecretAndAddsConfirmedReason() {
+        val module = entry("module", "").copy(password = "", fields = mapOf(EntryModules.FIELD_KEY to
+            Json.parseToJsonElement("""[{"id":"secret","type":"password","value":"module-secret","config":{"autofill_role":"password"}}]""").jsonArray))
+        val source = FakeSource(VaultPayload(entries = listOf(module)))
+        val gateway = AutofillVaultGateway(source, NoopAttemptPolicy, clock = { 10.0 })
+        val session = (gateway.authenticate("main", "master".toCharArray()) as VaultAuthResult.Success).session
+        val origin = TargetOrigin.Web("example.com")
+        assertTrue(gateway.rememberOriginBinding(session, module.id, origin) is VaultWriteResult.Success)
+        val saved = source.payload.entries.single()
+        assertEquals("", saved.password)
+        assertEquals(module.fields[EntryModules.FIELD_KEY], saved.fields[EntryModules.FIELD_KEY])
+        assertEquals(AutofillCandidateReason.CONFIRMED_BINDING, OriginMatcher.fillCandidateReason(origin, saved))
+    }
+
+    @Test
+    fun preferencesAreOriginScopedAndRevocationDoesNotRestoreLegacyBinding() {
+        val origin = TargetOrigin.Web("example.com")
+        val other = TargetOrigin.Web("other.com")
+        val original = entry("preferences", "").copy(fields = AutofillOriginMetadata.addBinding(
+            AutofillOriginMetadata.addBinding(emptyMap(), origin), other))
+        val source = FakeSource(VaultPayload(entries = listOf(original)))
+        val gateway = AutofillVaultGateway(source, NoopAttemptPolicy, clock = { 10.0 })
+        val session = (gateway.authenticate("main", "master".toCharArray()) as VaultAuthResult.Success).session
+        assertTrue(gateway.rememberFieldMapping(session, original.id, origin, "custom-input", "password") is VaultWriteResult.Success)
+        assertEquals(mapOf("custom-input" to "password"), gateway.fieldMappings(session, original.id, origin))
+        assertEquals(emptyMap<String, String>(), gateway.fieldMappings(session, original.id, other))
+        assertTrue(gateway.forgetOriginPreferences(session, original.id, origin) is VaultWriteResult.Success)
+        val saved = source.payload.entries.single()
+        assertEquals(emptyMap<String, String>(), gateway.fieldMappings(session, original.id, origin))
+        assertEquals(listOf(other.host), AutofillOriginMetadata.webHosts(saved))
+        assertEquals(OriginMatchLevel.NONE, OriginMatcher.matchLevel(origin, saved))
+        assertEquals(AutofillCandidateReason.CONFIRMED_BINDING, OriginMatcher.fillCandidateReason(other, saved))
+        assertEquals(original.password, saved.password)
+    }
+
+    @Test
+    fun knownSignerMismatchCannotBeRememberedAsBindingOrFieldMapping() {
+        val originalOrigin = TargetOrigin.AndroidPackage("com.example.app", setOf("a".repeat(64)))
+        val attacker = originalOrigin.copy(signingCertificateSha256 = setOf("b".repeat(64)))
+        val original = entry("preferences", "").copy(fields = AutofillOriginMetadata.addBinding(emptyMap(), originalOrigin))
+        val source = FakeSource(VaultPayload(entries = listOf(original)))
+        val gateway = AutofillVaultGateway(source, NoopAttemptPolicy)
+        val session = (gateway.authenticate("main", "master".toCharArray()) as VaultAuthResult.Success).session
+        assertTrue(gateway.rememberOriginBinding(session, original.id, attacker) is VaultWriteResult.Failure)
+        assertTrue(gateway.rememberFieldMapping(session, original.id, attacker, "custom-input", "password") is VaultWriteResult.Failure)
+        assertTrue(gateway.forgetOriginPreferences(session, original.id, attacker) is VaultWriteResult.Failure)
+        assertEquals(original, source.payload.entries.single())
+    }
+
+    @Test
+    fun customSecretOnlyLoginRemainsAvailableForExplicitFieldMapping() {
+        val original = entry("custom", "https://example.com").copy(username = "", password = "", fields = mapOf(
+            EntryModules.FIELD_KEY to Json.parseToJsonElement(
+                """[{"id":"custom-secret","type":"password","value":"secret-value","config":{"autofill_role":"custom_secret"}}]""").jsonArray))
+        val source = FakeSource(VaultPayload(entries = listOf(original)))
+        val gateway = AutofillVaultGateway(source, NoopAttemptPolicy)
+        val session = (gateway.authenticate("main", "master".toCharArray()) as VaultAuthResult.Success).session
+        assertEquals(listOf(original.id), gateway.findFillCandidates(session, TargetOrigin.Web("example.com")).map { it.id })
+        assertEquals(listOf(original.id), gateway.findAllLoginEntries(session).map { it.id })
+        assertEquals("secret-value", gateway.resolveAutofillValues(session, original).values[AutofillRole.CUSTOM_SECRET]?.value)
+    }
+
+    @Test
+    fun explicitFillRejectsKnownSignerMismatchEvenWithStoredMappingAndAllowsUnassociatedLogin() {
+        val trusted = TargetOrigin.AndroidPackage("com.example.app", setOf("a".repeat(64)))
+        val attacker = trusted.copy(signingCertificateSha256 = setOf("b".repeat(64)))
+        val bound = entry("bound", "").copy(fields = AutofillFieldMappingMetadata.add(
+            AutofillOriginMetadata.addBinding(emptyMap(), trusted), trusted, "custom-input", "password"))
+        val unassociated = entry("unassociated", "")
+        val source = FakeSource(VaultPayload(entries = listOf(bound, unassociated)))
+        val gateway = AutofillVaultGateway(source, NoopAttemptPolicy)
+        val session = (gateway.authenticate("main", "master".toCharArray()) as VaultAuthResult.Success).session
+        assertTrue(gateway.allowedForExplicitFill(session, bound, trusted))
+        assertTrue(!gateway.allowedForExplicitFill(session, bound, attacker))
+        assertTrue(gateway.fieldMappings(session, bound.id, attacker).isNotEmpty())
+        assertTrue(gateway.allowedForExplicitFill(session, unassociated, attacker))
+        assertTrue(!gateway.allowedForExplicitFill(session, bound.copy(deletedAt = 1.0), trusted))
+        val excluded = AutofillVaultGateway(source, NoopAttemptPolicy, excludeFilter = { true })
+        assertTrue(!excluded.allowedForExplicitFill(session, unassociated, trusted))
+    }
 
     private class FakeSource(var payload: VaultPayload) : AutofillVaultDataSource {
         override fun listVaults() = listOf("main")

@@ -34,7 +34,7 @@ PC_PATTERNS = (
         "cpp", "h", "idl", "xaml", "vcxproj", "filters", "sln", "manifest", "appxmanifest")),
 )
 PC_EXACT = {
-    "__main__.py", "browser_host.py", "pyproject.toml", "uv.lock", ".python-version",
+    "core/public_suffix_list.dat", "__main__.py", "browser_host.py", "pyproject.toml", "uv.lock", ".python-version",
     "native/passkey_provider/app/packages.config",
     "native/passkey_provider/MICROSOFT_SAMPLE_LICENSE.txt",
     "native/passkey_provider/README.md",

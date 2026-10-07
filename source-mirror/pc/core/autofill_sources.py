@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import re
 import uuid
+import unicodedata
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Iterable
 from urllib.parse import urlsplit
@@ -372,31 +373,88 @@ def _nonblank_string(value: object) -> str | None:
     return value if type(value) is str and value.strip() else None
 
 
+GENERIC_MATCH_WORDS = frozenset({"www", "com", "org", "net", "edu", "gov", "co", "app", "apps", "android", "auth", "login", "account", "accounts", "my", "git", "password", "mail", "email", "exe", "账号", "账户", "登录", "邮箱", "密码", "认证", "应用", "网页", "浏览器"})
+AUTOFILL_BINDINGS_KEY = "_autofill_bindings"
+
+
 def matching_words(value: str) -> frozenset[str]:
-    """Unicode whole words, with underscores treated as word separators."""
-    return frozenset(re.findall(r"[^\W_]+", str(value or "").casefold()))
+    text = unicodedata.normalize("NFKC", str(value or ""))
+    raw_words = re.findall(r"[^\W_]+", text.casefold())
+    text = re.sub(r"([\u3400-\u9fff]+)", r" \1 ", text)
+    text = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", text)
+    text = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1 \2", text).casefold()
+    return frozenset(word for word in [*raw_words, *re.findall(r"[^\W_]+", text)]
+                     if len(word) >= 2 and word not in GENERIC_MATCH_WORDS)
 
 
 def shares_matching_word(left: str, right: str) -> bool:
-    return bool(matching_words(left) & matching_words(right))
+    left_words, right_words = matching_words(left), matching_words(right)
+    if left_words & right_words:
+        return True
+    # Camel splitting also joins a brand such as WeChat for its flat spelling.
+    def joined(value):
+        text = unicodedata.normalize("NFKC", str(value or ""))
+        text = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", text)
+        text = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1 \2", text).casefold()
+        return "".join(w for w in re.findall(r"[^\W_]+", text) if (w not in GENERIC_MATCH_WORDS or w == "git") and not re.search(r"[\u3400-\u9fff]", w))
+    def compact(value):
+        return "".join(re.findall(r"[^\W_]+", unicodedata.normalize("NFKC", str(value or "")).casefold()))
+    if left_words and right_words and compact(left) == compact(right):
+        return True
+    if joined(left) and joined(left) == joined(right):
+        return True
+    return any(len(short) >= 2 and re.fullmatch(r"[\u3400-\u9fff]+", short)
+               and short in long for a in left_words for b in right_words
+               for short, long in [(a, b), (b, a)])
 
 
-def entry_matching_text(entry: Entry) -> str:
-    """Non-secret names and explicit app/website bindings for suggestions."""
-    values = [entry.title, entry.target_app.removesuffix(".exe")]
-    urls = [entry.url]
+def entry_bindings(entry: Entry) -> tuple[dict, ...]:
+    raw = entry.fields.get(AUTOFILL_BINDINGS_KEY, [])
+    return tuple(item for item in raw if isinstance(item, dict)) if isinstance(raw, list) else ()
+
+
+def entry_binding_values(entry: Entry, kind: str) -> tuple[str, ...]:
+    values = [entry.url if kind == "web" else entry.target_app]
     raw_modules = entry.fields.get("modules", [])
     for module in raw_modules if isinstance(raw_modules, list) else ():
         if not isinstance(module, dict) or module.get("sensitive"):
             continue
         value = module.get("value")
-        if not isinstance(value, str):
-            continue
-        kind = module.get("type")
-        if kind == "target_app":
+        if isinstance(value, str) and (module.get("type") == ("url" if kind == "web" else "target_app")
+                or (kind == "web" and module.get("type") == "text" and value.lower().startswith(("https://", "http://")))):
             values.append(value)
-        elif kind == "url" or (kind == "text" and value.lower().startswith(("https://", "http://"))):
-            urls.append(value)
+    return tuple(value for value in values if isinstance(value, str) and value.strip())
+
+
+def with_linked_sources(vault, entries: Iterable[Entry]) -> list[Entry]:
+    """Load only explicitly referenced sources, never unrelated categories."""
+    by_id = {entry.id: entry for entry in entries}
+    source_ids = {link.source_entry_id for entry in by_id.values() for link in entry.autofill_links()}
+    for source_id in source_ids - by_id.keys():
+        source = vault.read_entry(source_id)
+        if source is not None:
+            by_id[source_id] = source
+    return list(by_id.values())
+
+
+def entry_is_fillable(entry: Entry, entries=None) -> bool:
+    from .autofill_resolver import resolve_snapshot
+    return bool(resolve_snapshot(entry, entries or [entry]).values)
+
+
+def entry_has_password(entry: Entry, entries=None) -> bool:
+    from .autofill_resolver import resolve_snapshot
+    return bool(resolve_snapshot(entry, entries or [entry]).get("password"))
+
+
+def entry_matching_text(entry: Entry) -> str:
+    values = [entry.title, *(v.removesuffix(".exe") for v in entry_binding_values(entry, "windows"))]
+    urls = list(entry_binding_values(entry, "web"))
+    for binding in entry_bindings(entry):
+        if binding.get("kind") == "web":
+            urls.append(str(binding.get("origin") or "https://" + str(binding.get("host") or "")))
+        elif binding.get("kind") == "windows":
+            values.append(str(binding.get("process") or "").removesuffix(".exe"))
     for value in urls:
         try:
             host = urlsplit(value).hostname or ""

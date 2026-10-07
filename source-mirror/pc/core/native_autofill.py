@@ -8,12 +8,13 @@ from __future__ import annotations
 
 import os
 import re
+import unicodedata
 import subprocess
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Any, Iterable
 
 from . import modules as entry_modules
-from .autofill_sources import shares_matching_word, entry_matching_text
+from .autofill_sources import shares_matching_word, entry_matching_text, entry_binding_values, entry_bindings, entry_is_fillable, with_linked_sources, AUTOFILL_BINDINGS_KEY, AUTOFILL_ROLES
 from .autofill_resolver import AutofillSnapshot
 from .models import Entry, SecretType
 
@@ -153,51 +154,80 @@ def signer_certificate_sha256(executable_path: str) -> str:
 
 
 def entry_matches_target(entry: Entry, target: NativeTarget) -> bool:
-    """Trusted association; word suggestions must never qualify as identity."""
-    if entry_target_app(entry) != normalize_process_name(target.process_name):
-        return False
-    if (entry.get_field(APP_SIGNER_FIELD).strip() and target.executable_path
-            and not target.signer_sha256
-            and normalize_executable_path(entry.get_field(APP_PATH_FIELD)) == normalize_executable_path(target.executable_path)):
+    """Trusted association; word suggestions never qualify as identity."""
+    process = normalize_process_name(target.process_name)
+    bindings = [b for b in entry_bindings(entry) if b.get("kind") == "windows"
+                and normalize_process_name(b.get("process")) == process]
+    if (entry.get_field(APP_SIGNER_FIELD).strip() or any(b.get("signer") for b in bindings)) and target.executable_path and not target.signer_sha256:
         target = replace(target, signer_sha256=signer_certificate_sha256(target.executable_path))
-    return entry_identity_matches(entry, target)
+    if not entry_identity_matches(entry, target):
+        return False
+    if bindings:
+        return any(bool(normalize_executable_path(b.get("path")))
+                   and normalize_executable_path(b.get("path")) == normalize_executable_path(target.executable_path)
+                   and (not b.get("signer") or b["signer"] == target.signer_sha256.strip().lower()) for b in bindings)
+    return any(normalize_process_name(value) == process for value in entry_binding_values(entry, "windows"))
 
+
+
+def allowed_for_explicit_fill(entry: Entry, target: NativeTarget) -> bool:
+    if entry.deleted_at is not None or not entry_identity_matches(entry, target):
+        return False
+    stored = [binding for binding in entry_bindings(entry) if binding.get("kind") == "windows" and normalize_process_name(binding.get("process")) == normalize_process_name(target.process_name)]
+    return not stored or entry_matches_target(entry,target)
 
 def matching_entries(entries: Iterable[Entry], process_name: str, *, window_title: str = "") -> list[Entry]:
     target = normalize_process_name(process_name)
     if not target:
         return []
+    entries = list(entries)
     eligible = [entry for entry in entries if entry.deleted_at is None
-                and entry.secret_type == SecretType.LOGIN and bool(entry.password)]
-    exact = [entry for entry in eligible if entry_target_app(entry) == target]
+                and entry.secret_type == SecretType.LOGIN and entry_is_fillable(entry, entries)]
+    exact = [entry for entry in eligible if any(normalize_process_name(v) == target for v in entry_binding_values(entry, "windows"))
+             or any(b.get("kind") == "windows" and normalize_process_name(b.get("process")) == target for b in entry_bindings(entry))]
     # Suggestions are secondary to explicit associations and require a picker.
     words = target.removesuffix(".exe") + " " + window_title
-    matched = exact or [entry for entry in eligible if shares_matching_word(
+    matched = exact + [entry for entry in eligible if entry not in exact and shares_matching_word(
         entry_matching_text(entry), words)]
-    return sorted(matched, key=lambda entry: (entry.title.casefold(), entry.username.casefold(), entry.id))
+    return sorted(matched, key=lambda entry: (entry not in exact, entry.title.casefold(), entry.username.casefold(), entry.id))
 
 
 def matching_vault_entries(vault: "Vault", process_name: str, *, target: NativeTarget | None = None) -> list[Entry]:
-    """Use exact PMVE index first; decrypt login entries only for word fallback."""
+    """Return explicit associations and suggestions concurrently."""
     normalized = normalize_process_name(process_name)
     if not normalized:
         return []
-    indexed_ids = vault.query_login_package(normalized)
-    candidates = [entry for entry_id in indexed_ids if (entry := vault.read_entry(entry_id)) is not None]
-    matched = matching_entries(candidates, normalized)
-    if target is not None and target.executable_path and not target.signer_sha256:
-        target_path = normalize_executable_path(target.executable_path)
-        if any(entry.get_field(APP_SIGNER_FIELD).strip()
-               and normalize_executable_path(entry.get_field(APP_PATH_FIELD)) == target_path for entry in matched):
-            target = replace(target, signer_sha256=signer_certificate_sha256(target.executable_path))
-    trusted = [entry for entry in matched if target is None or entry_identity_matches(entry, target)]
-    if trusted:
-        return trusted
-    # An explicit identity mismatch cannot be bypassed by the same entry's title.
     candidates = [entry for entry_id in vault.list_entry_ids(SecretType.LOGIN)
-                  if entry_id not in indexed_ids and (entry := vault.read_entry(entry_id)) is not None]
-    matched = matching_entries(candidates, normalized, window_title=target.window_title if target else "")
-    return [entry for entry in matched if target is None or entry_identity_matches(entry, target)]
+                  if (entry := vault.read_entry(entry_id)) is not None]
+    if target is not None and target.executable_path and not target.signer_sha256 and any(
+            e.get_field(APP_SIGNER_FIELD).strip() or any(b.get("signer") for b in entry_bindings(e)) for e in candidates):
+        target = replace(target, signer_sha256=signer_certificate_sha256(target.executable_path))
+    matched = matching_entries(with_linked_sources(vault, candidates), normalized, window_title=target.window_title if target else "")
+    return [entry for entry in matched if target is None or (entry_identity_matches(entry, target)
+            and (not any(b.get("kind") == "windows" and normalize_process_name(b.get("process")) == normalized
+                         for b in entry_bindings(entry)) or entry_matches_target(entry, target)))]
+
+
+def remember_native_binding(vault: "Vault", entry: Entry, target: NativeTarget) -> Entry:
+    if not normalize_executable_path(target.executable_path):
+        raise NativeAutofillError("无法确认程序路径，请重试")
+    if not target.signer_sha256:
+        target = replace(target, signer_sha256=signer_certificate_sha256(target.executable_path))
+    current = vault.read_entry(entry.id)
+    if current is None or current.to_dict() != entry.to_dict() or not entry_identity_matches(current, target):
+        raise NativeAutofillError("条目或程序身份已变化，请重试")
+    existing = [b for b in entry_bindings(current) if b.get("kind") == "windows" and normalize_process_name(b.get("process")) == normalize_process_name(target.process_name)]
+    if existing and not entry_matches_target(current, target):
+        raise NativeAutofillError("程序身份已变化，请重试")
+    changed = Entry.from_dict(current.to_dict())
+    binding = {"kind": "windows", "process": normalize_process_name(target.process_name),
+               "path": normalize_executable_path(target.executable_path), "signer": target.signer_sha256.strip().lower()}
+    bindings = list(entry_bindings(changed))
+    if binding not in bindings:
+        bindings.append(binding)
+    changed.fields[AUTOFILL_BINDINGS_KEY] = bindings
+    vault.update(changed)
+    return changed
 
 
 def is_excluded(process_name: str | None, excluded: Iterable[str] | None) -> bool:
@@ -212,18 +242,24 @@ def is_excluded(process_name: str | None, excluded: Iterable[str] | None) -> boo
 def classify_field(*, name: str = "", automation_id: str = "", help_text: str = "", is_password: bool = False) -> str:
     if is_password:
         return "password"
-    text = " ".join((name, automation_id, help_text)).strip().casefold()
+    text = unicodedata.normalize("NFKC", " ".join((name, automation_id, help_text))).strip()
+    text = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", text).casefold()
     compact = re.sub(r"[^\w\u4e00-\u9fff]+", " ", text)
-    if any(token in compact for token in _SEARCH_TOKENS):
+    def matches(token):
+        normalized = re.sub(r"[^\w\u4e00-\u9fff]+", " ", token)
+        if re.search(r"[\u3400-\u9fff]", normalized):
+            return normalized in compact
+        return re.search(r"(?<!\w)" + re.escape(normalized) + r"(?!\w)", compact) is not None
+    if any(matches(token) for token in _SEARCH_TOKENS):
         return "other"
-    if any(token in compact for token in _OTP_TOKENS):
+    if any(matches(token) for token in _OTP_TOKENS):
         return "otp"
-    if any(token in compact for token in _PASSWORD_TOKENS):
+    if any(matches(token) for token in _PASSWORD_TOKENS):
         return "password"
     for role, tokens in _AUTOFILL_ROLE_TOKENS:
-        if any(token in compact for token in tokens):
+        if any(matches(token) for token in tokens):
             return role
-    if any(token in compact for token in _USERNAME_TOKENS):
+    if any(matches(token) for token in _USERNAME_TOKENS):
         return "username"
     return "unknown"
 
@@ -245,16 +281,6 @@ def choose_fields(fields: Iterable[FieldInfo]) -> tuple[FieldInfo | None, FieldI
         pool = before or usernames
         username = min(pool, key=lambda field: _field_distance(field, anchor))
 
-    if username is None and password is not None:
-        unknown_before = [field for field in candidates if field.role == "unknown" and field.top <= password.top]
-        if unknown_before:
-            username = min(unknown_before, key=lambda field: _field_distance(field, password))
-
-    if focused and focused.role == "unknown":
-        if any(field.role == "password" for field in candidates):
-            username = username or focused
-        elif not passwords:
-            username = username or focused
     return username, password
 
 
@@ -374,23 +400,29 @@ class WindowsUiaBackend:
         return PreparedFill(target, fields, focused_control)
 
     def fill_focused(self, prepared: PreparedFill, value: str, *, role: str) -> FillResult:
-        if prepared.fields or role not in {"username", "password"} or not value:
+        if prepared.fields or role not in AUTOFILL_ROLES or not value:
             raise NativeAutofillError("请选择有效的当前输入框填充内容")
-        self._activate_target(prepared.target)
-        if prepared.focused_control is not None:
-            try:
-                prepared.focused_control.SetFocus()
-            except Exception as exc:
-                raise NativeAutofillError("无法恢复原输入框焦点，请重新聚焦后重试") from exc
+        # The caller arms this operation, then the user refocuses the field and
+        # triggers the hotkey again. Never activate a window or guess a control.
         self._send_focused_text(prepared.target, value)
-        return FillResult(role == "username", role == "password")
+        return FillResult(role == "username", role == "password", role == "one_time_code",
+                          (role,) if role not in {"username", "password", "one_time_code"} else ())
 
     @staticmethod
     def _send_focused_text(target: NativeTarget, value: str) -> None:
         import ctypes
         from ctypes import wintypes
 
+        import time
+
         user32 = ctypes.windll.user32
+        # WM_HOTKEY arrives before Ctrl/Alt/Shift/Win are necessarily released.
+        # Unicode input must not inherit those modifiers.
+        deadline = time.monotonic() + 1.0
+        while any(user32.GetAsyncKeyState(key) & 0x8000 for key in (0x10, 0x11, 0x12, 0x5B, 0x5C)):
+            if time.monotonic() >= deadline:
+                raise NativeAutofillError("请松开快捷键后重新触发自动填充")
+            time.sleep(0.01)
         hwnd = int(user32.GetForegroundWindow() or 0)
         pid = wintypes.DWORD()
         user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
@@ -415,14 +447,21 @@ class WindowsUiaBackend:
         class INPUT(ctypes.Structure):
             _fields_ = [("type", wintypes.DWORD), ("data", INPUTUNION)]
 
-        encoded = value.encode("utf-16-le")
-        units = [int.from_bytes(encoded[i:i + 2], "little") for i in range(0, len(encoded), 2)]
-        events = (INPUT * (len(units) * 2))()
-        for index, unit in enumerate(units):
-            events[index * 2] = INPUT(1, INPUTUNION(ki=KEYBDINPUT(0, unit, 0x0004, 0, None)))
-            events[index * 2 + 1] = INPUT(1, INPUTUNION(ki=KEYBDINPUT(0, unit, 0x0004 | 0x0002, 0, None)))
-        if user32.SendInput(len(events), events, ctypes.sizeof(INPUT)) != len(events):
-            raise NativeAutofillError("无法向当前输入框输入内容，请确认程序未以管理员身份运行")
+        # Deliver one Unicode character at a time. Some Qt/embedded providers
+        # process surrogate pairs separately from adjacent BMP characters and
+        # move the caret when a whole password is queued in one SendInput call.
+        for character in value:
+            if int(user32.GetForegroundWindow() or 0) != target.hwnd:
+                raise NativeAutofillError("填充过程中目标窗口失焦，已停止输入")
+            encoded = character.encode("utf-16-le")
+            units = [int.from_bytes(encoded[i:i + 2], "little") for i in range(0, len(encoded), 2)]
+            events = (INPUT * (len(units) * 2))()
+            for index, unit in enumerate(units):
+                events[index * 2] = INPUT(1, INPUTUNION(ki=KEYBDINPUT(0, unit, 0x0004, 0, None)))
+                events[index * 2 + 1] = INPUT(1, INPUTUNION(ki=KEYBDINPUT(0, unit, 0x0004 | 0x0002, 0, None)))
+            if user32.SendInput(len(events), events, ctypes.sizeof(INPUT)) != len(events):
+                raise NativeAutofillError("无法向当前输入框输入内容，请确认程序未以管理员身份运行")
+            time.sleep(0.01)
 
     def fill(
         self,
@@ -432,11 +471,13 @@ class WindowsUiaBackend:
         otp_code: str = "",
         resolved: AutofillSnapshot | None = None,
     ) -> FillResult:
-        self._activate_target(prepared.target)
+        self._validate_target(prepared.target)
         username_field, password_field = choose_fields(prepared.fields)
         otp_field = choose_otp_field(prepared.fields)
         role_values = {role: item.value for role, item in resolved.values.items()} if resolved is not None else {}
-        username = role_values.get("username", entry.username)
+        preferred_username_role = "email" if username_field is not None and username_field.role == "email" else "username"
+        fallback_username_role = "username" if preferred_username_role == "email" else "email"
+        username = role_values.get(preferred_username_role) or role_values.get(fallback_username_role) or entry.username
         password = role_values.get("password", entry.password)
         username_filled = bool(username_field and username and self._set_value(username_field.control, username))
         password_filled = bool(password_field and password and self._set_value(password_field.control, password))
@@ -463,14 +504,19 @@ class WindowsUiaBackend:
         )
 
     @staticmethod
-    def _activate_target(target: NativeTarget) -> None:
-        try:
-            import ctypes
+    def _validate_target(target: NativeTarget) -> None:
+        import ctypes
+        from ctypes import wintypes
 
-            if ctypes.windll.user32.IsWindow(target.hwnd):
-                ctypes.windll.user32.SetForegroundWindow(target.hwnd)
-        except Exception:
-            pass
+        user32 = ctypes.windll.user32
+        pid = wintypes.DWORD()
+        if not user32.IsWindow(target.hwnd):
+            raise NativeAutofillError("目标窗口已关闭，请重新触发自动填充")
+        user32.GetWindowThreadProcessId(target.hwnd, ctypes.byref(pid))
+        if pid.value != target.process_id:
+            raise NativeAutofillError("目标程序已变化，请重新触发自动填充")
+        if target.executable_path and normalize_executable_path(WindowsUiaBackend._process_path(pid.value)) != normalize_executable_path(target.executable_path):
+            raise NativeAutofillError("目标程序已变化，请重新触发自动填充")
 
     @staticmethod
     def _set_value(control: Any, value: str) -> bool:

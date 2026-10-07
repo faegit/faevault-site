@@ -150,6 +150,33 @@ try {
     returnByValue: true,
   });
   assert.equal(overlayLogo.result.result.value.loaded, true, overlayLogo.result.result.value.src);
+  const mappedFill = await pageCdp.call("Runtime.evaluate", {
+    contextId: context.id, awaitPromise: true, returnByValue: true,
+    expression: `(async () => {
+      const form = document.createElement('form');
+      const make = (id, type='text') => {
+        const input=document.createElement('input'); input.id=id; input.type=type;
+        input.style.cssText='width:200px;height:30px'; form.append(input); return input;
+      };
+      const email=make('mail','email'); email.autocomplete='email';
+      const token=make('token');
+      const readonly=make('readonly'); readonly.readOnly=true; readonly.value='keep-readonly';
+      const disabled=make('disabled'); disabled.disabled=true; disabled.value='keep-disabled';
+      const newPassword=make('new-password','password'); newPassword.autocomplete='new-password'; newPassword.value='keep-new';
+      const password=make('existing-password','password'); password.value='keep-existing';
+      document.body.append(form);
+      activePassword=password; panel=document.createElement('div'); panelRoot.append(panel);
+      const mappings={}; mappings[fieldKey(token)]='one_time_code'; mappings[fieldKey(readonly)]='custom_secret';
+      mappings[fieldKey(disabled)]='custom_secret'; mappings[fieldKey(newPassword)]='custom_secret'; mappings[fieldKey(email)]='custom_secret';
+      const savedSend=send;
+      send=async () => ({ok:true,result:{username:'',password:'',fields:{email:'test@example.com',custom_secret:'synthetic-only',one_time_code:'123456'},otp:{code:'123456'},fieldMappings:mappings}});
+      try {
+        await fillCredential('synthetic-test');
+        return {email:email.value,token:token.value,readonly:readonly.value,disabled:disabled.value,newPassword:newPassword.value,password:password.value};
+      } finally {send=savedSend;form.remove();hideUi();}
+    })()`,
+  });
+  assert.deepEqual(mappedFill.result.result.value, {email:'test@example.com',token:'123456',readonly:'keep-readonly',disabled:'keep-disabled',newPassword:'keep-new',password:'keep-existing'});
   pageCdp.close();
 
   const browserCdp = await cdp(version.webSocketDebuggerUrl);

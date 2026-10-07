@@ -946,6 +946,16 @@ class Vault:
                 local_rev, local_time, remote_rev, remote_time
             )
             merged_metadata = copy.deepcopy(remote_metadata)
+            from .device_activity import FIELD as ACTIVITY_FIELD, merge as merge_activity, stamp, current_device_id
+            merged_metadata[ACTIVITY_FIELD] = merge_activity(local_metadata.get(ACTIVITY_FIELD), remote_metadata.get(ACTIVITY_FIELD))
+            merged_metadata = stamp(merged_metadata, current_device_id(self))
+            if merged_metadata[ACTIVITY_FIELD].get("version", 1) == 1:
+                merged_metadata[ACTIVITY_FIELD]["last_writer"]["parent_commit_id"] = str(remote_store.identity.commit_id)
+            try:
+                from .vault_history import HistoryStore
+                HistoryStore(self).capture("before-sync")
+            except Exception as error:
+                _log.warning("历史快照保存失败: %s", type(error).__name__)
             from .autofill_exclusions import FIELD, merge as merge_exclusions
             if FIELD in local_metadata or FIELD in remote_metadata:
                 merged_metadata[FIELD] = merge_exclusions(local_metadata.get(FIELD), remote_metadata.get(FIELD))
@@ -1037,6 +1047,13 @@ class Vault:
         """Identify the OS-protected PMVE RootKey payload."""
 
         return self._device_unlock_key_format
+
+    @property
+    def metadata(self) -> dict:
+        """Copy of authenticated vault metadata; available after unlock only."""
+        if self._pmve_store is None:
+            raise crypto.DecryptError("PMVE Store 会话不可用")
+        return copy.deepcopy(self._pmve_store.metadata())
 
     @property
     def vault_identity(self):
@@ -1194,6 +1211,11 @@ class Vault:
             entry = store.read_entry(summary.entry_id)
             if entry is not None:
                 entries.append(entry)
+        from .device_activity import stamp, FIELD as ACTIVITY_FIELD
+        updated = stamp(updated, device_id)
+        if updated[ACTIVITY_FIELD].get("version", 1) == 1:
+            updated[ACTIVITY_FIELD]["last_writer"]["parent_commit_id"] = str(store.identity.commit_id)
+        self._capture_history_best_effort("before-device-registration")
         store.save_full(
             expected_sequence=identity.sequence,
             metadata=updated,
@@ -1242,7 +1264,15 @@ class Vault:
         if store is None:
             raise crypto.DecryptError("PMVE Store 会话不可用")
 
-        metadata = copy.deepcopy(self._pmve_metadata)
+        from .device_activity import stamp, current_device_id, FIELD as ACTIVITY_FIELD
+        from .vault_history import HistoryStore
+        try:
+            HistoryStore(self).capture("before-save")
+        except Exception as error:
+            _log.warning("历史快照保存失败: %s", type(error).__name__)
+        metadata = stamp(self._pmve_metadata, current_device_id(self))
+        if metadata[ACTIVITY_FIELD].get("version", 1) == 1:
+            metadata[ACTIVITY_FIELD]["last_writer"]["parent_commit_id"] = str(store.identity.commit_id)
         metadata.setdefault("schema", "pmv-vault-metadata")
         metadata.setdefault("version", 1)
         metadata["vault_id"] = self._vault_id
@@ -1439,10 +1469,18 @@ class Vault:
         except Exception:
             return False
 
+    def _capture_history_best_effort(self, reason: str) -> None:
+        try:
+            from .vault_history import HistoryStore
+            HistoryStore(self).capture(reason)
+        except Exception as error:
+            _log.warning("历史快照保存失败: %s", type(error).__name__)
+
     def change_password(self, new_password: str) -> None:
         _log.info("修改 PMVE 主密码")
         if self._pmve_store is None or self._password.is_empty():
             raise crypto.DecryptError("PMVE 修改主密码需要由当前主密码解锁的会话")
+        self._capture_history_best_effort("before-password-change")
         new_password_utf8 = bytearray(new_password.encode("utf-8"))
         try:
             with self._password.bytes() as old_password_utf8:
@@ -1467,6 +1505,7 @@ class Vault:
         if self._pmve_store is None:
             raise crypto.DecryptError("PMVE Store 会话不可用")
         new_password_utf8 = bytearray(new_password.encode("utf-8"))
+        self._capture_history_best_effort("before-password-reset")
         try:
             identity = self._pmve_store.reset_password_with_recovery(
                 bytes(recovery_secret), bytes(new_password_utf8)
@@ -1491,6 +1530,7 @@ class Vault:
     ) -> None:
         if self._pmve_store is None or old_recovery_secret is None:
             raise crypto.DecryptError("PMVE 轮换恢复密钥需要验证旧恢复密钥")
+        self._capture_history_best_effort("before-recovery-rotation")
         try:
             identity = self._pmve_store.rotate_recovery(
                 bytes(old_recovery_secret), bytes(recovery_secret)
@@ -1508,6 +1548,7 @@ class Vault:
         """用主密码重新生成恢复密钥（无需旧恢复密钥）；旧密钥立即失效。"""
         if self._pmve_store is None:
             raise crypto.DecryptError("PMVE Store 会话不可用")
+        self._capture_history_best_effort("before-recovery-reset")
         try:
             identity = self._pmve_store.regenerate_recovery_key(
                 bytes(password_utf8, "utf-8"), bytes(new_recovery_secret)

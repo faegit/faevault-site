@@ -47,12 +47,43 @@ object AutofillOriginMetadata {
         )
     }
 
+    fun removeBinding(fields: Map<String, JsonElement>, origin: TargetOrigin): Map<String, JsonElement> {
+        fun matches(raw: JsonObject): Boolean = when (origin) {
+            is TargetOrigin.Web -> (raw["kind"] as? JsonPrimitive)?.contentOrNull == "web" &&
+                OriginMatcher.webHost((raw["host"] as? JsonPrimitive)?.contentOrNull.orEmpty()) == origin.host &&
+                ((raw["origin"] as? JsonPrimitive)?.contentOrNull?.let { value ->
+                    runCatching { java.net.URI(value).port in setOf(-1, 443) }.getOrDefault(false)
+                } ?: true)
+            is TargetOrigin.AndroidPackage -> (raw["kind"] as? JsonPrimitive)?.contentOrNull == "android" &&
+                (raw["package"] as? JsonPrimitive)?.contentOrNull == origin.packageName
+        }
+        val retained = bindingObjects(fields).filterNot(::matches)
+        val result = fields.toMutableMap()
+        result.remove(FIELD_KEY)
+        result.remove(BINDINGS_FIELD_KEY)
+        if (retained.isNotEmpty()) {
+            result[BINDINGS_FIELD_KEY] = JsonArray(retained)
+            result[FIELD_KEY] = retained.last()
+        }
+        return result
+    }
+
+    /** Android receives a host, not a verified page port; explicit nondefault-port origins cannot authorize it. */
     fun webHosts(entry: Entry): List<String> = bindingObjects(entry.fields).mapNotNull { raw ->
-        if ((raw["kind"] as? JsonPrimitive)?.contentOrNull != "web") return@mapNotNull null
-        (raw["host"] as? JsonPrimitive)?.contentOrNull?.trim()?.takeIf(String::isNotEmpty)
+        if ((raw["kind"] as? JsonPrimitive)?.contentOrNull != "web" ||
+            (raw["deleted"] as? JsonPrimitive)?.contentOrNull == "true") return@mapNotNull null
+        val host = (raw["host"] as? JsonPrimitive)?.contentOrNull?.trim()?.takeIf(String::isNotEmpty)
+            ?: return@mapNotNull null
+        val explicitOrigin = (raw["origin"] as? JsonPrimitive)?.contentOrNull
+        val uri = runCatching { java.net.URI(explicitOrigin ?: "https://$host") }.getOrNull()
+            ?: return@mapNotNull null
+        if (uri.scheme != "https" || uri.port !in setOf(-1, 443) || uri.rawUserInfo != null ||
+            OriginMatcher.webHost(uri.toString()) != OriginMatcher.webHost(host)) return@mapNotNull null
+        host
     }.distinct()
 
-    fun androidIdentities(entry: Entry): List<AndroidIdentity> = bindingObjects(entry.fields).mapNotNull(::androidIdentity)
+    fun androidIdentities(entry: Entry): List<AndroidIdentity> = bindingObjects(entry.fields)
+        .filterNot { (it["deleted"] as? JsonPrimitive)?.contentOrNull == "true" }.mapNotNull(::androidIdentity)
         .distinct()
 
     private fun androidIdentity(raw: JsonObject): AndroidIdentity? {

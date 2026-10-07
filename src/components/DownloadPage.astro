@@ -1,31 +1,19 @@
 ---
-import { getCollection } from "astro:content";
-
 import type { Locale } from "../i18n/config";
-
 import PageShell from "./PageShell.astro";
 
 /**
  * 版本与下载地址在构建时从 GitHub Releases 读取，避免官网与实际发布版本脱节。
  * 分别选择 Android 和 PC 的正式发布，且 PC 发布必须包含对应的安装包。
- *
- * 取不到 Release 时不再回退到写死的版本号。旧实现里 FALLBACK_VERSION 恒为
- * "4.6.2"，而构建期请求一旦失败（Actions 出口 IP 共享，未认证的 api.github.com
- * 只有 60 次/小时，很容易被限流），latestReleases() 又只返回空数组、不报任何错，
- * 结果官网静默停在旧版本上——4.6.3 就这样在官网上挂了很久而无人察觉。
- *
- * 现在改为：带 GITHUB_TOKEN 请求（限流提到 5000 次/小时），失败时回退到已同步的
- * 更新日志里最新的版本号（更新日志随每次发版自动同步），并把原因打进构建日志。
+ * 网络不可用时回退到 FALLBACK_VERSION，保证本地构建与 Pages 构建都能成功。
  */
 const RELEASES_API = "https://api.github.com/repos/faegit/faevault-site/releases?per_page=100";
 const ANDROID_TAG_PREFIX = "android/v";
 const PC_TAG_PREFIX = "pc/v";
+const FALLBACK_VERSION = "4.6.7";
 const APK_ASSET = "faevault-arm64-v8a.apk";
 const PC_CERT_ASSET = "FAE-Vault-CodeSigning.cer";
 const CHECKSUM_ASSET = "SHA256SUMS.txt";
-// 更新日志的 translationKey：取不到 Release 时从这里取各端最新版本号。
-const ANDROID_CHANGELOG_KEY = "changelog";
-const PC_CHANGELOG_KEY = "pc-changelog";
 
 type ReleaseAsset = { name?: string; browser_download_url?: string };
 type Release = { tag_name?: string; draft?: boolean; prerelease?: boolean; html_url?: string; assets?: ReleaseAsset[] };
@@ -36,39 +24,14 @@ function versionKey(version: string): number {
     return Number(match[1]) * 1_000_000 + Number(match[2]) * 1_000 + Number(match[3]);
 }
 
-const legalEntries = await getCollection("legal");
-const changelogVersions: Record<string, string> = {};
-for (const entry of legalEntries) {
-    const match = /^##\s+(\d+\.\d+\.\d+)/m.exec(entry.body ?? "");
-    if (match) changelogVersions[entry.data.translationKey] = match[1];
-}
-const FALLBACK_ANDROID = changelogVersions[ANDROID_CHANGELOG_KEY] ?? "0.0.0";
-const FALLBACK_PC = changelogVersions[PC_CHANGELOG_KEY] ?? "0.0.0";
-
 async function latestReleases(): Promise<Release[]> {
-    const headers: Record<string, string> = {
-        Accept: "application/vnd.github+json",
-        "User-Agent": "FAEvault-site-build",
-    };
-    // Actions 默认提供 GITHUB_TOKEN（workflow 已声明 contents: read），限流从
-    // 60 次/小时提到 5000 次/小时；本地构建没有该变量则退回匿名请求。
-    const token = process.env.GITHUB_TOKEN;
-    if (token) headers.Authorization = `Bearer ${token}`;
     try {
-        const response = await fetch(RELEASES_API, { headers });
-        if (!response.ok) {
-            console.warn(
-                `[download] GitHub Releases 返回 ${response.status} ${response.statusText}；` +
-                    `回退到更新日志版本（Android ${FALLBACK_ANDROID} / PC ${FALLBACK_PC}）。`,
-            );
-            return [];
-        }
+        const response = await fetch(RELEASES_API, {
+            headers: { Accept: "application/vnd.github+json", "User-Agent": "FAEVault-site-build" },
+        });
+        if (!response.ok) return [];
         return (await response.json()) as Release[];
-    } catch (error) {
-        console.warn(
-            `[download] 读取 GitHub Releases 失败：${error}；` +
-                `回退到更新日志版本（Android ${FALLBACK_ANDROID} / PC ${FALLBACK_PC}）。`,
-        );
+    } catch {
         return [];
     }
 }
@@ -87,8 +50,8 @@ function latestRelease(releases: Release[], prefix: string, requiredAsset: (vers
 const releases = await latestReleases();
 const release = latestRelease(releases, ANDROID_TAG_PREFIX, () => APK_ASSET);
 const pcRelease = latestRelease(releases, PC_TAG_PREFIX, (version) => `FAEVault_v${version}_Setup.exe`);
-const ver = release ? release.tag_name!.slice(ANDROID_TAG_PREFIX.length) : FALLBACK_ANDROID;
-const pcVer = pcRelease ? pcRelease.tag_name!.slice(PC_TAG_PREFIX.length) : FALLBACK_PC;
+const ver = release ? release.tag_name!.slice(ANDROID_TAG_PREFIX.length) : FALLBACK_VERSION;
+const pcVer = pcRelease ? pcRelease.tag_name!.slice(PC_TAG_PREFIX.length) : FALLBACK_VERSION;
 const androidApk =
     release?.assets?.find((asset) => asset.name === APK_ASSET)?.browser_download_url
     ?? `https://github.com/faegit/faevault-site/releases/download/${ANDROID_TAG_PREFIX}${ver}/${APK_ASSET}`;

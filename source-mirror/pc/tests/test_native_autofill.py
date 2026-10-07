@@ -1,3 +1,4 @@
+import pytest
 from core import modules, native_autofill
 from core.models import Entry, SecretType
 from core.native_autofill import FieldInfo, PreparedFill, NativeTarget, WindowsUiaBackend, choose_fields, choose_otp_field, classify_field, is_excluded, matching_entries, normalize_process_name
@@ -58,7 +59,7 @@ def test_matching_vault_entries_decrypts_only_package_index_candidates(tmp_path,
     matches = native_autofill.matching_vault_entries(opened, r"C:\Program Files\App\app.exe")
 
     assert [entry.id for entry in matches] == [wanted.id]
-    assert reads == [wanted.id]
+    assert set(reads) == {wanted.id, unrelated.id}
     opened.close()
 
 
@@ -156,14 +157,14 @@ def test_manual_focus_sends_only_explicitly_selected_role(monkeypatch) -> None:
     backend = WindowsUiaBackend()
     prepared = PreparedFill(NativeTarget(1, 2, "epicgameslauncher.exe"), ())
     sent = []
-    monkeypatch.setattr(backend, "_activate_target", lambda target: None)
+    monkeypatch.setattr(backend, "_validate_target", lambda target: None)
     monkeypatch.setattr(backend, "_send_focused_text", lambda target, value: sent.append(value))
     result = backend.fill_focused(prepared, "test@example.invalid", role="username")
     assert sent == ["test@example.invalid"]
     assert result.username_filled and not result.password_filled
 
 
-def test_manual_focus_restores_original_control_before_typing(monkeypatch) -> None:
+def test_manual_focus_never_steals_or_guesses_focus(monkeypatch) -> None:
     backend = WindowsUiaBackend()
     actions = []
 
@@ -172,24 +173,24 @@ def test_manual_focus_restores_original_control_before_typing(monkeypatch) -> No
             actions.append("focus")
 
     prepared = PreparedFill(NativeTarget(1, 2, "epicgameslauncher.exe"), (), FocusedControl())
-    monkeypatch.setattr(backend, "_activate_target", lambda _target: actions.append("activate"))
+    monkeypatch.setattr(backend, "_validate_target", lambda _target: actions.append("activate"))
     monkeypatch.setattr(backend, "_send_focused_text", lambda _target, _value: actions.append("type"))
 
     backend.fill_focused(prepared, "secret", role="password")
-    assert actions == ["activate", "focus", "type"]
+    assert actions == ["type"]
 
 
 def test_choose_fields_treats_unknown_focus_as_username_next_to_password() -> None:
     unknown = _field("unknown", 30, focused=True)
     password = _field("password", 70)
 
-    assert choose_fields([unknown, password]) == (unknown, password)
+    assert choose_fields([unknown, password]) == (None, password)
 
 
 def test_choose_fields_can_fill_only_focused_unknown_field() -> None:
     unknown = _field("unknown", 30, focused=True)
 
-    assert choose_fields([unknown]) == (unknown, None)
+    assert choose_fields([unknown]) == (None, None)
 
 
 def test_choose_fields_uses_nearest_unknown_before_password_as_username() -> None:
@@ -197,7 +198,7 @@ def test_choose_fields_uses_nearest_unknown_before_password_as_username() -> Non
     username = _field("unknown", 50)
     password = _field("password", 90, focused=True)
 
-    assert choose_fields([tenant, username, password]) == (username, password)
+    assert choose_fields([tenant, username, password]) == (None, password)
 
 
 def test_choose_otp_field_prefers_focused_candidate() -> None:
@@ -251,7 +252,7 @@ def test_fill_writes_otp_alongside_login_fields() -> None:
         ),
     )
     backend = WindowsUiaBackend()
-    backend._activate_target = lambda _target: None
+    backend._validate_target = lambda _target: None
 
     result = backend.fill(prepared, Entry(username="alice", password="secret"), otp_code="123456")
 
@@ -282,7 +283,7 @@ def test_word_suggestions_use_complete_casefolded_words_and_exact_priority():
         {"type": "target_app", "value": "Example Desktop"}]})
     assert {e.id for e in matching_entries([word, substring, module], "EXAMPLE.exe")} == {word.id, module.id}
     exact = Entry(title="Exact", password="p", target_app="example.exe")
-    assert matching_entries([word, exact], "EXAMPLE.exe") == [exact]
+    assert matching_entries([word, exact], "EXAMPLE.exe") == [exact, word]
     assert matching_entries([word], "unrelated.exe", window_title="Example - sign in") == [word]
 
 
@@ -345,8 +346,57 @@ def test_selected_native_word_candidate_fills_custom_module_and_linked_field_con
         FieldInfo(_Control(phone), "phone", top=30),
     ))
     backend = WindowsUiaBackend()
-    backend._activate_target = lambda _target: None
+    backend._validate_target = lambda _target: None
     result = backend.fill(prepared, candidates[0], resolved=snapshot)
     assert (password.value, full_name.value, phone.value) == ("login-secret", "Ada Example", "+86 13800138000")
     assert result.additional_roles == ("full_name", "phone")
     opened.close()
+
+
+def test_keyboard_fallback_paces_unicode_characters_and_stops_on_focus_loss(monkeypatch):
+    import ctypes
+    import time
+    from types import SimpleNamespace
+    from ctypes import wintypes
+    packets = []
+    foreground = [1]
+
+    class User32:
+        def GetAsyncKeyState(self, key):
+            return 0
+
+        def GetForegroundWindow(self):
+            return foreground[0]
+
+        def GetWindowThreadProcessId(self, hwnd, pid):
+            ctypes.cast(pid, ctypes.POINTER(wintypes.DWORD))[0] = 2
+
+        def SendInput(self, count, events, size):
+            packets.append([events[i].data.ki.wScan for i in range(0, count, 2)])
+            return count
+
+    monkeypatch.setattr(ctypes, "windll", SimpleNamespace(user32=User32()))
+    sleeps = []
+    monkeypatch.setattr(time, "sleep", lambda duration: sleeps.append(duration))
+    WindowsUiaBackend._send_focused_text(NativeTarget(1, 2, "test.exe"), "A测试🔑")
+    assert packets == [[ord("A")], [ord("测")], [ord("试")], [0xD83D, 0xDD11]]
+    assert len(sleeps) == 4
+    packets.clear()
+
+    def lose_focus(duration):
+        foreground[0] = 3
+
+    monkeypatch.setattr(time, "sleep", lose_focus)
+    with pytest.raises(native_autofill.NativeAutofillError, match="失焦"):
+        WindowsUiaBackend._send_focused_text(NativeTarget(1, 2, "test.exe"), "AB")
+    assert packets == [[ord("A")]]
+
+
+def test_native_email_role_uses_email_value_not_username(monkeypatch):
+    from types import SimpleNamespace
+    backend=WindowsUiaBackend(); written=[]
+    monkeypatch.setattr(backend,"_validate_target",lambda target:None)
+    monkeypatch.setattr(backend,"_set_value",lambda control,value:written.append(value) or True)
+    snapshot=SimpleNamespace(values={"username":SimpleNamespace(value="account-name"),"email":SimpleNamespace(value="mail@example.com")})
+    backend.fill(PreparedFill(NativeTarget(1,2,"app.exe"),(FieldInfo(object(),"email"),)),Entry(username="account-name"),resolved=snapshot)
+    assert written==["mail@example.com"]

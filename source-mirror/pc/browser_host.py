@@ -141,20 +141,35 @@ def _is_origin_excluded(origin: str) -> bool:
     return origin_is_excluded(origin, config.get("browser_autofill_excluded_hosts", []))
 
 
-def _confirm_word_match(origin: str, entry) -> bool:
+def _confirm_word_match(origin: str, entry):
+    from PySide6.QtWidgets import QCheckBox, QDialog, QHBoxLayout, QLabel, QPushButton
+    from core.browser_host import FillSelection
     from ui import i18n, widgets
 
     _application()
-    return widgets.confirm(
-        None,
-        "确认自动填充来源",
-        i18n.tr("所选条目仅名称与此网页有单词匹配。\n\n"
-                "条目：{title}\n保存的网站：{url}\n当前网页：{origin}\n\n"
-                "确认信任当前网页后，允许仅本次填充所选条目？").format(
-                    title=entry.title, url=entry.url or i18n.tr("未设置"), origin=origin,
-                ),
-        kind="warn",
-    )
+    dialog = widgets.ShadowDialog(i18n.tr("确认自动填充来源"), width=470)
+    message = QLabel(i18n.tr("请确认当前网站可以接收所选条目的填充内容。"))
+    message.setWordWrap(True)
+    dialog.body.addWidget(message)
+    detail = QLabel(f"{entry.title}\n{origin}")
+    detail.setTextFormat(__import__('PySide6.QtCore', fromlist=['Qt']).Qt.PlainText)
+    detail.setWordWrap(True)
+    dialog.body.addWidget(detail)
+    remember = QCheckBox(i18n.tr("记住此网站与条目的关联"))
+    dialog.body.addWidget(remember)
+    buttons = QHBoxLayout()
+    cancel = QPushButton(i18n.tr("取消")); cancel.clicked.connect(dialog.reject)
+    allow = QPushButton(i18n.tr("允许填充")); allow.setObjectName("Primary"); allow.clicked.connect(dialog.accept)
+    buttons.addWidget(cancel); buttons.addWidget(allow); dialog.body.addLayout(buttons)
+    accepted = dialog.exec() == QDialog.Accepted
+    return FillSelection(accepted, accepted and remember.isChecked())
+
+
+def _confirm_field_mapping(origin: str, entry, field_key: str, role: str) -> bool:
+    from ui import i18n, widgets
+    _application()
+    return widgets.confirm(None, i18n.tr("确认输入框映射"),
+        i18n.tr("此设置仅适用于当前网站和所选条目。")+f"\n\n{entry.title}\n{origin}\n{field_key}\n{role or i18n.tr('移除映射')}", kind="warn")
 
 
 def _confirm_save(request, matches) -> SaveSelection:
@@ -243,6 +258,7 @@ def main(arguments: list[str] | None = None) -> int:
         authorize_origin=_authorize_ip_origin,
         is_origin_excluded=_is_origin_excluded,
         confirm_word_match=_confirm_word_match,
+        confirm_field_mapping=_confirm_field_mapping,
         lock_after_seconds=config.lock_seconds,
     )
     input_stream = sys.stdin.buffer

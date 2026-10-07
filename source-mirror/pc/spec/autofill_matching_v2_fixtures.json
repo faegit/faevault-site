@@ -1,0 +1,131 @@
+{
+  "schema": 2,
+  "name_pairs": [
+    {
+      "id": "1",
+      "left": "GitHub",
+      "right": "github",
+      "expected": true
+    },
+    {
+      "id": "2",
+      "left": "ＧｉｔＨｕｂ",
+      "right": "github",
+      "expected": true
+    },
+    {
+      "id": "3",
+      "left": "MyService",
+      "right": "My Service",
+      "expected": true
+    },
+    {
+      "id": "4",
+      "left": "GitHub账号",
+      "right": "GitHub",
+      "expected": true
+    },
+    {
+      "id": "5",
+      "left": "网易邮箱",
+      "right": "网易",
+      "expected": true
+    },
+    {
+      "id": "6",
+      "left": "支付宝账号",
+      "right": "支付宝",
+      "expected": true
+    },
+    {
+      "id": "7",
+      "left": "google.com",
+      "right": "Google账号",
+      "expected": true
+    },
+    {
+      "id": "8",
+      "left": "login account",
+      "right": "账号 登录",
+      "expected": false
+    },
+    {
+      "id": "9",
+      "left": "foo.com",
+      "right": "bar.com",
+      "expected": false
+    },
+    {
+      "id": "10",
+      "left": "GitHub",
+      "right": "GitLab",
+      "expected": false
+    },
+    {
+      "id": "11",
+      "left": "pay",
+      "right": "repayment",
+      "expected": false
+    },
+    {
+      "id": "12",
+      "left": "邮箱",
+      "right": "网易邮箱",
+      "expected": false
+    },
+    {
+      "id": "13",
+      "left": "auth-login",
+      "right": "login",
+      "expected": false
+    },
+    {
+      "id": "14",
+      "left": "My_Service",
+      "right": "my-service",
+      "expected": true
+    },
+    {
+      "id": "15",
+      "left": "foo",
+      "right": "food",
+      "expected": false
+    },
+    {
+      "id": "16",
+      "left": "WeChat",
+      "right": "wechat",
+      "expected": true
+    },
+    {
+      "id": "17",
+      "left": "myservice",
+      "right": "My Service",
+      "expected": true
+    },
+    {
+      "id": "18",
+      "left": "Google",
+      "right": "google账号",
+      "expected": true
+    },
+    {
+      "id": "19",
+      "left": "foo auth",
+      "right": "bar auth",
+      "expected": false
+    },
+    {
+      "id": "20",
+      "left": "MyGit",
+      "right": "mygit",
+      "expected": true
+    },
+    {
+      "id": "21",
+      "left": "app账户",
+      "right": "app account",
+      "expected": false
+    }
+  ]
+}

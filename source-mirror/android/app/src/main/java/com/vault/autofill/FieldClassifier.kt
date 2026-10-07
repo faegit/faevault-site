@@ -49,6 +49,8 @@ object FieldClassifier {
             scoreToken(evidence.htmlAttributes["id"], 65)
             scoreToken(evidence.htmlAttributes["placeholder"], 60)
             scoreToken(evidence.htmlAttributes["aria-label"], 60)
+            scoreToken(evidence.htmlAttributes["title"], 55)
+            scoreToken(evidence.htmlAttributes["data-label"], 55)
             scoreToken(evidence.label, 40)
             tokenKind(evidence.className)?.let { score(it, 10) }
         }
@@ -64,7 +66,7 @@ object FieldClassifier {
     }
 
     fun <T> selectFields(candidates: List<FieldCandidate<T>>, manualRequest: Boolean): List<ClassifiedField<T>> {
-        val classified = candidates.map { candidate ->
+        val classified = candidates.filter { it.evidence.visible && it.evidence.enabled }.map { candidate ->
             val result = classify(candidate.evidence)
             ClassifiedField(
                 id = candidate.id,
@@ -72,12 +74,14 @@ object FieldClassifier {
                 score = result.score,
                 focused = candidate.evidence.focused,
                 currentText = candidate.evidence.currentText,
+                fieldKey = candidate.evidence.fieldKey,
+                label = candidate.evidence.label,
             )
         }
         val selected = classified.filter { it.kind != FieldKind.UNKNOWN }.toMutableList()
         if (manualRequest && selected.none { it.focused }) {
             classified.firstOrNull { it.focused }?.let {
-                selected.add(0, if (it.kind == FieldKind.UNKNOWN) it.copy(kind = FieldKind.CUSTOM_TEXT, score = 1) else it)
+                selected.add(0, it)
             }
         }
         return selected

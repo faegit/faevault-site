@@ -34,7 +34,7 @@ def test_controller_unlocks_lists_and_revalidates_get(tmp_path):
 
     listed = controller.handle(request("list", origin="https://example.com"))
     assert listed["credentials"] == [
-        {"id": ENTRY_ID, "title": "Example", "username": "alice", "origin": "https://example.com", "kind": "login"}
+        {"id": ENTRY_ID, "title": "Example", "username": "alice", "origin": "https://example.com", "kind": "login", "matchReason": "exact"}
     ]
     assert controller.handle(request("get", origin="https://example.com", credential_id=ENTRY_ID)) == {
         "username": "alice",
@@ -145,7 +145,7 @@ def test_private_ip_requires_exact_origin_authorization(tmp_path):
         "origin": "https://192.168.1.10:8443",
     }
     result = controller.handle(request("list", origin="https://192.168.1.10:8443"))
-    assert result["credentials"] == []
+    assert [item["id"] for item in result["credentials"]] == [NAS_ID]
     assert requested == ["https://192.168.1.10:8443"]
 
     save_result = controller.handle(
@@ -239,8 +239,8 @@ def test_pmve_browser_list_decrypts_only_login_index_candidates(tmp_path, monkey
 
     listed = controller.handle(request("list", origin="https://example.com"))
 
-    assert [item["id"] for item in listed["credentials"]] == [str(UUID(wanted.id))]
-    assert reads == [str(UUID(wanted.id))]
+    assert [item["id"] for item in listed["credentials"]] == [str(UUID(wanted.id)), str(UUID(unrelated.id))]
+    assert set(reads) == {str(UUID(wanted.id)), str(UUID(unrelated.id))}
 
 
 def test_pmve_private_ip_index_miss_does_not_decrypt_entries(tmp_path, monkeypatch):
@@ -267,8 +267,9 @@ def test_pmve_private_ip_index_miss_does_not_decrypt_entries(tmp_path, monkeypat
 
     listed = controller.handle(request("list", origin="https://192.168.1.10:8443"))
 
-    assert listed["credentials"] == []
-    assert reads == []
+    assert len(listed["credentials"]) == 1
+    assert listed["credentials"][0]["matchReason"] == "exact"
+    assert reads
 
 
 def test_browser_lists_and_gets_bound_totp_without_full_materialization(tmp_path, monkeypatch):

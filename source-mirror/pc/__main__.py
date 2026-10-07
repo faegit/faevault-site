@@ -6,12 +6,13 @@ import sys
 
 if __name__ == "__main__":
     import multiprocessing
+
     multiprocessing.freeze_support()
 
 from PySide6.QtCore import QLocale, QSharedMemory
 from PySide6.QtWidgets import QApplication, QDialog
 
-from core import config
+from core import config, startup
 from core import log as _log_mod
 from core.storage import vault_dir
 from ui import i18n, widgets
@@ -52,6 +53,15 @@ def main() -> "int":
     app.setWindowIcon(widgets.app_icon())
     i18n.install(app, config.language_mode(), QLocale.system().name())
     app.setStyleSheet(stylesheet(config.theme_mode()))
+
+    if startup.silent_requested():
+        from ui.startup import LockedStartupSession
+
+        session = LockedStartupSession(app)
+        if session.start():
+            _log.info("静默启动：保险库保持锁定，等待托盘激活")
+            return app.exec()
+        _log.info("系统托盘不可用，改为显示解锁窗口")
 
     dlg = UnlockDialog()
     dlg.setWindowIcon(widgets.app_icon())

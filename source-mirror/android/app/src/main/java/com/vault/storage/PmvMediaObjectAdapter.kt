@@ -48,6 +48,7 @@ internal class PmvMediaObjectAdapter(private val file: java.io.File) {
         entry: Entry,
         expectedEntryRevision: Long?,
         streams: List<PmvMediaRef.LegacyStream>,
+        transformMetadata: (PmvVaultStore.Session, kotlinx.serialization.json.JsonObject) -> kotlinx.serialization.json.JsonObject = { _, metadata -> metadata },
     ): SaveResult = PmvVaultStore.openRootKey(file, rootKey).use { session ->
         if (session.identity().sequence != expectedSequence) {
             throw VaultStaleMutationException("PMVE 媒体提交基线已过期")
@@ -77,7 +78,7 @@ internal class PmvMediaObjectAdapter(private val file: java.io.File) {
                     metadata,
                 )
                 PmvVaultStore.MutationContent(
-                    updatedMetadata,
+                    transformMetadata(session, updatedMetadata),
                     updatedPayload.entries + updatedPayload.trash,
                 )
             }

@@ -9,15 +9,54 @@
 from __future__ import annotations
 
 import datetime
+import time
+import email.utils
 import enum
 import os
 import tempfile
 from pathlib import Path
 
 from PySide6.QtCore import QMetaMethod, QObject, QThread, Signal
+from shiboken6 import isValid
 
-from core import auto_cloud_sync, cloud, crypto
+from core import auto_cloud_sync, cloud, crypto, remote_update, cloud_sync_prefs
 from core.storage import Vault, VaultLineage
+from . import i18n
+
+
+def authenticated_writer_line(store) -> str:
+    from core.device_activity import verified_last_writer
+    profile = verified_last_writer(store)
+    name = profile.get("name") if profile else None
+    return i18n.tr("最近写入设备：{name}").format(name=name or i18n.tr("未知设备"))
+
+
+class RemoteMetadataWorker(QThread):
+    completed = Signal(object)
+    failed = Signal(str)
+
+    def __init__(self, target, connection, parent=None):
+        super().__init__(parent)
+        self.target, self.connection = target, connection
+
+    def run(self):
+        try:
+            if self.target == "drive":
+                metadata = cloud.cloud_drive_metadata(self.connection)
+            else:
+                client = cloud.WebDavClient(self.connection)
+                # Deliberately HEAD only: unsupported metadata never falls back to a download.
+                _, headers, response = client._request("HEAD", url=self.connection.file_url, retry=True, stream=True)
+                try:
+                    modified = email.utils.parsedate_to_datetime(headers["Last-Modified"]).timestamp() if headers.get("Last-Modified") else 0.0
+                    metadata = cloud.RemoteMetadata(True, int(headers.get("Content-Length", "-1")), modified, cloud._strong_etag(headers))
+                finally:
+                    response.close()
+            if not metadata.exists:
+                raise cloud.CloudError("远端文件已删除")
+            self.completed.emit(metadata)
+        except Exception as exc:
+            self.failed.emit(str(exc))
 
 
 class CloudSyncPhase(enum.Enum):
@@ -320,6 +359,12 @@ class RemotePreviewWorker(QThread):
                     local_trash=len(vault.trash),
                     checked=datetime.datetime.now().strftime("%H:%M:%S"),
                 )
+                from core.pmv_vault_store import PmvVaultStore
+                remote_store = PmvVaultStore.open_root_key(self.remote_path, vault.root_key_for_device_unlock())
+                try:
+                    text += "\n" + authenticated_writer_line(remote_store)
+                finally:
+                    remote_store.close()
                 # 透传已认证的远端身份与计数，供控制器缓存复用（跳过下次整库下载/解密）。
                 self.previewReady.emit(text, remote_identity, len(vault.entries), remote_key_rev)
             finally:
@@ -438,6 +483,7 @@ class CloudSyncController(QObject):
     settled = Signal()
     busyChanged = Signal(str, bool)
     previewChanged = Signal(str, str)
+    remoteUpdateFound = Signal(str)
     message = Signal(str, str, str)
     askExistingRemote = Signal(str, object)
     vaultReplaced = Signal(object)
@@ -478,7 +524,13 @@ class CloudSyncController(QObject):
         # 远端未发生变化时复用上次整库解密得到的身份，跳过下载与解密（与安卓“先比 ETag 再决定
         # 是否下载全量”的探测一致），从而消除“检测很慢”的重复开销。
         self._remote_cache: dict[str, tuple[str, object, int, int]] = {}
+        self._remote_writer_lines = {}
         self._workers: list[QThread] = []
+        self._remote_checks = {}
+        self._remote_checked_at = {}
+        self._remote_associations = {}
+        self._overwrite_update_inputs = {}
+        self._remote_epochs = {"drive": 0, "webdav": 0}
         self._closed = False
         self.loading = False
         self.loaded = False
@@ -490,6 +542,99 @@ class CloudSyncController(QObject):
         self.previewChanged.connect(self._remember_preview)
         self.message.connect(self._remember_notice)
         self.askExistingRemote.connect(self._remember_question)
+
+    def _update_association(self, target):
+        connection = self.drive_path if target == self.DRIVE else self.webdav_config
+        return remote_update.association_fingerprint(target, connection) if connection is not None else ""
+
+    def remote_update_state(self, target):
+        association = self._update_association(target)
+        if not association or not remote_update.enabled(self._cloud_vault_id, target):
+            return remote_update.UpdateState()
+        return remote_update.load(self._cloud_vault_id, target, association)
+
+    def set_remote_detection(self, target, enabled):
+        self._remote_epochs[target] += 1
+        remote_update.set_enabled(self._cloud_vault_id, target, enabled)
+        self._remote_checked_at.pop(target, None)
+        self.stateChanged.emit()
+        if enabled:
+            self.check_remote_updates()
+
+    def snooze_remote_update(self, target):
+        # History is persisted when shown, so Later retains the card without repeating a toast.
+        self.stateChanged.emit()
+
+    def acknowledge_remote_update(self, target, version, consumed_version=""):
+        if not version:
+            return
+        association = self._update_association(target)
+        if not association:
+            return
+        state = self.remote_update_state(target)
+        state, _ = remote_update.reduce(state, {"type": "acknowledge", "version": version, "consumed_version": consumed_version})
+        remote_update.save(self._cloud_vault_id, target, association, state)
+        self.stateChanged.emit()
+
+    def check_remote_updates(self):
+        # A queued page-open timer can outlive the session QObject during teardown.
+        if self._closed or not isValid(self):
+            return
+        parent = self.parent()
+        if (self._closed or not self.loaded or getattr(parent, "_locked", False)
+                or not cloud_sync_prefs.master_enabled(self._cloud_vault_id) or self.start_block_reason()):
+            return
+        now = time.monotonic()
+        for target in (self.DRIVE, self.WEBDAV):
+            association = self._update_association(target)
+            if association != self._remote_associations.get(target):
+                self._remote_epochs[target] += 1
+                self._remote_associations[target] = association
+                self._remote_checked_at.pop(target, None)
+            if (not association or not remote_update.enabled(self._cloud_vault_id, target)
+                    or target in self._remote_checks
+                    or now - self._remote_checked_at.get(target, -remote_update.INTERVAL_SECONDS) < remote_update.INTERVAL_SECONDS):
+                continue
+            self._remote_checked_at[target] = now
+            epoch = self._remote_epochs[target]
+            worker = RemoteMetadataWorker(target, self.drive_path if target == self.DRIVE else self.webdav_config, self)
+            self._remote_checks[target] = worker
+            worker.completed.connect(lambda meta, t=target, a=association, e=epoch: self._remote_observed(t, a, e, meta))
+            worker.failed.connect(lambda msg, t=target, a=association, e=epoch: self._remote_check_failed(t, a, e, msg))
+            worker.finished.connect(lambda t=target: self._remote_checks.pop(t, None))
+            self._start(worker)
+        self.stateChanged.emit()
+
+    def _remote_result_current(self, target, association, epoch):
+        return (not self._closed and isValid(self) and not getattr(self.parent(), "_locked", False)
+                and cloud_sync_prefs.master_enabled(self._cloud_vault_id)
+                and remote_update.enabled(self._cloud_vault_id, target)
+                and self._remote_epochs[target] == epoch and self._update_association(target) == association)
+
+    def _remote_observed(self, target, association, epoch, metadata):
+        if not self._remote_result_current(target, association, epoch):
+            return
+        version = remote_update.metadata_version(target, metadata)
+        if not version:
+            return
+        previous = self.remote_update_state(target)
+        state, notify = remote_update.reduce(previous,
+                                            {"type": "observe", "version": version, "now": int(time.time() * 1000)})
+        if state.pending and state.pending != previous.pending:
+            self._remote_cache.pop(target, None)
+            self.previews.pop(target, None)
+            self.previewChanged.emit(target, "远端版本已变化，请重新验证设备信息")
+        remote_update.save(self._cloud_vault_id, target, association, state)
+        setattr(self, f"{target}_health", "ok")
+        self.stateChanged.emit()
+        if notify:
+            self.remoteUpdateFound.emit(target)
+
+    def _remote_check_failed(self, target, association, epoch, message):
+        if self._remote_result_current(target, association, epoch):
+            setattr(self, f"{target}_health", "missing" if "404" in message or "已删除" in message else "failed")
+            self._set_phase(target, CloudSyncPhase.FAILED, message=cloud_sync_user_message(message))
+            self.stateChanged.emit()
 
     def _remember_preview(self, target, text):
         self.previews[target] = text
@@ -572,7 +717,7 @@ class CloudSyncController(QObject):
 
     @property
     def any_busy(self) -> bool:
-        return self.loading or bool(self._busy_targets)
+        return self.loading or bool(self._busy_targets) or bool(self._remote_checks)
 
     def is_busy(self, target: str) -> bool:
         return target in self._busy_targets
@@ -704,7 +849,7 @@ class CloudSyncController(QObject):
                     Path(path).unlink(missing_ok=True)
 
     def load_async(self):
-        if self.loaded or self.loading or self._closed:
+        if self._closed or not isValid(self) or self.loaded or self.loading:
             return
         self.loading = True
         self.stateChanged.emit()
@@ -724,6 +869,7 @@ class CloudSyncController(QObject):
         self.webdav_health = "ok" if self.webdav_config else ""
         self.loading = False
         self.loaded = True
+        self.check_remote_updates()
         self.previewChanged.emit(self.DRIVE, "已加载关联设置，点击同步或重新检测" if self.drive_path else "尚未关联云端硬盘")
         self.previewChanged.emit(self.WEBDAV, "已加载关联设置，点击同步或重新检测" if self.webdav_config else "尚未关联 WebDAV")
         self.stateChanged.emit()
@@ -799,7 +945,7 @@ class CloudSyncController(QObject):
         live = self._live_vault
         lineage = Vault.classify_lineage(live.pmve_identity, remote_identity)
         local_key_rev, _ = live.read_sync_key_meta(live.path)
-        return _preview_detail(
+        text = _preview_detail(
             lineage,
             local_seq=live.pmve_identity.sequence,
             remote_seq=remote_identity.sequence,
@@ -809,6 +955,12 @@ class CloudSyncController(QObject):
             local_trash=len(live.trash),
             checked=datetime.datetime.now().strftime("%H:%M:%S"),
         )
+        verified = self._remote_writer_lines.get(target)
+        if verified and verified[0] == remote_identity.root_digest:
+            text += "\n" + verified[1]
+        else:
+            text += "\n" + i18n.tr("最近写入设备：{name}").format(name=i18n.tr("未知设备"))
+        return text
 
     def inspect_drive(self) -> None:
         if not self.can_start(self.DRIVE):
@@ -933,6 +1085,10 @@ class CloudSyncController(QObject):
         if self._closed:
             return
         self._remote_cache[target] = (revision_key, remote_identity, entry_count, remote_key_rev)
+        prefix = i18n.tr("最近写入设备：{name}").split("{name}")[0]
+        writer_line = next((line for line in text.splitlines() if line.startswith(prefix)), None)
+        if writer_line is not None:
+            self._remote_writer_lines[target] = (remote_identity.root_digest, writer_line)
         setattr(self, f"{target}_health", "ok")
         self.previewChanged.emit(target, text)
         self._set_phase(target, CloudSyncPhase.IDLE, message="")
@@ -1013,6 +1169,8 @@ class CloudSyncController(QObject):
                 finally:
                     root_key[:] = bytes(len(root_key))
                 self.webdav_config = target_ref
+        self.acknowledge_remote_update(target, result.stats.get("remote_update_version", ""),
+                                       result.stats.get("remote_update_consumed_version", ""))
         if refreshed is not None:
             self._vault = refreshed
             # 视图负责关闭旧库并刷新列表；即使刷新失败也不阻塞同步状态。
@@ -1053,6 +1211,7 @@ class CloudSyncController(QObject):
         if not self.can_start(self.DRIVE):
             self._refuse_start(self.DRIVE)
             return
+        self._overwrite_update_inputs[self.DRIVE] = (self._update_association(self.DRIVE), self._remote_epochs[self.DRIVE], self.remote_update_state(self.DRIVE).pending)
         self._vault.save()
         worker = CloudDriveWorker("overwrite_file", target, self._vault.path, parent=self)
         worker.completed.connect(lambda _action, snap: self._overwrite_pulled(self.DRIVE, target, associated, snap))
@@ -1065,6 +1224,7 @@ class CloudSyncController(QObject):
         if not self.can_start(self.WEBDAV):
             self._refuse_start(self.WEBDAV)
             return
+        self._overwrite_update_inputs[self.WEBDAV] = (self._update_association(self.WEBDAV), self._remote_epochs[self.WEBDAV], self.remote_update_state(self.WEBDAV).pending)
         self._vault.save()
         worker = CloudWorker("overwrite_file", connection, (self._vault.path, None), parent=self)
         worker.completed.connect(lambda _action, snap: self._overwrite_pulled(self.WEBDAV, connection, associated, snap))
@@ -1118,6 +1278,9 @@ class CloudSyncController(QObject):
                         root_key[:] = bytes(len(root_key))
                     self.webdav_config = target_ref
             setattr(self, f"{target}_health", "ok")
+            association, epoch, pending = self._overwrite_update_inputs.pop(target, ("", -1, ""))
+            consumed = pending if association == self._update_association(target) and epoch == self._remote_epochs[target] else ""
+            self.acknowledge_remote_update(target, remote_update.metadata_version(target, snapshot), consumed)
             self._mark_success(target, changed=1, uploaded=True)
             self._set_phase(target, CloudSyncPhase.IDLE, message="")
             self._set_busy(target, False)
@@ -1127,6 +1290,7 @@ class CloudSyncController(QObject):
             self._overwrite_failed(target, associated, str(exc))
 
     def _overwrite_failed(self, target: str, associated: bool, message: str) -> None:
+        self._overwrite_update_inputs.pop(target, None)
         if self._closed:
             return
         if not associated:
@@ -1189,6 +1353,7 @@ class CloudSyncController(QObject):
                 cloud.save_cloud_drive(self._cloud_vault_id, Path(target_ref))
                 cloud.save_cloud_drive_sync(self._cloud_vault_id, revision=snapshot.revision)
             setattr(self, f"{target}_health", "ok")
+            self.acknowledge_remote_update(target, remote_update.metadata_version(target, snapshot))
             self._mark_success(target)
             self._set_phase(target, CloudSyncPhase.IDLE, message="")
             self._set_busy(target, False)
@@ -1301,6 +1466,7 @@ class CloudSyncController(QObject):
         if not self.can_start(self.DRIVE):
             self._refuse_start(self.DRIVE)
             return
+        self.set_remote_detection(self.DRIVE, False)
         cloud.clear_cloud_drive(self._cloud_vault_id)
         self.drive_path = None
         self.drive_revision = None
@@ -1319,6 +1485,7 @@ class CloudSyncController(QObject):
         if not self.can_start(self.WEBDAV):
             self._refuse_start(self.WEBDAV)
             return
+        self.set_remote_detection(self.WEBDAV, False)
         cloud.clear_webdav(self._cloud_vault_id)
         self.webdav_config = None
         self.webdav_health = ""

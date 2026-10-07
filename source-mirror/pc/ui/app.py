@@ -127,6 +127,7 @@ from .lan_panels import (
     LanTransferPanel,
 )
 from .maintenance_pages import DedupPage, RecycleBinPage, SameServicePage
+from .devices_history import DevicesHistoryPage
 from .module_editor import AUTOFILL_ROLE_LABELS, passkey_display_rows
 from .security_page import SecurityCenterPage
 from .settings_page import SettingsPage
@@ -1407,6 +1408,7 @@ class MainWindow(widgets.FramelessMain):
         self._native_autofill_backend = native_autofill.WindowsUiaBackend()
         self._native_autofill_prepared: native_autofill.PreparedFill | None = None
         self._native_autofill_busy = False
+        self._native_autofill_pending = None
         self._native_hotkey_registered = False
         self._session_notifications_registered = False
         self._lock_enabled = True  # 初始值，UI 构建后由 apply_lock_settings 覆盖
@@ -1481,6 +1483,8 @@ class MainWindow(widgets.FramelessMain):
         self._auto_sync_timer = QTimer(self)
         self._auto_sync_timer.setInterval(60_000)
         self._auto_sync_timer.timeout.connect(self._auto_sync_tick)
+        self._auto_sync_timer.timeout.connect(self._remote_update_tick)
+        QTimer.singleShot(0, self._remote_update_tick)
         self._auto_sync_timer.start()
         QTimer.singleShot(2_000, self._auto_sync_tick)
 
@@ -1593,7 +1597,12 @@ class MainWindow(widgets.FramelessMain):
                 if not self._native_autofill_busy and bool(config.get("native_autofill_enabled", True)):
                     self._native_autofill_busy = True
                     try:
-                        self._native_autofill_prepared = self._native_autofill_backend.prepare()
+                        if self._native_autofill_pending is not None:
+                            self._native_autofill_prepared = native_autofill.PreparedFill(
+                                self._native_autofill_backend.capture_target(), (),
+                            )
+                        else:
+                            self._native_autofill_prepared = self._native_autofill_backend.prepare()
                     except native_autofill.NativeAutofillError as exc:
                         self._native_autofill_busy = False
                         QTimer.singleShot(0, lambda text=str(exc): self._native_autofill_failed(text))
@@ -1657,6 +1666,45 @@ class MainWindow(widgets.FramelessMain):
         try:
             if prepared is None:
                 return
+            if getattr(prepared.target, "executable_path", "") and not getattr(prepared.target, "signer_sha256", ""):
+                from dataclasses import replace
+                prepared = replace(prepared, target=replace(prepared.target, signer_sha256=native_autofill.signer_certificate_sha256(prepared.target.executable_path)))
+            pending = getattr(self, "_native_autofill_pending", None)
+            self._native_autofill_pending = None
+            if pending is not None:
+                target, entry_id, role, deadline = pending[:4]
+                approved = pending[4] if len(pending) > 4 else None
+                if self._locked or time.monotonic() > deadline or (prepared.target.hwnd, prepared.target.process_id, prepared.target.executable_path) != (target.hwnd, target.process_id, target.executable_path):
+                    raise native_autofill.NativeAutofillError("待填充操作已取消，请在目标程序重新触发自动填充")
+                if callable(getattr(self.vault, "reopen", None)):
+                    self.vault = self.vault.reopen()
+                entry = self.vault.read_entry(entry_id)
+                if entry is None or entry.deleted_at is not None or not native_autofill.allowed_for_explicit_fill(entry, prepared.target):
+                    raise native_autofill.NativeAutofillError("所选条目已变化，请重新选择")
+                sources = [source for link in entry.autofill_links()
+                           if (source := self.vault.read_entry(link.source_entry_id)) is not None]
+                if native_autofill.is_excluded(prepared.target.process_name, config.get("native_autofill_excluded", [])):
+                    return
+                if approved is not None and approved != [item.to_dict() for item in [entry, *sources]]:
+                    raise native_autofill.NativeAutofillError("所选条目已变化，请重新选择")
+                resolved = autofill_resolver.resolve_snapshot(entry, [entry, *sources])
+                value = resolved.values.get(role)
+                if value is None or not value.value:
+                    raise native_autofill.NativeAutofillError("所选字段内容已不可用，请重新选择")
+                otp_value = None
+                if role == "one_time_code":
+                    otp_source = self.vault.read_entry(value.source_entry_id)
+                    otp_value = autofill_otp.snapshot(self.vault, otp_source) if otp_source is not None else None
+                    if otp_value is None:
+                        raise native_autofill.NativeAutofillError("所选字段内容已不可用，请重新选择")
+                self._native_autofill_backend.fill_focused(
+                    native_autofill.PreparedFill(prepared.target, ()),
+                    otp_value.code if otp_value is not None else value.value, role=role,
+                )
+                if otp_value is not None and otp_value.kind == "hotp":
+                    autofill_otp.advance_hotp(self.vault, otp_value.source_id)
+                self._flash(i18n.tr("已填充所选字段"))
+                return
             if self._locked and not self._unlock_for_native_autofill(prepared):
                 return
             if prepared.target.process_id == os.getpid():
@@ -1677,18 +1725,31 @@ class MainWindow(widgets.FramelessMain):
                 for entry in entries
             )
             if not entries:
-                entries = [
-                    entry
-                    for entry_id in self.vault.list_entry_ids(SecretType.LOGIN)
-                    if (entry := self.vault.read_entry(entry_id)) is not None and entry.deleted_at is None and bool(entry.password)
-                ]
+                from core.autofill_sources import entry_is_fillable, with_linked_sources
+                all_candidates = [entry for entry_id in self.vault.list_entry_ids(SecretType.LOGIN)
+                    if (entry := self.vault.read_entry(entry_id)) is not None and entry.deleted_at is None]
+                resolved_sources = with_linked_sources(self.vault, all_candidates)
+                entries = [entry for entry in all_candidates if entry_is_fillable(entry, resolved_sources)
+                    and native_autofill.allowed_for_explicit_fill(entry, prepared.target)]
             if not entries:
                 raise native_autofill.NativeAutofillError("保险库中没有可填充的登录条目")
             otp_sources = {entry.id: source for entry in entries if (source := autofill_otp.resolve_source(self.vault, entry)) is not None}
             captured = self._native_autofill_backend.capture_credentials(prepared)
             entry = entries[0]
+            from core.autofill_field_mapping import apply_native_mappings, native_origin, native_field_key, with_mapping
+            if len(entries) == 1:
+                prepared = apply_native_mappings(entry, prepared)
+            manual_focus = not prepared.fields or any(getattr(field, "focused", False) and getattr(field, "role", "") == "unknown" for field in prepared.fields)
+            available_roles = {}
+            approved_snapshots = {}
+            for candidate in entries:
+                sources = [source for link in candidate.autofill_links() if (source := self.vault.read_entry(link.source_entry_id)) is not None]
+                available_roles[candidate.id] = tuple(autofill_resolver.resolve_snapshot(candidate, [candidate, *sources]).values)
+                approved_snapshots[candidate.id] = [item.to_dict() for item in [candidate, *sources]]
             action = "fill"
-            if len(entries) > 1 or fallback or bool(captured.password) or not prepared.fields:
+            remember_binding = False
+            remember_mapping = False
+            if len(entries) > 1 or fallback or bool(captured.password) or manual_focus:
                 dialog = NativeAutofillPickerDialog(
                     entries,
                     prepared.target.process_name,
@@ -1696,7 +1757,9 @@ class MainWindow(widgets.FramelessMain):
                     otp_sources=otp_sources,
                     fallback=fallback,
                     can_save=bool(captured.password),
-                    manual_focus=not prepared.fields,
+                    manual_focus=manual_focus,
+                    available_roles=available_roles,
+                    reasons={item.id: ("exact" if native_autofill.entry_matches_target(item, prepared.target) else "name") for item in entries},
                 )
                 if dialog.exec() != QDialog.Accepted or dialog.selected_entry is None:
                     if dialog.action != "create":
@@ -1710,6 +1773,20 @@ class MainWindow(widgets.FramelessMain):
                     return
                 entry = dialog.selected_entry
                 action = dialog.action
+                remember_binding = bool(getattr(dialog, "remember_binding", None) and dialog.remember_binding.isChecked())
+                remember_mapping = bool(getattr(dialog, "remember_mapping", None) and dialog.remember_mapping.isChecked())
+            if callable(getattr(self.vault, "reopen", None)):
+                self.vault = self.vault.reopen()
+                refreshed = self.vault.read_entry(entry.id)
+                sources = [source for link in refreshed.autofill_links() if (source := self.vault.read_entry(link.source_entry_id)) is not None] if refreshed is not None else []
+                if refreshed is None or approved_snapshots.get(entry.id) != [item.to_dict() for item in [refreshed, *sources]]:
+                    raise native_autofill.NativeAutofillError("所选条目已变化，请重新选择")
+                entry = refreshed
+            if not native_autofill.allowed_for_explicit_fill(entry, prepared.target):
+                raise native_autofill.NativeAutofillError("程序身份已变化，请重试")
+            if remember_binding:
+                entry = native_autofill.remember_native_binding(self.vault, entry, prepared.target)
+            prepared = apply_native_mappings(entry, prepared)
             linked_entries = [source for link in entry.autofill_links() if (source := self.vault.read_entry(link.source_entry_id)) is not None]
             resolved = autofill_resolver.resolve_snapshot(entry, [entry, *linked_entries])
             otp_resolved = resolved.values.get("one_time_code")
@@ -1722,12 +1799,29 @@ class MainWindow(widgets.FramelessMain):
                 else entry
             )
             otp_value = autofill_otp.snapshot(self.vault, otp_source)
-            if action in {"manual_username", "manual_password"}:
+            if action.startswith("manual_"):
                 role = action.removeprefix("manual_")
-                value = resolved.values.get(role)
-                result = self._native_autofill_backend.fill_focused(
-                    prepared, value.value if value is not None else getattr(entry, role), role=role,
-                )
+                if role not in resolved.values:
+                    raise native_autofill.NativeAutofillError("所选字段内容已不可用，请重新选择")
+                focused = next((field for field in prepared.fields if getattr(field, "focused", False)), None)
+                if focused is not None:
+                    if remember_mapping:
+                        origin, key = native_origin(prepared.target), native_field_key(focused, prepared.fields)
+                        if not origin or not key:
+                            raise native_autofill.NativeAutofillError("此输入框没有稳定标识，无法记住映射")
+                        entry = with_mapping(entry, origin, key, role)
+                        self.vault.update(entry)
+                    from dataclasses import replace
+                    selected_field = replace(focused, role="otp" if role == "one_time_code" else role)
+                    result = self._native_autofill_backend.fill(replace(prepared, fields=(selected_field,)), entry,
+                        otp_code=otp_value.code if otp_value is not None else "", resolved=resolved)
+                    if result.otp_filled and otp_value is not None and otp_value.kind == "hotp":
+                        autofill_otp.advance_hotp(self.vault, otp_value.source_id)
+                    self._flash(i18n.tr("已填充所选字段"))
+                    return
+                self._native_autofill_pending = (prepared.target, entry.id, role, time.monotonic() + 30, [item.to_dict() for item in [entry, *linked_entries]])
+                self._flash("已准备填充：请在 30 秒内点回并清空目标输入框，再按自动填充快捷键")
+                return
             else:
                 result = self._native_autofill_backend.fill(
                     prepared,
@@ -1811,6 +1905,7 @@ class MainWindow(widgets.FramelessMain):
                 return False
             media_files.ensure_vault_context(self.vault)
             self._locked = False
+            QTimer.singleShot(0, self._remote_update_tick)
             self._reset_idle_timer()
             QTimer.singleShot(0, self._run_auto_maintenance)
             _log.info("后台自动填充解锁成功，主界面保持隐藏")
@@ -2366,6 +2461,7 @@ class MainWindow(widgets.FramelessMain):
 
             media_files.ensure_vault_context(self.vault)
             self._locked = False
+            QTimer.singleShot(0, self._remote_update_tick)
             self.show()
             self._reset_idle_timer()
             self._flash("已解锁")
@@ -2719,6 +2815,7 @@ class MainWindow(widgets.FramelessMain):
 
     def _build_maintenance_menu(self, parent: QMenu) -> QMenu:
         menu = QMenu(i18n.tr("库维护"), parent)
+        menu.addAction(i18n.tr("设备与历史"), self._open_devices_history)
         menu.addAction(i18n.tr("重复条目合并"), self.dedup_entries)
         menu.addAction(i18n.tr("相同服务合并"), self.merge_same_service_entries)
         return menu
@@ -3140,6 +3237,11 @@ class MainWindow(widgets.FramelessMain):
         if data_changed and not getattr(self, "_locked", False):
             from core.autofill_exclusions import sync_local_config
             sync_local_config(self.vault, migrate=True)
+            workspace = getattr(self, "editor_workspace", None)
+            if workspace is not None:
+                settings_page = workspace.page("settings")
+                if settings_page is not None:
+                    settings_page.refresh(self.vault)
         if data_changed:
             self._filter_source_vault = self.vault
             self._filter_source_entries = tuple(self.vault.entries)
@@ -3832,6 +3934,21 @@ class MainWindow(widgets.FramelessMain):
             # 与「用户名 / 密码 / 网址」一致：标题一行、内容一行，长包名换行显示而不是右对齐裁切。
             self.detail.addWidget(self._field("关联程序 / 包名", associated_app, copyable=True))
         self._render_linked_autofill(entry)
+        if any(entry.fields.get(key) for key in ("_autofill_bindings", "_autofill_origin", "_autofill_field_mappings")):
+            memory = QPushButton(i18n.tr("自动填充记忆"))
+            memory.setObjectName("SettingsBtn")
+            memory.clicked.connect(lambda: self._show_autofill_memory(entry))
+            self.detail.addWidget(memory)
+
+    def _show_autofill_memory(self, entry: Entry) -> None:
+        from .autofill_memory import AutofillMemoryDialog
+        dialog = AutofillMemoryDialog(self.vault, entry, self)
+        dialog.exec()
+        if dialog.changed:
+            self._flash(i18n.tr("自动填充记忆已更新"))
+            refreshed = self.vault.read_entry(entry.id)
+            if refreshed is not None:
+                self._show_entry(refreshed)
 
     def _render_linked_autofill(self, entry: Entry) -> None:
         """展示本条目关联的自动填充来源，对齐 Android 详情页的「关联自动填充内容」。
@@ -4961,6 +5078,22 @@ class MainWindow(widgets.FramelessMain):
         return changed
 
     # ---------- 整理 ----------
+    def _open_devices_history(self) -> None:
+        page = self._open_workspace_page(
+            "devices-history", "设备与历史",
+            lambda: DevicesHistoryPage(self.vault, self),
+        )
+        if not page.property("historyRestoreWired"):
+            page.restoreRequested.connect(self._adopt_history_vault)
+            page.setProperty("historyRestoreWired", True)
+
+    def _adopt_history_vault(self) -> None:
+        refreshed = self.vault.reopen()
+        self._adopt_cloud_vault(refreshed)
+        media_files.ensure_vault_context(self.vault)
+        self._update_recycle_btn()
+        self._refresh_open_feature_pages()
+
     def dedup_entries(self) -> None:
         scan = self.vault.scan_duplicates()
         if scan["exact"] + scan["pw_conflict"] == 0:
@@ -5294,6 +5427,8 @@ class MainWindow(widgets.FramelessMain):
         self._auto_sync_workers.pop(target, None)
         controller = getattr(self, "_cloud_controller", None)
         if controller is not None:
+            controller.acknowledge_remote_update(target, result.stats.get("remote_update_version", ""),
+                                                 result.stats.get("remote_update_consumed_version", ""))
             controller.stateChanged.emit()
         cloud_sync_prefs.success(
             self._cloud_sync_vault_id(),
@@ -5318,6 +5453,61 @@ class MainWindow(widgets.FramelessMain):
             failures = cloud_sync_prefs.failure(vault_id, f"本次自动同步已跳过：{message}", target)
             if failures >= 3:
                 cloud_sync_prefs.save(vault_id, False, target, cloud_sync_prefs.load(vault_id).interval_minutes)
+
+    def _remote_update_tick(self) -> None:
+        from PySide6.QtCore import QObject
+        from shiboken6 import isValid
+        if isinstance(self, QObject) and not isValid(self):
+            return
+        from core import remote_update
+        from .cloud_sync_controller import CloudSyncController
+        if self._locked or not self._cloud_sync_enabled():
+            return
+        vault_id = self._cloud_sync_vault_id()
+        if not any(remote_update.enabled(vault_id, target) for target in ("drive", "webdav")):
+            return
+        controller = getattr(self, "_cloud_controller", None)
+        if controller is None:
+            controller = CloudSyncController(vault=self.vault, vault_path=self.vault.path,
+                                             password=self.vault._password.clone(), cloud_vault_id=vault_id, parent=self)
+            self._cloud_controller = controller
+            controller.vaultReplaced.connect(self._adopt_cloud_vault)
+            controller.localVaultReplaced.connect(self._reopen_local_vault)
+            controller.message.connect(lambda title, text, kind: self._flash(f"{title}：{text}"))
+            controller.load_async()
+        self._connect_remote_notifications(controller)
+        controller.check_remote_updates()
+
+    def _connect_remote_notifications(self, controller):
+        if getattr(controller, "_update_notification_connected", False):
+            return
+        controller._update_notification_connected = True
+        vault_id = self._cloud_sync_vault_id()
+        controller.remoteUpdateFound.connect(lambda target: self._remote_update_notice(vault_id, target))
+
+    def _remote_update_notice(self, vault_id, target):
+        from . import tray
+        label = i18n.tr("云端硬盘" if target == "drive" else "WebDAV")
+        # Qt supplies no balloon identity: every click opens the same overview.
+        tray.show_update_notification(self._open_remote_update_overview,
+                                      i18n.tr("远端有更新"), label + "：" + i18n.tr("远端文件已变化，尚未同步到本机"))
+
+    def _open_remote_update_overview(self):
+        from PySide6.QtCore import QObject
+        from shiboken6 import isValid
+        if isinstance(self, QObject) and not isValid(self):
+            return
+        # Windows may deliver clicks from older Action Center notifications.
+        # Show the active window; a locked session requires the user's normal unlock action.
+        if self.isMinimized():
+            self.showNormal()
+        else:
+            self.show()
+        self.raise_()
+        self.activateWindow()
+        if self._locked:
+            return
+        self._open_cloud_sync()
 
     def _open_cloud_sync(self) -> None:
         """云端同步：在编辑器工作区中打开单实例页面。"""

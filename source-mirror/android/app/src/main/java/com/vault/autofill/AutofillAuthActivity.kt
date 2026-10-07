@@ -268,9 +268,14 @@ class AutofillAuthActivity : FragmentActivity() {
             val s = session
             if (s != null && request is PendingAutofillRequest.Fill) {
                 val r = request as PendingAutofillRequest.Fill
-                val mm = gateway.findMatches(s, r.form.origin)
-                val singleId = mm.map { it.entryId }.distinct().singleOrNull()
-                singleId?.let { id -> gateway.entry(s, id) }
+                val candidates = gateway.findFillCandidates(s, r.form.origin).filter { entry ->
+                    fillCompatible(s, entry, r.form)
+                }
+                candidates.singleOrNull()?.takeIf { entry ->
+                    OriginMatcher.matchLevel(r.form.origin, entry) == OriginMatchLevel.EXACT &&
+                        r.form.fields.none { field -> field.focused && field.kind == FieldKind.UNKNOWN &&
+                            field.fieldKey?.let { gateway.fieldMappings(s, entry.id, r.form.origin)[it] } == null }
+                }
                     ?.let { entry -> r to entry }
             } else null
         }
@@ -281,10 +286,13 @@ class AutofillAuthActivity : FragmentActivity() {
                 if (hasOtpField && otpSource != null) {
                     val computationEntry = otpSource.computationEntry()
                     val code = OtpAutofill.computeFillCode(computationEntry) { delay(it) }
+                    var approvedEntry = entry
+                    if (gateway.entry(session!!, entry.id) != entry) { finishFill(r, session!!, entry, code); return@let }
                     if (code != null && computationEntry.otpIsHotp()) {
-                        gateway.advanceOtpCounter(session!!, otpSource)
+                        val advanced = gateway.advanceOtpCounter(session!!, otpSource)
+                        if (advanced is VaultWriteResult.Success && advanced.entry.id == entry.id) approvedEntry = advanced.entry
                     }
-                    finishFill(r, session!!, entry, code)
+                    finishFill(r, session!!, approvedEntry, code)
                 } else {
                     finishFill(r, session!!, entry, null)
                 }
@@ -297,9 +305,6 @@ class AutofillAuthActivity : FragmentActivity() {
                 finishRequest(AutofillSaveCompletion.DISMISSED)
                 return
             }
-            (request.form.origin as? TargetOrigin.AndroidPackage)?.let { origin ->
-                gateway.upgradeLegacyAndroidBinding(session, entry.id, origin)
-            }
             val hasOtpField = request.form.fields.any { it.kind == FieldKind.OTP }
             val otpSource = gateway.otpSourceRef(session, entry)
             if (!hasOtpField || otpSource == null) {
@@ -310,11 +315,14 @@ class AutofillAuthActivity : FragmentActivity() {
             scope.launch {
                 val computationEntry = otpSource.computationEntry()
                 val code = OtpAutofill.computeFillCode(computationEntry) { delay(it) }
+                var approvedEntry = entry
+                if (gateway.entry(session, entry.id) != entry) { finishFill(request, session, entry, code); return@launch }
                 if (code != null && computationEntry.otpIsHotp()) {
-                    gateway.advanceOtpCounter(session, otpSource)
+                    val advanced = gateway.advanceOtpCounter(session, otpSource)
+                    if (advanced is VaultWriteResult.Success && advanced.entry.id == entry.id) approvedEntry = advanced.entry
                 }
                 otpWaiting = false
-                finishFill(request, session, entry, code)
+                finishFill(request, session, approvedEntry, code)
             }
         }
 
@@ -404,9 +412,31 @@ class AutofillAuthActivity : FragmentActivity() {
         onPick: (Entry) -> Unit,
     ) {
         var query by remember { mutableStateOf("") }
+        var preferencesRevision by remember { mutableIntStateOf(0) }
+        val clearedPreferencesText = uiText("已清除当前来源的关联与字段用途")
+        var pendingSelection by remember { mutableStateOf<Entry?>(null) }
+        var rememberSelection by remember { mutableStateOf(false) }
+        var bindingError by remember { mutableStateOf(false) }
+        var mappingEntry by remember { mutableStateOf<Entry?>(null) }
+        var mappedKind by remember { mutableStateOf<FieldKind?>(null) }
+        var rememberMapping by remember { mutableStateOf(false) }
+        val unknownField = request.form.fields.firstOrNull { it.focused && it.kind == FieldKind.UNKNOWN }
+        val mappedPick: (Entry) -> Unit = { entry ->
+            if (unknownField == null || unknownField.fieldKey?.let {
+                    gateway.fieldMappings(session, entry.id, request.form.origin).containsKey(it)
+                } == true) onPick(entry)
+            else { mappingEntry = entry; mappedKind = null; rememberMapping = false; bindingError = false }
+        }
+        val confirmPick: (Entry) -> Unit = { entry ->
+            if (!gateway.allowedForExplicitFill(session, entry, request.form.origin)) bindingError = true
+            else if (OriginMatcher.matchLevel(request.form.origin, entry) == OriginMatchLevel.EXACT) mappedPick(entry)
+            else { pendingSelection = entry; rememberSelection = false; bindingError = false }
+        }
         var showPasswordGenerator by remember { mutableStateOf(false) }
-        val eligible = remember(session, request) {
-            gateway.findFillCandidates(session, request.form.origin)
+        val eligible = remember(session, request, preferencesRevision) {
+            gateway.findFillCandidates(session, request.form.origin).filter { entry ->
+                fillCompatible(session, entry, request.form)
+            }
         }
         val hasOtpField = request.form.fields.any { it.kind == FieldKind.OTP }
         val candidates = remember(session, request, hasOtpField, eligible) {
@@ -435,7 +465,8 @@ class AutofillAuthActivity : FragmentActivity() {
         val shown = if (query.isBlank()) {
             candidates.sortedWith(
                 compareByDescending<Entry> {
-                    OriginMatcher.matchLevel(request.form.origin, it) == OriginMatchLevel.EXACT
+                    OriginMatcher.fillCandidateReason(request.form.origin, it,
+                        (request.form.origin as? TargetOrigin.AndroidPackage)?.packageName?.let { packageName -> AppNameResolver.label(this, packageName) })?.score ?: 0
                 }.thenByDescending { it.id in matchedIds }.thenBy { it.titleLower }.thenBy { it.id },
             ).take(40)
         } else {
@@ -446,9 +477,13 @@ class AutofillAuthActivity : FragmentActivity() {
                 entry.username.contains(query, ignoreCase = true) || entry.url.contains(query, ignoreCase = true)
         }.sortedBy { it.titleLower }.take(40)
         val searchLogins = if (query.isBlank()) emptyList() else {
-            AutofillEntrySearch.search(allLogins ?: emptyList(), query, excludeIds = candidateIds)
+            AutofillEntrySearch.search(allLogins ?: emptyList(), query, excludeIds = candidateIds).filter { entry ->
+                gateway.allowedForExplicitFill(session, entry, request.form.origin) && fillCompatible(session, entry, request.form)
+            }
         }
-        val allShownRows = shown + otherOtpShown + searchLogins
+        val allShownRows = (shown + otherOtpShown + searchLogins).filter { entry ->
+            gateway.allowedForExplicitFill(session, entry, request.form.origin)
+        }
         val hasOtpRow = remember(allShownRows) { allShownRows.any { gateway.otpSourceRef(session, it) != null } }
         var tick by remember { mutableIntStateOf(0) }
         LaunchedEffect(hasOtpRow) {
@@ -512,22 +547,86 @@ Spacer(Modifier.height(8.dp))
                             .height(listHeight)
                             .verticalScroll(rememberScrollState()),
                     ) {
-                        if (shown.isNotEmpty()) {
-                            EntryRows(shown, matchedIds, otpSnapshots, onPick)
-                        }
-                        if (otherOtpShown.isNotEmpty()) {
-                            GroupDivider()
-                            GroupHeader(uiText("其他动态码"))
-                            EntryRows(otherOtpShown, matchedIds, otpSnapshots, onPick)
-                        }
-                        if (searchLogins.isNotEmpty()) {
-                            GroupDivider()
-                            GroupHeader(uiText("其他登录条目"))
-                            EntryRows(searchLogins, matchedIds, otpSnapshots, onPick)
-                        }
+                        EntryRows(allShownRows.distinctBy { it.id }, matchedIds, otpSnapshots, request.form.origin, confirmPick,
+                            remembered = { entry ->
+                                OriginMatcher.fillCandidateReason(request.form.origin, entry) == AutofillCandidateReason.CONFIRMED_BINDING ||
+                                    gateway.fieldMappings(session, entry.id, request.form.origin).isNotEmpty()
+                            },
+                            onForget = { entry ->
+                                val result = gateway.forgetOriginPreferences(session, entry.id, request.form.origin)
+                                Toast.makeText(this@AutofillAuthActivity,
+                                    if (result is VaultWriteResult.Success) clearedPreferencesText else getString(R.string.system_auth_save_retry),
+                                    Toast.LENGTH_SHORT).show()
+                                if (result is VaultWriteResult.Success) preferencesRevision++
+                            })
                     }
                 }
             }
+        }
+        pendingSelection?.let { entry ->
+            AlertDialog(
+                onDismissRequest = { pendingSelection = null },
+                title = { Text(uiText("确认填充")) },
+                text = { Column {
+                    Text(uiText("此条目尚未确认与当前来源关联，请核对后填充。"))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        androidx.compose.material3.Checkbox(checked = rememberSelection, onCheckedChange = { rememberSelection = it })
+                        Text(uiText("记住与当前来源的关联"))
+                    }
+                    if (bindingError) Text(getString(R.string.system_auth_save_retry), color = MaterialTheme.colorScheme.error)
+                } },
+                confirmButton = { TextButton(onClick = {
+                    val latest = gateway.entry(session, entry.id)
+                    if (latest != entry) { bindingError = true; return@TextButton }
+                    val remembered = if (rememberSelection) gateway.rememberOriginBinding(session, entry.id, request.form.origin) else null
+                    if (!rememberSelection || remembered is VaultWriteResult.Success) {
+                        pendingSelection = null
+                        mappedPick((remembered as? VaultWriteResult.Success)?.entry ?: entry)
+                    } else bindingError = true
+                }) { Text(uiText("确认填充")) } },
+                dismissButton = { TextButton(onClick = { pendingSelection = null }) { Text(uiText("取消")) } },
+            )
+        }
+        mappingEntry?.let { entry ->
+            val values = gateway.resolveAutofillValues(session, entry).values
+            val available = FieldKind.entries.filter { kind ->
+                val wire = if (kind == FieldKind.OTP) "one_time_code" else kind.name.lowercase()
+                AutofillRole.fromWire(wire)?.let { it in values } == true && kind != FieldKind.UNKNOWN
+            }
+            AlertDialog(
+                onDismissRequest = { mappingEntry = null },
+                title = { Text(uiText("选择字段用途")) },
+                text = { Column(Modifier.verticalScroll(rememberScrollState())) {
+                    Text(unknownField?.label.orEmpty())
+                    available.forEach { kind ->
+                        TextButton(onClick = { mappedKind = kind }) {
+                            Text((if (mappedKind == kind) "✓ " else "") + autofillMappingRoleLabel(AutofillRole.fromWire(if (kind == FieldKind.OTP) "one_time_code" else kind.name.lowercase())!!))
+                        }
+                    }
+                    if (unknownField?.fieldKey != null) Row(verticalAlignment = Alignment.CenterVertically) {
+                        androidx.compose.material3.Checkbox(rememberMapping, { rememberMapping = it })
+                        Text(uiText("记住此字段用途"))
+                    }
+                    if (bindingError) Text(getString(R.string.system_auth_save_retry), color = MaterialTheme.colorScheme.error)
+                } },
+                confirmButton = { TextButton(enabled = mappedKind != null, onClick = {
+                    val kind = mappedKind ?: return@TextButton
+                    val field = unknownField ?: return@TextButton
+                    val role = if (kind == FieldKind.OTP) "one_time_code" else kind.name.lowercase()
+                    if (gateway.entry(session, entry.id) != entry) { bindingError = true; return@TextButton }
+                    val remembered = if (rememberMapping && field.fieldKey != null)
+                        gateway.rememberFieldMapping(session, entry.id, request.form.origin, field.fieldKey, role) else null
+                    if (rememberMapping && field.fieldKey != null && remembered !is VaultWriteResult.Success) {
+                        bindingError = true
+                    } else {
+                        mappingEntry = null
+                        finishFill(request.copy(form = request.form.copy(fields = request.form.fields.map {
+                            if (it.id == field.id) it.copy(kind = kind) else it
+                        })), session, (remembered as? VaultWriteResult.Success)?.entry ?: entry)
+                    }
+                }) { Text(uiText("确认填充")) } },
+                dismissButton = { TextButton(onClick = { mappingEntry = null }) { Text(uiText("取消")) } },
+            )
         }
         if (showPasswordGenerator) {
             PasswordGeneratorDialog(
@@ -545,7 +644,10 @@ Spacer(Modifier.height(8.dp))
         entries: List<Entry>,
         matchedIds: Set<String>,
         otpSnapshots: Map<String, OtpDisplaySnapshot>,
+        origin: TargetOrigin,
         onPick: (Entry) -> Unit,
+        remembered: (Entry) -> Boolean,
+        onForget: (Entry) -> Unit,
     ) {
         entries.forEachIndexed { i, entry ->
             val snap = otpSnapshots[entry.id]
@@ -555,9 +657,19 @@ Spacer(Modifier.height(8.dp))
                     snap?.issuer?.ifBlank { snap.label } ?: entry.username
                 },
                 isMatched = entry.id in matchedIds,
+                reason = when (OriginMatcher.fillCandidateReason(origin, entry, AppNameResolver.label(this, (origin as? TargetOrigin.AndroidPackage)?.packageName.orEmpty()))) {
+                    AutofillCandidateReason.CONFIRMED_BINDING -> uiText("已确认关联")
+                    AutofillCandidateReason.EXACT_SOURCE -> uiText("来源匹配")
+                    AutofillCandidateReason.SAME_SITE -> uiText("同一网站")
+                    AutofillCandidateReason.RELATED_NAME -> uiText("名称相关")
+                    null -> uiText("手动选择")
+                },
                 otp = snap,
                 onClick = { onPick(entry) },
             )
+            if (remembered(entry)) TextButton(onClick = { onForget(entry) }) {
+                Text(uiText("清除当前来源的关联与字段用途"))
+            }
             if (i < entries.lastIndex) {
                 GroupDivider()
             }
@@ -592,6 +704,7 @@ Spacer(Modifier.height(8.dp))
         title: String,
         subtitle: String,
         isMatched: Boolean,
+        reason: String,
         otp: OtpDisplaySnapshot?,
         onClick: () -> Unit,
     ) {
@@ -642,13 +755,13 @@ Spacer(Modifier.height(8.dp))
                     )
                 }
             }
-            if (isMatched) {
+            run {
                 Surface(
                     shape = VaultShape,
                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
                 ) {
                     Text(
-                        uiText("匹配"),
+                        reason,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary,
@@ -841,17 +954,51 @@ Spacer(Modifier.height(8.dp))
         session: AutofillVaultSession,
         selected: Entry,
         otpCode: String? = null,
+        otpResolved: Boolean = false,
     ) {
         if (gateway.isOriginExcluded(request.form.origin, session)) {
             finishRequest(AutofillSaveCompletion.DISMISSED)
             return
         }
+        val fresh = gateway.entry(session, selected.id)
+        if (fresh == null || fresh != selected || !gateway.allowedForExplicitFill(session, fresh, request.form.origin)) {
+            Toast.makeText(this, getString(R.string.system_auth_entry_changed), Toast.LENGTH_SHORT).show()
+            finishRequest(AutofillSaveCompletion.DISMISSED)
+            return
+        }
         val snapshot = gateway.resolveAutofillValues(session, selected)
+        val mappings = gateway.fieldMappings(session, selected.id, request.form.origin)
+        val uniqueKeys = AutofillFieldSignature.unique(request.form.fields.map { it.fieldKey }).filterNotNull().toSet()
+        val mappedForm = request.form.copy(fields = request.form.fields.map { field ->
+            val role = field.fieldKey?.takeIf { it in uniqueKeys }?.let(mappings::get)
+            val kind = if (role == "one_time_code") FieldKind.OTP else FieldKind.entries.firstOrNull { it.name.lowercase() == role }
+            if (field.kind == FieldKind.UNKNOWN && kind != null) field.copy(kind = kind) else field
+        })
+        if (!otpResolved && otpCode == null && mappedForm.fields.any { it.kind == FieldKind.OTP }) {
+            val source = gateway.otpSourceRef(session, selected)
+            if (source != null) {
+                lifecycleScope.launch {
+                    val computationEntry = source.computationEntry()
+                    val code = OtpAutofill.computeFillCode(computationEntry) { delay(it) }
+                    var approvedEntry = selected
+                    if (gateway.entry(session, selected.id) != selected) {
+                        finishFill(request, session, selected, code, otpResolved = true)
+                        return@launch
+                    }
+                    if (code != null && computationEntry.otpIsHotp()) {
+                        val advanced = gateway.advanceOtpCounter(session, source)
+                        if (advanced is VaultWriteResult.Success && advanced.entry.id == selected.id) approvedEntry = advanced.entry
+                    }
+                    finishFill(request, session, approvedEntry, code, otpResolved = true)
+                }
+                return
+            }
+        }
         val resolvedOtpCode = otpCode
             ?: snapshot.values[AutofillRole.ONE_TIME_CODE]?.value
         val dataset = AutofillResponseFactory.authenticatedDataset(
             this,
-            request.form,
+            mappedForm,
             selected,
             request.inlineSpec,
             resolvedOtpCode,
@@ -865,6 +1012,27 @@ Spacer(Modifier.height(8.dp))
         activeSession?.clear()
         activeSession = null
         finish()
+    }
+
+    private fun fillCompatible(
+        session: AutofillVaultSession,
+        entry: Entry,
+        form: ParsedForm<android.view.autofill.AutofillId>,
+    ): Boolean {
+        if (!gateway.allowedForExplicitFill(session, entry, form.origin)) return false
+        val values = gateway.resolveAutofillValues(session, entry).values
+        val mappings = gateway.fieldMappings(session, entry.id, form.origin)
+        val uniqueKeys = AutofillFieldSignature.unique(form.fields.map { it.fieldKey }).filterNotNull().toSet()
+        return form.fields.any { field ->
+            val mapped = field.fieldKey?.takeIf { it in uniqueKeys }?.let(mappings::get)
+            if (field.focused && field.kind == FieldKind.UNKNOWN && mapped == null) {
+                values.values.any { it.value.isNotBlank() }
+            } else {
+                val kind = if (mapped == "one_time_code") FieldKind.OTP else
+                    FieldKind.entries.firstOrNull { it.name.lowercase(java.util.Locale.ROOT) == mapped } ?: field.kind
+                AutofillFieldValueResolver.value(kind, AutofillSnapshot(values, emptySet()), verificationGranted = true) != null
+            }
+        }
     }
 
     /** 无匹配时：用户先在生成页选定密码，再填充目标字段并写入登录条目供 autofill 保存/更新机制持续维护。 */
@@ -1000,4 +1168,35 @@ Spacer(Modifier.height(8.dp))
     companion object {
         const val EXTRA_REQUEST_TOKEN = "com.vault.autofill.REQUEST_TOKEN"
     }
+}
+
+@Composable
+private fun autofillMappingRoleLabel(role: AutofillRole): String = when (role) {
+    AutofillRole.USERNAME -> uiText("用户名")
+    AutofillRole.EMAIL -> uiText("邮箱")
+    AutofillRole.PASSWORD -> uiText("密码")
+    AutofillRole.ONE_TIME_CODE -> uiText("一次性验证码")
+    AutofillRole.FULL_NAME -> uiText("姓名")
+    AutofillRole.PHONE -> uiText("电话")
+    AutofillRole.COUNTRY -> uiText("国家 / 地区")
+    AutofillRole.REGION -> uiText("省 / 州")
+    AutofillRole.CITY -> uiText("城市")
+    AutofillRole.STREET_ADDRESS -> uiText("详细地址")
+    AutofillRole.POSTAL_CODE -> uiText("邮编")
+    AutofillRole.CARDHOLDER -> uiText("持卡人")
+    AutofillRole.CARD_NUMBER -> uiText("卡号")
+    AutofillRole.CARD_EXPIRY -> uiText("有效期")
+    AutofillRole.CARD_CVV -> uiText("安全码")
+    AutofillRole.ID_NUMBER -> uiText("证件号码")
+    AutofillRole.API_KEY -> uiText("API 凭证")
+    AutofillRole.API_SECRET -> uiText("API 密文")
+    AutofillRole.NONE -> uiText("不自动填充")
+    AutofillRole.HOST -> uiText("主机")
+    AutofillRole.PORT -> uiText("端口")
+    AutofillRole.DATABASE -> uiText("数据库")
+    AutofillRole.SSID -> uiText("Wi-Fi 名称")
+    AutofillRole.WIFI_PASSWORD -> uiText("Wi-Fi 密码")
+    AutofillRole.RECOVERY_ANSWER -> uiText("恢复答案")
+    AutofillRole.CUSTOM_TEXT -> uiText("自定义文本")
+    AutofillRole.CUSTOM_SECRET -> uiText("自定义密文")
 }

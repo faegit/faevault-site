@@ -8,6 +8,26 @@ import org.junit.Assert.assertFalse
 import org.junit.Test
 
 class UiTextTest {
+    @Test fun persistedBackupFallbackLabelsFollowCurrentLanguage() {
+        assertEquals("Backup device(VOL-a1b2) · 64 GB", localizeBackupDeviceLabel("备份设备（VOL-a1b2） · 64 GB", "en-US"))
+        assertEquals("本机存储（VOL-ab12）", localizeBackupDeviceLabel("Local storage(VOL-ab12)", "zh-CN"))
+        assertEquals("我的移动硬盘（VOL-ab12）", localizeBackupDeviceLabel("我的移动硬盘（VOL-ab12）", "en-US"))
+    }
+
+    @Test fun cloudStatusPrefixAndPersistedBodyAreBothLocalized() {
+        assertEquals("Status: Automatic sync has not run yet", localizeUiText("状态：${localizeCloudSyncStatus("尚未执行自动同步", "en-US")}", "en-US"))
+        assertEquals("Automatic sync failed: Backup device not connected", localizeCloudSyncStatus("自动同步失败: 备份设备未连接", "en-US"))
+        assertEquals("Consecutive failures: 3", localizeUiText("连续失败：3 次", "en-US"))
+        assertEquals("同步失败：服务器返回错误", localizeCloudSyncStatus("同步失败：服务器返回错误", "zh-CN"))
+    }
+
+    @Test fun remoteUpdateReminderCopyIsLocalized() {
+        listOf("检测远端更新", "远端更新", "远端有更新", "远端文件已变化，尚未同步到本机", "立即同步", "稍后处理",
+            "每5分钟检查一次，仅在保险库解锁且程序在前台时运行；只提醒，不会自动同步。", "发现时间：10-07 12:00").forEach {
+            assertNoChinese(it, localizeUiText(it, "en-US"))
+        }
+    }
+
     private fun assertNoChinese(label: String, value: String) {
         assertFalse("$label contains Chinese: $value", value.any { it in '\u3400'..'\u9fff' })
     }

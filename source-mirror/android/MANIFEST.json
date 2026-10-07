@@ -1,10 +1,10 @@
 {
   "schema": 1,
-  "snapshot_date": "2026-10-05",
+  "snapshot_date": "2026-10-07",
   "license": "Apache-2.0",
   "platform": "android",
-  "version": "4.6.6",
-  "source_commit": "2a5f32005eaa231a79ddd3b80a5ad994c7d2a4d6",
+  "version": "4.6.7",
+  "source_commit": "d9c6761be14feabe1ed5d0621fcc02912af7d22e",
   "working_tree_snapshot": true,
   "files": [
     {
@@ -15,20 +15,20 @@
     },
     {
       "path": "NOTICE",
-      "bytes": 619,
-      "sha256": "9069e6c5c03cae0222c9e018c7a351b1049ad221135d0517019edae92c760446",
+      "bytes": 827,
+      "sha256": "fe5eedd40ccc52c4621758afadd7698eaf65434eee3e7deab2ea1bcf446e0262",
       "kind": "publication-notice"
     },
     {
       "path": "OPEN_SOURCE_REVIEW.md",
-      "bytes": 3167,
-      "sha256": "9d09304716a27f638738f6f4296f2b8cee16593c641da1110e8ef2b83001ebbf",
+      "bytes": 3285,
+      "sha256": "c7aa1cb2be3a4a3b207380b935e5b615bd110878c90b3b0e027cdaba1f3ad97f",
       "kind": "publication-notice"
     },
     {
       "path": "README.md",
       "bytes": 1012,
-      "sha256": "51736226a5382df824a7d215b40e62e4d5a9e7cb4274cf207971c3ce19be4be4",
+      "sha256": "47909717e389e96cd359c20728de0e037ceaf6abb6c8fcebbea18ba64ea0a2db",
       "kind": "publication-notice"
     },
     {
@@ -40,7 +40,7 @@
     {
       "path": "app/build.gradle.kts",
       "bytes": 14339,
-      "sha256": "dd2f986f3f5a429971672f49ebd9c047961b1c6e90532caf96a21da9e382aeb6",
+      "sha256": "ee2cf7445924610266643f810099f1f42953a245ad808536f7507e6e04e2e11f",
       "kind": "source"
     },
     {
@@ -111,8 +111,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/MainActivity.kt",
-      "bytes": 11332,
-      "sha256": "42d6ad52e1a6433c5f832723718d058266d98a31891a5e9b3ea147d2de66bb87",
+      "bytes": 12512,
+      "sha256": "9377258cfeb26bf0de77cfd4c9e2b6dbb59fd8af76865300db623b66a9b7ff3d",
       "kind": "source"
     },
     {
@@ -123,14 +123,14 @@
     },
     {
       "path": "app/src/main/java/com/vault/autofill/AssistStructureParser.kt",
-      "bytes": 5499,
-      "sha256": "b9868085434dfb128c8f972b34bff94625df426dd816c295746a746794882675",
+      "bytes": 6917,
+      "sha256": "33d86aced2ebc70d0fce19c15abd6c772fc9a7ba4a92d471695f3e233f17dc11",
       "kind": "source"
     },
     {
       "path": "app/src/main/java/com/vault/autofill/AutofillAuthActivity.kt",
-      "bytes": 47069,
-      "sha256": "162444b68b11f30bd201ee24318acb736d7bef01236b96b0d99312dac2469640",
+      "bytes": 61456,
+      "sha256": "8e4506131fb0883b0dfd667de53d126bf1096b02424a534f15504783b0723e27",
       "kind": "source"
     },
     {
@@ -152,15 +152,39 @@
       "kind": "source"
     },
     {
+      "path": "app/src/main/java/com/vault/autofill/AutofillFieldMappingMetadata.kt",
+      "bytes": 3645,
+      "sha256": "11336735336cfce64c93e52c97235251752e70e62249393fd8c26804277992ab",
+      "kind": "source"
+    },
+    {
+      "path": "app/src/main/java/com/vault/autofill/AutofillFieldSignature.kt",
+      "bytes": 749,
+      "sha256": "9e6ea48257a0f322f804b36b246c237a0073428f9b714b9727922f7714ddb4ca",
+      "kind": "source"
+    },
+    {
+      "path": "app/src/main/java/com/vault/autofill/AutofillFieldValueResolver.kt",
+      "bytes": 869,
+      "sha256": "2f32fe223917292a58f643e495ee8858a445cc5d374f303d1985910e5ad125f1",
+      "kind": "source"
+    },
+    {
+      "path": "app/src/main/java/com/vault/autofill/AutofillMatchingPolicy.kt",
+      "bytes": 2549,
+      "sha256": "115ab6d1266978226b285f46dd43288e6c0063a6711b686f750189840e427c76",
+      "kind": "source"
+    },
+    {
       "path": "app/src/main/java/com/vault/autofill/AutofillModels.kt",
-      "bytes": 2576,
-      "sha256": "a1a9eb822c532117e12ccdd5e0fafa187b6cd77dbef34865b379a478978bb07e",
+      "bytes": 2671,
+      "sha256": "b9d88de8c81d6c6dfae5dbba4b20afae8a1a23377b52cd227caedfd1a9fdf8f6",
       "kind": "source"
     },
     {
       "path": "app/src/main/java/com/vault/autofill/AutofillOriginMetadata.kt",
-      "bytes": 3323,
-      "sha256": "9f6f3144404f297ed52396f3138b98f2fa191d66349462814070a186ede39239",
+      "bytes": 5262,
+      "sha256": "49154e929da9644693a87bd055af7219d34e83f3c4b233fa9599a32d6aee7dcb",
       "kind": "source"
     },
     {
@@ -171,8 +195,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/autofill/AutofillResponseFactory.kt",
-      "bytes": 8625,
-      "sha256": "7a671284e7a62802bb4014823249d82b40b1e375b9f29b60075313ca2d6216ec",
+      "bytes": 8473,
+      "sha256": "c9c9166e60b12d0af141f7494c0b639713da12ea863120b5f56618b99d299f20",
       "kind": "source"
     },
     {
@@ -195,8 +219,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/autofill/AutofillVaultGateway.kt",
-      "bytes": 30693,
-      "sha256": "813fdf39e57260e79d591d55297cf2156602da1941b2cfc08301544f629abf6d",
+      "bytes": 35228,
+      "sha256": "11d84c11584ac4e4271efb5dbac622a5014b4d87a973d9d0b204856f2bd20327",
       "kind": "source"
     },
     {
@@ -213,8 +237,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/autofill/FieldClassifier.kt",
-      "bytes": 10412,
-      "sha256": "b5adeec7c414928a4f0ca15b3e42dc1d76f675b07959dac97428d85ee65b137b",
+      "bytes": 10607,
+      "sha256": "88bc64f1007df825c0ad719bbefacdf33bb04a8f12c492139676740fd82c1624",
       "kind": "source"
     },
     {
@@ -225,8 +249,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/autofill/OriginMatcher.kt",
-      "bytes": 13225,
-      "sha256": "58d4e1bcac8029a3c88dde49620843eabdaf1ddde9f9f1a377ce4293d6c34ffc",
+      "bytes": 14100,
+      "sha256": "e96c27497d99bb23b81dbf554757198371cfedc7f61ed749bed5618846ebf95a",
       "kind": "source"
     },
     {
@@ -740,6 +764,12 @@
       "kind": "source"
     },
     {
+      "path": "app/src/main/java/com/vault/storage/DeviceActivity.kt",
+      "bytes": 5943,
+      "sha256": "1cfa94ec311dfc69b79ac0ab077c63ee2cd9fd40bcffa503d5ce7cd352a3058e",
+      "kind": "source"
+    },
+    {
       "path": "app/src/main/java/com/vault/storage/DeviceAuthWire.kt",
       "bytes": 6591,
       "sha256": "62896a40bcf807cb8978862ad98571919563dc9e37cd085ccdcea40717a811ee",
@@ -885,8 +915,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/storage/PmvMediaObjectAdapter.kt",
-      "bytes": 6881,
-      "sha256": "adb906076824bf242f400eee93f31926a2f86907074a3e4519499564769307e1",
+      "bytes": 7072,
+      "sha256": "9574831a19416a252f724b0ab4de587ab0cf449808ae7da1d10bff5a2960382c",
       "kind": "source"
     },
     {
@@ -944,6 +974,18 @@
       "kind": "source"
     },
     {
+      "path": "app/src/main/java/com/vault/storage/RemoteUpdatePolicy.kt",
+      "bytes": 1923,
+      "sha256": "dc02a3c70a8723d58b3f6ebcbe605b4a91a976213da23d60b021e4ea84c97386",
+      "kind": "source"
+    },
+    {
+      "path": "app/src/main/java/com/vault/storage/RemoteUpdatePrefs.kt",
+      "bytes": 1844,
+      "sha256": "4af02604c44639b5c9315f8ec4a48aaaa9522afccabc4d8f72f6a0810522beb0",
+      "kind": "source"
+    },
+    {
       "path": "app/src/main/java/com/vault/storage/Spake2P256.kt",
       "bytes": 9237,
       "sha256": "de6b41c0e0dbd2fe602e73ce71825dafbccab84564d880daa60ba10e5adedd64",
@@ -998,6 +1040,24 @@
       "kind": "source"
     },
     {
+      "path": "app/src/main/java/com/vault/storage/VaultHistoryRestore.kt",
+      "bytes": 1730,
+      "sha256": "ea3bedb822b332b824c64bd34c4571c56df84f92486366b72d03d1954bad8de3",
+      "kind": "source"
+    },
+    {
+      "path": "app/src/main/java/com/vault/storage/VaultHistoryRetention.kt",
+      "bytes": 743,
+      "sha256": "bc5cdb4d48248cfd60db79b585bb56719f6f92ee7f6afd797ae9ed3d31971846",
+      "kind": "source"
+    },
+    {
+      "path": "app/src/main/java/com/vault/storage/VaultHistoryStore.kt",
+      "bytes": 6633,
+      "sha256": "e0cefe119508a7cddd2b96a9da16edd05188af49c3241afad6c205ff6d455275",
+      "kind": "source"
+    },
+    {
       "path": "app/src/main/java/com/vault/storage/VaultLogicalRevision.kt",
       "bytes": 1452,
       "sha256": "7fd10d5c4915db82350b226427335ee7fabf7fcedad23d7141c4333c678d1bfd",
@@ -1011,8 +1071,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/storage/VaultRepository.kt",
-      "bytes": 67182,
-      "sha256": "a7dae127be98b8bd7b6db27b551462332a4fc59718512f9a02358839b663be20",
+      "bytes": 74370,
+      "sha256": "8bb326756a9c8ea4eec8bb74ea0ba48e5554338ed146c190a5e48ec65b538538",
       "kind": "source"
     },
     {
@@ -1023,14 +1083,14 @@
     },
     {
       "path": "app/src/main/java/com/vault/storage/WebDavCloud.kt",
-      "bytes": 44616,
-      "sha256": "1ea59e8b0a9b0b4b0bb9cb869b79b10f22eaa4e182f58ec29c83400867010a38",
+      "bytes": 45355,
+      "sha256": "7f337110a89d9993cf7c7ae4ed309af8ba418b30206da68250aa341a9adba617",
       "kind": "source"
     },
     {
       "path": "app/src/main/java/com/vault/ui/AppRoot.kt",
-      "bytes": 78006,
-      "sha256": "15b2f99bfa555c3030bb7719c9a60999c3ef35e76371388a67e8b8b79893e92e",
+      "bytes": 79765,
+      "sha256": "63d451d36a58b8c8a1bda24ff24c452952a5180f0be315ceaabef19dd37abcdc",
       "kind": "source"
     },
     {
@@ -1059,8 +1119,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/ui/CloudPreviewSessionCache.kt",
-      "bytes": 2288,
-      "sha256": "934a43f1e495cf73927dd118104fbafc72bc782d057fb74a9600445318464544",
+      "bytes": 2410,
+      "sha256": "58b5e45fef17bd56e94aabf566e7c191901cd884bb97527708abfc6db6298024",
       "kind": "source"
     },
     {
@@ -1142,6 +1202,18 @@
       "kind": "source"
     },
     {
+      "path": "app/src/main/java/com/vault/ui/RemoteUpdateNavigation.kt",
+      "bytes": 721,
+      "sha256": "5b6513a37f21340770d61c56255a003d0cabdc3384cdec3e334f0650056f049c",
+      "kind": "source"
+    },
+    {
+      "path": "app/src/main/java/com/vault/ui/RemoteUpdateNotifications.kt",
+      "bytes": 2261,
+      "sha256": "7355e364b80f9f5c86d25d75636998aaeae03668b490f4ce7b32db03e78472b4",
+      "kind": "source"
+    },
+    {
       "path": "app/src/main/java/com/vault/ui/SearchInputState.kt",
       "bytes": 1543,
       "sha256": "ae08e6da731cefb8a06f856b8d466115c9fa3882925021262778f93a518a50c4",
@@ -1191,14 +1263,14 @@
     },
     {
       "path": "app/src/main/java/com/vault/ui/UiCopyExtra.kt",
-      "bytes": 90651,
-      "sha256": "663d1cdd5eca5bf183b06cd1532bf3b5e182114e9b0ff3422ca2dc8d4b776dad",
+      "bytes": 98103,
+      "sha256": "6c8b42bd7787765b784ce6421c3007e254de017a183302fa5c77cb5dfeb9627e",
       "kind": "source"
     },
     {
       "path": "app/src/main/java/com/vault/ui/UiText.kt",
-      "bytes": 89288,
-      "sha256": "df660ae75597b6f17c2a3431f2cb52ee85d0790e9335ab929524c453f24fa5a4",
+      "bytes": 91078,
+      "sha256": "54c819b3f6531f02606acf7eb75f88dbba402837b83f46fac97740f62e4c59b9",
       "kind": "source"
     },
     {
@@ -1269,8 +1341,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/ui/VaultViewModel.kt",
-      "bytes": 399691,
-      "sha256": "687f13feac4c8601d5f122727ed80d7c3ed95885e4cf3c3625512c0fcacf7337",
+      "bytes": 416220,
+      "sha256": "1d1385961b9ff799b391ab52279dd1769224c6efbc6fe5230641c75ed8239eff",
       "kind": "source"
     },
     {
@@ -1353,8 +1425,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/ui/scan/CameraControls.kt",
-      "bytes": 6343,
-      "sha256": "31576dc955aed2b64a2b464b9df16b666c104d1ea0fd9e72e2f59738bad76986",
+      "bytes": 7232,
+      "sha256": "3571faf321598b82c70b1ebf0c891e9c7ba43049a954afbccffb189504e2f757",
       "kind": "source"
     },
     {
@@ -1365,14 +1437,20 @@
     },
     {
       "path": "app/src/main/java/com/vault/ui/scan/QrLiveScanActivity.kt",
-      "bytes": 24786,
-      "sha256": "612c2fc4d99448dc92c78648362eaa457d30ebffcfd83cb88273f8cd7cc5db02",
+      "bytes": 24808,
+      "sha256": "f65c406fe0fc92021a855793f409779496014ae7e81bf53bb349aed0c9f72338",
       "kind": "source"
     },
     {
       "path": "app/src/main/java/com/vault/ui/screens/AppPickerSheet.kt",
       "bytes": 22066,
       "sha256": "ed3200880d8d5ae16e9c4e860ccf39b98aa983258459d317f28f144e8b866bfe",
+      "kind": "source"
+    },
+    {
+      "path": "app/src/main/java/com/vault/ui/screens/DevicesHistoryDialog.kt",
+      "bytes": 10494,
+      "sha256": "81906e7c3112e5b45809e56e99f2aade0ea011098ffb3a1b2c06194e8631c1b9",
       "kind": "source"
     },
     {
@@ -1461,8 +1539,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/ui/screens/SettingsScreen.kt",
-      "bytes": 330026,
-      "sha256": "79116de88d320ae4eb76cb219e9dc0b4c682ce8ac19a3d1e999cd6ba6ad20946",
+      "bytes": 337433,
+      "sha256": "0707d0e8d0f2588c6e8acd9b2e5a57ddf4d4f7e826f5f39a3c5fca31c8fe99a1",
       "kind": "source"
     },
     {
@@ -1479,8 +1557,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/ui/screens/UnlockedShell.kt",
-      "bytes": 12814,
-      "sha256": "ac5e2562b18d63921e46d17bc87d92e5bfba0fe491719c80a0c88c157ee53a80",
+      "bytes": 12824,
+      "sha256": "155504f79e457f2b6d6aa655160eb66c6426f3a5756d9414d75830333cce3269",
       "kind": "source"
     },
     {
@@ -1928,15 +2006,39 @@
       "kind": "source"
     },
     {
+      "path": "app/src/test/java/com/vault/autofill/AutofillFieldMappingMetadataTest.kt",
+      "bytes": 3139,
+      "sha256": "1b903303605f6696d78c43db0d923410f803e1483160b16af09dcc70ebd688bf",
+      "kind": "source"
+    },
+    {
       "path": "app/src/test/java/com/vault/autofill/AutofillFieldPolicyTest.kt",
       "bytes": 7916,
       "sha256": "3bc8b91587c9aafce496146a2da98283bfa0775280b2866f52ebeb6648c90401",
       "kind": "source"
     },
     {
+      "path": "app/src/test/java/com/vault/autofill/AutofillFieldSignatureTest.kt",
+      "bytes": 1009,
+      "sha256": "daf6689c4ac1464c244d1bdb1a1c1091b77f1e4d016c6e4d1dee8f2b47ae9407",
+      "kind": "source"
+    },
+    {
+      "path": "app/src/test/java/com/vault/autofill/AutofillFieldValueResolverTest.kt",
+      "bytes": 1455,
+      "sha256": "bee2882aae924804de67700bbdd039bf2414b6d50618d32aed8f7760e532a796",
+      "kind": "source"
+    },
+    {
       "path": "app/src/test/java/com/vault/autofill/AutofillFixtureShapeTest.kt",
       "bytes": 17125,
       "sha256": "bdcb920e78deec9f8404b55c7c3da1a78dcc0c769351e5769726f65b490e71a7",
+      "kind": "source"
+    },
+    {
+      "path": "app/src/test/java/com/vault/autofill/AutofillMatchingPolicyTest.kt",
+      "bytes": 1108,
+      "sha256": "e02c296b975c0f1f06af0204451fc4d6444ebed4b0eb2093efcdc59344bc668d",
       "kind": "source"
     },
     {
@@ -1959,8 +2061,8 @@
     },
     {
       "path": "app/src/test/java/com/vault/autofill/AutofillVaultGatewayTest.kt",
-      "bytes": 52612,
-      "sha256": "7e4ffa2607e552618eac59003ba5e9d4a705f6e2c67c69aa9096c529b38dd169",
+      "bytes": 60801,
+      "sha256": "0d35b128b9083eb5d4ab9c40ad7be1309a885964de757cad02f1ef8b470bbdba",
       "kind": "source"
     },
     {
@@ -1971,8 +2073,8 @@
     },
     {
       "path": "app/src/test/java/com/vault/autofill/FieldClassifierTest.kt",
-      "bytes": 5113,
-      "sha256": "da5c8d1dce666f763215b593d385c6bc24abc5347c91573adcabe815dbd97c26",
+      "bytes": 5390,
+      "sha256": "edc50994820f54b12da3b35bb9540ffdcb819a76aa5ac7cfdb92f44a99679ca6",
       "kind": "source"
     },
     {
@@ -1983,8 +2085,8 @@
     },
     {
       "path": "app/src/test/java/com/vault/autofill/OriginMatcherTest.kt",
-      "bytes": 13346,
-      "sha256": "2a0d01c5ef479fddeb59d7aacbf28e04e9fd00adf11b26f5ac08c7fe5115f4c0",
+      "bytes": 15809,
+      "sha256": "a4196b78e0737e54f56a83789d7f4055c43cafe23eb72ef576d2d192cb6ae40b",
       "kind": "source"
     },
     {
@@ -2234,6 +2336,12 @@
       "kind": "source"
     },
     {
+      "path": "app/src/test/java/com/vault/storage/DeviceActivityTest.kt",
+      "bytes": 1943,
+      "sha256": "a59f5ec2c055f75f6e22e069912a67dc4c8c3a590d916ee70c394254305d9196",
+      "kind": "source"
+    },
+    {
       "path": "app/src/test/java/com/vault/storage/DeviceAuthWireTest.kt",
       "bytes": 6722,
       "sha256": "5ae88721cab49012baaa05c451726270b9f3be9bc800a033c74e6e3aa420b389",
@@ -2444,6 +2552,12 @@
       "kind": "source"
     },
     {
+      "path": "app/src/test/java/com/vault/storage/RemoteUpdatePolicyTest.kt",
+      "bytes": 3775,
+      "sha256": "a0ce922143d3e133f3733b2b583dee861d971572d7d4216182e3e8ea2bc46445",
+      "kind": "source"
+    },
+    {
       "path": "app/src/test/java/com/vault/storage/StorageBindingPolicyTest.kt",
       "bytes": 1804,
       "sha256": "495b6b30277c58dcc6606b09d323e110c896dfd8a31bb9464bde341f349159b7",
@@ -2453,6 +2567,12 @@
       "path": "app/src/test/java/com/vault/storage/SyncServerHostTeardownTest.kt",
       "bytes": 4342,
       "sha256": "97d710eba50cb76bd09622d17f94dc4a6cac1f3706ec6e578a049adba4f01925",
+      "kind": "source"
+    },
+    {
+      "path": "app/src/test/java/com/vault/storage/VaultHistoryRestoreTest.kt",
+      "bytes": 4530,
+      "sha256": "f9934938ce6f3102448cb176c47aa99b3ca6fccb8759c993955ae0dbe2526bab",
       "kind": "source"
     },
     {
@@ -2546,6 +2666,12 @@
       "kind": "source"
     },
     {
+      "path": "app/src/test/java/com/vault/ui/DevicesHistoryCopyTest.kt",
+      "bytes": 1203,
+      "sha256": "b63cb24ebd09e6c962f4ec057cbb781c70b0c8956d1a965758d4f4f1a06defe2",
+      "kind": "source"
+    },
+    {
       "path": "app/src/test/java/com/vault/ui/EdgeBounceTest.kt",
       "bytes": 1379,
       "sha256": "56c328073375652ddc3ec2229e0b97262f94bd94ab5e16e6f9dd4dc5c0d6c36f",
@@ -2571,8 +2697,8 @@
     },
     {
       "path": "app/src/test/java/com/vault/ui/HardcodedChineseGuardTest.kt",
-      "bytes": 4236,
-      "sha256": "44e726e7640fd3170c0343787e75ef06b0b6630fafbe5f668999bf0aa046557a",
+      "bytes": 4362,
+      "sha256": "385258a5a6a1ab3f5d7ecdeb2dd650ce39beb765208f35ca0f5f4ecdaa573ae7",
       "kind": "source"
     },
     {
@@ -2630,6 +2756,12 @@
       "kind": "source"
     },
     {
+      "path": "app/src/test/java/com/vault/ui/RemoteUpdateNavigationTest.kt",
+      "bytes": 771,
+      "sha256": "fee3a8e6ec3f0a56bd2d156cfca9bff4ab78eafe753ccd24fa3e4b3a3f3ace02",
+      "kind": "source"
+    },
+    {
       "path": "app/src/test/java/com/vault/ui/SearchInputStateTest.kt",
       "bytes": 2024,
       "sha256": "1e8dd00f70747a5fd5bb59e3542795dd00b24ef45e2e72395a8f4c15965c1882",
@@ -2655,8 +2787,8 @@
     },
     {
       "path": "app/src/test/java/com/vault/ui/UiTextTest.kt",
-      "bytes": 7763,
-      "sha256": "5fa04823d771d57d622376a96fb29384ab559158e9fef4946c770858353b8b9b",
+      "bytes": 9335,
+      "sha256": "d9c9265789e6dc14438021848292216d50b5911bdfa94f45d86d157e535785ed",
       "kind": "source"
     },
     {
@@ -2810,6 +2942,24 @@
       "kind": "source"
     },
     {
+      "path": "spec/AUTOFILL_MATCHING_V2.md",
+      "bytes": 3402,
+      "sha256": "f86b6b65047d5cff784d93d4ef494c1155608c9342eeaec89099581ad9d164ad",
+      "kind": "source"
+    },
+    {
+      "path": "spec/DEVICES_HISTORY_V1.md",
+      "bytes": 4763,
+      "sha256": "c0b7e45dc7157fc2b7678df360869479148cdbb9e97772045c8eba36e026159a",
+      "kind": "source"
+    },
+    {
+      "path": "spec/REMOTE_UPDATE_V1.md",
+      "bytes": 3502,
+      "sha256": "b5696a94404ee36f1ff0eef356ca8149df875e0fcd84e207dfe53c8bf3393758",
+      "kind": "source"
+    },
+    {
       "path": "spec/SYNC_V2.md",
       "bytes": 8567,
       "sha256": "d4d4678c51b79acc231ed4964d479496c2335064ce183a0d6931715b5ed8ea3e",
@@ -2828,6 +2978,12 @@
       "kind": "source"
     },
     {
+      "path": "spec/autofill_matching_v2_fixtures.json",
+      "bytes": 2438,
+      "sha256": "942ebc47c3042909e9764b831935628c50c1ba31941ded75c0c28e43e3bf7299",
+      "kind": "source"
+    },
+    {
       "path": "spec/autofill_sources_v1_fixtures.json",
       "bytes": 22415,
       "sha256": "d0b7e24a024934c3c923436c682e7b49d84f8ae63267049c2f6c5dfb7815bb2a",
@@ -2837,6 +2993,12 @@
       "path": "spec/backup_v2_fixture.json",
       "bytes": 883,
       "sha256": "9b560385cbf6f1d056d71cd691432063cde94ece47102b33d04477a80e191063",
+      "kind": "source"
+    },
+    {
+      "path": "spec/device_activity_v1_fixtures.json",
+      "bytes": 2933,
+      "sha256": "867c6d77b2f93cb00341ee3b875fa59130d649df556b2999310f721280bbaa79",
       "kind": "source"
     },
     {
@@ -2975,6 +3137,12 @@
       "path": "spec/passkey_v3_fixtures.json",
       "bytes": 4689,
       "sha256": "1abe33754d2c07ec8bb096d15be39f5d014283b99e797dc7d81559cc46243b46",
+      "kind": "source"
+    },
+    {
+      "path": "spec/remote_update_v1_fixtures.json",
+      "bytes": 5058,
+      "sha256": "6ecaf1766e969472274ad9b820b5d4bd81433a3aecce80b89fca599efeedd001",
       "kind": "source"
     },
     {

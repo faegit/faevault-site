@@ -2,9 +2,15 @@ package com.vault.autofill
 
 import android.text.InputType
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class FieldClassifierTest {
+    @Test fun disabledUnknownFocusIsNotManualFillTarget() {
+        val selected = FieldClassifier.selectFields(listOf(FieldCandidate("disabled", FieldEvidence(focused = true, enabled = false))), true)
+        assertTrue(selected.isEmpty())
+    }
+
     @Test
     fun explicitHintsWinOverHeuristics() {
         val evidence = FieldEvidence(
@@ -125,7 +131,7 @@ class FieldClassifierTest {
 
         assertEquals(8, selected.size)
         assertEquals(0, selected.first().id)
-        assertEquals(FieldKind.CUSTOM_TEXT, selected.first().kind)
+        assertEquals(FieldKind.UNKNOWN, selected.first().kind)
     }
 
     @Test

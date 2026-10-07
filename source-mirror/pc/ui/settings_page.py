@@ -25,7 +25,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from core import biometric, browser_install, config, pmv_kdf_policy, updates
+from core import biometric, browser_install, config, pmv_kdf_policy, startup, updates
 from core.passkey_provider_status import PasskeyProviderStatus
 from core.pmv_kdf_policy import PmvKdfPolicy, PmvKdfProfile
 from core.pmv_key_schedule import derive_password_kek
@@ -333,7 +333,7 @@ class SettingsPage(EditorPage):
         manage_exclude.clicked.connect(self._manage_native_autofill_exclusions)
         exclude_row.addWidget(manage_exclude)
         g.addLayout(exclude_row)
-        self._note(g, "添加后，被排除的程序即使按下自动填充快捷键，也不会显示填充建议。")
+        self._note(g, "添加排除项后，对应目标将不再显示自动填充建议。")
         self._refresh_native_exclude_count()
 
         sub = QLabel("浏览器通行密钥")
@@ -443,6 +443,22 @@ class SettingsPage(EditorPage):
             self._content_lay.removeWidget(appearance_box)
             self._content_lay.insertWidget(0, appearance_box)
 
+        g = self._group("启动与后台")
+        self.start_at_login = QCheckBox("开机启动")
+        self.start_at_login.setEnabled(sys.platform == "win32")
+        g.addWidget(self.start_at_login)
+        self._startup_note = self._note(g, "登录 Windows 后自动运行，适用于当前 Windows 用户。")
+        try:
+            self.start_at_login.setChecked(startup.is_enabled())
+        except OSError as exc:
+            self.start_at_login.setEnabled(False)
+            self._startup_note.setText(f"无法读取开机启动状态：{exc}")
+        self.start_at_login.toggled.connect(self._on_start_at_login_toggled)
+        self.silent_start = QCheckBox("静默启动")
+        self.silent_start.setChecked(bool(config.get("silent_start", False)))
+        g.addWidget(self.silent_start)
+        self._note(g, "下次启动时仅显示托盘图标；保险库保持锁定，点击托盘后显示解锁窗口。托盘不可用时仍显示窗口。")
+
         # 云端同步的开关与关联都在「云端同步」页自带，这里不再重复一份设置。
 
         # ── 关于 ──
@@ -473,6 +489,7 @@ class SettingsPage(EditorPage):
         return True
 
     def refresh(self, context: object) -> None:
+        self._refresh_native_exclude_count()
         if hasattr(self, "_user_lbl"):
             self._user_lbl.setText(f"当前用户：{config.get_current_user() or ''}")
 
@@ -536,9 +553,17 @@ class SettingsPage(EditorPage):
         return note
 
     def _refresh_native_exclude_count(self) -> None:
-        count = len(config.get("native_autofill_excluded", []) or []) + len(
-            config.get("browser_autofill_excluded_hosts", []) or []
-        )
+        from core.autofill_exclusions import normalize
+        from collections.abc import Mapping
+
+        exclusions = getattr(self._window.vault, "autofill_exclusions", None)
+        if not isinstance(exclusions, Mapping):
+            exclusions = {
+                "processes": config.get("native_autofill_excluded", []) or [],
+                "hosts": config.get("browser_autofill_excluded_hosts", []) or [],
+            }
+        values = normalize(exclusions)
+        count = sum(len(values[category]) for category in ("packages", "hosts", "processes"))
         if hasattr(self, "_native_exclude_count"):
             self._native_exclude_count.setText(i18n.tr("已排除 {count} 项").format(count=count))
 
@@ -825,6 +850,7 @@ class SettingsPage(EditorPage):
             (self.reveal_seconds, "reveal_hide_seconds"),
             (self.recycle_days, "recycle_bin_retention_days"),
             (self.background_hide, "background_hide"),
+            (self.silent_start, "silent_start"),
             (self.native_autofill_enabled, "native_autofill_enabled"),
         ]:
             if hasattr(w, "valueChanged"):
@@ -835,6 +861,17 @@ class SettingsPage(EditorPage):
                 w.currentIndexChanged.connect(lambda _i, k=key, control=w: self._queue_config_save(k, control.currentData()))
         self.require_master.toggled.connect(self._on_require_master_toggled)
         self.allow_capture.toggled.connect(self._on_allow_capture_toggled)
+
+    def _on_start_at_login_toggled(self, enabled: bool) -> None:
+        try:
+            startup.set_enabled(enabled)
+        except OSError as exc:
+            self.start_at_login.blockSignals(True)
+            self.start_at_login.setChecked(not enabled)
+            self.start_at_login.blockSignals(False)
+            self._startup_note.setText(f"开机启动设置失败：{exc}")
+            return
+        self._startup_note.setText("已开启开机启动，下次登录 Windows 后自动运行。" if enabled else "已关闭开机启动。")
 
     def _queue_config_save(self, key: str, value: object) -> None:
         self._pending_config_saves[key] = value

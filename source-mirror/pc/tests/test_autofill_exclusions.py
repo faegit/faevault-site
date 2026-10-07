@@ -11,6 +11,39 @@ PASSWORD = "correct horse battery staple"
 RECOVERY = bytes(range(32))
 
 
+def test_synced_android_exclusions_are_visible_without_local_cache(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    from PySide6.QtWidgets import QApplication, QLabel
+    from ui.dialogs import NativeAutofillExcludeDialog
+    from ui.settings_page import SettingsPage
+
+    app = QApplication.instance() or QApplication([])
+    monkeypatch.setattr(config, "get", lambda key, default=None: default)
+    vault = Vault.create_pmve(tmp_path / "visible.pmv", PASSWORD, RECOVERY)
+    dialog = None
+    try:
+        vault.set_autofill_exclusions("packages", ["com.example.app"])
+        host = SimpleNamespace(_window=SimpleNamespace(vault=vault), _native_exclude_count=QLabel())
+        host._refresh_native_exclude_count = lambda: SettingsPage._refresh_native_exclude_count(host)
+        SettingsPage.refresh(host, None)
+        assert "1" in host._native_exclude_count.text()
+        dialog = NativeAutofillExcludeDialog(vault=vault)
+        assert dialog._list_lay.itemAt(0).widget().property("exclusion_value") == "com.example.app"
+        assert dialog._list_lay.itemAt(0).widget().property("exclusion_category") == "packages"
+        vault.set_autofill_exclusions("hosts", ["example.com"])
+        SettingsPage.refresh(host, None)
+        dialog._reload()
+        assert "2" in host._native_exclude_count.text()
+        assert {dialog._list_lay.itemAt(i).widget().property("exclusion_value")
+                for i in range(dialog._list_lay.count())} == {"com.example.app", "example.com"}
+        assert vault.autofill_exclusions["packages"] == ["com.example.app"]
+    finally:
+        if dialog is not None:
+            dialog.deleteLater()
+        app.processEvents()
+        vault.close()
+
+
 def test_shared_vectors_converge():
     fixtures = json.loads((Path(__file__).parents[1] / "spec/autofill_exclusions_v1_fixtures.json").read_text(encoding="utf-8"))
     for case in fixtures["cases"]:
@@ -161,16 +194,15 @@ def test_dialog_edits_are_saved_in_encrypted_vault(tmp_path, monkeypatch):
         assert vault.autofill_exclusions["processes"] == []
         monkeypatch.setattr(vault, "save", original_save)
         dialog._add("CHROME.EXE")
-        dialog._site_input.setText("https://Login.Example.com/path")
-        dialog._add_site()
+        dialog._input.setText("https://Login.Example.com/path")
+        dialog._add_from_input()
         reopened = Vault.open(path, PASSWORD)
         try:
             assert reopened.autofill_exclusions["processes"] == ["chrome.exe"]
             assert reopened.autofill_exclusions["hosts"] == ["login.example.com"]
         finally:
             reopened.close()
-        dialog._site_list.setCurrentRow(0)
-        dialog._remove_site()
+        dialog._remove_exclusion("hosts", "login.example.com")
         dialog._remove("chrome.exe")
         assert vault.autofill_exclusions["hosts"] == []
         assert vault.autofill_exclusions["processes"] == []
@@ -259,3 +291,86 @@ def test_locked_account_switch_migrates_before_reload(tmp_path, monkeypatch):
         assert settings["autofill_exclusions_migrated_vault_id"] == str(vault.vault_identity.vault_id)
     finally:
         vault.close()
+
+
+def test_unified_exclusions_have_no_platform_sections_and_remove_synced_android_item(tmp_path, monkeypatch):
+    from PySide6.QtWidgets import QApplication, QLabel, QPushButton
+    from ui.dialogs import NativeAutofillExcludeDialog
+    app = QApplication.instance() or QApplication([])
+    settings = {}
+    monkeypatch.setattr(config, "set", lambda key, value: settings.__setitem__(key, value))
+    path = tmp_path / "unified.pmv"
+    vault = Vault.create_pmve(path, PASSWORD, RECOVERY)
+    vault.replace_autofill_exclusions({"packages": ["com.example.app"],
+                                       "hosts": ["example.com"], "processes": ["example.exe"]})
+    dialog = NativeAutofillExcludeDialog(vault=vault)
+    try:
+        assert dialog._list_lay.count() == 3
+        assert not hasattr(dialog, "_package_list")
+        assert not hasattr(dialog, "_site_list")
+        rows = [dialog._list_lay.itemAt(i).widget() for i in range(3)]
+        assert [row.findChild(QLabel).text() for row in rows] == ["com.example.app", "example.com", "example.exe"]
+        assert all(len(row.findChildren(QLabel)) == 1 for row in rows)
+        package_row = next(row for row in rows if row.property("exclusion_category") == "packages")
+        package_row.findChild(QPushButton).click()
+        assert dialog._list_lay.count() == 2
+        reopened = Vault.open(path, PASSWORD)
+        try:
+            value = reopened.autofill_exclusions
+            assert value["packages"] == []
+            assert value["hosts"] == ["example.com"]
+            assert value["processes"] == ["example.exe"]
+            assert value["states"]["packages:com.example.app"]["deleted"]
+        finally:
+            reopened.close()
+        assert not any(key != "device_identities" and not key.startswith("vault_history_v1_") for key in settings)
+    finally:
+        dialog.deleteLater()
+        app.processEvents()
+        vault.close()
+
+
+def test_unified_input_and_background_program_picker(monkeypatch):
+    from PySide6.QtWidgets import QApplication, QDialog, QLineEdit, QLabel
+    from ui import dialogs
+    from core import native_autofill
+    app = QApplication.instance() or QApplication([])
+    settings = {}
+    monkeypatch.setattr(config, "get", lambda key, default=None: settings.get(key, default))
+    monkeypatch.setattr(config, "set", lambda key, value: settings.__setitem__(key, value))
+    monkeypatch.setattr(dialogs.window_tracker, "running_process_identities", lambda: [
+        ("background-agent.exe", r"C:\Apps\background-agent.exe"), ("example.exe", "")])
+    monkeypatch.setattr(dialogs.window_tracker, "foreground_process_name", lambda: pytest.fail("used foreground instead of list"))
+    monkeypatch.setattr(native_autofill, "signer_certificate_sha256", lambda _: pytest.fail("unneeded signer probe"))
+
+    def choose(picker):
+        assert any(label.text() == "选择排除程序" for label in picker.findChildren(QLabel))
+        assert picker._list.count() == 2
+        picker._search.setText("background")
+        assert not picker._list.item(0).isHidden()
+        assert picker._list.item(1).isHidden()
+        picker._list.setCurrentRow(0)
+        picker.accept()
+        return QDialog.Accepted
+
+    monkeypatch.setattr(dialogs.ProgramPickerDialog, "exec", choose)
+    dialog = dialogs.NativeAutofillExcludeDialog()
+    try:
+        assert not hasattr(dialog, "_site_input")
+        assert dialog.findChildren(QLineEdit) == [dialog._input]
+        dialog._input.setText("https://Login.Example.com/path")
+        dialog._add_from_input()
+        assert settings["browser_autofill_excluded_hosts"] == ["login.example.com"]
+        assert dialog._input.text() == ""
+        dialog._input.setText("EXAMPLE.EXE")
+        dialog._add_from_input()
+        dialog._choose_program.click()
+        assert settings["native_autofill_excluded"] == ["background-agent.exe", "example.exe"]
+        assert dialog._list_lay.count() == 3
+        dialog._input.setText("https://example.exe")
+        dialog._add_from_input()
+        assert settings["browser_autofill_excluded_hosts"] == ["example.exe", "login.example.com"]
+        assert settings["native_autofill_excluded"] == ["background-agent.exe", "example.exe"]
+    finally:
+        dialog.deleteLater()
+        app.processEvents()

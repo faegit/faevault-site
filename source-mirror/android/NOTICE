@@ -5,3 +5,5 @@ Original FAEVault code in this snapshot is released under Apache-2.0 by the proj
 Microsoft-derived passkey provider sample files retain their MIT license: see native/passkey_provider/MICROSOFT_SAMPLE_LICENSE.txt in the PC snapshot.
 Dependencies are not relicensed or bundled. See Android THIRD_PARTY_LICENSES.md, PC pyproject.toml/uv.lock and retained native sample notices.
 FAEVault names and artwork are not granted a trademark license by this source release.
+
+The PC snapshot includes the Public Suffix List (https://publicsuffix.org/list/), under Mozilla Public License 2.0. Its upstream license header and attribution are retained in core/public_suffix_list.dat.

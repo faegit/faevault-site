@@ -1,6 +1,6 @@
 # FAEVault android source-review snapshot
 
-Snapshot date: 2026-10-05. Application version: 4.6.6.
+Snapshot date: 2026-10-07. Application version: 4.6.7.
 
 Original FAEVault source in this snapshot is provided under Apache-2.0.
 Retained upstream notices and Microsoft sample files keep their own licenses.

@@ -43,7 +43,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.FolderCopy
 import androidx.compose.material3.TopAppBarDefaults
 import com.vault.ui.vaultBackdropSource
 import com.vault.ui.vaultEdgeBounce
@@ -211,7 +211,7 @@ fun UnlockedShell(
                         ) {
                             val icon: ImageVector = when (page) {
                                 RootPage.HOME -> Icons.Default.Home
-                                RootPage.MAINTENANCE -> Icons.Default.Build
+                                RootPage.MAINTENANCE -> Icons.Default.FolderCopy
                                 RootPage.SECURITY -> Icons.Default.Security
                                 RootPage.SYNC -> Icons.Default.Sync
                                 RootPage.SETTINGS -> Icons.Default.Settings

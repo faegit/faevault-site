@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "metadata_field": "_device_activity_v1",
+  "writer_cases": [
+    {
+      "name": "bound_current_writer",
+      "metadata": {
+        "version": 1,
+        "profiles": [
+          {
+            "device_id": "00000000-0000-0000-0000-000000000001",
+            "name": "My phone",
+            "platform": "android",
+            "last_seen_at": 1000,
+            "updated_at": 1000
+          }
+        ],
+        "last_writer": {
+          "device_id": "00000000-0000-0000-0000-000000000001",
+          "updated_at": 1000,
+          "parent_commit_id": "00000000-0000-0000-0000-000000000010"
+        }
+      },
+      "parent_commit_id": "00000000-0000-0000-0000-000000000010",
+      "expected_device_id": "00000000-0000-0000-0000-000000000001"
+    },
+    {
+      "name": "old_client_retained_stale_writer",
+      "metadata": {
+        "version": 1,
+        "profiles": [
+          {
+            "device_id": "00000000-0000-0000-0000-000000000001",
+            "name": "My phone",
+            "platform": "android",
+            "last_seen_at": 1000,
+            "updated_at": 1000
+          }
+        ],
+        "last_writer": {
+          "device_id": "00000000-0000-0000-0000-000000000001",
+          "updated_at": 1000,
+          "parent_commit_id": "00000000-0000-0000-0000-000000000010"
+        }
+      },
+      "parent_commit_id": "00000000-0000-0000-0000-000000000011",
+      "expected_device_id": null
+    },
+    {
+      "name": "legacy_no_record",
+      "metadata": {},
+      "parent_commit_id": "00000000-0000-0000-0000-000000000010",
+      "expected_device_id": null
+    },
+    {
+      "name": "unbound_writer",
+      "metadata": {
+        "version": 1,
+        "profiles": [
+          {
+            "device_id": "00000000-0000-0000-0000-000000000001",
+            "name": "My phone",
+            "platform": "android",
+            "last_seen_at": 1000,
+            "updated_at": 1000
+          }
+        ],
+        "last_writer": {
+          "device_id": "00000000-0000-0000-0000-000000000001",
+          "updated_at": 1000
+        }
+      },
+      "parent_commit_id": "00000000-0000-0000-0000-000000000010",
+      "expected_device_id": null
+    },
+    {
+      "name": "unknown_writer_identity",
+      "metadata": {
+        "version": 1,
+        "profiles": [
+          {
+            "device_id": "00000000-0000-0000-0000-000000000001",
+            "name": "My phone",
+            "platform": "android",
+            "last_seen_at": 1000,
+            "updated_at": 1000
+          }
+        ],
+        "last_writer": {
+          "device_id": "00000000-0000-0000-0000-000000000002",
+          "updated_at": 1000,
+          "parent_commit_id": "00000000-0000-0000-0000-000000000010"
+        }
+      },
+      "parent_commit_id": "00000000-0000-0000-0000-000000000010",
+      "expected_device_id": null
+    }
+  ]
+}

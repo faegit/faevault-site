@@ -94,7 +94,7 @@ class OriginMatcherTest {
             login("parent", "Parent", "https://example.com", "bob", "pw"),
             login("none", "None", "https://other.example", "c", "pw"),
             login("deleted", "Deleted", "https://login.example.com", "d", "pw", deleted = true),
-            login("empty", "Empty", "https://login.example.com", "e", ""),
+            login("empty", "Empty", "https://login.example.com", "", ""),
             login("wifi", "Wifi", "https://login.example.com", "f", "pw", type = SecretType.WIFI),
         )
 
@@ -273,6 +273,35 @@ class OriginMatcherTest {
             OriginMatcher.fillCandidateLevel(TargetOrigin.Web("tenant.github.io"), suffixOnly))
         assertEquals(OriginMatchLevel.WORD_CANDIDATE,
             OriginMatcher.fillCandidateLevel(TargetOrigin.Web("tenant.github.io"), matching.copy(title = "TENANT backup")))
+    }
+
+    @Test
+    fun candidateReasonsDistinguishConfirmedExactSameSiteAndName() {
+        val origin = TargetOrigin.Web("login.example.com")
+        val confirmed = login("bound", "Z", "", "u", "pw").copy(
+            fields = AutofillOriginMetadata.addBinding(emptyMap(), origin))
+        assertEquals(AutofillCandidateReason.CONFIRMED_BINDING, OriginMatcher.fillCandidateReason(origin, confirmed))
+        assertEquals(AutofillCandidateReason.EXACT_SOURCE, OriginMatcher.fillCandidateReason(origin, confirmed.copy(fields = emptyMap(), url = "https://login.example.com")))
+        val sibling = confirmed.copy(fields = emptyMap(), url = "https://accounts.example.com")
+        assertEquals(AutofillCandidateReason.SAME_SITE, OriginMatcher.fillCandidateReason(origin, sibling))
+        assertEquals(OriginMatchLevel.NONE, OriginMatcher.matchLevel(origin, sibling))
+        assertEquals(OriginMatchLevel.WORD_CANDIDATE, OriginMatcher.fillCandidateLevel(origin, sibling))
+        assertEquals(AutofillCandidateReason.RELATED_NAME, OriginMatcher.fillCandidateReason(origin, sibling.copy(url = "", title = "Example Personal")))
+        assertEquals(null, OriginMatcher.fillCandidateReason(TargetOrigin.Web("alice.github.io"), sibling.copy(url = "https://bob.github.io", title = "Other")))
+    }
+
+    @Test
+    fun rememberedNondefaultPortCannotAuthorizeAndroidHostOnlyRequest() {
+        val metadata = kotlinx.serialization.json.Json.parseToJsonElement(
+            """[{"kind":"web","host":"example.com","origin":"https://example.com:8443"}]""").jsonArray
+        val entry = login("port", "Other", "", "u", "pw").copy(fields = mapOf(AutofillOriginMetadata.BINDINGS_FIELD_KEY to metadata))
+        val origin = TargetOrigin.Web("example.com")
+        assertEquals(OriginMatchLevel.NONE, OriginMatcher.matchLevel(origin, entry))
+        assertEquals(null, OriginMatcher.fillCandidateReason(origin, entry))
+        assertEquals(metadata, AutofillOriginMetadata.removeBinding(entry.fields, origin)[AutofillOriginMetadata.BINDINGS_FIELD_KEY])
+        val defaultPort = entry.copy(fields = mapOf(AutofillOriginMetadata.BINDINGS_FIELD_KEY to
+            kotlinx.serialization.json.Json.parseToJsonElement("""[{"kind":"web","host":"example.com","origin":"https://example.com:443"}]""").jsonArray))
+        assertEquals(OriginMatchLevel.EXACT, OriginMatcher.matchLevel(origin, defaultPort))
     }
 
     private fun login(

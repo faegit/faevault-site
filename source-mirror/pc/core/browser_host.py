@@ -3,13 +3,15 @@
 from __future__ import annotations
 
 import time
+import unicodedata
 from dataclasses import dataclass
 from typing import Callable, Literal
 from urllib.parse import urlsplit
 
 from . import autofill_otp, autofill_resolver
-from .browser_autofill import BrowserRequest, ProtocolError, is_ip_origin, matching_entries, word_matching_entries, origin_is_excluded
+from .browser_autofill import BrowserRequest, ProtocolError, is_ip_origin, matching_entries, word_matching_entries, origin_is_excluded, browser_match_reason, normalize_origin
 from .models import Entry, SecretType
+from .autofill_sources import entry_is_fillable, with_linked_sources, entry_bindings, AUTOFILL_BINDINGS_KEY, shares_matching_word, entry_matching_text
 from .storage import ExternalVaultChange, Vault
 
 
@@ -19,13 +21,19 @@ class SaveSelection:
     credential_id: str | None = None
 
 
+@dataclass(frozen=True)
+class FillSelection:
+    allow: bool
+    remember: bool = False
+
+
 UnlockVault = Callable[[], Vault | None]
 UnlockWithPassword = Callable[[str], Vault]
 ConfirmSave = Callable[[BrowserRequest, list[Entry]], SaveSelection]
 AuthorizeOrigin = Callable[[str], bool]
 IsOriginAuthorized = Callable[[str], bool]
 IsOriginExcluded = Callable[[str], bool]
-ConfirmWordMatch = Callable[[str, Entry], bool]
+ConfirmWordMatch = Callable[[str, Entry], bool | FillSelection]
 
 
 class BrowserAutofillController:
@@ -39,6 +47,7 @@ class BrowserAutofillController:
         authorize_origin: AuthorizeOrigin | None = None,
         is_origin_excluded: IsOriginExcluded | None = None,
         confirm_word_match: ConfirmWordMatch | None = None,
+        confirm_field_mapping: Callable[[str, Entry, str, str], bool] | None = None,
         lock_after_seconds: Callable[[], int],
         clock: Callable[[], float] = time.monotonic,
         otp_clock: Callable[[], float] = time.time,
@@ -50,6 +59,7 @@ class BrowserAutofillController:
         self._authorize_origin = authorize_origin
         self._is_origin_excluded = is_origin_excluded
         self._confirm_word_match = confirm_word_match
+        self._confirm_field_mapping = confirm_field_mapping
         self._lock_after_seconds = lock_after_seconds
         self._clock = clock
         self._otp_clock = otp_clock
@@ -91,6 +101,12 @@ class BrowserAutofillController:
             raise ProtocolError("ORIGIN_EXCLUDED", "此网站已关闭自动填充")
         if request.action == "list":
             matches = self._candidate_matches(vault, request.origin or "")
+            if request.query:
+                all_entries = [e for eid in vault.list_entry_ids(SecretType.LOGIN) if (e := vault.read_entry(eid)) is not None]
+                sources = with_linked_sources(vault, all_entries)
+                matches = [e for e in all_entries if e.deleted_at is None and entry_is_fillable(e, sources)
+                           and unicodedata.normalize("NFKC", request.query).casefold() in unicodedata.normalize("NFKC", entry_matching_text(e) + " " + e.username).casefold()]
+                matches.sort(key=lambda e: (e.title.casefold(), e.username.casefold(), e.id))
             represented_otp_ids = {
                 source.id
                 for entry in matches
@@ -105,7 +121,7 @@ class BrowserAutofillController:
             return {
                 "locked": False,
                 "credentials": [
-                    self._credential_summary(vault, entry, request.origin or "")
+                    dict(self._credential_summary(vault, entry, request.origin or ""), **({"matchReason": "manual", "requiresSelection": True, "manualSelection": True} if request.query and browser_match_reason(entry, request.origin or "") is None else {}))
                     for entry in (*matches, *standalone)
                 ],
             }
@@ -114,9 +130,15 @@ class BrowserAutofillController:
             if selected is None:
                 selected = next((entry for entry in self._candidate_matches(vault, request.origin or "")
                                  if entry.id == request.credential_id), None)
+                if selected is None and request.manual_selection:
+                    candidate = vault.read_entry(request.credential_id or "")
+                    if candidate is not None and candidate.secret_type == SecretType.LOGIN and candidate.deleted_at is None and entry_is_fillable(candidate, with_linked_sources(vault, [candidate])):
+                        selected = candidate
                 if selected is None:
                     raise ProtocolError("NOT_FOUND", "凭据不存在或已不再匹配此网页")
-                if self._confirm_word_match is None or not self._confirm_word_match(request.origin or "", selected):
+                decision = self._confirm_word_match(request.origin or "", selected) if self._confirm_word_match else False
+                consent = decision if isinstance(decision, FillSelection) else FillSelection(bool(decision))
+                if not consent.allow:
                     raise ProtocolError("ORIGIN_NOT_AUTHORIZED", "未允许将所选条目填充到此网页")
                 # Consent applies to this one release and the exact selected revision.
                 approved = selected.to_dict()
@@ -124,8 +146,15 @@ class BrowserAutofillController:
                 selected = vault.read_entry(selected.id)
                 if (self._origin_excluded(vault, request.origin or "") or selected is None
                         or selected.to_dict() != approved
-                        or not word_matching_entries([selected], request.origin or "")):
+                        or (not request.manual_selection and not browser_match_reason(selected, request.origin or ""))):
                     raise ProtocolError("CONFLICT", "条目或网页权限已变化，请重试", retryable=True)
+                if consent.remember:
+                    changed = Entry.from_dict(selected.to_dict())
+                    origin = normalize_origin(request.origin, allow_ip=True)
+                    binding = {"kind": "web", "host": urlsplit(origin).hostname, "origin": origin}
+                    changed.fields[AUTOFILL_BINDINGS_KEY] = [*entry_bindings(changed), binding]
+                    vault.update(changed)
+                    selected = changed
             linked = [
                 source
                 for link in selected.autofill_links()
@@ -150,7 +179,34 @@ class BrowserAutofillController:
                 result["otp"] = self._otp_payload(otp_value)
                 if otp_value.kind == "hotp":
                     autofill_otp.advance_hotp(vault, otp_value.source_id)
+            from .autofill_field_mapping import mappings_for
+            mappings = mappings_for(selected, request.origin or "")
+            if mappings:
+                result["fieldMappings"] = mappings
             return result
+        if request.action == "map_field":
+            selected = vault.read_entry(request.credential_id or "")
+            if selected is None or selected.deleted_at is not None or selected.secret_type != SecretType.LOGIN:
+                raise ProtocolError("NOT_FOUND", "凭据不存在")
+            linked = [source for link in selected.autofill_links() if (source := vault.read_entry(link.source_entry_id)) is not None]
+            snapshot = autofill_resolver.resolve_snapshot(selected, [selected, *linked], now=self._otp_clock())
+            if request.field_role and request.field_role not in snapshot.values:
+                raise ProtocolError("INVALID_REQUEST", "条目没有此字段角色")
+            approved = selected.to_dict()
+            if self._confirm_field_mapping is None or not self._confirm_field_mapping(request.origin or "", selected, request.field_key, request.field_role):
+                raise ProtocolError("ORIGIN_NOT_AUTHORIZED", "未允许保存字段映射")
+            vault = self._fresh_vault()
+            current = vault.read_entry(selected.id)
+            if self._origin_excluded(vault, request.origin or "") or current is None or current.to_dict() != approved:
+                raise ProtocolError("CONFLICT", "条目或网页权限已变化，请重试", retryable=True)
+            linked = [source for link in current.autofill_links() if (source := vault.read_entry(link.source_entry_id)) is not None]
+            snapshot = autofill_resolver.resolve_snapshot(current, [current, *linked], now=self._otp_clock())
+            if request.field_role and request.field_role not in snapshot.values:
+                raise ProtocolError("CONFLICT", "字段来源已变化，请重试", retryable=True)
+            from .autofill_field_mapping import with_mapping, mappings_for
+            changed = with_mapping(current, request.origin or "", request.field_key, request.field_role)
+            vault.update(changed)
+            return {"fieldMappings": mappings_for(changed, request.origin or "")}
         if request.action == "save":
             return self._save(request, vault)
         raise ProtocolError("UNSUPPORTED_ACTION", "不支持的操作")
@@ -200,6 +256,7 @@ class BrowserAutofillController:
             "username": entry.username[:512],
             "origin": origin,
             "kind": "otp" if entry.secret_type == SecretType.OTP else "login",
+            "matchReason": browser_match_reason(entry, origin) if entry.secret_type == SecretType.LOGIN else "exact",
         }
         if self._is_word_match(entry, origin):
             result["requiresSelection"] = True
@@ -222,24 +279,25 @@ class BrowserAutofillController:
 
     @staticmethod
     def _matches(vault: Vault, origin: str) -> list[Entry]:
-        host = urlsplit(origin).hostname or ""
-        candidate_ids = vault.query_login_domain(host)
-        candidates = [entry for entry_id in candidate_ids
+        candidates = [entry for entry_id in vault.list_entry_ids(SecretType.LOGIN)
                       if (entry := vault.read_entry(entry_id)) is not None]
-        return matching_entries(candidates, origin, allow_ip=True)
+        sources = with_linked_sources(vault, candidates)
+        return [e for e in candidates if e.deleted_at is None and entry_is_fillable(e, sources)
+                and browser_match_reason(e, origin) in {"confirmed", "exact"}]
 
     @staticmethod
     def _is_word_match(entry: Entry, origin: str) -> bool:
-        return entry.secret_type == SecretType.LOGIN and not matching_entries([entry], origin, allow_ip=True)
+        return entry.secret_type == SecretType.LOGIN and browser_match_reason(entry, origin) not in {"confirmed", "exact"}
 
     @staticmethod
     def _candidate_matches(vault: Vault, origin: str) -> list[Entry]:
-        exact = BrowserAutofillController._matches(vault, origin)
-        if exact or is_ip_origin(origin):
-            return exact
         candidates = [entry for entry_id in vault.list_entry_ids(SecretType.LOGIN)
                       if (entry := vault.read_entry(entry_id)) is not None]
-        return word_matching_entries(candidates, origin)
+        sources = with_linked_sources(vault, candidates)
+        matches = [e for e in candidates if e.deleted_at is None and entry_is_fillable(e, sources)
+                   and browser_match_reason(e, origin)]
+        rank = {"confirmed": 0, "exact": 1, "same_site": 2, "name": 3}
+        return sorted(matches, key=lambda e: (rank[browser_match_reason(e, origin)], e.title.casefold(), e.username.casefold(), e.id))[:20]
 
     def _origin_excluded(self, vault: Vault, origin: str) -> bool:
         rules = getattr(vault, "autofill_exclusions", None)

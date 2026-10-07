@@ -56,6 +56,11 @@ internal class CloudPreviewSessionCache<T> {
     }
 
     @Synchronized
+    fun invalidate(provider: String) {
+        slots.remove(provider)?.completion?.cancel()
+    }
+
+    @Synchronized
     fun cancel(provider: String, associationKey: String) {
         if (slots[provider]?.associationKey == associationKey && slots[provider]?.checking == true) {
             slots.remove(provider)?.completion?.cancel()

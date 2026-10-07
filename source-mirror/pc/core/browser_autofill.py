@@ -11,7 +11,8 @@ from typing import Any
 from urllib.parse import urlsplit
 
 from .models import Entry, SecretType
-from .autofill_sources import matching_words, shares_matching_word, entry_matching_text
+from .public_suffix import registrable_domain
+from .autofill_sources import matching_words, shares_matching_word, entry_matching_text, entry_binding_values, entry_bindings, entry_is_fillable, parse_role
 
 PROTOCOL_VERSION = 1
 MAX_MESSAGE_BYTES = 1024 * 1024
@@ -41,6 +42,10 @@ class BrowserRequest:
     username: str = ""
     password: str = ""
     master_password: str = ""
+    query: str = ""
+    manual_selection: bool = False
+    field_key: str = ""
+    field_role: str = ""
 
 
 def _is_authorizable_ip(address: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
@@ -141,6 +146,62 @@ def entry_origin(entry: Entry, *, allow_ip: bool = False) -> str | None:
         return None
 
 
+def entry_origins(entry: Entry) -> tuple[str, ...]:
+    result = []
+    for raw in entry_binding_values(entry, "web"):
+        try:
+            parsed = urlsplit(raw if "://" in raw else "https://" + raw)
+            result.append(normalize_origin(f"{parsed.scheme}://{parsed.netloc}", allow_ip=True))
+        except (ProtocolError, ValueError):
+            pass
+    for binding in entry_bindings(entry):
+        if binding.get("kind") != "web":
+            continue
+        raw = binding.get("origin") or "https://" + str(binding.get("host") or "")
+        try:
+            result.append(normalize_origin(raw, allow_ip=True))
+        except ProtocolError:
+            pass
+    return tuple(dict.fromkeys(result))
+
+
+def browser_match_reason(entry: Entry, origin: str) -> str | None:
+    normalized = normalize_origin(origin, allow_ip=True)
+    for binding in entry_bindings(entry):
+        if binding.get("kind") != "web":
+            continue
+        try:
+            remembered = normalize_origin(binding.get("origin") or "https://" + str(binding.get("host") or ""), allow_ip=True)
+        except ProtocolError:
+            continue
+        if remembered == normalized:
+            return "confirmed"
+    origins = entry_origins(entry)
+    if normalized in origins:
+        return "exact"
+    if is_ip_origin(normalized):
+        return None
+    host = urlsplit(normalized).hostname or ""
+    related_origins = list(origins)
+    for raw in entry_binding_values(entry, "web"):
+        try:
+            parsed = urlsplit(raw if "://" in raw else "https://" + raw)
+            if parsed.scheme == "http" and parsed.hostname:
+                related_origins.append("https://" + parsed.netloc)
+        except ValueError:
+            pass
+    for stored in related_origins:
+        other = urlsplit(stored).hostname or ""
+        site = registrable_domain(host)
+        if site is not None and site == registrable_domain(other):
+            return "same_site"
+    try:
+        readable = host.encode("ascii").decode("idna")
+    except UnicodeError:
+        readable = host
+    return "name" if shares_matching_word(entry_matching_text(entry), ".".join(readable.split(".")[:-1])) else None
+
+
 def matching_entries(
     entries: list[Entry], origin: str, *, limit: int = 20, allow_ip: bool = False
 ) -> list[Entry]:
@@ -150,8 +211,8 @@ def matching_entries(
         for entry in entries
         if entry.secret_type == SecretType.LOGIN
         and entry.deleted_at is None
-        and bool(entry.password)
-        and entry_origin(entry, allow_ip=allow_ip) == normalized
+        and entry_is_fillable(entry, entries)
+        and browser_match_reason(entry, normalized) in {"confirmed", "exact"}
     ]
     matches.sort(key=lambda item: (item.title.lower(), item.username.lower(), item.id))
     return matches[: max(0, min(int(limit), 20))]
@@ -172,8 +233,8 @@ def word_matching_entries(entries: list[Entry], origin: str, *, limit: int = 20)
     if not words:
         return []
     matches = [entry for entry in entries if entry.secret_type == SecretType.LOGIN
-               and entry.deleted_at is None and bool(entry.password)
-               and shares_matching_word(entry_matching_text(entry), " ".join(words))]
+               and entry.deleted_at is None and entry_is_fillable(entry, entries)
+               and browser_match_reason(entry, normalized) in {"same_site", "name"}]
     matches.sort(key=lambda entry: (entry.title.casefold(), entry.username.casefold(), entry.id))
     return matches[:max(0, min(int(limit), 20))]
 
@@ -187,11 +248,11 @@ def parse_request(value: object) -> BrowserRequest:
     if not isinstance(request_id, str) or not request_id or len(request_id) > MAX_REQUEST_ID:
         raise ProtocolError("INVALID_REQUEST", "请求标识无效")
     action = value.get("action")
-    if action not in {"status", "unlock", "list", "get", "save", "authorize", "lock"}:
+    if action not in {"status", "unlock", "list", "get", "save", "authorize", "lock", "map_field"}:
         raise ProtocolError("UNSUPPORTED_ACTION", "不支持的操作")
-    origin = normalize_origin(value.get("origin"), allow_ip=True) if action in {"list", "get", "save", "authorize"} else None
+    origin = normalize_origin(value.get("origin"), allow_ip=True) if action in {"list", "get", "save", "authorize", "map_field"} else None
     credential_id = None
-    if action == "get":
+    if action in {"get", "map_field"}:
         credential_id = _bounded_text(value.get("credentialId"), "凭据标识", 128, required=True)
     title = username = password = ""
     if action == "save":
@@ -201,7 +262,15 @@ def parse_request(value: object) -> BrowserRequest:
     master_password = ""
     if action == "unlock":
         master_password = _bounded_text(value.get("masterPassword"), "主密码", 128, required=True)
-    return BrowserRequest(request_id, action, origin, credential_id, title, username, password, master_password)
+    query = _bounded_text(value.get("query", ""), "搜索", 80)
+    manual = value.get("manualSelection", False)
+    if type(manual) is not bool:
+        raise ProtocolError("INVALID_REQUEST", "选择状态无效")
+    key = _bounded_text(value.get("fieldKey", ""), "字段", 256, required=action == "map_field")
+    role = _bounded_text(value.get("fieldRole", ""), "角色", 64)
+    if role and parse_role(role) is None:
+        raise ProtocolError("INVALID_REQUEST", "字段角色无效")
+    return BrowserRequest(request_id, action, origin, credential_id, title, username, password, master_password, query, manual, key, role)
 
 
 def success(request_id: str, result: dict[str, Any] | None = None) -> dict[str, Any]:

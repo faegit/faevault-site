@@ -31,6 +31,15 @@ class AutoSyncResult:
 
 
 
+def _acknowledged_result(target, uploaded, changed, stats, snapshot) -> AutoSyncResult:
+    from .remote_update import metadata_version
+    acknowledged = dict(stats)
+    token = metadata_version(target, snapshot)
+    if token:
+        acknowledged["remote_update_version"] = token
+    return AutoSyncResult(target, uploaded, changed, acknowledged)
+
+
 def _sync_pmve_files(
     vault: Vault,
     target: str,
@@ -61,14 +70,18 @@ def _sync_pmve_files(
                 lineage = vault.classify_lineage(vault.pmve_identity, remote_identity)
 
             stats = {"lineage": lineage.value, "cas_retries": cas_retries}
+            from .remote_update import metadata_version
+            consumed_version = metadata_version(target, snapshot)
+            if consumed_version:
+                stats["remote_update_consumed_version"] = consumed_version
             if lineage is VaultLineage.SAME:
-                return AutoSyncResult(target, False, False, stats)
+                return _acknowledged_result(target, False, False, stats, snapshot)
             if lineage is VaultLineage.FAST_FORWARD:
                 vault.replace_authenticated_file(snapshot.path)
                 # Re-opened identity must still equal the authenticated snapshot Head.
                 if vault.classify_lineage(vault.pmve_identity, remote_identity) is not VaultLineage.SAME:
                     raise cloud.CloudError("PMVE 本地安装后 Identity 复验失败")
-                return AutoSyncResult(target, False, True, stats)
+                return _acknowledged_result(target, False, True, stats, snapshot)
             if lineage is VaultLineage.REMOTE_STALE:
                 try:
                     vault.compact_before_sync()
@@ -87,7 +100,7 @@ def _sync_pmve_files(
                             committed_identity = None
                         if Vault.classify_lineage(vault.pmve_identity, committed_identity) is VaultLineage.SAME:
                             stats["cas_retries"] = cas_retries
-                            return AutoSyncResult(target, True, False, stats)
+                            return _acknowledged_result(target, True, False, stats, committed)
                     cas_retries += 1
                     if attempt == 2:
                         raise cloud.CloudConflict("PMVE CAS 连续竞争，请稍后重试")
@@ -102,7 +115,7 @@ def _sync_pmve_files(
                 if vault.classify_lineage(vault.pmve_identity, verified_identity) is not VaultLineage.SAME:
                     raise cloud.CloudError("PMVE 上传后回读 Identity 不一致")
                 stats["cas_retries"] = cas_retries
-                return AutoSyncResult(target, True, False, stats)
+                return _acknowledged_result(target, True, False, stats, verified)
             if lineage is VaultLineage.DIVERGED:
                 # 自动收敛：以远端 Head 为基线提交合并内容（条目 LWW + 密钥版本/注册表
                 # union），原子采纳为本地库，再上传同一文件让远端快速前进。
@@ -124,7 +137,7 @@ def _sync_pmve_files(
                             if Vault.classify_lineage(installed, committed_identity) is not VaultLineage.SAME:
                                 raise cloud.CloudError("PMVE 合并本地安装后 Identity 复验失败")
                             stats["cas_retries"] = cas_retries
-                            return AutoSyncResult(target, True, True, stats)
+                            return _acknowledged_result(target, True, True, stats, committed)
                     # 合并期间远端又被更新：重拉最新远端并以新 Head 再合并，
                     # 合并与密钥收敛是确定性的，有界重试后仍冲突才失败。
                     cas_retries += 1
@@ -145,7 +158,7 @@ def _sync_pmve_files(
                 if Vault.classify_lineage(installed, verified_identity) is not VaultLineage.SAME:
                     raise cloud.CloudError("PMVE 合并本地安装后 Identity 复验失败")
                 stats["cas_retries"] = cas_retries
-                return AutoSyncResult(target, True, True, stats)
+                return _acknowledged_result(target, True, True, stats, verified)
             if lineage is VaultLineage.DIFFERENT:
                 raise cloud.CloudError("远端 PMVE 不是同一保险库或签名者")
             raise cloud.CloudError("远端 PMVE Identity 无效")

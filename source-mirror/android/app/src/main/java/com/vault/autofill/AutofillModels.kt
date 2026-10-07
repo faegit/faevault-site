@@ -20,6 +20,7 @@ data class FieldEvidence(
     val visible: Boolean = true,
     val enabled: Boolean = true,
     val currentText: String? = null,
+    val fieldKey: String? = null,
 )
 
 data class FieldCandidate<T>(val id: T, val evidence: FieldEvidence)
@@ -32,6 +33,8 @@ data class ClassifiedField<T>(
     val score: Int,
     val focused: Boolean,
     val currentText: String? = null,
+    val fieldKey: String? = null,
+    val label: String? = null,
 )
 
 sealed interface TargetOrigin {

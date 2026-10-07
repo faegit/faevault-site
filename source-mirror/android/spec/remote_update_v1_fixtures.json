@@ -1,0 +1,223 @@
+{
+  "schema": 1,
+  "time_unit": "epoch_milliseconds",
+  "notification_history_limit": 32,
+  "cases": [
+    {
+      "name": "first_observation_is_silent",
+      "initial": {},
+      "events": [
+        {
+          "type": "observe",
+          "version": "A",
+          "now": 1000,
+          "expected_baseline": "A",
+          "expected_pending": "",
+          "notify": false
+        }
+      ]
+    },
+    {
+      "name": "changed_version_is_deduplicated",
+      "initial": {
+        "baseline": "A"
+      },
+      "events": [
+        {
+          "type": "observe",
+          "version": "B",
+          "now": 2000,
+          "expected_pending": "B",
+          "notify": true
+        },
+        {
+          "type": "observe",
+          "version": "B",
+          "now": 3000,
+          "expected_pending": "B",
+          "notify": false
+        },
+        {
+          "type": "snooze",
+          "expected_pending": "B",
+          "notify": false
+        },
+        {
+          "type": "observe",
+          "version": "B",
+          "now": 4000,
+          "expected_pending": "B",
+          "notify": false
+        },
+        {
+          "type": "observe",
+          "version": "C",
+          "now": 5000,
+          "expected_pending": "C",
+          "notify": true
+        }
+      ]
+    },
+    {
+      "name": "stale_ack_does_not_clear_newer_pending",
+      "initial": {
+        "baseline": "A",
+        "pending": "C",
+        "notified": [
+          "C"
+        ],
+        "detected_at": 2000
+      },
+      "events": [
+        {
+          "type": "acknowledge",
+          "version": "B",
+          "expected_baseline": "B",
+          "expected_pending": "C",
+          "notify": false
+        },
+        {
+          "type": "acknowledge",
+          "version": "C",
+          "expected_baseline": "C",
+          "expected_pending": "",
+          "notify": false
+        }
+      ]
+    },
+    {
+      "name": "own_upload_suppressed",
+      "initial": {
+        "baseline": "A"
+      },
+      "events": [
+        {
+          "type": "acknowledge",
+          "version": "B",
+          "expected_baseline": "B",
+          "expected_pending": "",
+          "notify": false
+        },
+        {
+          "type": "observe",
+          "version": "B",
+          "now": 3000,
+          "expected_pending": "",
+          "notify": false
+        }
+      ]
+    },
+    {
+      "name": "missing_metadata_is_not_an_update",
+      "initial": {
+        "baseline": "A"
+      },
+      "events": [
+        {
+          "type": "observe",
+          "version": "",
+          "now": 2000,
+          "expected_baseline": "A",
+          "expected_pending": "",
+          "notify": false
+        },
+        {
+          "type": "error",
+          "expected_baseline": "A",
+          "expected_pending": "",
+          "notify": false
+        }
+      ]
+    },
+    {
+      "name": "association_reset_discards_old_versions",
+      "initial": {
+        "baseline": "A",
+        "pending": "B",
+        "notified": [
+          "B"
+        ],
+        "detected_at": 2000
+      },
+      "events": [
+        {
+          "type": "reset",
+          "expected_baseline": "",
+          "expected_pending": "",
+          "notify": false
+        },
+        {
+          "type": "observe",
+          "version": "C",
+          "now": 3000,
+          "expected_baseline": "C",
+          "expected_pending": "",
+          "notify": false
+        }
+      ]
+    },
+    {
+      "name": "return_to_baseline_clears_pending",
+      "initial": {
+        "baseline": "A",
+        "pending": "B",
+        "notified": [
+          "B"
+        ],
+        "detected_at": 2000
+      },
+      "events": [
+        {
+          "type": "observe",
+          "version": "A",
+          "now": 3000,
+          "expected_pending": "",
+          "notify": false
+        },
+        {
+          "type": "observe",
+          "version": "B",
+          "now": 4000,
+          "expected_pending": "B",
+          "notify": false
+        }
+      ]
+    },
+    {
+      "name": "merge_upload_ack_clears_consumed_but_preserves_unrelated_version",
+      "initial": {
+        "baseline": "A",
+        "pending": "B",
+        "notified": [
+          "B"
+        ],
+        "detected_at": 2000
+      },
+      "events": [
+        {
+          "type": "acknowledge",
+          "version": "C",
+          "consumed_version": "B",
+          "expected_baseline": "C",
+          "expected_pending": "",
+          "notify": false
+        },
+        {
+          "type": "observe",
+          "version": "D",
+          "now": 3000,
+          "expected_pending": "D",
+          "notify": true
+        },
+        {
+          "type": "acknowledge",
+          "version": "E",
+          "consumed_version": "C",
+          "expected_baseline": "E",
+          "expected_pending": "D",
+          "notify": false
+        }
+      ]
+    }
+  ]
+}

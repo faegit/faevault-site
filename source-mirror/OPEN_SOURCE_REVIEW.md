@@ -1,6 +1,6 @@
 # FAEVault source publication review
 
-Reviewed snapshot: 2026-10-05. Android and PC application version: 4.6.6.
+Reviewed snapshot: 2026-10-07. Android and PC application version: 4.6.7.
 
 ## Published scope
 
@@ -10,7 +10,7 @@ These implementations are useful for independent security review and interoperab
 
 ## License boundaries
 
-Original FAEVault source is Apache-2.0. Existing upstream notices remain effective. The Windows provider contains Microsoft sample-derived code whose MIT license is retained. Android dependency notices are included. Python/Qt and other dependencies retain their own licenses, including applicable Qt distribution requirements; they are not included as binary libraries here.
+Original FAEVault source is Apache-2.0. Existing upstream notices remain effective. The Windows provider contains Microsoft sample-derived code whose MIT license is retained. Android dependency notices are included. The explicitly included PC Public Suffix List retains its Mozilla Public License 2.0 header and upstream attribution. Python/Qt and other dependencies retain their own licenses, including applicable Qt distribution requirements; they are not included as binary libraries here.
 
 ## Excluded material
 

@@ -1,5 +1,8 @@
 package com.vault
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+
 import android.app.ActivityManager
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -42,6 +45,22 @@ import kotlinx.coroutines.launch
  * 重置「最后活动时间」，供超时锁定计时使用。
  */
 class MainActivity : FragmentActivity() {
+    private var remoteUpdateOpenRequest by androidx.compose.runtime.mutableStateOf<com.vault.ui.RemoteUpdateOpenRequest?>(null)
+
+    private fun captureRemoteUpdateIntent(source: android.content.Intent?) {
+        val vault = source?.getStringExtra("remote_update_vault") ?: return
+        val target = source.getStringExtra("remote_update_target") ?: return
+        if (vault.isNotBlank() && vault.length <= 200 && target in setOf("drive", "webdav")) {
+            remoteUpdateOpenRequest = com.vault.ui.RemoteUpdateOpenRequest(vault, target, System.nanoTime())
+        }
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        captureRemoteUpdateIntent(intent)
+    }
+
     /** 后台品牌封面：切后台时显示品牌深色底 + 应用 Logo，代替敏感内容。 */
     private var backgroundCover: View? = null
 
@@ -100,7 +119,14 @@ class MainActivity : FragmentActivity() {
         com.vault.security.LeakCheckEnabledPref.init(this)
         com.vault.security.LeakCheckIntervalPref.init(this)
         com.vault.security.LeakOnlineCheckPref.init(this)
-        setContent { AppRoot() }
+        captureRemoteUpdateIntent(intent)
+        setContent {
+            AppRoot(remoteUpdateRequest = remoteUpdateOpenRequest, onRemoteUpdateRequestHandled = {
+                remoteUpdateOpenRequest = null
+                intent.removeExtra("remote_update_vault")
+                intent.removeExtra("remote_update_target")
+            })
+        }
         // 权限弹窗至少等首屏进入消息队列，避免首次启动只看到系统弹窗而看不到应用内容。
         window.decorView.post { requestNotificationPermission() }
         // 首屏提交后再做非关键维护，避免目录扫描、WorkManager 初始化和旧设置迁移

@@ -45,7 +45,7 @@ object AssistStructureParser {
             stack.addLast(NodeAtDepth(structure.getWindowNodeAt(windowIndex).rootViewNode, 0))
         }
         while (stack.isNotEmpty()) {
-            val (node, depth) = stack.removeLast()
+            val (node, depth, nearbyLabel) = stack.removeLast()
             if (!budget.accept(depth, cancellationSignal.isCanceled)) break
             val webDomain = node.webDomain?.toString()?.take(253)
             if (webDomain != null) {
@@ -76,17 +76,24 @@ object AssistStructureParser {
                             resourceId = node.idEntry?.take(120),
                             className = node.className?.toString()?.take(120),
                             inputType = node.inputType,
-                            label = (node.hint ?: node.contentDescription)?.toString()?.take(120),
+                            label = listOfNotNull(node.hint?.toString(), node.contentDescription?.toString(), nearbyLabel)
+                                .distinct().joinToString(" ").take(120).takeIf(String::isNotBlank),
                             focused = node.isFocused,
                             visible = node.visibility == View.VISIBLE,
                             enabled = node.isEnabled,
                             currentText = currentText,
+                            fieldKey = AutofillFieldSignature.create(node.idEntry, html["id"], html["name"], html["type"]),
                         ),
                     )
                 }
             }
             for (childIndex in node.childCount - 1 downTo 0) {
-                stack.addLast(NodeAtDepth(node.getChildAt(childIndex), depth + 1))
+                val previous = if (childIndex > 0) node.getChildAt(childIndex - 1) else null
+                val label = previous?.takeIf {
+                    it.autofillType == View.AUTOFILL_TYPE_NONE && it.visibility == View.VISIBLE &&
+                        it.childCount == 0 && it.inputType == 0
+                }?.text?.toString()?.take(120)
+                stack.addLast(NodeAtDepth(node.getChildAt(childIndex), depth + 1, label))
             }
         }
         if (cancellationSignal.isCanceled) return null
@@ -103,12 +110,22 @@ object AssistStructureParser {
             signingCertificateSha256 = signingCertificateSha256,
             trustedBrowserSigningCertificateSha256 = trustedBrowserSigningCertificateSha256,
         ) ?: return null
-        val fields = FieldClassifier.selectFields(candidates, manualRequest)
+        // Scope a remembered role to the stable form layout, never to entered values.
+        val formSignature = candidates.mapNotNull { it.evidence.fieldKey }.sorted().joinToString("\n")
+        val formHash = java.security.MessageDigest.getInstance("SHA-256")
+            .digest(formSignature.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }.take(24)
+        val uniqueKeys = AutofillFieldSignature.unique(candidates.map { it.evidence.fieldKey })
+        val uniqueCandidates = candidates.mapIndexed { index, candidate ->
+            candidate.copy(evidence = candidate.evidence.copy(fieldKey = uniqueKeys[index]))
+        }
+        val fields = FieldClassifier.selectFields(uniqueCandidates, manualRequest).map { field ->
+            field.copy(fieldKey = field.fieldKey?.let { "android:$formHash:$it".take(256) })
+        }
         if (fields.isEmpty()) return null
         return ParsedForm(origin = origin, fields = fields, packageName = packageName)
     }
 
-    private data class NodeAtDepth(val node: AssistStructure.ViewNode, val depth: Int)
+    private data class NodeAtDepth(val node: AssistStructure.ViewNode, val depth: Int, val nearbyLabel: String? = null)
 
     private fun containsFocusedChild(node: AssistStructure.ViewNode): Boolean {
         for (index in 0 until node.childCount) {

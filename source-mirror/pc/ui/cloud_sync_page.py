@@ -25,7 +25,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from . import widgets
+from . import i18n, widgets
 from .editor_workspace import page_shell
 
 
@@ -47,6 +47,11 @@ class CloudTargetControls:
     relate_action: QAction
     clear_action: QAction
     auto_anchor: QWidget
+    detection_toggle: QCheckBox
+    update_card: QFrame
+    update_detail: QLabel
+    update_sync: QPushButton
+    update_later: QPushButton
     path: QLabel | None = None
 
 
@@ -180,6 +185,10 @@ class CloudSyncPage(QWidget):
         preview.setTextFormat(Qt.PlainText)
         preview.setTextInteractionFlags(Qt.TextSelectableByMouse)
         layout.addWidget(preview)
+        writer_note = QLabel(i18n.tr("写入设备仅在验证此远端版本后显示；旧版本可能无法识别设备。"))
+        writer_note.setWordWrap(True)
+        writer_note.setObjectName("SettingNote")
+        layout.addWidget(writer_note)
 
         path = QLabel() if include_path else None
         if path is not None:
@@ -227,6 +236,28 @@ class CloudSyncPage(QWidget):
         layout.addWidget(check)
         layout.addWidget(more)
 
+        detection_toggle = QCheckBox("检测远端更新")
+        layout.addWidget(detection_toggle)
+        detection_hint = QLabel("每5分钟检查远端文件，仅提醒，不会自动同步。")
+        detection_hint.setObjectName("SettingNote")
+        detection_hint.setWordWrap(True)
+        layout.addWidget(detection_hint)
+        update_card = QFrame()
+        update_card.setObjectName("CloudInlineNotice")
+        update_layout = QVBoxLayout(update_card)
+        update_layout.addWidget(QLabel("远端有更新"))
+        update_detail = QLabel()
+        update_detail.setWordWrap(True)
+        update_detail.setTextFormat(Qt.PlainText)
+        update_layout.addWidget(update_detail)
+        update_sync = QPushButton("立即同步")
+        update_sync.setObjectName("Primary")
+        update_later = QPushButton("稍后处理")
+        update_layout.addWidget(update_sync)
+        update_layout.addWidget(update_later)
+        update_card.hide()
+        layout.insertWidget(3, update_card)
+
         # 自动同步设置块在更多操作之后插入。
         auto_anchor = QWidget()
         auto_anchor.setFixedHeight(0)
@@ -251,5 +282,10 @@ class CloudSyncPage(QWidget):
             relate_action=relate_action,
             clear_action=clear_action,
             auto_anchor=auto_anchor,
+            detection_toggle=detection_toggle,
+            update_card=update_card,
+            update_detail=update_detail,
+            update_sync=update_sync,
+            update_later=update_later,
             path=path,
         )

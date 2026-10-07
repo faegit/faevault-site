@@ -1,6 +1,9 @@
 package com.vault.ui.screens
 
 import com.vault.ui.vaultBackdropSource
+import com.vault.ui.uiBackupDeviceLabel
+import com.vault.ui.uiCloudSyncStatus
+import androidx.compose.foundation.layout.IntrinsicSize
 
 import java.util.UUID
 import android.app.Activity
@@ -346,12 +349,17 @@ fun SettingsScreen(
     vm: VaultViewModel,
     isActive: Boolean = true,
     contentMode: SettingsContentMode = SettingsContentMode.SETTINGS,
+    remoteUpdateOpenTarget: String? = null,
+    remoteUpdateOpenSignal: Int = 0,
+    onRemoteUpdateOpened: () -> Unit = {},
     onOpenEntry: (Entry) -> Unit = {},
     scrollToTopSignal: Int = 0,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     val ctx = LocalContext.current
+    var showDevicesHistory by remember { mutableStateOf(false) }
+    if (showDevicesHistory) DevicesHistoryDialog(vm, onDismiss = { showDevicesHistory = false })
     val securityChangePasswordGuard = stringResource(R.string.settings_remaining_change_password_guard)
     val securityRegenerateRecoveryGuard = stringResource(R.string.settings_remaining_regenerate_recovery_guard)
     val securityDisableBiometricGuard = stringResource(R.string.settings_remaining_disable_biometric_guard)
@@ -379,6 +387,7 @@ fun SettingsScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val settingsListState = rememberLazyListState()
 
+    val remoteUpdateStates by vm.remoteUpdateStates.collectAsStateWithLifecycle()
     val currentVault by vm.currentVault.collectAsStateWithLifecycle()
     val state by vm.state.collectAsStateWithLifecycle()
     // 使用稳定 ID 保存手风琴焦点，语言切换后本地化标题变化也不会导致展开状态失配。
@@ -589,6 +598,7 @@ fun SettingsScreen(
     }
     var excludedPackages by remember { mutableStateOf(emptySet<String>()) }
     var excludedHosts by remember { mutableStateOf(emptySet<String>()) }
+    val excludedProcesses = state.payload?.autofillExclusions?.normalized()?.processes.orEmpty()
     LaunchedEffect(Unit) {
         val loaded = withContext(Dispatchers.IO) {
             AutofillSetup.supportState(ctx) to AutofillSetup.credentialProviderState(ctx)
@@ -1026,6 +1036,46 @@ fun SettingsScreen(
     }
     // 轮询只读取当前模式（云端硬盘/WebDAV）的独立自动同步设置，
     // 避免共享 auto_target 把另一个目标的开关状态带到当前页面、反复改写开关。
+    LaunchedEffect(remoteUpdateStates["drive"]?.pending, remoteUpdateStates["webdav"]?.pending) {
+        if (remoteUpdateStates["drive"]?.pending?.isNotBlank() == true) cloudDiskPreview = null
+        if (remoteUpdateStates["webdav"]?.pending?.isNotBlank() == true) webDavPreview = null
+    }
+    LaunchedEffect(remoteUpdateOpenSignal, isActive, contentMode) {
+        if (remoteUpdateOpenSignal > 0 && isActive && contentMode == SettingsContentMode.TRANSFER &&
+            remoteUpdateOpenTarget in setOf("drive", "webdav")) {
+            transferExpandedSection = "transfer-cloud-sync"
+            cloudProviderMode = remoteUpdateOpenTarget!!
+            onRemoteUpdateOpened()
+        }
+    }
+    fun syncSelectedCloudTarget() {
+        if (state.cloudSyncRunning || cloudSyncBusy) return
+        if (cloudProviderMode == "drive") {
+            if (cloudDiskUri.isBlank()) return
+            checkAssociatedCloudFile {
+                vm.syncCloudVault(android.net.Uri.parse(cloudDiskUri)) { success ->
+                    if (success && cloudDiskTreeUri.isNotBlank()) {
+                        checkAssociatedCloudFile(updateBaseline = true) {
+                            vm.previewCloudVault(android.net.Uri.parse(cloudDiskUri), force = true) { cloudDiskPreview = it }
+                        }
+                    } else {
+                        cloudDiskStatus = if (success) "ok" else "failed"
+                        cloudPrefs.edit().putString(cloudKey("disk_status"), cloudDiskStatus).apply()
+                        if (success) vm.previewCloudVault(android.net.Uri.parse(cloudDiskUri), force = true) { cloudDiskPreview = it }
+                    }
+                }
+            }
+        } else if (webDavAssociated) {
+            vm.syncWebDav { success ->
+                if (success) vm.previewWebDav(force = true) { webDavPreview = it }
+                webDavStatus = if (success) "ok" else "failed"
+                cloudPrefs.edit().putString(cloudKey("webdav_status"), webDavStatus).apply()
+            }
+        }
+    }
+    LaunchedEffect(currentVault, isActive, cloudSyncCardExpanded, cloudProviderMode, cloudEnabled) {
+        if (isActive && cloudSyncCardExpanded && cloudEnabled) vm.checkRemoteUpdates(cloudProviderMode)
+    }
     LaunchedEffect(currentVault, isActive, contentMode, cloudEnabled, cloudProviderMode) {
         while (isActive && contentMode == SettingsContentMode.TRANSFER && cloudEnabled) {
             val mode = cloudProviderMode
@@ -1171,6 +1221,7 @@ fun SettingsScreen(
             ctx = ctx,
             excludedPackages = excludedPackages,
             excludedHosts = excludedHosts,
+            excludedProcesses = excludedProcesses,
             onUpdate = {
                 vm.saveAutofillExclusions()
                 excludedPackages = AutofillExcludePref.excludedPackages(ctx)
@@ -1211,6 +1262,19 @@ fun SettingsScreen(
             Spacer(Modifier.height(8.dp))
         }
         if (contentMode == SettingsContentMode.TRANSFER) {
+            item(contentType = "devicesHistory") {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                ) {
+                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(uiText("设备与历史版本"), style = MaterialTheme.typography.titleMedium)
+                        Text(uiText("查看已认证设备与本机加密历史，选择条目恢复。"), style = MaterialTheme.typography.bodySmall)
+                        VaultActionButton(onClick = { showDevicesHistory = true }, style = VaultActionStyle.PRIMARY) { Text(uiText("查看设备与历史")) }
+                    }
+                }
+            }
             item(contentType = "transferOverview") {
                 PageHeaderCard(
                     title = stringResource(R.string.settings_remaining_sync_and_migration),
@@ -1374,7 +1438,7 @@ fun SettingsScreen(
                     uiText("自动填充排除"),
                     help = uiText("添加后，排除的应用或网站将不显示自动填充建议"),
                 )
-                val totalExcluded = excludedPackages.size + excludedHosts.size
+                val totalExcluded = excludedPackages.size + excludedHosts.size + excludedProcesses.size
                 SettingsOutlinedButton(
                     onClick = { showExclusionEditor = true },
                     modifier = Modifier.fillMaxWidth(),
@@ -1629,14 +1693,16 @@ fun SettingsScreen(
                 localBackupSnapshot.deviceLabel?.takeIf { it.isNotBlank() }?.let { device ->
                     Spacer(Modifier.height(SettingsSpacing.withinItem))
                     Text(
-                        device,
+                        uiBackupDeviceLabel(device),
+                        modifier = Modifier.fillMaxWidth(),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 if (localBackupEnabled) {
                     Text(
-                        localBackupStatus,
+                        uiText(localBackupStatus),
+                        modifier = Modifier.fillMaxWidth(),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -2142,6 +2208,7 @@ fun SettingsScreen(
                             } else {
                                 cloudEnabled = false
                                 cloudPrefs.edit().putBoolean(cloudKey("enabled"), false).apply()
+                                vm.checkRemoteUpdates()
                             }
                         },
                     )
@@ -2158,6 +2225,37 @@ fun SettingsScreen(
                         enabled = true,
                         onModeChange = { cloudProviderMode = it },
                     )
+                    Spacer(Modifier.height(SettingsSpacing.withinItem))
+                    val remoteUpdate = remoteUpdateStates[cloudProviderMode]
+                    val remoteAssociationAvailable = if (cloudProviderMode == "drive") cloudDiskUri.isNotBlank() else webDavAssociated
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text(uiText("检测远端更新"), style = MaterialTheme.typography.bodyMedium)
+                            Text(uiText("每5分钟检查一次，仅在保险库解锁且程序在前台时运行；只提醒，不会自动同步。"),
+                                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        VaultSwitch(checked = remoteUpdate?.enabled == true,
+                            enabled = remoteAssociationAvailable,
+                            onCheckedChange = { vm.setRemoteUpdateDetection(cloudProviderMode, it) })
+                    }
+                    if (remoteUpdate?.pending?.isNotBlank() == true) {
+                        Spacer(Modifier.height(SettingsSpacing.withinItem))
+                        Card(Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f))) {
+                            Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Text(uiText("远端有更新"), style = MaterialTheme.typography.titleSmall)
+                                Text(uiText("远端文件已变化，尚未同步到本机"), style = MaterialTheme.typography.bodySmall)
+                                if (remoteUpdate.detectedAt > 0L) {
+                                    val time = java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.SHORT, java.text.DateFormat.SHORT,
+                                        androidx.compose.ui.platform.LocalConfiguration.current.locales[0]).format(java.util.Date(remoteUpdate.detectedAt))
+                                    Text(uiText("发现时间：$time"), style = MaterialTheme.typography.bodySmall)
+                                }
+                                SettingsButton(onClick = { syncSelectedCloudTarget() },
+                                    enabled = remoteAssociationAvailable && !state.cloudSyncRunning && !cloudSyncBusy,
+                                    modifier = Modifier.fillMaxWidth()) { Text(uiText("立即同步")) }
+                                SettingsOutlinedButton(onClick = { vm.snoozeRemoteUpdate(cloudProviderMode) }) { Text(uiText("稍后处理")) }
+                            }
+                        }
+                    }
                     Spacer(Modifier.height(SettingsSpacing.withinItem))
                     // 与局域网同款切换逻辑：按当前模式条件渲染对应面板。
                     when (cloudProviderMode) {
@@ -2199,21 +2297,7 @@ fun SettingsScreen(
                         }
                         Spacer(Modifier.height(SettingsSpacing.withinItem))
                         VaultButton(
-                            onClick = {
-                                checkAssociatedCloudFile {
-                                    vm.syncCloudVault(android.net.Uri.parse(cloudDiskUri)) { success ->
-                                        if (success && cloudDiskTreeUri.isNotBlank()) {
-                                            checkAssociatedCloudFile(updateBaseline = true) {
-                                                vm.previewCloudVault(android.net.Uri.parse(cloudDiskUri), force = true) { cloudDiskPreview = it }
-                                            }
-                                        } else {
-                                            cloudDiskStatus = if (success) "ok" else "failed"
-                                            cloudPrefs.edit().putString(cloudKey("disk_status"), cloudDiskStatus).apply()
-                                            if (success) vm.previewCloudVault(android.net.Uri.parse(cloudDiskUri), force = true) { cloudDiskPreview = it }
-                                        }
-                                    }
-                                }
-                            },
+                            onClick = { syncSelectedCloudTarget() },
                             enabled = !state.cloudSyncRunning && !cloudSyncBusy,
                             modifier = Modifier.fillMaxWidth(),
                         ) { Text(uiText("同步")) }
@@ -2324,13 +2408,7 @@ fun SettingsScreen(
                         }
                         Spacer(Modifier.height(SettingsSpacing.withinItem))
                         VaultButton(
-                            onClick = {
-                                vm.syncWebDav { success ->
-                                    if (success) vm.previewWebDav(force = true) { webDavPreview = it }
-                                    webDavStatus = if (success) "ok" else "failed"
-                                    cloudPrefs.edit().putString(cloudKey("webdav_status"), webDavStatus).apply()
-                                }
-                            },
+                            onClick = { syncSelectedCloudTarget() },
                             enabled = !state.cloudSyncRunning && !cloudSyncBusy,
                             modifier = Modifier.fillMaxWidth(),
                         ) { Text(uiText("同步")) }
@@ -2460,7 +2538,7 @@ fun SettingsScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         if (autoSyncStatus.isNotBlank()) Text(
-                            uiText("状态：$autoSyncStatus"),
+                            uiText("状态：${uiCloudSyncStatus(autoSyncStatus)}"),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -3189,6 +3267,7 @@ private fun AutofillExclusionEditor(
     ctx: android.content.Context,
     excludedPackages: Set<String>,
     excludedHosts: Set<String>,
+    excludedProcesses: List<String>,
     onUpdate: () -> Unit,
     onBack: () -> Unit,
 ) {
@@ -3262,6 +3341,26 @@ private fun AutofillExclusionEditor(
                 }
 
                 Spacer(Modifier.height(12.dp))
+
+                if (excludedProcesses.isNotEmpty()) {
+                    Text(
+                        uiText("PC程序排除（随保险库同步）"),
+                        style = MaterialTheme.typography.titleSmall,
+                    )
+                    Column(
+                        Modifier.fillMaxWidth().heightIn(max = 120.dp)
+                            .verticalScroll(rememberScrollState()),
+                    ) {
+                        excludedProcesses.forEach { process ->
+                            Text(
+                                process,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(vertical = 4.dp),
+                            )
+                        }
+                    }
+                    Spacer(Modifier.height(12.dp))
+                }
 
                 val allExcluded = buildList {
                     excludedPackages.sorted().forEach { add("app" to it) }
@@ -4543,17 +4642,17 @@ private fun AppearanceSection(ctx: android.content.Context, embedded: Boolean = 
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(Modifier.height(8.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             ThemeChoice(
                 label = stringResource(R.string.settings_remaining_items),
                 selected = homeLayoutMode == HomeLayoutMode.ITEMS,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).fillMaxHeight(),
                 onClick = { HomeLayoutPref.set(ctx, HomeLayoutMode.ITEMS) },
             )
             ThemeChoice(
                 label = stringResource(R.string.settings_remaining_two_columns),
                 selected = homeLayoutMode == HomeLayoutMode.TWO_COLUMNS,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).fillMaxHeight(),
                 onClick = { HomeLayoutPref.set(ctx, HomeLayoutMode.TWO_COLUMNS) },
             )
         }
@@ -4562,12 +4661,21 @@ private fun AppearanceSection(ctx: android.content.Context, embedded: Boolean = 
 
 @Composable
 private fun ThemeChoice(label: String, selected: Boolean, modifier: Modifier, onClick: () -> Unit) {
-    SettingsOutlinedButton(onClick = onClick, modifier = modifier, centered = false) {
-        Text(label, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal)
-        if (selected) {
-            Spacer(Modifier.width(6.dp))
-            Box(Modifier.size(8.dp).background(MaterialTheme.colorScheme.primary, CircleShape))
-        }
+    VaultButton(
+        onClick = onClick,
+        modifier = modifier.heightIn(min = 52.dp),
+        variant = VaultButtonVariant.NEUTRAL,
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 12.dp),
+    ) {
+        Text(
+            label,
+            modifier = Modifier.weight(1f),
+            softWrap = true,
+            textAlign = TextAlign.Start,
+            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+        )
+        Spacer(Modifier.width(6.dp))
+        Box(Modifier.size(8.dp).background(if (selected) MaterialTheme.colorScheme.primary else Color.Transparent, CircleShape))
     }
 }
 
@@ -4954,6 +5062,16 @@ private fun CloudSyncPreviewSummary(preview: VaultViewModel.CloudSyncPreview) {
     }
     Column(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(title, style = MaterialTheme.typography.labelLarge, color = color)
+        preview.remoteWriter?.let { writer ->
+            Text(
+                uiText("已验证的远端写入设备") + ": " +
+                    listOf(writer.name.ifBlank { writer.deviceId }, writer.platform,
+                        if (writer.lastSeenAt > 0L) historyDisplayTime(writer.lastSeenAt) else uiText("活动时间未知"))
+                        .filter { it.isNotBlank() }.joinToString(" · "),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
         // PMVE 提交版本信息（不再展示文件修改时间）
         if (preview.localSequence > 0L || preview.remoteSequence > 0L) {
             val localVer = if (preview.localSequence > 0L) {

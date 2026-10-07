@@ -126,7 +126,7 @@ const features = zh
               kind: "primary",
               icon: "sync",
               title: "跨设备，同一个保险库",
-               body: "支持 WebDAV 与局域网同步，也能导入导出 .pmbak、.pmv 和 CSV。同步状态一目了然，多设备之间始终保持一致，不必去猜哪份才是最新。",
+               body: "支持 WebDAV 与局域网同步，以及加密备份与导入导出。可按云端目标开启远端更新提醒，先查看已验证的来源设备信息，再主动决定是否同步。",
               art: null,
           },
           {
@@ -140,7 +140,7 @@ const features = zh
               kind: "third",
               icon: "fill",
               title: "系统自动填充",
-               body: "借助 Android Autofill 服务，为登录条目提供填充与保存，并按应用包名或 HTTPS 主机匹配来源。",
+               body: "Android 与 PC 综合网址、关联应用、标题和关键词推荐候选，支持大小写与相近名称匹配、自定义字段和加密记忆关联；填充仍需通过来源校验。",
               art: "field",
           },
           {
@@ -163,7 +163,7 @@ const features = zh
               kind: "primary",
               icon: "sync",
               title: "One vault across devices",
-               body: "WebDAV and LAN sync, with import/export of .pmbak, .pmv, and CSV. Sync status is always visible and stays consistent across devices, so you never wonder which copy is the latest.",
+               body: "WebDAV and LAN synchronization, encrypted backups and import/export. Opt in to remote-update reminders, review verified source-device information, then decide when to synchronize.",
               art: null,
           },
           {
@@ -177,7 +177,7 @@ const features = zh
               kind: "third",
               icon: "fill",
               title: "System autofill",
-              body: "Android Autofill fills and saves login entries, matching each source by app package name or HTTPS host.",
+              body: "Android and PC rank candidates by website, linked app, title and keywords, including case-insensitive names and custom fields. Encrypted remembered associations retain origin checks.",
               art: "field",
           },
           {
@@ -195,6 +195,10 @@ const features = zh
               art: "otp",
           },
       ];
+
+features.push(zh
+    ? { kind: "third", icon: "vault", title: "加密本地历史", body: "自动或手动保留历史快照，固定重要版本并预览、选择条目恢复。恢复前保存安全快照；暂不恢复通行密钥或永久清除的条目。历史保留在本机。", art: null }
+    : { kind: "third", icon: "vault", title: "Encrypted local history", body: "Keep automatic or manual snapshots, pin important versions, preview and selectively restore entries. A safety snapshot comes first; passkeys and permanently purged entries are excluded. History stays local.", art: null });
 
 const productScreensBase = zh
     ? [

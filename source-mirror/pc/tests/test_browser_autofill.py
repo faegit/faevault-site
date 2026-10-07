@@ -60,7 +60,7 @@ def test_normalize_origin_rejects_untrusted_values(origin):
     assert caught.value.code == "INVALID_ORIGIN"
 
 
-def test_matching_entries_requires_exact_origin_and_login_password():
+def test_matching_entries_requires_exact_origin_and_fillable_login():
     entries = [
         Entry(id="exact", title="Exact", url="https://example.com/login", username="u", password="p"),
         Entry(id="sub", title="Sub", url="https://login.example.com", username="u", password="p"),
@@ -69,7 +69,7 @@ def test_matching_entries_requires_exact_origin_and_login_password():
         Entry(id="wifi", title="Wifi", url="https://example.com", password="p", secret_type=SecretType.WIFI),
     ]
 
-    assert [item.id for item in autofill.matching_entries(entries, "https://example.com")] == ["exact"]
+    assert [item.id for item in autofill.matching_entries(entries, "https://example.com")] == ["empty", "exact"]
 
 
 def test_parse_request_validates_action_specific_fields():

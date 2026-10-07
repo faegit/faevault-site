@@ -49,6 +49,8 @@ class HardcodedChineseGuardTest {
             "UiCopyExtra.kt",
             "NotificationLocalizer.kt",
             "CloudSyncUiProjection.kt",
+            // Matching stop words are locale-independent input data, never UI copy.
+            "AutofillMatchingPolicy.kt",
         )
         val cjkPattern = Pattern.compile("\"([^\"\\n]*[\\u4e00-\\u9fff][^\"\\n]*)\"")
         val wrapper = Regex(

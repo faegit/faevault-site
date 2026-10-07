@@ -51,3 +51,46 @@ assert.deepStrictEqual(
 );
 
 console.log("extension logic tests passed");
+
+const logic = context.VaultContentLogic;
+assert.strictEqual(logic.autofillRole({autocomplete: "section-login username"}), "username");
+assert.strictEqual(logic.autofillRole({autocomplete: "shipping postal-code", name: "email"}), "postal_code");
+assert.strictEqual(logic.autofillRole({labelText: "API Secret"}), "api_secret");
+assert.strictEqual(logic.autofillRole({name: "wifiPassword", type: "password"}), "wifi_password");
+assert.strictEqual(logic.autofillRole({name: "ＡＰＩＫｅｙ"}), "api_key");
+assert.strictEqual(logic.autofillRole({ariaLabelledByText: "Card holder"}), "cardholder");
+assert.strictEqual(logic.autofillRole({name: "monkey"}), null);
+assert.strictEqual(logic.autofillRole({name: "passwordResetSearch", type: "text"}), null);
+assert.strictEqual(logic.autofillRole({type: "password"}), "password");
+assert.strictEqual(logic.autofillRole({type: "password", autocomplete: "new-password"}), null);
+assert.strictEqual(logic.isOtpField({name: "adoption"}), false);
+assert.strictEqual(logic.selectUsernameField([{type: "text", name: "search"}, password], password), null);
+assert.strictEqual(logic.autofillRole({autocomplete: "section-a billing username webauthn", labelText: "Email"}), "username");
+assert.strictEqual(logic.autofillRole({autocomplete: "given-name", labelText: "API Secret"}), null);
+assert.strictEqual(logic.autofillRole({labelText: "Email", visible: false}), null);
+assert.strictEqual(logic.autofillRole({labelText: "Email", readOnly: true}), null);
+assert.strictEqual(logic.autofillRole({labelText: "Email", disabled: true}), null);
+assert.strictEqual(logic.autofillRole({name: "cardNumber"}), "card_number");
+assert.deepStrictEqual(JSON.parse(JSON.stringify(logic.selectFillPasswordFields([
+  {id: "normal", type: "password"},
+  {id: "wifi", type: "password", labelText: "WiFi Password"},
+  {id: "api", type: "password", labelText: "API Secret"},
+]).map((field) => field.id))), ["normal"]);
+console.log("unified field recognition tests passed");
+assert.strictEqual(logic.isMappableField({type: "text"}), true);
+for (const field of [
+  {disabled: true}, {readOnly: true}, {visible: false},
+  {autocomplete: "new-password"}, {autocomplete: "section-a given-name"},
+  {autocomplete: "username"}, {autocomplete: "section-a current-password"},
+]) {
+  assert.strictEqual(logic.isMappableField(field), false);
+}
+assert.strictEqual(logic.resolvedFieldRole({disabled: true}, {field: "password"}, "field"), null);
+assert.strictEqual(logic.resolvedFieldRole({readOnly: true}, {field: "password"}, "field"), null);
+assert.strictEqual(logic.resolvedFieldRole({autocomplete: "new-password"}, {field: "password"}, "field"), null);
+assert.strictEqual(logic.resolvedFieldRole({autocomplete: "given-name"}, {field: "password"}, "field"), null);
+assert.strictEqual(logic.resolvedFieldRole({autocomplete: "email"}, {field: "password"}, "field"), "email");
+assert.strictEqual(logic.resolvedFieldRole({labelText: "API Secret"}, {field: "password"}, "field"), "api_secret");
+assert.strictEqual(logic.resolvedFieldRole({autocomplete: "off"}, {field: "custom_secret"}, "field"), "custom_secret");
+assert.strictEqual(logic.resolvedFieldRole({}, {field: "invalid"}, "field"), null);
+assert.strictEqual(logic.resolvedFieldRole({}, {}, "toString"), null);

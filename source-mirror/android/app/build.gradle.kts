@@ -83,8 +83,8 @@ android {
         applicationId = "app.fae.vault"
         minSdk = 26          // Android 8.0：AES-GCM、BiometricPrompt 基线
         targetSdk = 35
-        versionCode = 466
-        versionName = "4.6.6"
+        versionCode = 467
+        versionName = "4.6.7"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // 显式声明支持语言，确保 lint 的 MissingTranslation 按正确方向检查（默认中文，英文为翻译）。
         resConfigs("zh-rCN", "en")

@@ -1,0 +1,17 @@
+# Autofill matching v2
+
+Approved and implemented 2026-10-06 for Android and PC.
+
+Discovery is separate from source authorization and field resolution. Candidates rank remembered explicit binding, exact source, same registrable site, then related non-secret name. All tiers are combined and deduplicated before presentation; bounded lists retain manual search. Name similarity never authorizes save/update or direct disclosure. Manual choices require user interaction; an existing mismatched application identity cannot be bypassed through search or field mappings.
+
+The shared name fixture `autofill_matching_v2_fixtures.json` specifies Unicode NFKC/case-insensitive matching, camel/script boundaries, whole words, bounded Chinese meaningful-name containment and generic-token rejection. Latin substring matching is not used. Android uses OkHttp's PSL and PC vendors the official offline PSL including private hosting boundaries. PSL versions can be updated independently; related-site classification is always a candidate, never origin authorization.
+
+Source collections include top-level URLs/apps, configured module bindings and `_autofill_bindings`. Login eligibility comes from actual resolved internal or explicitly linked fields, not nonempty top-level password. User-selected web bindings on PC retain full origin including port. Android cannot verify webpage port from AssistStructure; bindings with explicit nondefault ports cannot authorize host-only requests.
+
+Field detection prioritizes explicit standard hints and recognized roles, then optional remembered mappings for eligible unknown inputs. Read-only, disabled, new-password and unsupported declared standard browser fields cannot be overridden by a remembered mapping. Unknown input roles require explicit selection. Username/email resolution uses symmetric fallback, other roles remain exact. Sensitive roles retain verification requirements.
+
+Remembered associations and field mappings reside in encrypted Entry extension fields and travel with normal vault synchronization. `_autofill_field_mappings` rows use `{origin,field_key,role,updated_at,deleted}` with millisecond timestamps. Latest row wins per origin/key; deletion wins equal timestamp. Revocation records mapping tombstones. Platform-specific field signatures use only identifiers/layout information, never entered values. Browser signatures include exact origin, page path and unique input id/name/type; Android uses exact source plus layout signature because full page paths are unavailable. Windows uses executable path/signer plus UIA layout/id/name. Ambiguous or missing identifiers cannot be remembered.
+
+Explicit remember is optional and unchecked initially. One-shot choices do not create persistent trust. Approval is rechecked against entry/source revisions and exclusions before releasing data. HOTP advances only after successful PC field writes; existing Android Autofill lifecycle semantics remain unchanged.
+
+Tests cover shared names, module and linked-only entries, PSL wildcard/private boundaries, signer changes, stale selections, explicit confirmation, mapping isolation/tombstones, role compatibility and revocation. A real isolated Edge profile additionally exercises synthetic field filling and verifies readonly/disabled/new-password protection and preservation of pre-existing passwords when the selected item has no password.

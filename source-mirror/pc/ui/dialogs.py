@@ -4335,13 +4335,14 @@ class GeneratorDialog(widgets.ShadowDialog):
 class ProgramPickerDialog(widgets.ShadowDialog):
     """从当前运行进程中选择单个可执行文件。"""
 
-    def __init__(self, selected: str, parent=None):
-        super().__init__("选择关联程序", parent, width=420)
+    def __init__(self, selected: str, parent=None, *, title: str = "选择关联程序", verify_identity: bool = True):
+        super().__init__(title, parent, width=420)
+        self._verify_identity = verify_identity
         self.selected_program: str = selected.lower() if selected else ""
         self.selected_path = ""
         self.selected_signer_sha256 = ""
 
-        title = widgets.icon_text("选择关联程序", "key", object_name="DetailTitle", icon_size=24)
+        title = widgets.icon_text(title, "key", object_name="DetailTitle", icon_size=24)
         self.body.addWidget(title)
 
         sub = QLabel("从运行中的程序列表选择，或手动输入程序名称。")
@@ -4410,7 +4411,7 @@ class ProgramPickerDialog(widgets.ShadowDialog):
             self.selected_path = str(selected.data(Qt.UserRole + 1) or "")
             from core import native_autofill
 
-            self.selected_signer_sha256 = native_autofill.signer_certificate_sha256(self.selected_path)
+            self.selected_signer_sha256 = native_autofill.signer_certificate_sha256(self.selected_path) if self._verify_identity else ""
         else:
             manual = self._manual.text().strip().lower()
             self.selected_program = manual if manual else ""
@@ -4422,13 +4423,15 @@ class ProgramPickerDialog(widgets.ShadowDialog):
 class NativeAutofillPickerDialog(widgets.ShadowDialog):
     """选择一个关联登录条目，列表中不呈现密码。"""
 
-    def __init__(self, entries: list[Entry], process_name: str, parent=None, *, otp_sources: dict[str, Entry] | None = None, fallback: bool = False, can_save: bool = False, manual_focus: bool = False):
+    def __init__(self, entries: list[Entry], process_name: str, parent=None, *, otp_sources: dict[str, Entry] | None = None, fallback: bool = False, can_save: bool = False, manual_focus: bool = False, reasons: dict[str, str] | None = None, available_roles: dict[str, tuple[str, ...]] | None = None):
         super().__init__("原生程序自动填充", parent, width=430)
         self.setWindowFlag(Qt.WindowStaysOnTopHint, True)
         self.selected_entry: Entry | None = None
         self.action = "fill"
         self._otp_sources = otp_sources or {}
         self._manual_focus = manual_focus
+        self._reasons = reasons or {}
+        self._available_roles = available_roles
 
         self.body.addWidget(widgets.icon_text("选择要填充的账号", "key", object_name="DetailTitle", icon_size=24))
         target = QLabel(
@@ -4455,7 +4458,7 @@ class NativeAutofillPickerDialog(widgets.ShadowDialog):
             item = QListWidgetItem()
             item.setData(Qt.UserRole, entry)
             item.setIcon(widgets.category_icon(SecretType.LOGIN))
-            item.setSizeHint(QSize(0, 54))
+            item.setSizeHint(QSize(0, 72))
             self._list.addItem(item)
         if self._list.count():
             self._list.setCurrentRow(0)
@@ -4471,13 +4474,26 @@ class NativeAutofillPickerDialog(widgets.ShadowDialog):
             self._otp_timer.start()
 
         note = QLabel(
-            "当前程序未提供可识别的输入框。请先清空并聚焦目标输入框，再选择填账号或填密码；不会自动提交。"
+            "当前程序未提供可识别的输入框。选择内容后，请在 30 秒内点回并清空目标输入框，再按自动填充快捷键；不会自动提交。"
             if manual_focus else
             "填充账号、密码和已关联动态码，不会自动提交；HOTP 仅在动态码写入成功后推进。"
         )
         note.setObjectName("Empty")
         note.setWordWrap(True)
         self.body.addWidget(note)
+        self.remember_binding = QCheckBox(i18n.tr("记住此程序与条目的关联"))
+        self.body.addWidget(self.remember_binding)
+        self.remember_mapping = QCheckBox(i18n.tr("记住此输入框的字段类型"))
+        self.remember_mapping.setVisible(manual_focus)
+        self.body.addWidget(self.remember_mapping)
+        if manual_focus:
+            self._role_selector = QComboBox()
+            self.body.addWidget(self._role_selector)
+            self._manual_fill = QPushButton(i18n.tr("填入当前输入框"))
+            self._manual_fill.setObjectName("Primary")
+            self._manual_fill.clicked.connect(lambda: self._choose_manual(self._role_selector.currentData()))
+            self._list.currentItemChanged.connect(lambda *_: self._refresh_manual_roles())
+            self._refresh_manual_roles()
         buttons = QHBoxLayout()
         if can_save:
             create = QPushButton("新建当前账号")
@@ -4493,11 +4509,7 @@ class NativeAutofillPickerDialog(widgets.ShadowDialog):
         cancel.clicked.connect(self.reject)
         buttons.addWidget(cancel)
         if manual_focus:
-            for label, role in (("填账号到当前输入框", "username"), ("填密码到当前输入框", "password")):
-                button = QPushButton(label)
-                button.setObjectName("Primary" if role == "username" else "SettingsBtn")
-                button.clicked.connect(lambda _checked=False, selected=role: self._choose_manual(selected))
-                buttons.addWidget(button)
+            buttons.addWidget(self._manual_fill)
         else:
             fill = QPushButton("填充")
             fill.setObjectName("Primary")
@@ -4505,7 +4517,24 @@ class NativeAutofillPickerDialog(widgets.ShadowDialog):
             buttons.addWidget(fill)
         self.body.addLayout(buttons)
 
+    def _refresh_manual_roles(self) -> None:
+        from core.autofill_resolver import resolve_snapshot
+        from core.autofill_sources import AUTOFILL_ROLES
+        from .module_editor import AUTOFILL_ROLE_LABELS
+        self._role_selector.clear()
+        current = self._list.currentItem()
+        if current is not None:
+            entry = current.data(Qt.UserRole)
+            roles = (self._available_roles.get(entry.id, ()) if self._available_roles is not None
+                     else resolve_snapshot(entry, [entry, *self._otp_sources.values()]).values)
+            for role in AUTOFILL_ROLES:
+                if role in roles:
+                    self._role_selector.addItem(i18n.tr(AUTOFILL_ROLE_LABELS.get(role, role)), role)
+        self._manual_fill.setEnabled(self._role_selector.count() > 0)
+
     def _choose_manual(self, role: str) -> None:
+        if not role or self._role_selector.findData(role) < 0:
+            return
         self.action = f"manual_{role}"
         self.accept()
 
@@ -4515,15 +4544,16 @@ class NativeAutofillPickerDialog(widgets.ShadowDialog):
             entry = item.data(Qt.UserRole)
             title = entry.title.strip() or "未命名登录"
             account = entry.username.strip() or "未填写账号"
+            reason = i18n.tr({"confirmed": "已记住关联", "exact": "程序匹配", "name": "名称相关", "manual": "手动搜索"}.get(self._reasons.get(entry.id), "程序匹配"))
             source = self._otp_sources.get(entry.id)
             if source is None:
-                item.setText(f"{title}\n{account}")
+                item.setText(f"{title}\n{account}\n{reason}")
                 continue
             fields = otp.normalize_fields(source.otp_fields())
             code = otp.code_from_fields(fields)
             grouped = " ".join(code[i : i + 3] for i in range(0, len(code), 3))
             timing = "填充后计数 +1" if fields.get("type") == "hotp" else f"{otp.seconds_remaining(fields)}s"
-            item.setText(f"{title}\n{account}  ·  动态码 {grouped}  ·  {timing}")
+            item.setText(f"{title}\n{account}  ·  {i18n.tr('动态码')} {grouped}  ·  {timing}\n{reason}")
 
     def _filter_entries(self, value: str) -> None:
         query = value.strip().casefold()
@@ -4568,7 +4598,7 @@ class NativeAutofillPickerDialog(widgets.ShadowDialog):
         super().accept()
 
     def accept(self) -> None:
-        if self._manual_focus and self.action not in {"manual_username", "manual_password"}:
+        if self._manual_focus and (not self.action.startswith("manual_") or self._role_selector.findData(self.action.removeprefix("manual_")) < 0):
             return
         current = self._list.currentItem()
         if current is None:
@@ -4578,7 +4608,7 @@ class NativeAutofillPickerDialog(widgets.ShadowDialog):
 
 
 class NativeAutofillExcludeDialog(widgets.ShadowDialog):
-    """管理原生自动填充排除清单（按进程名，与安卓端按包名排除的行为一致）。"""
+    """统一管理程序、网站与同步的安卓应用排除项。"""
 
     def __init__(self, parent=None, *, vault=None):
         super().__init__(i18n.tr("自动填充排除"), parent, width=480, simple_close=True)
@@ -4589,14 +4619,14 @@ class NativeAutofillExcludeDialog(widgets.ShadowDialog):
         self.body.addWidget(
             widgets.icon_text(i18n.tr("自动填充排除"), "security", object_name="DetailTitle", icon_size=24)
         )
-        note = QLabel(i18n.tr("分别管理原生程序和网站；排除后不会显示对应的自动填充建议。"))
+        note = QLabel(i18n.tr("添加排除项后，对应目标将不再显示自动填充建议。"))
         note.setObjectName("SettingNote")
         note.setWordWrap(True)
         self.body.addWidget(note)
 
         input_row = QHBoxLayout()
         self._input = QLineEdit()
-        self._input.setPlaceholderText(i18n.tr("输入程序名，例如 chrome.exe"))
+        self._input.setPlaceholderText(i18n.tr("输入排除项，例如 chrome.exe 或 example.com"))
         self._input.returnPressed.connect(self._add_from_input)
         input_row.addWidget(self._input, 1)
         add_btn = QPushButton(i18n.tr("添加"))
@@ -4605,11 +4635,11 @@ class NativeAutofillExcludeDialog(widgets.ShadowDialog):
         input_row.addWidget(add_btn)
         self.body.addLayout(input_row)
 
-        fg_btn = QPushButton(i18n.tr("添加当前前台程序"))
-        fg_btn.setObjectName("SettingsBtn")
-        fg_btn.setToolTip(i18n.tr("将当前处于前台的程序加入排除清单"))
-        fg_btn.clicked.connect(self._add_foreground)
-        self.body.addWidget(fg_btn)
+        self._choose_program = QPushButton(i18n.tr("从运行中的程序选择…"))
+        self._choose_program.setObjectName("SettingsBtn")
+        self._choose_program.setToolTip(i18n.tr("选择正在运行的程序，包含后台程序"))
+        self._choose_program.clicked.connect(self._select_running_program)
+        self.body.addWidget(self._choose_program)
 
         self._list_container = QScrollArea()
         self._list_container.setWidgetResizable(True)
@@ -4623,32 +4653,11 @@ class NativeAutofillExcludeDialog(widgets.ShadowDialog):
         self._list_container.setWidget(list_host)
         self.body.addWidget(self._list_container)
 
-        self._empty = QLabel(i18n.tr("暂未排除任何程序"))
+        self._empty = QLabel(i18n.tr("暂未添加排除项"))
         self._empty.setObjectName("SettingNote")
         self._empty.setAlignment(Qt.AlignCenter)
         self.body.addWidget(self._empty)
 
-        site_title = QLabel("网站排除")
-        site_title.setObjectName("SettingGroup")
-        self.body.addWidget(site_title)
-        site_row = QHBoxLayout()
-        self._site_input = QLineEdit()
-        self._site_input.setPlaceholderText("输入网站，例如 example.com")
-        self._site_input.returnPressed.connect(self._add_site)
-        site_row.addWidget(self._site_input, 1)
-        site_add = QPushButton("添加")
-        site_add.setObjectName("SettingsBtn")
-        site_add.clicked.connect(self._add_site)
-        site_row.addWidget(site_add)
-        self.body.addLayout(site_row)
-        self._site_list = QListWidget()
-        self._site_list.setFrameShape(QFrame.NoFrame)
-        self._site_list.setMaximumHeight(140)
-        self.body.addWidget(self._site_list)
-        site_remove = QPushButton("移除所选网站")
-        site_remove.setObjectName("SettingsBtn")
-        site_remove.clicked.connect(self._remove_site)
-        self.body.addWidget(site_remove)
 
         self._hint = QLabel()
         self._hint.setObjectName("SettingDangerNote")
@@ -4658,17 +4667,20 @@ class NativeAutofillExcludeDialog(widgets.ShadowDialog):
         self._reload()
 
     def _excluded(self) -> list[str]:
+        if self._vault is not None:
+            return list(self._vault.autofill_exclusions["processes"])
         return [str(name) for name in (config.get("native_autofill_excluded", []) or [])]
 
     def _save(self, values: list[str]) -> bool:
         return self._save_category("processes", "native_autofill_excluded", values)
 
-    def _save_category(self, category: str, key: str, values: list[str]) -> bool:
+    def _save_category(self, category: str, key: str | None, values: list[str]) -> bool:
         try:
             if self._vault is not None:
                 self._vault.set_autofill_exclusions(category, values)
                 values = self._vault.autofill_exclusions[category]
-            config.set(key, sorted(set(values)))
+            if key is not None:
+                config.set(key, sorted(set(values)))
         except Exception as exc:
             self._warn(f"保存排除项失败：{exc}")
             return False
@@ -4686,26 +4698,48 @@ class NativeAutofillExcludeDialog(widgets.ShadowDialog):
             item = self._list_lay.takeAt(0)
             if w := item.widget():
                 w.deleteLater()
-        values = self._excluded()
-        for name in values:
+        exclusions = [
+            ("processes", name) for name in self._excluded()
+        ] + [
+            ("hosts", name) for name in self._excluded_sites()
+        ] + [
+            ("packages", name)
+            for name in (self._vault.autofill_exclusions["packages"] if self._vault is not None else [])
+        ]
+        for category, name in sorted(exclusions, key=lambda item: (item[1].casefold(), item[0])):
             row = QWidget()
+            row.setProperty("exclusion_category", category)
+            row.setProperty("exclusion_value", name)
             row_lay = QHBoxLayout(row)
             row_lay.setContentsMargins(0, 0, 0, 0)
             row_lay.setSpacing(8)
             label = QLabel(name)
             label.setTextInteractionFlags(Qt.TextSelectableByMouse)
             row_lay.addWidget(label, 1)
-            remove = QPushButton()
-            remove.setObjectName("SettingsBtn")
-            remove.setFixedSize(30, 30)
-            remove.setToolTip(i18n.tr("移除排除项"))
-            remove.clicked.connect(lambda _checked=False, value=name: self._remove(value))
+            remove = widgets.icon_only_button(
+                "close", i18n.tr("移除排除项"), size=16, width=30, height=30,
+            )
+            remove.setAccessibleName(i18n.tr("移除排除项") + " " + name)
+            remove.clicked.connect(lambda _checked=False, c=category, value=name: self._remove_exclusion(c, value))
             row_lay.addWidget(remove)
             self._list_lay.addWidget(row)
-        self._empty.setVisible(not values)
-        self._list_container.setVisible(bool(values))
-        self._site_list.clear()
-        self._site_list.addItems(self._excluded_sites())
+        self._empty.setVisible(not exclusions)
+        self._list_container.setVisible(bool(exclusions))
+
+    def _remove_exclusion(self, category: str, value: str) -> None:
+        key = {"processes": "native_autofill_excluded", "hosts": "browser_autofill_excluded_hosts", "packages": None}[category]
+        if category == "processes":
+            values = self._excluded()
+        elif category == "hosts":
+            values = self._excluded_sites()
+        elif self._vault is not None:
+            values = list(self._vault.autofill_exclusions["packages"])
+        else:
+            return
+        if not self._save_category(category, key, [name for name in values if name != value]):
+            return
+        self._clear_hint()
+        self._reload()
 
     def _add(self, value: str) -> None:
         from core import native_autofill
@@ -4726,16 +4760,16 @@ class NativeAutofillExcludeDialog(widgets.ShadowDialog):
         self._reload()
 
     def _add_from_input(self) -> None:
-        self._add(self._input.text())
+        value = self._input.text().strip()
+        if "://" not in value and value.strip('"').lower().endswith(".exe"):
+            self._add(value)
+        else:
+            self._add_site(value)
 
-    def _add_foreground(self) -> None:
-        from core import window_tracker
-
-        name = window_tracker.foreground_process_name()
-        if not name:
-            self._warn(i18n.tr("无法获取当前前台程序，请先切换到目标程序再重试"))
-            return
-        self._add(name)
+    def _select_running_program(self) -> None:
+        dialog = ProgramPickerDialog("", self, title="选择排除程序", verify_identity=False)
+        if dialog.exec() == QDialog.Accepted and dialog.selected_program:
+            self._add(dialog.selected_program)
 
     def _remove(self, value: str) -> None:
         values = [item for item in self._excluded() if item != value]
@@ -4745,14 +4779,16 @@ class NativeAutofillExcludeDialog(widgets.ShadowDialog):
         self._reload()
 
     def _excluded_sites(self) -> list[str]:
+        if self._vault is not None:
+            return list(self._vault.autofill_exclusions["hosts"])
         return [str(host) for host in (config.get("browser_autofill_excluded_hosts", []) or [])]
 
-    def _add_site(self) -> None:
+    def _add_site(self, value: str) -> None:
         from core.browser_autofill import normalize_excluded_host
 
-        host = normalize_excluded_host(self._site_input.text())
+        host = normalize_excluded_host(value)
         if not host:
-            self._warn("请输入有效的网站域名，不支持 IP 地址")
+            self._warn(i18n.tr("请输入程序名（如 chrome.exe）或有效的网站域名"))
             return
         values = self._excluded_sites()
         if host in values:
@@ -4760,20 +4796,7 @@ class NativeAutofillExcludeDialog(widgets.ShadowDialog):
             return
         if not self._save_category("hosts", "browser_autofill_excluded_hosts", sorted({*values, host})):
             return
-        self._site_input.clear()
-        self._clear_hint()
-        self._reload()
-
-    def _remove_site(self) -> None:
-        current = self._site_list.currentItem()
-        if current is None:
-            return
-        host = current.text()
-        if not self._save_category(
-            "hosts", "browser_autofill_excluded_hosts",
-            [value for value in self._excluded_sites() if value != host],
-        ):
-            return
+        self._input.clear()
         self._clear_hint()
         self._reload()
 

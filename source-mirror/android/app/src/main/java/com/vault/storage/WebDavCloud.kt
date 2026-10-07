@@ -269,6 +269,20 @@ object WebDavCloud {
         }
     }
 
+    /** Read-only detector probe: never falls back to GET or downloads vault contents. */
+    fun metadataOnly(config: WebDavConfig): WebDavMetadata {
+        validate(config)
+        execute(config, "HEAD", config.fileUrl, retry = true).use { response ->
+            if (response.code in setOf(405, 501)) return WebDavMetadata(true, -1L, 0L, null)
+            if (response.code == 404) return WebDavMetadata(false, -1L, 0L, null)
+            checkResponse(response.code, allowMissing = true)
+            return WebDavMetadata(true,
+                response.header("Content-Length")?.toLongOrNull() ?: -1L,
+                response.header("Last-Modified")?.let(::parseHttpDate) ?: 0L,
+                strongEtag(response))
+        }
+    }
+
     fun metadata(config: WebDavConfig): WebDavMetadata {
         validate(config)
         val head = metadata(config, config.fileUrl, allowMissing = true)

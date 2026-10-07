@@ -177,6 +177,14 @@ class VaultViewModel(app: Application) : AndroidViewModel(app) {
     private var automaticLeakJob: Job? = null
     private var postUnlockJob: Job? = null
     private var autoCloudSyncJob: Job? = null
+    private var remoteUpdateJob: Job? = null
+    private var remoteUpdateOperationGeneration = 0L
+    private var remoteUpdatePaused = false
+    private val remoteUpdateMutex = kotlinx.coroutines.sync.Mutex()
+    private data class RemoteUpdateProof(val session: VaultSessionFence.Token, val association: String, val version: String, val consumedVersion: String = "")
+    private val remoteUpdateProofs = java.util.concurrent.ConcurrentHashMap<String, RemoteUpdateProof>()
+    private val _remoteUpdateStates = MutableStateFlow<Map<String, com.vault.storage.RemoteUpdateState>>(emptyMap())
+    val remoteUpdateStates: StateFlow<Map<String, com.vault.storage.RemoteUpdateState>> = _remoteUpdateStates.asStateFlow()
     private var cloudDiskOperationJob: Job? = null
     private var webDavOperationJob: Job? = null
     private val vaultSessionJobs = java.util.concurrent.ConcurrentHashMap.newKeySet<Job>()
@@ -540,6 +548,42 @@ class VaultViewModel(app: Application) : AndroidViewModel(app) {
     private fun captureVaultSession(): VaultSessionFence.Token =
         vaultSessionFence.capture(_currentVault.value)
 
+    private suspend fun <T> historyOperation(block: (VaultRepository, ByteArray) -> T): T {
+        val token = captureVaultSession()
+        return vaultOperationMutex.withLock {
+            requireVaultSessionCurrent(token)
+            val repository = repo() ?: error(localizeUiTextFor(getApplication(), "请先解锁保险库"))
+            val credential = _state.value.rootKey ?: error(localizeUiTextFor(getApplication(), "请先解锁保险库"))
+            withContext(Dispatchers.IO) {
+                requireVaultSessionCurrent(token)
+                credential.withRootKey(credential.identity) { key -> block(repository, key) }
+            }.also { requireVaultSessionCurrent(token) }
+        }
+    }
+
+    suspend fun deviceProfiles(): List<com.vault.storage.DeviceActivityProfile> = historyOperation { r, key -> r.deviceProfiles(key) }
+    suspend fun renameDevice(name: String) { historyOperation { r, key -> r.renameDevice(key, name) } }
+    suspend fun currentCommitSequence(): Long = historyOperation { r, key -> r.currentIdentity(key).sequence }
+    suspend fun listHistory(): List<com.vault.storage.VaultHistoryRecord> = historyOperation { r, key -> r.listHistory(key) }
+    suspend fun createHistorySnapshot(): com.vault.storage.VaultHistoryRecord = historyOperation { r, key -> r.createHistorySnapshot(key) }
+    suspend fun previewHistory(recordId: String, password: String? = null): com.vault.storage.VaultHistoryPreview {
+        val bytes = password?.toByteArray(Charsets.UTF_8)
+        return try { historyOperation { r, key -> r.previewHistory(key, recordId, bytes) } } finally { bytes?.fill(0) }
+    }
+    suspend fun restoreHistory(preview: com.vault.storage.VaultHistoryPreview, ids: Set<String>, password: String? = null) {
+        val bytes = password?.toByteArray(Charsets.UTF_8)
+        val token = captureVaultSession()
+        try {
+            historyOperation { r, key ->
+                val opened = r.restoreHistory(key, preview, ids, bytes, beforeWrite = { requireVaultSessionCurrent(token) })
+                try {
+                    requireVaultSessionCurrent(token)
+                    check(publishPayloadForSession(token, opened.payload)) { localizeUiTextFor(getApplication(), "保险库会话已变化") }
+                } finally { opened.rootKey?.fill(0) }
+            }
+        } finally { bytes?.fill(0) }
+    }
+
     private fun isVaultSessionCurrent(token: VaultSessionFence.Token): Boolean =
         vaultSessionFence.isCurrent(token, _currentVault.value)
 
@@ -569,6 +613,10 @@ class VaultViewModel(app: Application) : AndroidViewModel(app) {
 
     /** 仅停止依赖当前已解锁保险库的任务；用户显式开启的局域网内容传输继续运行。 */
     private fun invalidateVaultSession() {
+        remoteUpdateProofs.clear()
+        remoteUpdateJob?.cancel()
+        remoteUpdateJob = null
+        _remoteUpdateStates.value = emptyMap()
         vaultSessionFence.invalidate()
 
         // 待确认的跨账户导入持有 A 库的明文条目，锁定/切库/删除时立即销毁（H-10）：
@@ -3570,6 +3618,10 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
     }
 
     fun pauseBackgroundWork() {
+        remoteUpdatePaused = true
+        remoteUpdateOperationGeneration++
+        remoteUpdateJob?.cancel()
+        remoteUpdateJob = null
         autoCloudSyncJob?.cancel()
         autoCloudSyncJob = null
         postUnlockJob?.cancel()
@@ -3584,6 +3636,7 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
     }
 
     private fun restartAutoCloudSync() {
+        restartRemoteUpdateDetection()
         autoCloudSyncJob?.cancel()
         autoCloudSyncJob = null
         if (_state.value.phase != Phase.UNLOCKED) return
@@ -3593,6 +3646,121 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
                 delay(60_000L)
             }
         }
+    }
+
+    private fun restartRemoteUpdateDetection() {
+        remoteUpdateJob?.cancel()
+        if (_state.value.phase != Phase.UNLOCKED) return
+        remoteUpdatePaused = false
+        reloadRemoteUpdateStates()
+        remoteUpdateJob = viewModelScope.launch {
+            while (_state.value.phase == Phase.UNLOCKED) {
+                checkRemoteUpdates().join()
+                delay(60_000L)
+            }
+        }
+    }
+
+    private fun reloadRemoteUpdateStates() {
+        _remoteUpdateStates.value = listOf("drive", "webdav").associateWith {
+            com.vault.storage.RemoteUpdatePrefs.load(getApplication(), vaultName(), it)
+        }
+    }
+
+    fun setRemoteUpdateDetection(target: String, enabled: Boolean) {
+        if (target !in listOf("drive", "webdav") || _state.value.phase != Phase.UNLOCKED) return
+        val state = com.vault.storage.RemoteUpdatePrefs.load(getApplication(), vaultName(), target)
+        com.vault.storage.RemoteUpdatePrefs.save(getApplication(), vaultName(), target,
+            state.copy(enabled = enabled, pending = if (enabled) state.pending else "", detectedAt = if (enabled) state.detectedAt else 0))
+        reloadRemoteUpdateStates()
+        if (!enabled) RemoteUpdateNotifications.cancel(getApplication(), vaultName(), target)
+        else checkRemoteUpdates(target)
+    }
+
+    fun snoozeRemoteUpdate(target: String) {
+        RemoteUpdateNotifications.cancel(getApplication(), vaultName(), target)
+    }
+
+    private data class RemoteAssociation(val identity: String, val uri: Uri? = null, val config: WebDavConfig? = null)
+    private fun remoteAssociation(target: String): RemoteAssociation? {
+        if (_state.value.phase != Phase.UNLOCKED) return null
+        if (target == "drive") {
+            val prefs = com.vault.security.SecurePreferences.get(getApplication(), "cloud_sync")
+            val value = prefs.getString("uri_${AutoCloudSyncPrefs.suffix(cloudVaultKey())}", "").orEmpty()
+            return value.takeIf { it.isNotBlank() }?.let { RemoteAssociation(it, Uri.parse(it)) }
+        }
+        val config = loadCloudConfig() ?: return null
+        // Keep credential material out of persisted association keys.
+        val hash = java.security.MessageDigest.getInstance("SHA-256")
+            .digest(config.toString().toByteArray()).joinToString("") { "%02x".format(it) }
+        return RemoteAssociation(hash, config = config)
+    }
+
+    fun checkRemoteUpdates(target: String? = null, force: Boolean = false): Job = viewModelScope.launch {
+        if (remoteUpdatePaused || !remoteUpdateMutex.tryLock()) return@launch
+        try {
+            val token = captureVaultSession()
+            val vault = vaultName()
+            val cloudPrefs = com.vault.security.SecurePreferences.get(getApplication(), "cloud_sync")
+            if (!cloudPrefs.getBoolean("enabled_${AutoCloudSyncPrefs.suffix(cloudVaultKey())}", false)) {
+                listOf("drive", "webdav").forEach { RemoteUpdateNotifications.cancel(getApplication(), vault, it) }
+                return@launch
+            }
+            for (key in listOf("drive", "webdav").filter { target == null || it == target }) {
+                if (_state.value.phase != Phase.UNLOCKED || !isVaultSessionCurrent(token) ||
+                    _state.value.cloudSyncRunning || _cloudSyncState.value.phase == CloudSyncPhase.RUNNING ||
+                    cloudDiskOperationJob?.isActive == true || webDavOperationJob?.isActive == true) return@launch
+                val association = remoteAssociation(key)
+                if (association == null) {
+                    com.vault.storage.RemoteUpdatePrefs.associate(getApplication(), vault, key, "")
+                    RemoteUpdateNotifications.cancel(getApplication(), vault, key)
+                    continue
+                }
+                com.vault.storage.RemoteUpdatePrefs.associate(getApplication(), vault, key, association.identity)
+                val state = com.vault.storage.RemoteUpdatePrefs.load(getApplication(), vault, key)
+                if (state.pending.isBlank()) RemoteUpdateNotifications.cancel(getApplication(), vault, key)
+                val now = System.currentTimeMillis()
+                if (!state.enabled || (!force && now - state.lastCheckedAt in 0 until 300_000L)) continue
+                com.vault.storage.RemoteUpdatePrefs.save(getApplication(), vault, key, state.copy(lastCheckedAt = now))
+                val operationGeneration = remoteUpdateOperationGeneration
+                val version = runCatching { withContext(Dispatchers.IO) {
+                    val metadata = if (key == "drive") CloudTreeStorage.metadata(getApplication(), association.uri!!).toCloudFileVersion()
+                        else WebDavCloud.metadataOnly(association.config!!).toCloudFileVersion()
+                    com.vault.storage.RemoteUpdatePolicy.version(metadata)
+                } }.getOrNull()
+                if (!isVaultSessionCurrent(token) || _state.value.phase != Phase.UNLOCKED ||
+                    !cloudPrefs.getBoolean("enabled_${AutoCloudSyncPrefs.suffix(cloudVaultKey())}", false) ||
+                    remoteAssociation(key)?.identity != association.identity || !com.vault.storage.RemoteUpdatePolicy.mayAcceptObservation(operationGeneration, remoteUpdateOperationGeneration, remoteUpdatePaused) || _state.value.cloudSyncRunning ||
+                    _cloudSyncState.value.phase == CloudSyncPhase.RUNNING) continue
+                val current = com.vault.storage.RemoteUpdatePrefs.load(getApplication(), vault, key)
+                if (!current.enabled || version == null) continue
+                val observation = com.vault.storage.RemoteUpdatePolicy.observe(current, version, now)
+                if (observation.state.pending.isNotBlank() && observation.state.pending != current.pending) cloudPreviewCache.invalidate(key)
+                com.vault.storage.RemoteUpdatePrefs.save(getApplication(), vault, key, observation.state)
+                if (observation.state.pending.isBlank()) RemoteUpdateNotifications.cancel(getApplication(), vault, key)
+                if (observation.notify) RemoteUpdateNotifications.show(getApplication(), vault, key, now)
+            }
+            if (isVaultSessionCurrent(token) && _state.value.phase == Phase.UNLOCKED) reloadRemoteUpdateStates()
+        } finally { remoteUpdateMutex.unlock() }
+    }
+
+    private fun rememberRemoteUpdateProof(target: String, association: String, metadata: CloudFileVersion, consumedMetadata: CloudFileVersion? = null, consumedVersion: String = "") {
+        val version = com.vault.storage.RemoteUpdatePolicy.version(metadata) ?: return
+        remoteUpdateProofs[target] = RemoteUpdateProof(captureVaultSession(), association, version,
+            consumedVersion.ifBlank { consumedMetadata?.let(com.vault.storage.RemoteUpdatePolicy::version).orEmpty() })
+    }
+
+    private fun acknowledgeRemoteUpdate(target: String) {
+        val proof = remoteUpdateProofs.remove(target) ?: return
+        if (_state.value.phase != Phase.UNLOCKED || !isVaultSessionCurrent(proof.session) ||
+            remoteAssociation(target)?.identity != proof.association) return
+        val vault = vaultName()
+        com.vault.storage.RemoteUpdatePrefs.associate(getApplication(), vault, target, proof.association)
+        val state = com.vault.storage.RemoteUpdatePrefs.load(getApplication(), vault, target)
+        val acknowledged = com.vault.storage.RemoteUpdatePolicy.acknowledge(state, proof.version, proof.consumedVersion)
+        com.vault.storage.RemoteUpdatePrefs.save(getApplication(), vault, target, acknowledged)
+        reloadRemoteUpdateStates()
+        if (acknowledged.pending.isBlank()) RemoteUpdateNotifications.cancel(getApplication(), vault, target)
     }
 
     private suspend fun runAutoCloudSyncIfDue() {
@@ -4541,6 +4709,7 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
 
     fun overwriteCloudVault(uri: Uri, onResult: (Boolean) -> Unit = {}): Job {
         val sessionToken = captureVaultSession()
+        val dismissedVersion = if (remoteAssociation("drive")?.uri == uri) com.vault.storage.RemoteUpdatePrefs.load(getApplication(), vaultName(), "drive").pending else ""
         val job = viewModelScope.launch {
             if (!isVaultSessionCurrent(sessionToken)) return@launch
             val r = repo() ?: run { onResult(false); return@launch }
@@ -4573,6 +4742,18 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
                                 val before = runCatching { CloudTreeStorage.metadata(getApplication(), uri) }.getOrNull()
                                 writeCloudFile(uri, snapshot)
                                 val remoteModifiedAt = verifyCloudWrite(uri, snapshot.length(), before?.lastModified ?: 0L)
+                                val proofFile = newCloudTempFile("overwrite-proof")
+                                try {
+                                    val observed = runCatching { CloudTreeStorage.metadata(getApplication(), uri).toCloudFileVersion() }.getOrNull()
+                                    require(readCloudFileTo(uri, proofFile) > 0L) { localizeUiTextFor(getApplication(), "远端读回文件为空") }
+                                    val root = _state.value.rootKey ?: error(localizeUiTextFor(getApplication(), "保险库会话已失效"))
+                                    root.withRootKey(root.identity) { key ->
+                                        require(r.authenticateExternalFileWithDeviceKey(snapshot, key).identity ==
+                                            r.authenticateExternalFileWithDeviceKey(proofFile, key).identity) { localizeUiTextFor(getApplication(), "远端读回内容与上传不一致") }
+                                    }
+                                    val after = runCatching { CloudTreeStorage.metadata(getApplication(), uri).toCloudFileVersion() }.getOrNull()
+                                    if (observed != null && after != null && observed.matches(after)) rememberRemoteUpdateProof("drive", uri.toString(), observed, consumedVersion = dismissedVersion)
+                                } finally { proofFile.delete() }
                                 if (remoteModifiedAt > 0L) r.syncFile().setLastModified(remoteModifiedAt)
                             } finally {
                                 snapshot.delete()
@@ -4586,9 +4767,9 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
                     SyncForegroundService.succeedTask(
                         getApplication(),
                         CLOUD_DRIVE_UPLOAD_TASK_ID,
-                        localizeUiTextFor(getApplication(), "文件已写入；已按远端修改时间和大小确认，不再下载解密校验"),
+                        localizeUiTextFor(getApplication(), "已写入云端并通过读回校验"),
                     )
-                    emitInfo("文件已写入；已按远端修改时间和大小确认，不再下载解密校验")
+                    emitInfo(localizeUiTextFor(getApplication(), "已写入云端并通过读回校验"))
                     onResult(true)
                 }.onFailure {
                     if (it is kotlinx.coroutines.CancellationException || !isVaultSessionCurrent(sessionToken)) {
@@ -4687,8 +4868,10 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
                     val remoteFile = newCloudTempFile("download")
                     try {
                         require(readCloudFileTo(uri, remoteFile) > 0L) { "云端保险库文件为空" }
+                        val downloadedVersion = runCatching { CloudTreeStorage.metadata(getApplication(), uri).toCloudFileVersion() }.getOrNull()
                         replaceCurrentFromRemoteFile(r, local, remoteFile).also {
                             if (remoteMetadata.lastModified > 0L) r.syncFile().setLastModified(remoteMetadata.lastModified)
+                            if (downloadedVersion != null && remoteMetadata.toCloudFileVersion().matches(downloadedVersion)) rememberRemoteUpdateProof("drive", uri.toString(), downloadedVersion)
                         }
                     } finally {
                         remoteFile.delete()
@@ -4810,6 +4993,7 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
                             // 锁外：元数据 + 下载（纯网络/临时文件，不触碰保险库文件）
                             val remoteMetadata = CloudTreeStorage.metadata(getApplication(), uri)
                             remoteByteCount = readCloudFileTo(uri, remoteFile)
+                            val downloadedVersion = runCatching { CloudTreeStorage.metadata(getApplication(), uri).toCloudFileVersion() }.getOrNull()
                             var local: VaultPayload? = null
                             // 锁内：本地快照、远端认证、谱系分类与可立即完成的安装
                             val (action, statePayloadBefore) = vaultOperationMutex.withLock {
@@ -4835,6 +5019,7 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
                             }
                             if (action is CloudSyncAction.Completed) {
                                 val result = action.result
+                                if (downloadedVersion != null && remoteAssociation("drive")?.uri == uri && remoteMetadata.toCloudFileVersion().matches(downloadedVersion)) rememberRemoteUpdateProof("drive", uri.toString(), downloadedVersion)
                                 syncStats = result.stats
                                 keyConvergence = result.keyConvergence
                                 if (result.payload !== local) savedPayload = result.payload
@@ -5432,9 +5617,12 @@ PmvELineageRelation.REMOTE_STALE -> {
             for (waitMs in CLOUD_CONTENT_READBACK_DELAYS_MS) {
                 if (waitMs > 0L) Thread.sleep(waitMs)
                 val attempt = runCatching {
+                    val observed = runCatching { CloudTreeStorage.metadata(getApplication(), uri).toCloudFileVersion() }.getOrNull()
                     require(readCloudFileTo(uri, verification) > 0L) { "云端回读文件为空" }
                     val verified = repository.authenticateExternalFileWithDeviceKey(verification, rootKey)
                     require(verified.identity == expectedIdentity) { "云端仍返回写入前版本" }
+                    val after = runCatching { CloudTreeStorage.metadata(getApplication(), uri).toCloudFileVersion() }.getOrNull()
+                    if (observed != null && after != null && observed.matches(after)) rememberRemoteUpdateProof("drive", uri.toString(), observed, expectedRemote)
                 }
                 if (attempt.isSuccess) {
                     matched = true
@@ -5504,9 +5692,12 @@ PmvELineageRelation.REMOTE_STALE -> {
             for (waitMs in CLOUD_CONTENT_READBACK_DELAYS_MS) {
                 if (waitMs > 0L) Thread.sleep(waitMs)
                 val attempt = runCatching {
+                    val observed = runCatching { WebDavCloud.metadataOnly(config).toCloudFileVersion() }.getOrNull()
                     WebDavCloud.downloadTo(config, verification)
                     val verified = repository.authenticateExternalFileWithDeviceKey(verification, rootKey)
                     require(verified.identity == expectedIdentity) { "WebDAV 仍返回写入前版本" }
+                    val after = runCatching { WebDavCloud.metadataOnly(config).toCloudFileVersion() }.getOrNull()
+                    if (observed != null && after != null && observed.matches(after)) remoteAssociation("webdav")?.takeIf { it.config == config }?.let { rememberRemoteUpdateProof("webdav", it.identity, observed, expectedRemote.toCloudFileVersion()) }
                 }
                 if (attempt.isSuccess) {
                     matched = true
@@ -5722,6 +5913,7 @@ PmvELineageRelation.REMOTE_STALE -> {
         val r = repo() ?: run { onResult(false); return@launch }
         val config = candidate ?: loadCloudConfig()
             ?: run { emitError(getApplication<Application>().getString(R.string.viewmodel_connect_webdav_first)); onResult(false); return@launch }
+        val dismissedVersion = if (remoteAssociation("webdav")?.config == config) com.vault.storage.RemoteUpdatePrefs.load(getApplication(), vaultName(), "webdav").pending else ""
         _state.update { it.copy(cloudSyncRunning = true) }
         markCloudBusy(
             "webdav",
@@ -5745,6 +5937,7 @@ PmvELineageRelation.REMOTE_STALE -> {
                             }
                         }
                         val remoteModifiedAt = verifiedUpload.lastModified
+                        remoteAssociation("webdav")?.takeIf { it.config == config }?.let { rememberRemoteUpdateProof("webdav", it.identity, verifiedUpload.toCloudFileVersion(), consumedVersion = dismissedVersion) }
                         if (remoteModifiedAt > 0L) r.syncFile().setLastModified(remoteModifiedAt)
                     } finally {
                         snapshot.delete()
@@ -5815,9 +6008,11 @@ PmvELineageRelation.REMOTE_STALE -> {
                         val remoteFile = newCloudTempFile("webdav-download")
                         try {
                             val remote = WebDavCloud.downloadTo(config, remoteFile)
+                            val downloadedVersion = if (!remote.etag.isNullOrBlank()) CloudFileVersion(true, remote.size, 0, remote.etag) else runCatching { WebDavCloud.metadataOnly(config).toCloudFileVersion().takeIf { remoteMetadata.toCloudFileVersion().matches(it) } }.getOrNull()
                             require(remote.size > 0L) { "WebDAV 保险库文件为空" }
                             replaceCurrentFromRemoteFile(r, local, remoteFile).also {
                                 if (remoteMetadata.lastModified > 0L) r.syncFile().setLastModified(remoteMetadata.lastModified)
+                                downloadedVersion?.let { version -> remoteAssociation("webdav")?.takeIf { it.config == config }?.let { rememberRemoteUpdateProof("webdav", it.identity, version) } }
                             }
                         } finally {
                             remoteFile.delete()
@@ -5937,6 +6132,7 @@ PmvELineageRelation.REMOTE_STALE -> {
                             // 锁外：元数据 + 下载（纯网络/临时文件，不触碰保险库文件）
                             val before = WebDavCloud.metadata(config)
                             val downloaded = WebDavCloud.downloadIfExistsTo(config, remoteFile)
+                            val downloadedVersion = downloaded?.let { file -> if (!file.etag.isNullOrBlank()) CloudFileVersion(true, file.size, 0, file.etag) else runCatching { WebDavCloud.metadataOnly(config).toCloudFileVersion().takeIf { before.toCloudFileVersion().matches(it) } }.getOrNull() }
                             // 每轮重取本端快照：与 drive 路径一致，CAS 冲突重试时用最新的本地
                             // 内容参与合并，不沿用首轮快照。materializePayload 只在内存中解密
                             // 密封条目，不产生额外网络或磁盘 I/O。
@@ -5965,6 +6161,7 @@ PmvELineageRelation.REMOTE_STALE -> {
                             }
                             if (action is CloudSyncAction.Completed) {
                                 val result = action.result
+                                downloadedVersion?.let { version -> remoteAssociation("webdav")?.takeIf { it.config == config }?.let { rememberRemoteUpdateProof("webdav", it.identity, version) } }
                                 keyConvergence = result.keyConvergence
                                 if (result.payload !== local) savedPayload = result.payload
                                 outcome = result.payload to result.stats
@@ -6306,6 +6503,7 @@ PmvELineageRelation.REMOTE_STALE -> {
             remoteKeyRevision = remoteStats?.third ?: 0L,
             relationship = relationship,
             message = relationText,
+            remoteWriter = runCatching { repository.authenticatedDeviceWriter(remoteFile, rootKey) }.getOrNull(),
         )
     }
 
@@ -6901,11 +7099,15 @@ PmvELineageRelation.REMOTE_STALE -> {
         root.withRootKey(root.identity) { raw ->
             CloudCredentialStore.save(getApplication(), root.identity.vaultId.toString(), config, raw)
         }
+        checkRemoteUpdates("webdav")
     }
 
     fun clearCloudConfig() {
         val root = _state.value.credential.sessionRootKey() ?: return
         CloudCredentialStore.clear(getApplication(), root.identity.vaultId.toString(), cloudVaultKey())
+        com.vault.storage.RemoteUpdatePrefs.associate(getApplication(), vaultName(), "webdav", "")
+        RemoteUpdateNotifications.cancel(getApplication(), vaultName(), "webdav")
+        reloadRemoteUpdateStates()
     }
 
     // —— KDF 安全等级（审计发现 5）——
@@ -7277,6 +7479,7 @@ PmvELineageRelation.REMOTE_STALE -> {
         uploaded: Boolean = false,
         verified: Boolean = true,
     ) {
+        acknowledgeRemoteUpdate(targetKey)
         if (verified) markPasskeysBackedUpAfterExternalCopy()
         val now = System.currentTimeMillis()
         AutoCloudSyncPrefs.success(
@@ -7313,6 +7516,7 @@ PmvELineageRelation.REMOTE_STALE -> {
     }
 
     private fun failCloudSync(targetKey: String, target: String, message: String, localChangesSaved: Boolean) {
+        remoteUpdateProofs.remove(targetKey)
         AutoCloudSyncPrefs.recordFailure(getApplication(), cloudVaultKey(), targetKey, message)
         _cloudSyncState.value = _cloudSyncState.value.copy(
             phase = CloudSyncPhase.FAILED,
@@ -7329,6 +7533,8 @@ PmvELineageRelation.REMOTE_STALE -> {
 
     /** 覆盖/下载/识别等操作开始时置为“进行中”，进度条跨页面保留。 */
     private fun markCloudBusy(targetKey: String, target: String, busyMessage: String) {
+        remoteUpdateProofs.remove(targetKey)
+        remoteUpdateOperationGeneration++
         _cloudSyncState.value = _cloudSyncState.value.copy(
             phase = CloudSyncPhase.RUNNING,
             targetKey = targetKey,
@@ -7344,6 +7550,7 @@ PmvELineageRelation.REMOTE_STALE -> {
 
     /** 覆盖/下载成功：保留最近成功时间，清空进行中状态（不写入自动同步记录）。 */
     private fun finishCloudBusyOk(targetKey: String, target: String) {
+        acknowledgeRemoteUpdate(targetKey)
         _cloudSyncState.value = CloudSyncUiState(
             targetKey = targetKey,
             target = target,
@@ -7381,6 +7588,7 @@ PmvELineageRelation.REMOTE_STALE -> {
     data class CloudSyncPreview(
         val kind: String,
         val source: String,
+        val remoteWriter: com.vault.storage.DeviceActivityProfile? = null,
         val stats: VaultOps.LwwMergeStats = VaultOps.LwwMergeStats(),
         val localActive: Int = 0,
         val localTrash: Int = 0,

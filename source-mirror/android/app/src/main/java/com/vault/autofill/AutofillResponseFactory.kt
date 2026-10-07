@@ -81,9 +81,8 @@ object AutofillResponseFactory {
         var otpIndex = 0
         form.fields.forEach { field ->
             val value = when (field.kind) {
-                FieldKind.USERNAME -> snapshot?.valueFor(AutofillRole.USERNAME, verificationGranted) ?: entry.username
-                FieldKind.EMAIL -> snapshot?.valueFor(AutofillRole.EMAIL, verificationGranted)
-                    ?: snapshot?.valueFor(AutofillRole.USERNAME, verificationGranted) ?: entry.username
+                FieldKind.USERNAME, FieldKind.EMAIL -> AutofillFieldValueResolver.value(field.kind, snapshot, verificationGranted)
+                    ?: entry.username
                 FieldKind.PASSWORD, FieldKind.NEW_PASSWORD -> snapshot?.valueFor(AutofillRole.PASSWORD, verificationGranted)
                     ?: entry.password.takeIf { verificationGranted }.orEmpty()
                 FieldKind.UNKNOWN -> ""

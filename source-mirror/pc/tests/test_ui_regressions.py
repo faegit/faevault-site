@@ -1533,11 +1533,10 @@ def test_native_autofill_exclude_dialog_adds_normalizes_and_removes(monkeypatch)
         assert app_ui.config.get("native_autofill_excluded") == []
         assert not dlg._empty.isHidden()  # 清空后显示“暂未排除任何程序”
 
-        dlg._site_input.setText("https://Login.Example.com/path")
-        dlg._add_site()
+        dlg._input.setText("https://Login.Example.com/path")
+        dlg._add_from_input()
         assert app_ui.config.get("browser_autofill_excluded_hosts") == ["login.example.com"]
-        dlg._site_list.setCurrentRow(0)
-        dlg._remove_site()
+        dlg._remove_exclusion("hosts", "login.example.com")
         assert app_ui.config.get("browser_autofill_excluded_hosts") == []
     finally:
         dlg.deleteLater()
@@ -2194,15 +2193,32 @@ def test_empty_unlock_dialog_is_the_only_first_use_surface(monkeypatch):
     dialog.close()
 
 
-def test_main_window_reuses_shared_app_tray():
+def test_main_window_reuses_shared_app_tray(monkeypatch):
     import ui.tray as app_tray_mod
 
     source = inspect.getsource(MainWindow._setup_tray)
     assert "app_tray.setup_tray(" in source
     assert "self._show_from_tray," in source
-    tray_source = inspect.getsource(app_tray_mod)
-    assert "def setup_tray" in tray_source
-    assert "if _tray is not None:" in tray_source
+    application = QApplication.instance() or QApplication([])
+    created = []
+    class Signal:
+        def connect(self, callback): pass
+    class Tray:
+        activated = Signal()
+        messageClicked = Signal()
+        @staticmethod
+        def isSystemTrayAvailable(): return True
+        def __init__(self, icon): created.append(self)
+        def setToolTip(self, text): pass
+        def setContextMenu(self, menu): self.menu = menu
+        def show(self): pass
+    monkeypatch.setattr(app_tray_mod, "QSystemTrayIcon", Tray)
+    monkeypatch.setattr(app_tray_mod, "_tray", None)
+    monkeypatch.setattr(app_tray_mod, "_menu", None)
+    monkeypatch.setattr(app_tray_mod, "_on_open", None)
+    first = app_tray_mod.setup_tray(lambda: None)
+    second = app_tray_mod.setup_tray(lambda: None)
+    assert first is second and len(created) == 1
 
 
 def test_unlock_new_menu_button_reserves_space_for_dropdown_arrow():
