@@ -15,6 +15,8 @@ This changelog records features and fixes for the FAEVault Android client only. 
 ## 4.6.7 - 2026-10-07
 
 ### Added and improved
+- Match the checkmark stroke to the resting dot diameter, and reserve a stable device-record viewport so asynchronous loading does not disturb popup motion.
+- Enlarged login dots and success checkmark, matched the Organize icon size to other navigation icons, and disabled phase size animation to prevent diagonal movement on lock.
 - Device records show only verified, currently authorized devices; missing, revoked, expired and invalid authorizations are hidden.
 - Fixed dialog scrolling not refreshing user activity and triggering idle lock; genuine inactivity and background locking remain intact.
 - Login and password verification show three dots pulsing left to right, with a checkmark only on login success; reserved bounds prevent clipping.
