@@ -12,6 +12,19 @@ This changelog records features and fixes for the FAEVault Android client only. 
 
 ---
 
+## 4.6.7 - 2026-10-07
+
+### Added and improved
+- Unified autofill candidate ranking across website origins, linked applications, titles and keywords, with case-insensitive, full-width and related-name matching. Similar candidates do not bypass origin authorization.
+- Added custom-field matching, manual field-role selection and encrypted remembered autofill associations. Exclusions and associations travel with vault synchronization.
+- Added opt-in remote-update reminders per cloud target, with a silent initial baseline, duplicate suppression and a later option. Checks do not download or overwrite the vault. Android checks while foregrounded and unlocked; PC checks while running and unlocked.
+- Added device information and local device renaming using authenticated activity records. Legacy or unverifiable sources remain unknown. This is an activity view, not server-side access revocation.
+- Added encrypted local history with manual and automatic snapshots, pinned versions, previews and selective entry restoration. Restoration requires a safety snapshot and creates a new version. Passkey-bearing and permanently purged entries are excluded. Local history is not automatically uploaded.
+
+- Updated the Organize icon and corrected backup-device/cloud-status translations and column-selector layouts.
+
+---
+
 ## 4.6.4 - 2026-09-30
 
 ### Fixed
