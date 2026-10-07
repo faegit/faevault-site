@@ -127,7 +127,7 @@ from .lan_panels import (
     LanTransferPanel,
 )
 from .maintenance_pages import DedupPage, RecycleBinPage, SameServicePage
-from .devices_history import DevicesHistoryPage
+from .devices_page import DevicesPage
 from .module_editor import AUTOFILL_ROLE_LABELS, passkey_display_rows
 from .security_page import SecurityCenterPage
 from .settings_page import SettingsPage
@@ -2815,7 +2815,6 @@ class MainWindow(widgets.FramelessMain):
 
     def _build_maintenance_menu(self, parent: QMenu) -> QMenu:
         menu = QMenu(i18n.tr("库维护"), parent)
-        menu.addAction(i18n.tr("设备与历史"), self._open_devices_history)
         menu.addAction(i18n.tr("重复条目合并"), self.dedup_entries)
         menu.addAction(i18n.tr("相同服务合并"), self.merge_same_service_entries)
         return menu
@@ -5078,21 +5077,11 @@ class MainWindow(widgets.FramelessMain):
         return changed
 
     # ---------- 整理 ----------
-    def _open_devices_history(self) -> None:
-        page = self._open_workspace_page(
-            "devices-history", "设备与历史",
-            lambda: DevicesHistoryPage(self.vault, self),
+    def _open_devices(self) -> None:
+        self._open_workspace_page(
+            "devices", "设备记录",
+            lambda: DevicesPage(self.vault, self),
         )
-        if not page.property("historyRestoreWired"):
-            page.restoreRequested.connect(self._adopt_history_vault)
-            page.setProperty("historyRestoreWired", True)
-
-    def _adopt_history_vault(self) -> None:
-        refreshed = self.vault.reopen()
-        self._adopt_cloud_vault(refreshed)
-        media_files.ensure_vault_context(self.vault)
-        self._update_recycle_btn()
-        self._refresh_open_feature_pages()
 
     def dedup_entries(self) -> None:
         scan = self.vault.scan_duplicates()

@@ -1261,6 +1261,110 @@ class SpinnerWidget(QWidget):
         painter.drawArc(arc_rect, start, span)
 
 
+class WaitingDotsWidget(QWidget):
+    """Three fixed bounds, sequential grow-and-return pulses."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setFixedSize(30, 18)
+        self.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self._angle = 0
+        self._spinning = False
+        self._color = None
+        self._anim = QPropertyAnimation(self, b"angle", self)
+        self._anim.setDuration(1200)
+        self._anim.setStartValue(0)
+        self._anim.setEndValue(360)
+        self._anim.setLoopCount(-1)
+        self.hide()
+
+    def _set_angle(self, value):
+        self._angle = value
+        self.update()
+
+    angle = Property(int, lambda self: self._angle, _set_angle)
+
+    def set_color(self, color):
+        self._color = color
+        self.update()
+
+    def start(self):
+        self._spinning = True
+        self.show()
+        self._anim.start()
+
+    def stop(self):
+        self._spinning = False
+        self._anim.stop()
+        self.hide()
+
+    def dot_radii(self):
+        import math
+        # Each pulse finishes before the next one starts, from left to right.
+        phase = (self._angle % 360) / 120.0
+        return [1.5 + 2.5 * math.sin(math.pi * (phase - index))
+                if index <= phase <= index + 1 else 1.5 for index in range(3)]
+
+    def paintEvent(self, event):
+        if not self._spinning:
+            return
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setPen(Qt.NoPen)
+        painter.setBrush(QColor(self._color or theme.active()["accent"]))
+        for index, radius in enumerate(self.dot_radii()):
+            painter.drawEllipse(QPointF(5 + 10 * index, 9), radius, radius)
+
+
+class CompletionCheckWidget(QWidget):
+    """A check stroke only; deliberately has no enclosing circle."""
+
+    def __init__(self, parent=None, *, size=18):
+        super().__init__(parent)
+        self.setFixedSize(size, size)
+        self.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self._progress = 0.0
+        self._color = "#ffffff"
+        self._anim = QPropertyAnimation(self, b"progress", self)
+        self._anim.setDuration(240)
+        self._anim.setStartValue(0.0)
+        self._anim.setEndValue(1.0)
+        self.hide()
+
+    def _set_progress(self, value):
+        self._progress = value
+        self.update()
+
+    progress = Property(float, lambda self: self._progress, _set_progress)
+
+    def start(self, color):
+        self._color = color
+        self._progress = 0.0
+        self.show()
+        self._anim.start()
+
+    def reset(self):
+        self._anim.stop()
+        self.hide()
+        self._progress = 0.0
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        pen = QPen(QColor(self._color), 2)
+        pen.setCapStyle(Qt.RoundCap)
+        pen.setJoinStyle(Qt.RoundJoin)
+        painter.setPen(pen)
+        points = [QPointF(3, 9), QPointF(7, 13), QPointF(15, 5)]
+        # Allocate time by stroke length for an even drawing speed.
+        split = 1.0 / 3.0
+        if self._progress <= split:
+            painter.drawLine(points[0], points[0] + (points[1] - points[0]) * (self._progress / split))
+        else:
+            painter.drawLine(points[0], points[1])
+            painter.drawLine(points[1], points[1] + (points[2] - points[1]) * ((self._progress - split) / (1 - split)))
+
+
 class ShadowDialog(QDialog):
     """无边框圆角对话框基类：半透明背景 + 投影 + 自定义标题栏。
 

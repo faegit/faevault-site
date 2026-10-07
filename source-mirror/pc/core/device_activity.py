@@ -2,6 +2,7 @@
 import copy
 import json
 import platform
+import socket
 import time
 import uuid
 
@@ -63,24 +64,33 @@ def current_device_id(vault):
     from .device_identity import load_or_create
     return str(load_or_create(vault._pmve_store.identity.vault_id)[0])
 
-def stamp(metadata, device_id, now=None, name=None):
+def system_device_name():
+    """Read the current OS computer name, including changes made after unlock."""
+    for read_name in (socket.gethostname, platform.node):
+        try:
+            name = read_name().strip()
+        except (OSError, UnicodeError):
+            continue
+        if name:
+            return name[:64]
+    return "PC"
+
+
+def stamp(metadata, device_id, now=None):
     updated = copy.deepcopy(metadata)
     activity = normalize(updated.get(FIELD))
     if activity.get("version", 1) != 1:
-        if name is not None:
-            raise ValueError("设备记录由新版客户端管理，请升级后修改名称")
         return updated
     device_id = str(uuid.UUID(str(device_id)))
     now = int(time.time() * 1000) if now is None else int(now)
     now = max(now, activity.get("last_writer", {}).get("updated_at", -1) + 1)
     profile = next((p for p in activity["profiles"] if p["device_id"] == device_id), None)
+    name = system_device_name()
     if profile is None:
-        profile = {"device_id": device_id, "name": platform.node()[:64] or "PC", "platform": "pc", "updated_at": now}
+        profile = {"device_id": device_id, "name": name, "platform": "pc", "updated_at": now}
         activity["profiles"].append(profile)
-    if name is not None:
-        if not isinstance(name, str) or not name.strip() or len(name.strip()) > 64:
-            raise ValueError("设备名称须为 1–64 个字符")
-        profile["name"] = name.strip()
+    if profile.get("name") != name:
+        profile["name"] = name
         profile["updated_at"] = max(now, profile["updated_at"] + 1)
     profile["last_seen_at"] = max(now, profile.get("last_seen_at", 0))
     activity["last_writer"] = {"device_id": device_id, "updated_at": now}
@@ -100,24 +110,15 @@ def devices(vault):
             latest[r.device_id] = r
     result = []
     for key in sorted(set(profiles) | {str(k) for k in latest} | {own}):
-        p = copy.deepcopy(profiles.get(key, {"device_id": key, "name": (platform.node()[:64] or "PC") if key == own else "未知设备", "platform": "pc" if key == own else "unknown", "last_seen_at": 0, "updated_at": 0}))
+        p = copy.deepcopy(profiles.get(key, {"device_id": key, "name": system_device_name() if key == own else "未知设备", "platform": "pc" if key == own else "unknown", "last_seen_at": 0, "updated_at": 0}))
+        if key == own:
+            p["name"] = system_device_name()
         record = latest.get(uuid.UUID(key))
-        p.update(is_current=key == own, authorized=bool(record and record.active_at(int(time.time()*1000))))
+        if record is None or record.vault_id != vault._pmve_store.identity.vault_id or not record.active_at(int(time.time() * 1000)):
+            continue
+        p.update(is_current=key == own, authorized=True)
         result.append(p)
     return result
-
-def rename(vault, name, device_id=None):
-    own = current_device_id(vault)
-    if device_id is not None and str(device_id) != own:
-        raise ValueError("只能重命名本机")
-    previous = vault._pmve_metadata
-    vault._pmve_metadata = stamp(previous, own, name=name)
-    try:
-        vault.save()
-    except Exception:
-        vault._pmve_metadata = previous
-        raise
-
 
 def verified_last_writer(store):
     activity = normalize(store.metadata().get(FIELD))

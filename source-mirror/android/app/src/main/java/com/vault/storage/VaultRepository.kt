@@ -212,92 +212,27 @@ class VaultRepository(
         .loadOrCreate().use { it.deviceId.toString() }
 
     private fun activityMetadata(session: PmvVaultStore.Session, metadata: JsonObject): JsonObject =
-        DeviceActivity.touch(metadata, localDeviceId(), parentCommitId = session.identity().latestCommitId.toString())
-
-    private fun autoHistory(session: PmvVaultStore.Session) {
-        runCatching { PmvAppendOnlyFile.withExclusiveWriterLock(vaultFile) {
-            val identity = session.identity().toVaultIdentity()
-            VaultHistoryStore(context, identity.vaultId).create(vaultFile, identity, verifySnapshot = { copy ->
-                session.withRootKeyForDeviceUnlock { key -> PmvVaultStore.openRootKey(copy, key).use { it.identity().toVaultIdentity() } }
-            })
-        } }
-    }
+        DeviceActivity.touch(metadata, localDeviceId(), SystemDeviceName.read(context), parentCommitId = session.identity().latestCommitId.toString())
 
     fun deviceProfiles(rootKey: ByteArray): List<DeviceActivityProfile> = PmvVaultStore.openRootKey(vaultFile, rootKey).use {
         val id = localDeviceId()
+        val currentVaultId = it.identity().vaultId
         val registry = PmvDeviceRegistry.decode(it.readMetadata()).also { records -> PmvDeviceRegistry.verifyAll(records, it.identity().signingPublicKey) }
         val profiles = DeviceActivity.profiles(it.readMetadata())
         val all = profiles + registry.filter { grant -> profiles.none { p -> p.deviceId == grant.deviceId.toString() } }
             .map { grant -> DeviceActivityProfile(grant.deviceId.toString(), "", "", 0, 0) }
         val withCurrent = if (all.none { profile -> profile.deviceId == id }) all + DeviceActivityProfile(id, "", "android", 0, 0) else all
-        withCurrent.map { profile ->
-            val grant = registry.firstOrNull { g -> g.deviceId.toString() == profile.deviceId }
-            profile.copy(isCurrent = profile.deviceId == id, authorizationStatus = grant?.let { g ->
-                if (g.revokedAtEpochMillis > 0) "revoked" else if (!g.activeAt(System.currentTimeMillis())) "expired" else "authorized"
+        DeviceActivity.authorizedProfiles(withCurrent.map { profile ->
+            val grant = PmvDeviceRegistry.latest(registry, UUID.fromString(profile.deviceId))
+            profile.copy(name = if (profile.deviceId == id) SystemDeviceName.read(context) else profile.name,
+                isCurrent = profile.deviceId == id, authorizationStatus = grant?.let { g ->
+                if (g.vaultId != currentVaultId) "invalid" else if (g.revokedAtEpochMillis > 0) "revoked" else if (!g.activeAt(System.currentTimeMillis())) "expired" else "authorized"
             })
-        }
-    }
-
-    fun renameDevice(rootKey: ByteArray, name: String): VaultIdentity = PmvVaultStore.openRootKey(vaultFile, rootKey).use { session ->
-        val metadata = DeviceActivity.touch(session.readMetadata(), localDeviceId(), name,
-            parentCommitId = session.identity().latestCommitId.toString())
-        autoHistory(session)
-        session.saveFull(metadata, pmvePayload(session).let { it.entries + it.trash }, session.identity().sequence).toVaultIdentity()
+        })
     }
 
     fun authenticatedDeviceWriter(file: File, rootKey: ByteArray): DeviceActivityProfile? =
         PmvVaultStore.openRootKey(file, rootKey).use { DeviceActivity.writer(it.readMetadata(), it.identity().parentCommitId?.toString()) }
-
-    fun listHistory(rootKey: ByteArray): List<VaultHistoryRecord> =
-        VaultHistoryStore(context, currentIdentity(rootKey).vaultId).list()
-
-    fun createHistorySnapshot(rootKey: ByteArray): VaultHistoryRecord = PmvAppendOnlyFile.withExclusiveWriterLock(vaultFile) {
-        VaultHistoryStore(context, currentIdentity(rootKey).vaultId).create(vaultFile, currentIdentity(rootKey), verifySnapshot = { copy ->
-            PmvVaultStore.openRootKey(copy, rootKey).use { it.identity().toVaultIdentity() }
-        })
-    }
-
-    private fun openHistory(file: File, rootKey: ByteArray, password: ByteArray?): PmvVaultStore.Session =
-        if (password != null) PmvVaultStore.openPassword(file, password) else try { PmvVaultStore.openRootKey(file, rootKey) }
-        catch (error: Exception) { throw IllegalStateException("此历史快照需要创建时的主密码", error) }
-
-    fun previewHistory(rootKey: ByteArray, recordId: String, password: ByteArray? = null): VaultHistoryPreview {
-        val current = currentIdentity(rootKey)
-        val history = VaultHistoryStore(context, current.vaultId)
-        val record = history.list().firstOrNull { it.id == recordId } ?: error("历史快照已失效")
-        return openHistory(history.file(recordId), rootKey, password).use { session ->
-            history.verifyIdentity(recordId, session.identity())
-            require(session.identity().vaultId == current.vaultId) { "历史快照不属于当前保险库" }
-            VaultHistoryPreview(record, VaultHistoryRestore.previewEntries(pmvePayload(session).entries), current.commitId.toString(), current.sequence,
-                session.identity().latestCommitId.toString())
-        }
-    }
-
-    fun restoreHistory(rootKey: ByteArray, preview: VaultHistoryPreview, ids: Set<String>, password: ByteArray? = null, beforeWrite: () -> Unit = {}): VaultUnlockResult =
-        PmvAppendOnlyFile.withExclusiveWriterLock(vaultFile) {
-            require(ids.isNotEmpty()) { "请选择需要恢复的条目" }
-            val current = currentIdentity(rootKey)
-            check(current.commitId.toString() == preview.expectedCommit && current.sequence == preview.expectedSequence) { "保险库已变化，请重新预览历史快照" }
-            val history = VaultHistoryStore(context, current.vaultId)
-            val sourceFile = history.file(preview.record.id)
-            openHistory(sourceFile, rootKey, password).use { source ->
-                history.verifyIdentity(preview.record.id, source.identity())
-                require(source.identity().vaultId == current.vaultId && source.identity().latestCommitId.toString() == preview.snapshotCommit) { "历史快照身份校验失败" }
-                PmvVaultStore.openRootKey(vaultFile, rootKey).use { destination ->
-                    val live = pmvePayload(destination)
-                    val payload = VaultHistoryRestore.plan(live, pmvePayload(source), ids, System.currentTimeMillis() / 1000.0)
-                    val metadata = activityMetadata(destination, PmvEPayloadAdapter.toMetadata(payload, current.vaultId, destination.readMetadata()))
-                    // Mandatory recovery copy: any failure aborts before appending the restore commit.
-                    history.create(vaultFile, current, protected = true, preserveId = preview.record.id, verifySnapshot = { copy ->
-                        PmvVaultStore.openRootKey(copy, rootKey).use { it.identity().toVaultIdentity() }
-                    })
-                    beforeWrite()
-                    destination.saveMerged(source, metadata, payload.entries + payload.trash, current.sequence)
-                }
-            }
-            runCatching { history.prune() }
-            openPmvEWithRootKey(rootKey)
-        }
 
     /** 从 SAF Uri 复制库文件到当前账户位置；覆盖前调用方应确认。 */
     fun importFromUri(uri: Uri) {
@@ -481,7 +416,6 @@ class VaultRepository(
             val entries = session.listSummaries().map { summary ->
                 requireNotNull(session.readEntry(summary.entryId)) { "PMVE EntryIndex 引用了不存在的 Entry" }
             }
-            autoHistory(session)
             session.saveFull(activityMetadata(session, metadata), entries, identity.sequence)
             updated
         }
@@ -511,7 +445,6 @@ class VaultRepository(
             val entries = session.listSummaries().map { summary ->
                 requireNotNull(session.readEntry(summary.entryId)) { "PMVE EntryIndex 引用了不存在的 Entry" }
             }
-            autoHistory(session)
             session.saveFull(activityMetadata(session, metadata), entries, identity.sequence)
             updated
         }
@@ -808,7 +741,6 @@ class VaultRepository(
                 PmvEPayloadAdapter.toMetadata(normalized, identity.vaultId, session.readMetadata()),
                 unionDeviceRegistries(localRegistry, remoteRegistry),
             )
-            autoHistory(session)
             session.saveFull(
                 activityMetadata(session, mergedMetadata),
                 normalized.entries + normalized.trash,
@@ -1077,7 +1009,6 @@ class VaultRepository(
             identity.vaultId,
             previousMetadata = session.readMetadata(),
         )
-        autoHistory(session)
         session.saveFull(activityMetadata(session, metadata), normalized.entries + normalized.trash, expectedSequence)
         return normalized
     }
@@ -1094,7 +1025,6 @@ class VaultRepository(
             session.identity().vaultId,
             previousMetadata = session.readMetadata(),
         )
-        autoHistory(session)
         val result = try {
             session.applyMutation(expectedSequence) {
                 PmvVaultStore.MutationContent(activityMetadata(session, metadata), after.entries + after.trash)
@@ -1427,7 +1357,6 @@ class VaultRepository(
         expectedSequence: Long,
     ): PmvEMediaSaveResult {
         require(isPmvE()) { "保险库不是 PMVE 格式" }
-        PmvVaultStore.openRootKey(vaultFile, rootKey).use(::autoHistory)
         val saved = PmvMediaObjectAdapter(vaultFile).saveEntryWithMedia(
             rootKey,
             expectedSequence,

@@ -11,7 +11,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -420,7 +419,20 @@ internal fun AppRoot(remoteUpdateRequest: RemoteUpdateOpenRequest? = null, onRem
             CompositionLocalProvider(LocalVaultModalSource provides trashBackground) {
             Box(modifier = Modifier.fillMaxSize()) {
                 Box(Modifier.fillMaxSize().vaultBackdropSource(trashBackground)) {
-                when (state.phase) {
+                AnimatedContent(
+                    targetState = state.phase,
+                    modifier = Modifier.fillMaxSize(),
+                    label = "unlock-handoff",
+                    transitionSpec = {
+                        if (initialState == Phase.LOCKED && targetState == Phase.UNLOCKED) {
+                            fadeIn(tween(180)) togetherWith fadeOut(tween(140))
+                        } else {
+                            // 锁定必须立即隐藏保险库内容，不延迟安全边界。
+                            fadeIn(tween(0)) togetherWith fadeOut(tween(0))
+                        }
+                    },
+                ) { visiblePhase ->
+                when (visiblePhase) {
                     Phase.NO_VAULT -> Box(Modifier.fillMaxSize()) {
                         WelcomeScreen(vm)
                     }
@@ -924,6 +936,7 @@ internal fun AppRoot(remoteUpdateRequest: RemoteUpdateOpenRequest? = null, onRem
                     }
                 }
                 }
+                }
                 // 对话框遮罩：模糊 + 变暗层一起淡入淡出。用 AnimatedVisibility 而不是 if，
                 // 关闭时遮罩才会逐步变亮，而不是瞬间消失。
                 AnimatedVisibility(
@@ -964,17 +977,14 @@ internal fun AppRoot(remoteUpdateRequest: RemoteUpdateOpenRequest? = null, onRem
                             tonalElevation = 0.dp,
                             modifier = Modifier
                                 .animateEnterExit(
-                                    enter = fadeIn(tween(180)) + scaleIn(
-                                        animationSpec = tween(180),
-                                        initialScale = 0.97f,
-                                    ),
-                                    exit = fadeOut(tween(120)) + scaleOut(tween(120), targetScale = 0.98f),
+                                    enter = vaultModalEnter(),
+                                    exit = vaultModalExit(),
                                 )
                                 .padding(horizontal = 24.dp, vertical = 24.dp)
                                 .widthIn(max = 560.dp)
                                 .fillMaxWidth()
                                 .heightIn(max = 620.dp)
-                                .vaultPopupCardSurface()
+                                .vaultPopupCardSurface(animateEntry = false)
                                 .pointerInput(Unit) { detectTapGestures(onTap = {}) },
                         ) {
                             VaultBackdropHost(state = trashBackdrop, backgroundColor = Color.Transparent) {

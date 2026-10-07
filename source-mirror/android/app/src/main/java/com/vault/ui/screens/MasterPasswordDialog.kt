@@ -5,7 +5,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.layout.widthIn
+import com.vault.ui.ThreeDotLoading
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
@@ -129,11 +130,11 @@ fun MasterPasswordDialog(
                 },
                 enabled = pw.isNotEmpty() && !busy && cooldownMs <= 0L,
                 style = VaultActionStyle.PRIMARY,
+                modifier = Modifier.widthIn(min = 80.dp),
             ) {
                 if (busy) {
-                    androidx.compose.material3.CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp,
+                    ThreeDotLoading(
+                        modifier = Modifier.size(width = 32.dp, height = 18.dp),
                         color = MaterialTheme.colorScheme.onPrimary,
                     )
                 } else {

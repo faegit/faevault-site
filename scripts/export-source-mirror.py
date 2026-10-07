@@ -106,8 +106,11 @@ def export(roots: dict[str, Path], site: Path, date: str) -> dict:
     report = {"schema": 1, "snapshot_date": date, "license": "Apache-2.0", "platforms": {}}
     for platform, root in roots.items():
         destination = mirror / platform
-        # Existing outputs are deliberately not deleted. Unexpected files fail validation.
         destination.mkdir(parents=True, exist_ok=True)
+        if destination.is_symlink() or mirror.resolve() not in destination.resolve().parents:
+            raise ValueError(f"Unsafe mirror directory: {platform}")
+        previous_manifest = destination / "MANIFEST.json"
+        previous_files = json.loads(previous_manifest.read_text(encoding="utf-8"))["files"] if previous_manifest.exists() else []
         files, original_hashes = [], {}
         for relative in candidate_files(root, platform):
             source = root / relative
@@ -163,6 +166,19 @@ def export(roots: dict[str, Path], site: Path, date: str) -> dict:
                     "version": source_version(root, platform),
                     "source_commit": subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD"], text=True).strip(),
                     "working_tree_snapshot": True, "files": sorted(files, key=lambda item: item["path"])}
+        # Remove only formerly manifested source files retired from this snapshot.
+        # Unlisted files still fail validation; never traverse out of the mirror.
+        new_paths = {item["path"] for item in files}
+        for previous in previous_files:
+            relative = previous["path"]
+            if relative in new_paths:
+                continue
+            allowed = permitted(platform, relative) or (platform == "pc" and relative.startswith("spec/") and permitted("android", relative))
+            target = destination / relative
+            if not allowed or target.is_symlink() or destination.resolve() not in target.resolve().parents:
+                raise ValueError(f"Unsafe retired source path: {relative}")
+            if target.exists():
+                target.unlink()
         (destination / "MANIFEST.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         zip_path = downloads / f"faevault-{platform}-source.zip"
         archive(destination, zip_path)

@@ -548,7 +548,7 @@ class VaultViewModel(app: Application) : AndroidViewModel(app) {
     private fun captureVaultSession(): VaultSessionFence.Token =
         vaultSessionFence.capture(_currentVault.value)
 
-    private suspend fun <T> historyOperation(block: (VaultRepository, ByteArray) -> T): T {
+    private suspend fun <T> deviceOperation(block: (VaultRepository, ByteArray) -> T): T {
         val token = captureVaultSession()
         return vaultOperationMutex.withLock {
             requireVaultSessionCurrent(token)
@@ -561,29 +561,7 @@ class VaultViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    suspend fun deviceProfiles(): List<com.vault.storage.DeviceActivityProfile> = historyOperation { r, key -> r.deviceProfiles(key) }
-    suspend fun renameDevice(name: String) { historyOperation { r, key -> r.renameDevice(key, name) } }
-    suspend fun currentCommitSequence(): Long = historyOperation { r, key -> r.currentIdentity(key).sequence }
-    suspend fun listHistory(): List<com.vault.storage.VaultHistoryRecord> = historyOperation { r, key -> r.listHistory(key) }
-    suspend fun createHistorySnapshot(): com.vault.storage.VaultHistoryRecord = historyOperation { r, key -> r.createHistorySnapshot(key) }
-    suspend fun previewHistory(recordId: String, password: String? = null): com.vault.storage.VaultHistoryPreview {
-        val bytes = password?.toByteArray(Charsets.UTF_8)
-        return try { historyOperation { r, key -> r.previewHistory(key, recordId, bytes) } } finally { bytes?.fill(0) }
-    }
-    suspend fun restoreHistory(preview: com.vault.storage.VaultHistoryPreview, ids: Set<String>, password: String? = null) {
-        val bytes = password?.toByteArray(Charsets.UTF_8)
-        val token = captureVaultSession()
-        try {
-            historyOperation { r, key ->
-                val opened = r.restoreHistory(key, preview, ids, bytes, beforeWrite = { requireVaultSessionCurrent(token) })
-                try {
-                    requireVaultSessionCurrent(token)
-                    check(publishPayloadForSession(token, opened.payload)) { localizeUiTextFor(getApplication(), "保险库会话已变化") }
-                } finally { opened.rootKey?.fill(0) }
-            }
-        } finally { bytes?.fill(0) }
-    }
-
+    suspend fun deviceProfiles(): List<com.vault.storage.DeviceActivityProfile> = deviceOperation { r, key -> r.deviceProfiles(key) }
     private fun isVaultSessionCurrent(token: VaultSessionFence.Token): Boolean =
         vaultSessionFence.isCurrent(token, _currentVault.value)
 

@@ -9,6 +9,8 @@ data class DeviceActivityProfile(val deviceId: String, val name: String, val pla
 /** Informational activity only; this never grants or revokes device authorization. */
 object DeviceActivity {
     const val KEY = "_device_activity_v1"
+    fun authorizedProfiles(profiles: List<DeviceActivityProfile>): List<DeviceActivityProfile> =
+        profiles.filter { it.authorizationStatus == "authorized" }
     fun profiles(metadata: JsonObject): List<DeviceActivityProfile> =
         ((metadata[KEY] as? JsonObject)?.get("profiles") as? JsonArray).orEmpty().mapNotNull { raw ->
             val obj = raw as? JsonObject ?: return@mapNotNull null
@@ -53,7 +55,6 @@ object DeviceActivity {
     fun touch(metadata: JsonObject, id: String, name: String? = null, now: Long = System.currentTimeMillis(), parentCommitId: String? = null): JsonObject {
         val version = ((metadata[KEY] as? JsonObject)?.get("version") as? JsonPrimitive)?.intOrNull ?: 1
         if (version > 1) {
-            require(name == null) { "设备记录由新版客户端管理，请升级后修改名称" }
             return metadata
         }
         require(name == null || name.trim().length in 1..64) { "设备名称须为 1–64 个字符" }

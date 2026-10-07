@@ -4,7 +4,7 @@
   "license": "Apache-2.0",
   "platform": "pc",
   "version": "4.6.7",
-  "source_commit": "7b928283c813228d85efdf1f7c9a4efca4f3231c",
+  "source_commit": "6fd8f3926ab6f4241c1c4b469a9084406c999958",
   "working_tree_snapshot": true,
   "files": [
     {
@@ -39,8 +39,8 @@
     },
     {
       "path": "__main__.py",
-      "bytes": 3089,
-      "sha256": "3168bf298a54bc76f961be7a8e6c15f70c20bcc23b1c4cb72315bfec70812f6e",
+      "bytes": 3827,
+      "sha256": "24def6fb99cf37c31d8a41eacb4a2b0e4fe0735a5456bdc36c72fb8818201d88",
       "kind": "source"
     },
     {
@@ -225,8 +225,8 @@
     },
     {
       "path": "core/device_activity.py",
-      "bytes": 6322,
-      "sha256": "48a0795e28bc8319afbea84bc33fcbac9a1b3d17ead4116202f0161defe94db5",
+      "bytes": 6179,
+      "sha256": "0a0f07da6f453e44d6fa0a3f259679593a907a51914168700dec404b4e71ae9a",
       "kind": "source"
     },
     {
@@ -567,8 +567,8 @@
     },
     {
       "path": "core/storage.py",
-      "bytes": 97032,
-      "sha256": "0de3df183ec6a54fa352c6b67c3b32590fbf943fe1d9c976ca3cb44371b627cd",
+      "bytes": 95892,
+      "sha256": "4d2801eab0b15f2deb574961609bf0fc0bd67d1ea9461d519297b5189f4b4283",
       "kind": "source"
     },
     {
@@ -599,12 +599,6 @@
       "path": "core/utils.py",
       "bytes": 1829,
       "sha256": "bb8b4b0f39adef4a4d8a72faddb926eda87bb955a8e9665998423bca21f8c6b8",
-      "kind": "source"
-    },
-    {
-      "path": "core/vault_history.py",
-      "bytes": 11888,
-      "sha256": "c177cc5806c313234421c5a48fc51490611a4e2b11389a6717834c8450936958",
       "kind": "source"
     },
     {
@@ -1004,9 +998,9 @@
       "kind": "shared-fixture"
     },
     {
-      "path": "spec/DEVICES_HISTORY_V1.md",
-      "bytes": 4763,
-      "sha256": "c0b7e45dc7157fc2b7678df360869479148cdbb9e97772045c8eba36e026159a",
+      "path": "spec/DEVICE_ACTIVITY_V1.md",
+      "bytes": 2244,
+      "sha256": "724153fa4997198d40efd50bffb4c335a2dfecd318d4d0b33d5f90d9e37859d7",
       "kind": "shared-fixture"
     },
     {
@@ -1209,8 +1203,8 @@
     },
     {
       "path": "tests/conftest.py",
-      "bytes": 2703,
-      "sha256": "c282ab6a22240d55fc58454e4aa1b7d28bc143e8e74ed0618385ef7c040c0dea",
+      "bytes": 2505,
+      "sha256": "e73c21832d272e91d3fedd2c43f4c1510a266d90bafc1860ad91f0a0923b8817",
       "kind": "source"
     },
     {
@@ -1239,8 +1233,8 @@
     },
     {
       "path": "tests/test_autofill_exclusions.py",
-      "bytes": 19462,
-      "sha256": "d3301ea9353536bc08ec8a90d9e9989c2de679938fbaf38f6185b92d3472e6ab",
+      "bytes": 19418,
+      "sha256": "86441c0b8d70e5ab4979266c626d18719bdd1dfdbbefb8a6fe8b330373d5148f",
       "kind": "source"
     },
     {
@@ -1364,9 +1358,9 @@
       "kind": "source"
     },
     {
-      "path": "tests/test_device_activity_history.py",
-      "bytes": 6091,
-      "sha256": "0b7c0a4f000d1d800e4eecccf0f8334182622887e311658842fe4a37cbfc0d19",
+      "path": "tests/test_device_activity.py",
+      "bytes": 6261,
+      "sha256": "88b071889a2cde7994e9f0d0028f3967f53bf64b5f7439204a57f5c5be10dc2f",
       "kind": "source"
     },
     {
@@ -1382,9 +1376,9 @@
       "kind": "source"
     },
     {
-      "path": "tests/test_devices_history_ui.py",
-      "bytes": 7237,
-      "sha256": "a925d68304486d92ca373e9b687cf22bbe6d047fe5e91430c2245aa908ddcafb",
+      "path": "tests/test_devices_page.py",
+      "bytes": 1326,
+      "sha256": "f6afd47979ec7addc1626f7648bc9ee4cf4734e89150f1bd5a2317ef9c7f8ea5",
       "kind": "source"
     },
     {
@@ -1815,8 +1809,8 @@
     },
     {
       "path": "tests/test_startup_imports.py",
-      "bytes": 2104,
-      "sha256": "301a800a71a42747f836ea6497da2d095f19038c3ce0be1c8db5a19fa666bf33",
+      "bytes": 3042,
+      "sha256": "fbe4e8402943be1edb0abe62baefa116b1687582dee6b68607e42f0e96a6d129",
       "kind": "source"
     },
     {
@@ -1875,8 +1869,8 @@
     },
     {
       "path": "tests/test_unlock_spinner.py",
-      "bytes": 17794,
-      "sha256": "c3cc475bcdb221f3b3ae225c18136dbe09e63783d9ff512f52e5eec4142563fb",
+      "bytes": 27635,
+      "sha256": "bf2ad342f898c36e442ca095907281c5aecf39d92b690ab0e073088d1191ed47",
       "kind": "source"
     },
     {
@@ -1917,8 +1911,8 @@
     },
     {
       "path": "ui/app.py",
-      "bytes": 260963,
-      "sha256": "d0d062c08cf92c53a90b37a94567e6ebf0907a93c82769687cb59c9c88529e68",
+      "bytes": 260391,
+      "sha256": "9d9a5ee8d0ed1b918d4773eecb3adb157ba3c6d6558fcea0bb348b2d8fdd5532",
       "kind": "source"
     },
     {
@@ -1940,15 +1934,15 @@
       "kind": "source"
     },
     {
-      "path": "ui/devices_history.py",
-      "bytes": 14335,
-      "sha256": "4623ad6382366ae8e49ec96c02720f32bd2c358c98e483522db97f3d4f364d2a",
+      "path": "ui/devices_page.py",
+      "bytes": 2907,
+      "sha256": "fff8b9a95e459cb1a1956d4674d04cd5dffab79b77319a70a3f1426d5b9e63c9",
       "kind": "source"
     },
     {
       "path": "ui/dialogs.py",
-      "bytes": 239656,
-      "sha256": "aeec3e2534758f182f54efb369bf55db578835c6df71d53a077864f66d03ef70",
+      "bytes": 244174,
+      "sha256": "e6b86fb5e7299155e66eabf3c4334b6808057e5427fd3a26386906f7b6a6a7e1",
       "kind": "source"
     },
     {
@@ -1983,8 +1977,8 @@
     },
     {
       "path": "ui/i18n.py",
-      "bytes": 80569,
-      "sha256": "ad2ea104ca16125e826371461ce5a52c16f7f911170cad3a0cc827d93e5b5768",
+      "bytes": 77524,
+      "sha256": "673b974b1c03cfd72e73c66f5fa92c16fabc2dcd0b7e8e448a7500b109cd3875",
       "kind": "source"
     },
     {
@@ -2049,8 +2043,8 @@
     },
     {
       "path": "ui/settings_page.py",
-      "bytes": 55127,
-      "sha256": "5a1fcd3725bc96d5615618ba80fc5cede16d3ad7d030b9cc852308e0cfdf6ea4",
+      "bytes": 55811,
+      "sha256": "eadcd84ce5009e19703d7ad1ae4dce3ed121852e5ae5aed3eb52850d37317fe8",
       "kind": "source"
     },
     {
@@ -2097,8 +2091,8 @@
     },
     {
       "path": "ui/widgets.py",
-      "bytes": 63277,
-      "sha256": "a3bee0e7d17d901893bd176c927908a0ba2ca9f73fb60acbef448c4a2b5cb96f",
+      "bytes": 66834,
+      "sha256": "8883dff14c97602afa4486eccef3aab5abe8e18682c76dac466340cb58f2b4db",
       "kind": "source"
     },
     {

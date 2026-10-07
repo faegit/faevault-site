@@ -1,0 +1,11 @@
+# Authenticated device activity v1
+
+Vault metadata `_device_activity_v1` contains version=1, profiles with real per-vault device_identity UUID, system device name up to64 characters, platform android/pc, last_seen_at and updated_at epochmilliseconds. Windows reads the current OS computer name; Android reads the system device name with model fallback. Each durable save refreshes the current device name, including previously customized names. The device page displays the current OS name immediately and preserves synced remote names. Unknown fields and future schema versions remain intact and must not prevent ordinary saving. Profiles merge deterministically per identity; the signed authorization registry remains authoritative for grant status.
+
+Last writer `{device_id,updated_at,parent_commit_id}` is stored in the same encrypted authenticated Commit. Parent is the authenticated head ID before that write. Reader must compare it to the resulting Commit parent and resolve a known device profile. Missing, invalid, unbound, mismatched or old-client-carried records show unknown. Notification HEAD-only detection never guesses the writer. Device information appears after authenticated remote preview, alongside its checked version/time; a new remote version invalidates cached writer details.
+
+The Devices page is available without cloud configuration. It shows current device, system or synced name, platform, activity and verified authorization state, with read-only refresh and explicit errors. It does not provide manual device naming or local version-history capture/preview/restore. Removing the feature does not delete existing user vaults or previously generated runtime archives.
+
+Shared device_activity_v1_fixtures.json checks parent binding, stale records, absent data and unknown identity. Tests cover current OS name changes on refresh/save, remote-name preservation, future-schema retention, readonly refresh, and durable operations without history generation. Physical notification and real storage-provider tests remain external.
+
+Android name-source reference: https://android.googlesource.com/platform/packages/apps/Settings/+/master/src/com/android/settings/deviceinfo/DeviceNamePreferenceController.java

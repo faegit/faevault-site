@@ -323,7 +323,7 @@ def test_unified_exclusions_have_no_platform_sections_and_remove_synced_android_
             assert value["states"]["packages:com.example.app"]["deleted"]
         finally:
             reopened.close()
-        assert not any(key != "device_identities" and not key.startswith("vault_history_v1_") for key in settings)
+        assert not any(key != "device_identities" for key in settings)
     finally:
         dialog.deleteLater()
         app.processEvents()

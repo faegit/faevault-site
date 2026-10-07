@@ -78,6 +78,8 @@ from PySide6.QtWidgets import (
 QStackedWidget,
     QStyle,
     QStyledItemDelegate,
+    QStyleOptionButton,
+    QStylePainter,
     QTextEdit,
     QVBoxLayout,
     QWidget,
@@ -817,9 +819,9 @@ class HintMixin:
 
 
 class _BusyButton(QPushButton):
-    """主操作按钮：等待期间在文字左侧显示旋转指示，不再单独占一行。
+    """主操作按钮：等待期间在文字左侧显示三个依次缩放的圆点。
 
-    旋转指示是按钮的子控件，因此按钮文字的宽度、行高都不变，对话框不会因为
+    圆点保留最大绘制空间；过长文字会省略，行高不变，对话框不会因为
     等待状态的出现与消失而改变尺寸。
     """
 
@@ -827,11 +829,14 @@ class _BusyButton(QPushButton):
         super().__init__(text, parent)
         self._idle_text = text
         self._busy = False
-        self._spinner = widgets.SpinnerWidget(self, size=18)
+        self._spinner = widgets.WaitingDotsWidget(self)
         self._spinner.setVisible(False)
+        self._check = widgets.CompletionCheckWidget(self)
+        self.setMinimumWidth(self.minimumSizeHint().width())
 
     def start_busy(self, text: str) -> None:
         self._busy = True
+        self._check.reset()
         self.setText(text)
         self._refresh_spinner_color()
         self._spinner.start()
@@ -840,7 +845,18 @@ class _BusyButton(QPushButton):
     def stop_busy(self) -> None:
         self._busy = False
         self._spinner.stop()
+        self._check.reset()
         self.setText(self._idle_text)
+
+    def complete_busy(self) -> None:
+        was_busy = self._busy
+        self._busy = True
+        self._spinner.stop()
+        self.setText(i18n.tr("解锁成功"))
+        if not was_busy:
+            self._reposition()
+        self._check.move(self._spinner.x() + 6, self._spinner.y())
+        self._check.start(self.palette().color(QPalette.ButtonText).name())
 
     def changeEvent(self, event) -> None:
         super().changeEvent(event)
@@ -855,12 +871,44 @@ class _BusyButton(QPushButton):
         super().resizeEvent(event)
         self._reposition()
 
+    def sizeHint(self):
+        base = super().sizeHint()
+        width = max(self.fontMetrics().horizontalAdvance(self.text()),
+                    self.fontMetrics().horizontalAdvance(self._idle_text))
+        return QSize(max(base.width(), width + 30 + 8 + 32), max(base.height(), 30))
+
+    def minimumSizeHint(self):
+        base = super().minimumSizeHint()
+        return QSize(30 + 8 + 32 + self.fontMetrics().horizontalAdvance("…"), max(base.height(), 30))
+
+    def _content_rects(self):
+        width = self.fontMetrics().horizontalAdvance(self.text())
+        available = max(0, self.width() - 32 - 30 - 8)
+        text_width = min(width, available)
+        left = max(16, (self.width() - 30 - 8 - text_width) // 2)
+        return (QRect(left, (self.height() - 18) // 2, 30, 18),
+                QRect(left + 38, 0, text_width, self.height()))
+
+    def paintEvent(self, event):
+        if not self._busy:
+            super().paintEvent(event)
+            return
+        painter = QStylePainter(self)
+        option = QStyleOptionButton()
+        self.initStyleOption(option)
+        option.text = ""
+        painter.drawControl(QStyle.CE_PushButton, option)
+        _, text_rect = self._content_rects()
+        painter.setPen(self.palette().color(QPalette.ButtonText))
+        text = self.fontMetrics().elidedText(self.text(), Qt.ElideRight, text_rect.width())
+        painter.drawText(text_rect, Qt.AlignVCenter | Qt.AlignLeft, text)
+
     def _reposition(self) -> None:
         if not self._busy:
             return
-        text_width = self.fontMetrics().horizontalAdvance(self.text())
-        left = (self.width() - text_width) // 2 - self._spinner.width() - 6
-        self._spinner.move(max(8, left), (self.height() - self._spinner.height()) // 2)
+        icon_rect, _ = self._content_rects()
+        self._spinner.move(icon_rect.topLeft())
+        self._check.move(icon_rect.x() + 6, icon_rect.y())
 
 
 def _password_row(
@@ -1477,9 +1525,19 @@ class _UnlockVerifyWorker(QThread):
 
 
 class UnlockDialog(LockoutMixin, widgets.ShadowDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, *, prepare_handoff=None):
         super().__init__("保险库", parent, width=380, simple_close=True)
         self.vault = None
+        self._prepare_handoff = prepare_handoff
+        self._completion_started = False
+        self._handoff_done = False
+        self._completion_queued = False
+        self._handoff_preparing = False
+        self._completion_hold_timer = QTimer(self)
+        self._completion_hold_timer.setSingleShot(True)
+        self._completion_hold_timer.setInterval(80)
+        self._completion_hold_timer.setTimerType(Qt.PreciseTimer)
+        self._completion_hold_timer.timeout.connect(self._prepare_completed_unlock)
         self._users: list[dict] = []
 
         title = widgets.icon_text(
@@ -1538,6 +1596,7 @@ class UnlockDialog(LockoutMixin, widgets.ShadowDialog):
         action_lay.setSpacing(4)
 
         self.btn = _BusyButton("解锁")
+        self.btn._check._anim.finished.connect(self._on_completion_drawn)
         self.btn.setObjectName("Primary")
         self.btn.setAutoDefault(False)
         self.btn.ensurePolished()
@@ -1759,9 +1818,7 @@ class UnlockDialog(LockoutMixin, widgets.ShadowDialog):
         record = config.register_user(dlg.user_name, filename)
         config.set_current_user(record["name"])
         self._reload_users(select=record["name"])
-        self.vault = vault
-        self.passed()
-        super().accept()
+        self._on_unlock_success(record, vault)
 
     def _import_vault(self) -> None:
         src, _ = QFileDialog.getOpenFileName(
@@ -1830,9 +1887,7 @@ class UnlockDialog(LockoutMixin, widgets.ShadowDialog):
         if self.vault is None:
             self.warn("生物识别验证未通过")
             return
-        config.set_current_user(record["name"])
-        self.passed()
-        super().accept()
+        self._on_unlock_success(record, self.vault)
 
     # ---------- 紧急恢复密钥 ----------
     def _forgot_password(self) -> None:
@@ -1898,7 +1953,7 @@ class UnlockDialog(LockoutMixin, widgets.ShadowDialog):
             recovery_message,
             kind="success",
         )
-        super().accept()
+        self._on_unlock_success(record, vault)
 
     # ---------- 解锁 ----------
     def closeEvent(self, event) -> None:
@@ -1934,6 +1989,9 @@ class UnlockDialog(LockoutMixin, widgets.ShadowDialog):
         worker.start()
 
     def _finish_busy(self) -> None:
+        self._completion_hold_timer.stop()
+        self._completion_queued = False
+        self._handoff_preparing = False
         self._unlocking = False
         self.btn.stop_busy()
         self.set_close_enabled(True)
@@ -1942,20 +2000,68 @@ class UnlockDialog(LockoutMixin, widgets.ShadowDialog):
         self.user_combo.setEnabled(len(self._users) > 1)
         self._refresh_hello_button(self._current_record())
 
+    def reject(self) -> None:
+        if self._unlocking:
+            return
+        super().reject()
+
+    def finish_handoff(self) -> None:
+        if self._handoff_done or not self._completion_started or not self._handoff_preparing:
+            return
+        self._handoff_done = True
+        self._completion_hold_timer.stop()
+        super().accept()
+
+    def _on_completion_drawn(self) -> None:
+        if (not self._completion_started or self._completion_queued
+                or self._handoff_done or self.btn._check._progress < 1.0):
+            return
+        self._completion_queued = True
+        self._completion_hold_timer.start()
+
+    def _prepare_completed_unlock(self) -> None:
+        if self._handoff_done or self._handoff_preparing or not self._completion_started:
+            return
+        self._handoff_preparing = True
+        if self._prepare_handoff is None:
+            self.finish_handoff()
+            return
+        try:
+            self._prepare_handoff(self)
+        except Exception:
+            _log.exception("主窗口准备失败")
+            if self.vault is not None:
+                try:
+                    self.vault.close()
+                except Exception:
+                    _log.exception("清理已解锁保险库失败")
+            self.vault = None
+            self._completion_started = False
+            self._finish_busy()
+            self.warn(i18n.tr("无法打开密码库，请稍后重试"))
+
     def _on_unlock_success(self, record: dict, vault) -> None:
-        self._finish_busy()
+        if self._completion_started:
+            return
+        self._completion_started = True
+        self._unlocking = True
+        for widget in (self.pw, self.btn, self.user_combo, self.hello_btn, self.forgot_btn, self._new_user_btn):
+            widget.setEnabled(False)
+        self.set_close_enabled(False)
         self.vault = vault
         config.set_current_user(record["name"])
         self.passed()
-        super().accept()
+        self.btn.complete_busy()
 
     def _on_unlock_failure(self, kind: str, msg: str) -> None:
+        if self._completion_started:
+            return
         self._finish_busy()
         if kind == "decrypt":
             self.wrong_password()
         else:
             if msg:
-                _log_mod.warning("解锁校验失败：%s", msg)
+                _log.warning("解锁校验失败：%s", msg)
             self.warn(i18n.tr("无法打开密码库，请稍后重试"))
 
 

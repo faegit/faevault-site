@@ -60,3 +60,29 @@ def test_unlock_dialog_defers_windows_hello_probe(monkeypatch) -> None:
     assert calls == [True]
     dialog.close()
     assert app is not None
+
+
+def test_launcher_waits_for_first_paint_before_handoff():
+    from PySide6.QtCore import QEvent
+    from PySide6.QtWidgets import QWidget
+    from PySide6.QtTest import QTest
+    entry = Path(__file__).resolve().parents[1] / "__main__.py"
+    spec = importlib.util.spec_from_file_location("entry_handoff", entry)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    app = QApplication.instance() or QApplication([])
+    calls = []
+    class Dialog:
+        def finish_handoff(self):
+            calls.append(True)
+    window = QWidget()
+    ready = module._FirstPaintHandoff(window, Dialog())
+    assert calls == []
+    ready.eventFilter(window, QEvent(QEvent.Paint))
+    assert calls == []
+    app.processEvents()
+    assert calls == [True]
+    ready.eventFilter(window, QEvent(QEvent.Paint))
+    app.processEvents()
+    assert calls == [True]
+    window.close()

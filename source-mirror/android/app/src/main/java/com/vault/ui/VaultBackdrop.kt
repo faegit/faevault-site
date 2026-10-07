@@ -60,10 +60,11 @@ internal fun Modifier.vaultPopupCardSurface(
     shape: Shape = VaultShape,
     color: Color = MaterialTheme.colorScheme.surface,
     opaque: Boolean = false,
+    animateEntry: Boolean = true,
 ): Modifier {
     val source = LocalVaultModalSource.current
     val canBlur = !opaque && source != null && Build.VERSION.SDK_INT >= 31
-    val surface = vaultShadow(12.dp, shape)
+    val surface = (if (animateEntry) vaultModalRise() else this).vaultShadow(12.dp, shape)
     if (!canBlur) return surface.background(color, shape).clip(shape)
     return surface
         .vaultBackdrop(shape = shape, baseColor = color, state = source)

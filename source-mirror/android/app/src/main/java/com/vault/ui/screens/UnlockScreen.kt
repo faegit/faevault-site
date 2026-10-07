@@ -114,6 +114,7 @@ import com.vault.ui.vaultShadow
 import com.vault.ui.vaultBackdrop
 import com.vault.ui.vaultBackdropSource
 import com.vault.ui.VaultShape
+import com.vault.ui.ThreeDotMotion
 
 private fun pmvDisplayName(ctx: android.content.Context, uri: android.net.Uri): String {
     val name = ctx.contentResolver.query(uri, null, null, null, null)?.use { c ->
@@ -171,9 +172,10 @@ fun UnlockScreen(vm: VaultViewModel) {
     }
     val cooling = cooldownSec > 0
     val unlockBackground = remember { dev.chrisbanes.haze.HazeState() }
-    val busy = bioInProgress || state.busy || state.unlockSuccess
+    val completed = state.unlockSuccess || state.phase == com.vault.ui.Phase.UNLOCKED
+    val busy = bioInProgress || state.busy || completed
     // 生物识别弹窗期间不显示解锁进度容器/图标，只保留背景模糊模板；生物识别完成后才出现图标动画
-    val showUnlockOverlay = state.busy || state.unlockSuccess
+    val showUnlockOverlay = state.busy || completed
     val blurAlpha by animateFloatAsState(if (busy) 1f else 0f, tween(220), label = "unlockBlur")
     val overlayAlpha by animateFloatAsState(if (showUnlockOverlay) 1f else 0f, tween(220), label = "unlockOverlay")
 
@@ -421,10 +423,11 @@ fun UnlockScreen(vm: VaultViewModel) {
                     .pointerInput(showUnlockOverlay) { detectTapGestures { /* 吞掉点击 */ } },
                 contentAlignment = Alignment.Center,
             ) {
-                // 生物识别解锁图标：蓝色圆环 + 白色圆角卡片，无文字。
-                // 卡片紧贴圆环：内边距按 ringSize 比例派生（约 0.24×，比原 0.2× 略大），不写死 dp 值。
+                // 三点等待 / 成功对勾共用小尺寸白色圆角卡片。
+                // 固定指示区域和安全内边距，避免变换时卡片抖动或裁切。
                 val dark = MaterialTheme.colorScheme.background.luminance() < 0.5f
-                val ringSize = 56.dp
+                val indicatorWidth = 36.dp
+                val indicatorHeight = 24.dp
                 Surface(
                     shape = VaultShape,
                     color = if (dark) Color.Black else Color.White,
@@ -435,13 +438,14 @@ fun UnlockScreen(vm: VaultViewModel) {
                     Box(
                         modifier = Modifier
                             .wrapContentSize()
-                            .padding(horizontal = ringSize * 0.24f, vertical = ringSize * 0.24f),
+                            .padding(horizontal = 10.dp, vertical = 10.dp),
                         contentAlignment = Alignment.Center,
                     ) {
-                        UnlockProgressRing(
-                            success = state.unlockSuccess,
+                        UnlockProgressIndicator(
+                            success = completed,
                             onSuccessAnimationFinished = vm::completeUnlockAnimation,
-                            diameter = ringSize,
+                            width = indicatorWidth,
+                            height = indicatorHeight,
                         )
                     }
                 }
@@ -597,102 +601,68 @@ private fun handleBioFailure(
     }
 }
 
-/** 圆环持续旋转；解锁成功后沿外部圆环铺满，并在透明圆心内绘制对勾。 */
+/** 等待时三点从左向右呼吸；成功时点淡出，仅绘制对勾，并交接首屏。 */
 @Composable
-private fun UnlockProgressRing(success: Boolean, onSuccessAnimationFinished: () -> Unit, diameter: Dp = 56.dp) {
+private fun UnlockProgressIndicator(success: Boolean, onSuccessAnimationFinished: () -> Unit, width: Dp = 36.dp, height: Dp = 24.dp) {
     // 单段圆弧的追逐-呼吸循环：圆弧长度在最短↔最长之间连续变化，
     // 前端加速拉伸、后端减速，收缩时后端加速追赶前端；整体始终顺时针旋转，无静止/跳变/重置。
     var elapsedMillis by remember { mutableFloatStateOf(0f) }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(success) {
         var lastNanos = withFrameNanos { it }
-        while (true) {
+        while (!success) {
             val now = withFrameNanos { it }
-            elapsedMillis += (now - lastNanos) / 1_000_000f
+            elapsedMillis = (elapsedMillis + (now - lastNanos) / 1_000_000f) % ThreeDotMotion.PERIOD_MS
             lastNanos = now
         }
     }
+    val dotsAlpha = remember { androidx.compose.animation.core.Animatable(if (success) 0f else 1f) }
     val checkAnim = remember { androidx.compose.animation.core.Animatable(0f) }
     val latestOnFinished by rememberUpdatedState(onSuccessAnimationFinished)
     LaunchedEffect(success) {
         checkAnim.snapTo(0f)
+        if (!success) dotsAlpha.snapTo(1f)
         if (success) {
-            // 成功阶段：圆环直接显示为完整填充，不再播放从零铺满的动画，只播放对勾绘制。
+            // 等待点淡出；成功图形只保留对勾。
+            if (dotsAlpha.value > 0f) dotsAlpha.animateTo(0f, tween(100))
             checkAnim.animateTo(
                 targetValue = 1f,
                 animationSpec = androidx.compose.animation.core.tween(
-                    durationMillis = 280,
+                    durationMillis = 240,
                     easing = androidx.compose.animation.core.FastOutSlowInEasing,
                 ),
             )
             // 保留完整对勾至少一帧以上，再通知 ViewModel 挂载主页。
-            delay(80)
+            delay(60)
             latestOnFinished()
         }
     }
     val primary = MaterialTheme.colorScheme.primary
-    val ringBlue = MaterialTheme.colorScheme.primary
-    androidx.compose.foundation.Canvas(modifier = Modifier.size(diameter)) {
+        androidx.compose.foundation.Canvas(modifier = Modifier.size(width, height)) {
         // 逐帧状态只在绘制阶段读取，避免解锁关键路径上的整组件逐帧重组。
-        val periodMs = 1600f
-        val turnsPerPeriod = 2
-        val t = (elapsedMillis % periodMs) / periodMs
-        val omega = 2f * PI.toFloat() * t
-        val minSweep = 30f
-        val maxSweep = 300f
-        // 弧长按余弦波形呼吸：min → max → min
-        val sweep = minSweep + (maxSweep - minSweep) * (1f - cos(omega)) / 2f
-        // 线性旋转 + 正弦速度调制：延伸时整体稍慢突显前端拉开，收缩时整体稍快突显后端追赶
-        val speedWobbleAmplitude = 25f
-        val linearRotation = turnsPerPeriod * 360f * (elapsedMillis / periodMs)
-        val wobble = speedWobbleAmplitude * sin(omega)
-        val totalRotation = linearRotation - wobble
-        val startAngle = totalRotation - sweep / 2f
         val stroke = androidx.compose.ui.graphics.drawscope.Stroke(
-            width = 4.dp.toPx(),
+            width = 2.5.dp.toPx(),
             cap = androidx.compose.ui.graphics.StrokeCap.Round,
             join = androidx.compose.ui.graphics.StrokeJoin.Round,
         )
-        val arcBounds = androidx.compose.ui.geometry.Size(
-            size.width - stroke.width,
-            size.height - stroke.width,
-        )
-        if (!success) {
-            drawArc(
-                color = ringBlue,
-                startAngle = startAngle,
-                sweepAngle = sweep,
-                useCenter = false,
-                topLeft = androidx.compose.ui.geometry.Offset(stroke.width / 2f, stroke.width / 2f),
-                size = arcBounds,
-                style = stroke,
-            )
-        } else {
-            // 成功阶段：只填充外部圆环（直接完整显示），圆心保持透明；仅对勾播放绘制动画。
-            drawArc(
-                color = ringBlue.copy(alpha = 0.18f),
-                startAngle = -90f,
-                sweepAngle = 360f,
-                useCenter = false,
-                topLeft = androidx.compose.ui.geometry.Offset(stroke.width / 2f, stroke.width / 2f),
-                size = arcBounds,
-                style = stroke,
-            )
-            drawArc(
-                color = ringBlue,
-                startAngle = -90f,
-                sweepAngle = 360f,
-                useCenter = false,
-                topLeft = androidx.compose.ui.geometry.Offset(stroke.width / 2f, stroke.width / 2f),
-                size = arcBounds,
-                style = stroke,
-            )
+        if (dotsAlpha.value > 0f) {
+            val radius = minOf(size.height / 6f, size.width / 15f)
+            repeat(3) { index ->
+                drawCircle(
+                    color = primary.copy(alpha = dotsAlpha.value),
+                    radius = radius * ThreeDotMotion.scale(elapsedMillis, index),
+                    center = androidx.compose.ui.geometry.Offset(size.width * (index + 0.5f) / 3f, size.height / 2f),
+                )
+            }
+        }
+        if (success) {
             val tickFrac = checkAnim.value.coerceIn(0f, 1f)
             if (tickFrac > 0f) {
-                val w = size.width
+                val w = minOf(size.width, size.height)
                 val h = size.height
-                val p0 = androidx.compose.ui.geometry.Offset(w * 0.28f, h * 0.52f)
-                val p1 = androidx.compose.ui.geometry.Offset(w * 0.45f, h * 0.68f)
-                val p2 = androidx.compose.ui.geometry.Offset(w * 0.74f, h * 0.36f)
+                val inset = (size.width - w) / 2f
+                val p0 = androidx.compose.ui.geometry.Offset(inset + w * 0.24f, h * 0.52f)
+                val p1 = androidx.compose.ui.geometry.Offset(inset + w * 0.43f, h * 0.70f)
+                val p2 = androidx.compose.ui.geometry.Offset(inset + w * 0.80f, h * 0.32f)
                 val seg1Len = (p1 - p0).getDistance()
                 val seg2Len = (p2 - p1).getDistance()
                 val total = seg1Len + seg2Len

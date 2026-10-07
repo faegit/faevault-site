@@ -178,8 +178,33 @@ internal fun VaultDialog(
 @Composable
 internal fun VaultDialogWindow() {
     val view = androidx.compose.ui.platform.LocalView.current
+    val window = (view.parent as? androidx.compose.ui.window.DialogWindowProvider)?.window
+    androidx.compose.runtime.DisposableEffect(window) {
+        val original = window?.callback
+        val activity = com.vault.ui.UserActivityDispatcher(com.vault.ui.IdleTracker::touch)
+        val tracking = original?.let { callback ->
+            object : android.view.Window.Callback by callback {
+                override fun dispatchTouchEvent(event: android.view.MotionEvent): Boolean =
+                    activity.dispatch { callback.dispatchTouchEvent(event) }
+
+                override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean =
+                    activity.dispatch { callback.dispatchKeyEvent(event) }
+
+                override fun dispatchKeyShortcutEvent(event: android.view.KeyEvent): Boolean =
+                    activity.dispatch { callback.dispatchKeyShortcutEvent(event) }
+
+                override fun dispatchGenericMotionEvent(event: android.view.MotionEvent): Boolean =
+                    if (event.actionMasked == android.view.MotionEvent.ACTION_SCROLL) {
+                        activity.dispatch { callback.dispatchGenericMotionEvent(event) }
+                    } else callback.dispatchGenericMotionEvent(event)
+            }
+        }
+        if (tracking != null) window?.callback = tracking
+        onDispose {
+            if (window?.callback === tracking) window?.callback = original
+        }
+    }
     androidx.compose.runtime.SideEffect {
-        (view.parent as? androidx.compose.ui.window.DialogWindowProvider)?.window
-            ?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+        window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND)
     }
 }

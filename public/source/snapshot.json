@@ -5,19 +5,19 @@
   "platforms": {
     "android": {
       "version": "4.6.7",
-      "file_count": 525,
-      "bytes": 6342524,
-      "archive_bytes": 2043159,
-      "archive_sha256": "03a2405bba3209aeb60cb5da47fc651efb4f2022f8c719d2a02ec9be800493ca",
-      "source_commit": "d9c6761be14feabe1ed5d0621fcc02912af7d22e"
+      "file_count": 529,
+      "bytes": 6323306,
+      "archive_bytes": 2038826,
+      "archive_sha256": "ef651fb663d71eb2d0940bf226fec41536d663da301ae25b2008e0523c658dfe",
+      "source_commit": "475dfc14843efdd6b20a856376a67417130982e2"
     },
     "pc": {
       "version": "4.6.7",
-      "file_count": 351,
-      "bytes": 5535662,
-      "archive_bytes": 1894906,
-      "archive_sha256": "cae2d82d8eec20828acd65eeb3ac18ff4ba34aec28e06d3d814ead6c08fe392f",
-      "source_commit": "7b928283c813228d85efdf1f7c9a4efca4f3231c"
+      "file_count": 350,
+      "bytes": 5519015,
+      "archive_bytes": 1888566,
+      "archive_sha256": "d2ff34f13b3bc266f2e7192f4dd3a6ef520d2480d2057e1e9c952a79f8cd0b02",
+      "source_commit": "6fd8f3926ab6f4241c1c4b469a9084406c999958"
     }
   }
 }

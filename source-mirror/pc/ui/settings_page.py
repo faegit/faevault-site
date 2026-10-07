@@ -176,6 +176,15 @@ class SettingsPage(EditorPage):
         # ── 隐私与安全 ──
         g = self._group("隐私与安全", sensitive=True)
 
+        sub = QLabel(i18n.tr("设备记录"))
+        sub.setObjectName("SettingGroup")
+        g.addWidget(sub)
+        self.devices_button = QPushButton(i18n.tr("查看设备记录"))
+        self.devices_button.setObjectName("SettingsBtn")
+        self.devices_button.clicked.connect(lambda: self._window._open_devices())
+        g.addWidget(self.devices_button)
+        self._note(g, i18n.tr("设备名称自动使用系统设置中的名称。"))
+
         sub = QLabel("会话与锁定")
         sub.setObjectName("SettingGroup")
         g.addWidget(sub)
@@ -543,6 +552,9 @@ class SettingsPage(EditorPage):
             obj.setFocus()
 
     def _in_sensitive(self, obj) -> bool:
+        # Viewing authenticated device records does not change a security setting.
+        if isinstance(obj, QWidget) and (obj is self.devices_button or self.devices_button.isAncestorOf(obj)):
+            return False
         return any(box.isAncestorOf(obj) for box in self._sensitive_boxes if isinstance(obj, QWidget))
 
     def _note(self, layout: QVBoxLayout, text: str, *, object_name: str = "SettingNote") -> QLabel:

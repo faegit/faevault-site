@@ -246,8 +246,23 @@ override fun onStart() {
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        if (ev.action == MotionEvent.ACTION_DOWN) IdleTracker.touch()
+        IdleTracker.touch()
         return super.dispatchTouchEvent(ev)
+    }
+
+    override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean {
+        IdleTracker.touch()
+        return super.dispatchKeyEvent(event)
+    }
+
+    override fun dispatchKeyShortcutEvent(event: android.view.KeyEvent): Boolean {
+        IdleTracker.touch()
+        return super.dispatchKeyShortcutEvent(event)
+    }
+
+    override fun dispatchGenericMotionEvent(event: MotionEvent): Boolean {
+        if (event.actionMasked == MotionEvent.ACTION_SCROLL) IdleTracker.touch()
+        return super.dispatchGenericMotionEvent(event)
     }
 
     /**

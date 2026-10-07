@@ -42,17 +42,16 @@ def _dispose_test_windows(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
-def _isolate_device_history_configuration(monkeypatch, tmp_path, request):
-    # Newly automatic device/history writes must never touch the signed-in user's configuration.
-    from core import config, device_identity, vault_history
+def _isolate_device_configuration(monkeypatch, tmp_path, request):
+    # Automatic device writes must never touch the signed-in user's configuration.
+    from core import config, device_identity
     if request.node.path.name == "test_device_identity.py":
         # These tests explicitly isolate and exercise the actual protected configuration adapter.
         return
     original_get, original_set = config.get, config.set
     isolated = {}
     def own(key):
-        return key == device_identity._CONFIG_KEY or (isinstance(key, str) and key.startswith("vault_history_v1_"))
+        return key == device_identity._CONFIG_KEY
     monkeypatch.setattr(config, "get", lambda key, default=None: isolated.get(key, default) if own(key) else original_get(key, default))
     monkeypatch.setattr(config, "set", lambda key, value: isolated.__setitem__(key, value) if own(key) else original_set(key, value))
     monkeypatch.setattr(device_identity, "_path", lambda: tmp_path / "legacy-device.json")
-    monkeypatch.setattr(vault_history, "_history_root", lambda: tmp_path / "private-history")

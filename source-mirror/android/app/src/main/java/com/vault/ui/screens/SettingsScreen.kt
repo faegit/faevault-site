@@ -358,8 +358,8 @@ fun SettingsScreen(
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     val ctx = LocalContext.current
-    var showDevicesHistory by remember { mutableStateOf(false) }
-    if (showDevicesHistory) DevicesHistoryDialog(vm, onDismiss = { showDevicesHistory = false })
+    var showDevices by remember { mutableStateOf(false) }
+    if (showDevices) DevicesDialog(vm, onDismiss = { showDevices = false })
     val securityChangePasswordGuard = stringResource(R.string.settings_remaining_change_password_guard)
     val securityRegenerateRecoveryGuard = stringResource(R.string.settings_remaining_regenerate_recovery_guard)
     val securityDisableBiometricGuard = stringResource(R.string.settings_remaining_disable_biometric_guard)
@@ -1262,19 +1262,6 @@ fun SettingsScreen(
             Spacer(Modifier.height(8.dp))
         }
         if (contentMode == SettingsContentMode.TRANSFER) {
-            item(contentType = "devicesHistory") {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                ) {
-                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(uiText("设备与历史版本"), style = MaterialTheme.typography.titleMedium)
-                        Text(uiText("查看已认证设备与本机加密历史，选择条目恢复。"), style = MaterialTheme.typography.bodySmall)
-                        VaultActionButton(onClick = { showDevicesHistory = true }, style = VaultActionStyle.PRIMARY) { Text(uiText("查看设备与历史")) }
-                    }
-                }
-            }
             item(contentType = "transferOverview") {
                 PageHeaderCard(
                     title = stringResource(R.string.settings_remaining_sync_and_migration),
@@ -1554,6 +1541,14 @@ fun SettingsScreen(
                     help = uiText("密码、卡号等敏感内容点击显示后，到时间会自动重新隐藏。"),
                 )
                 AutoHideSection(ctx, embedded = true)
+                SettingsSubsectionTitle(
+                    uiText("设备记录"),
+                    help = uiText("查看保险库中记录的设备、最近活动与授权状态。"),
+                )
+                SettingsOutlinedButton(
+                    onClick = { showDevices = true },
+                    modifier = Modifier.fillMaxWidth(),
+                ) { Text(uiText("查看设备记录")) }
                     }
                     SettingsAccordion(
                         title = appearanceSettingsTitle,
@@ -2553,6 +2548,7 @@ fun SettingsScreen(
                 }
             }
         }
+
 
         }
     }
@@ -5066,7 +5062,7 @@ private fun CloudSyncPreviewSummary(preview: VaultViewModel.CloudSyncPreview) {
             Text(
                 uiText("已验证的远端写入设备") + ": " +
                     listOf(writer.name.ifBlank { writer.deviceId }, writer.platform,
-                        if (writer.lastSeenAt > 0L) historyDisplayTime(writer.lastSeenAt) else uiText("活动时间未知"))
+                        if (writer.lastSeenAt > 0L) deviceActivityDisplayTime(writer.lastSeenAt) else uiText("活动时间未知"))
                         .filter { it.isNotBlank() }.joinToString(" · "),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -5826,10 +5822,10 @@ private fun LanSyncPinDialog(
 }
 
 /**
- * 同步进行中的会话面板：设备信息（仅主机侧）+ 同步状态 + 断开连接。
+ * 同步进行中的会话面板：设备记录（仅主机侧）+ 同步状态 + 断开连接。
  *
  * 主机侧（别人连我）与连接方（我连别人）共用同一个 lanSyncProgress——主机的收发
- * 回调也往里写字节数。但只有主机侧拿得到对端身份，连接方拿不到，故设备信息卡仅在
+ * 回调也往里写字节数。但只有主机侧拿得到对端身份，连接方拿不到，故设备记录卡仅在
  * 主机侧出现。
  */
 @OptIn(ExperimentalFoundationApi::class)

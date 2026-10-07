@@ -20,6 +20,13 @@ def _app():
     return QApplication.instance() or QApplication([])
 
 
+def _pump_until(predicate):
+    deadline = time.monotonic() + 5
+    while not predicate() and time.monotonic() < deadline:
+        QTest.qWait(10)
+    assert predicate()
+
+
 def test_unlock_worker_emits_succeeded(monkeypatch):
     _app()
     fake = object()
@@ -101,46 +108,64 @@ def _unlock_dialog(monkeypatch):
 
 
 def test_slow_hello_probe_keeps_unlock_spinner_moving(monkeypatch):
-    # Start the probe explicitly below; slow CI setup must not run the scheduled
-    # production probe before the mock is installed.
+    # Suppress the scheduled startup probe; exercise it explicitly below.
     with monkeypatch.context() as setup_patch:
         setup_patch.setattr(dialogs.UnlockDialog, "_load_hello_availability", lambda self: None)
         dialog = _unlock_dialog(monkeypatch)
     release = threading.Event()
+    entered = threading.Event()
+    finished = threading.Event()
+    frame_changed = threading.Event()
+    ui_thread = threading.get_ident()
     probe_threads = []
 
     def slow_probe():
-        probe_threads.append(threading.get_ident())
-        release.wait(2)
+        thread = threading.get_ident()
+        probe_threads.append(thread)
+        # Fail before blocking if the implementation regresses onto the UI thread.
+        assert thread != ui_thread
+        entered.set()
+        release.wait()
+        finished.set()
         return True
+
+    def wait_for_ui(predicate):
+        # This bounds a hung test, rather than measuring scheduling performance.
+        deadline = time.monotonic() + 5
+        while not predicate() and time.monotonic() < deadline:
+            QTest.qWait(10)
+        assert predicate()
 
     monkeypatch.setattr(dialogs.biometric, "available", slow_probe)
     monkeypatch.setattr(dialogs.biometric, "is_enabled", lambda _path: True)
     dialog._unlocking = True
     dialog.hello_btn.setEnabled(False)
     dialog.btn.start_busy("正在解锁…")
+    dialog.btn._spinner._anim.valueChanged.connect(lambda _value: frame_changed.set())
     try:
-        started = time.monotonic()
         dialog._load_hello_availability()
-        assert time.monotonic() - started < 0.15
-        deadline = time.monotonic() + 2
-        while not probe_threads and time.monotonic() < deadline:
-            QTest.qWait(10)
-        angles = []
-        for _ in range(6):
-            QTest.qWait(25)
-            angles.append(dialog.btn._spinner.angle)
-        assert len(set(angles)) >= 3
+        wait_for_ui(entered.is_set)
         assert len(probe_threads) == 1
-        assert all(thread != threading.get_ident() for thread in probe_threads)
+        assert probe_threads[0] != ui_thread
+        assert not dialog._hello_probe_future.done()
+        assert not finished.is_set()
+        assert dialog.btn._spinner._spinning
+        assert dialog.btn._spinner.isVisible()
+        frame_changed.clear()
+        wait_for_ui(frame_changed.is_set)
+        # A frame was delivered by the UI event loop while the worker was held.
+        assert not finished.is_set()
+        assert not dialog._hello_probe_future.done()
+        assert not dialog.hello_btn.isEnabled()
         release.set()
-        deadline = time.monotonic() + 2
-        while not dialog._hello_ok and time.monotonic() < deadline:
-            QTest.qWait(10)
-        assert dialog._hello_ok
+        wait_for_ui(lambda: finished.is_set() and dialog._hello_ok)
+        assert dialog._hello_probe_future.result() is True
+        assert not dialog._hello_probe_timer.isActive()
         assert not dialog.hello_btn.isEnabled()
     finally:
         release.set()
+        if dialog._hello_probe_future is not None:
+            dialog._hello_probe_future.result(timeout=5)
         dialog._unlocking = False
         dialog.btn.stop_busy()
         dialog.close()
@@ -462,3 +487,233 @@ def test_unlock_error_keeps_layout_and_single_user_disabled(monkeypatch):
     finally:
         dialog.close()
         app.setStyleSheet(old_sheet)
+
+
+def test_completion_hides_ring_and_keeps_geometry():
+    _app()
+    button = dialogs._BusyButton("解锁")
+    button.resize(250, 40)
+    button.show()
+    button.start_busy("正在解锁…")
+    size = button.size()
+    from PySide6.QtTest import QSignalSpy
+    finished = QSignalSpy(button._check._anim.finished)
+    button.complete_busy()
+    assert not button._spinner._spinning
+    assert button._spinner.isHidden()
+    assert not button._check.isHidden()
+    assert button.size() == size
+    assert "drawArc" not in inspect.getsource(widgets.CompletionCheckWidget)
+    _pump_until(lambda: finished.count() == 1)
+    assert button._check._progress == pytest.approx(1.0)
+    button.stop_busy()
+    assert button._check.isHidden()
+    assert button.text() == "解锁"
+    button.close()
+
+
+def test_success_handoff_once_and_blocks_cancel_and_submit(monkeypatch):
+    dialog = _unlock_dialog(monkeypatch)
+    monkeypatch.setattr(dialog, "passed", lambda: None)
+    prepared = []
+    dialog._prepare_handoff = lambda dlg: prepared.append(dlg)
+    vault = object()
+    dialog._on_unlock_success({"name": "FAE"}, vault)
+    dialog._on_unlock_success({"name": "FAE"}, vault)
+    dialog.accept()
+    dialog.reject()
+    assert dialog.isVisible()
+    assert not dialog.btn.isEnabled()
+    assert not dialog.pw.isEnabled()
+    assert not dialog.btn._spinner._spinning
+    # Hold the drawing partway through; pumping past the former fixed delay
+    # must not prepare the main window or accept the login.
+    animation = dialog.btn._check._anim
+    animation.pause()
+    animation.setCurrentTime(120)
+    QTest.qWait(360)
+    assert dialog.btn._check._progress < 1.0
+    assert prepared == []
+    assert not dialog._completion_hold_timer.isActive()
+    dialog.finish_handoff()
+    assert dialog.isVisible()
+    finished_states = []
+    def on_finished():
+        finished_states.append((dialog.btn._check._progress,
+                                dialog._completion_hold_timer.isActive(), list(prepared)))
+        # Duplicate finished delivery must not restart the hold or prepare twice.
+        dialog._on_completion_drawn()
+    animation.finished.connect(on_finished)
+    animation.resume()
+    _pump_until(lambda: len(prepared) == 1)
+    assert finished_states == [(1.0, True, [])]
+    assert dialog._completion_hold_timer.interval() == 80
+    assert prepared == [dialog]
+    assert dialog.isVisible()
+    accepted = []
+    dialog.accepted.connect(lambda: accepted.append(True))
+    dialog.finish_handoff()
+    dialog.finish_handoff()
+    assert accepted == [True]
+
+
+def test_handoff_failure_closes_vault_and_resets_completion(monkeypatch):
+    dialog = _unlock_dialog(monkeypatch)
+    monkeypatch.setattr(dialog, "passed", lambda: None)
+    closed = []
+    class Vault:
+        def close(self):
+            closed.append(True)
+    def fail(dlg):
+        raise RuntimeError("prepare failed")
+    dialog._prepare_handoff = fail
+    dialog._on_unlock_success({"name": "FAE"}, Vault())
+    _pump_until(lambda: bool(closed))
+    assert closed == [True]
+    assert dialog.vault is None
+    assert not dialog._unlocking
+    assert dialog.btn._check.isHidden()
+    assert dialog.btn._spinner.isHidden()
+    assert dialog.btn.isEnabled()
+    dialog.close()
+
+
+def test_worker_pending_prevents_dialog_cancellation(monkeypatch):
+    dialog = _unlock_dialog(monkeypatch)
+    dialog._unlocking = True
+    dialog.btn.start_busy("正在解锁…")
+    dialog.reject()
+    dialog.close()
+    assert dialog.isVisible()
+    dialog._on_unlock_failure("other", "cancelled")
+    assert dialog.btn._spinner.isHidden()
+    assert dialog.btn._check.isHidden()
+    dialog.reject()
+    assert not dialog.isVisible()
+
+
+def test_direct_success_places_check_inside_button():
+    _app()
+    button = dialogs._BusyButton("解锁")
+    button.resize(250, 40)
+    button.complete_busy()
+    assert button._check.y() == 11
+    assert button._check.x() >= 8
+    assert button._spinner.isHidden()
+    button.stop_busy()
+
+
+@pytest.mark.parametrize("label", ["正在验证主密码，请稍候…", "Verifying a very long master password label…"])
+def test_waiting_dots_long_labels_do_not_overlap_or_clip(label):
+    _app()
+    button = dialogs._BusyButton("确认密码")
+    button.resize(120, 40)
+    button.show()
+    height = button.sizeHint().height()
+    button.start_busy(label)
+    assert isinstance(button._spinner, widgets.WaitingDotsWidget)
+    assert button.sizeHint().width() >= button.fontMetrics().horizontalAdvance(label) + 70
+    assert button.minimumSizeHint().width() >= 70
+    icon, text = button._content_rects()
+    assert button.rect().contains(icon)
+    assert not icon.intersects(text)
+    geometry = button._spinner.geometry()
+    for angle in (0, 60, 120, 180, 240, 300, 360):
+        button._spinner.angle = angle
+        for index, radius in enumerate(button._spinner.dot_radii()):
+            assert 0 <= 5 + index * 10 - radius
+            assert 5 + index * 10 + radius <= 30
+            assert 0 <= 9 - radius and 9 + radius <= 18
+        assert button._spinner.geometry() == geometry
+        assert button.sizeHint().height() == height
+    button.complete_busy()
+    assert button._spinner.isHidden()
+    assert not button._check.isHidden()
+    button.stop_busy()
+    assert button._check.isHidden()
+    assert button.sizeHint().height() == height
+    button.close()
+
+
+def test_dots_pulse_in_left_to_right_order():
+    _app()
+    dots = widgets.WaitingDotsWidget()
+    for active, angle in enumerate((60, 180, 300)):
+        dots.angle = angle
+        radii = dots.dot_radii()
+        assert radii[active] == pytest.approx(4.0)
+        assert sum(radius == pytest.approx(1.5) for radius in radii) == 2
+    dots.angle = 360
+    assert dots.dot_radii() == [1.5, 1.5, 1.5]
+
+
+def test_too_narrow_button_reserves_full_indicator_bounds():
+    _app()
+    button = dialogs._BusyButton("Verify password")
+    button.resize(20, 40)
+    button.start_busy("Verifying password…")
+    icon, text = button._content_rects()
+    assert button.width() >= button.minimumSizeHint().width()
+    assert button.rect().contains(icon)
+    assert not icon.intersects(text)
+    button.stop_busy()
+
+
+def test_new_vault_action_uses_completed_unlock_handoff(monkeypatch, tmp_path):
+    dialog = _unlock_dialog(monkeypatch)
+    password = bytearray(b"new master password")
+    secret = object()
+    vault = object()
+    created = []
+    records = []
+    prepared = []
+    accepted = []
+    class AddUser:
+        restore_name = None
+        user_name = "NewUser"
+        def __init__(self, *args, **kwargs):
+            self.password = password
+        def exec(self):
+            return dialogs.QDialog.Accepted
+    class Recovery:
+        def __init__(self, *args, **kwargs):
+            self.secret = secret
+        def exec(self):
+            return dialogs.QDialog.Accepted
+    monkeypatch.setattr(dialogs, "AddUserDialog", AddUser)
+    monkeypatch.setattr(dialogs, "RecoveryKeyConfirmDialog", Recovery)
+    monkeypatch.setattr(dialogs.config, "trashed_accounts", lambda: {})
+    monkeypatch.setattr(dialogs.config, "unique_vault_filename", lambda _name: "new.pmv")
+    monkeypatch.setattr(dialogs.config, "vault_dir", lambda: tmp_path)
+    def create(path, pw, recovery):
+        created.append((path, bytes(pw), recovery))
+        return vault
+    def register(name, filename):
+        record = {"name": name, "file": filename}
+        records.append(record)
+        return record
+    monkeypatch.setattr(dialogs, "_create_new_vault", create)
+    monkeypatch.setattr(dialogs.config, "register_user", register)
+    monkeypatch.setattr(dialog, "_reload_users", lambda select: None)
+    monkeypatch.setattr(dialog, "passed", lambda: None)
+    def prepare(dlg):
+        prepared.append((dlg.vault, dlg.btn._check._progress))
+        dlg.finish_handoff()
+    dialog._prepare_handoff = prepare
+    dialog.accepted.connect(lambda: accepted.append(True))
+    dialog._new_user_btn.menu().actions()[0].trigger()
+    assert created == [(tmp_path / "new.pmv", b"new master password", secret)]
+    assert records == [{"name": "NewUser", "file": "new.pmv"}]
+    assert password == bytearray(len(password))
+    assert dialog.vault is vault
+    assert dialog.isVisible()
+    assert dialog._completion_started
+    assert dialog.btn._spinner.isHidden()
+    assert not dialog.btn._check.isHidden()
+    assert prepared == []
+    assert accepted == []
+    _pump_until(lambda: bool(accepted))
+    assert prepared == [(vault, 1.0)]
+    assert accepted == [True]
+    dialog.finish_handoff()
+    assert accepted == [True]
