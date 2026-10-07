@@ -13,7 +13,7 @@ class ThreeDotMotionTest {
     }
 
     @Test fun peakDotsRemainInsideFixedButtonAndLoginBounds() {
-        listOf(32f to 18f, 36f to 24f, 24f to 12f).forEach { (width, height) ->
+        listOf(32f to 18f, 36f to 24f, 54f to 40f, 24f to 12f).forEach { (width, height) ->
             val radius = minOf(height / 6f, width / 15f) * ThreeDotMotion.MAX_SCALE
             assertTrue(radius < height / 2f)
             assertTrue(width / 6f - radius > 0f)

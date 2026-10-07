@@ -2345,6 +2345,7 @@ class VaultViewModel(app: Application) : AndroidViewModel(app) {
      */
     @Synchronized
     fun otpDisplaySnapshot(id: String, epochSeconds: Long): OtpDisplaySnapshot? {
+        if (_state.value.phase != Phase.UNLOCKED) return null
         // 先走缓存命中：命中时只做纯算术，避免每秒对每条可见 OTP 条目做全库线性扫描
         // （缓存由 sealPayload() 在条目变更时清空，命中即代表当前条目仍有效）
         val cached = otpCache[id]
@@ -2372,6 +2373,8 @@ class VaultViewModel(app: Application) : AndroidViewModel(app) {
 
     @Synchronized
     private fun clearEntryStore() {
+        otpCache.clear()
+        otpCacheStep.clear()
         entryStore?.close()
         entryStore = null
     }

@@ -425,13 +425,14 @@ internal fun AppRoot(remoteUpdateRequest: RemoteUpdateOpenRequest? = null, onRem
                     label = "unlock-handoff",
                     transitionSpec = {
                         if (initialState == Phase.LOCKED && targetState == Phase.UNLOCKED) {
-                            fadeIn(tween(180)) togetherWith fadeOut(tween(140))
+                            (fadeIn(tween(180)) togetherWith fadeOut(tween(140))).using(null)
                         } else {
                             // 锁定必须立即隐藏保险库内容，不延迟安全边界。
-                            fadeIn(tween(0)) togetherWith fadeOut(tween(0))
+                            (fadeIn(tween(0)) togetherWith fadeOut(tween(0))).using(null)
                         }
                     },
                 ) { visiblePhase ->
+                Box(Modifier.fillMaxSize()) {
                 when (visiblePhase) {
                     Phase.NO_VAULT -> Box(Modifier.fillMaxSize()) {
                         WelcomeScreen(vm)
@@ -934,6 +935,7 @@ internal fun AppRoot(remoteUpdateRequest: RemoteUpdateOpenRequest? = null, onRem
                             }
                         }
                     }
+                }
                 }
                 }
                 }

@@ -6,10 +6,10 @@
     "android": {
       "version": "4.6.7",
       "file_count": 529,
-      "bytes": 6323306,
-      "archive_bytes": 2038826,
-      "archive_sha256": "ef651fb663d71eb2d0940bf226fec41536d663da301ae25b2008e0523c658dfe",
-      "source_commit": "475dfc14843efdd6b20a856376a67417130982e2"
+      "bytes": 6323664,
+      "archive_bytes": 2038841,
+      "archive_sha256": "0c0b9df33aeebb2aa9150d7bafab423562f4f8bf4ee4a282f344fd249852df61",
+      "source_commit": "cf74a6457f560e2027ab84f46d4c8d2450e22e99"
     },
     "pc": {
       "version": "4.6.7",

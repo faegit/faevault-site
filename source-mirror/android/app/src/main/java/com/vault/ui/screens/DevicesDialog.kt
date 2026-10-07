@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
 import com.vault.storage.DeviceActivityProfile
 import com.vault.ui.VaultViewModel
 import com.vault.ui.localizeUiTextFor
@@ -24,6 +25,8 @@ import java.util.Date
 internal fun DevicesDialog(vm: VaultViewModel, onDismiss: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    // Reserve the viewport before IO completes; growing content must not recenter the entering card.
+    val bodyHeight = (LocalConfiguration.current.screenHeightDp.dp - 200.dp).coerceIn(120.dp, 360.dp)
     var devices by remember { mutableStateOf(emptyList<DeviceActivityProfile>()) }
     var busy by remember { mutableStateOf(true) }
     var feedback by remember { mutableStateOf("") }
@@ -48,7 +51,7 @@ internal fun DevicesDialog(vm: VaultViewModel, onDismiss: () -> Unit) {
         title = { Text(uiText("设备记录")) },
         text = {
             Column(
-                Modifier.fillMaxWidth().heightIn(max = 520.dp).verticalScroll(rememberScrollState()),
+                Modifier.fillMaxWidth().height(bodyHeight).verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Text(uiText("设备名称自动读取系统设置；其他设备显示其最近同步的名称。"), style = MaterialTheme.typography.bodySmall)

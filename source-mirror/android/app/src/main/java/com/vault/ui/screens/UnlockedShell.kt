@@ -226,7 +226,7 @@ fun UnlockedShell(
                                 Icon(
                                     icon,
                                     contentDescription = stringResource(page.labelRes),
-                                    modifier = Modifier.size(20.dp).padding(if (page == RootPage.MAINTENANCE) 1.dp else 0.dp),
+                                    modifier = Modifier.size(20.dp),
                                     tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }

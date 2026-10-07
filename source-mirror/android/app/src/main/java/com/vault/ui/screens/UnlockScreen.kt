@@ -426,8 +426,8 @@ fun UnlockScreen(vm: VaultViewModel) {
                 // 三点等待 / 成功对勾共用小尺寸白色圆角卡片。
                 // 固定指示区域和安全内边距，避免变换时卡片抖动或裁切。
                 val dark = MaterialTheme.colorScheme.background.luminance() < 0.5f
-                val indicatorWidth = 36.dp
-                val indicatorHeight = 24.dp
+                val indicatorWidth = 54.dp
+                val indicatorHeight = 40.dp
                 Surface(
                     shape = VaultShape,
                     color = if (dark) Color.Black else Color.White,
@@ -438,7 +438,7 @@ fun UnlockScreen(vm: VaultViewModel) {
                     Box(
                         modifier = Modifier
                             .wrapContentSize()
-                            .padding(horizontal = 10.dp, vertical = 10.dp),
+                            .padding(horizontal = 12.dp, vertical = 12.dp),
                         contentAlignment = Alignment.Center,
                     ) {
                         UnlockProgressIndicator(
@@ -603,9 +603,8 @@ private fun handleBioFailure(
 
 /** 等待时三点从左向右呼吸；成功时点淡出，仅绘制对勾，并交接首屏。 */
 @Composable
-private fun UnlockProgressIndicator(success: Boolean, onSuccessAnimationFinished: () -> Unit, width: Dp = 36.dp, height: Dp = 24.dp) {
-    // 单段圆弧的追逐-呼吸循环：圆弧长度在最短↔最长之间连续变化，
-    // 前端加速拉伸、后端减速，收缩时后端加速追赶前端；整体始终顺时针旋转，无静止/跳变/重置。
+private fun UnlockProgressIndicator(success: Boolean, onSuccessAnimationFinished: () -> Unit, width: Dp = 54.dp, height: Dp = 40.dp) {
+    // 每帧只更新三点的绘制，白色容器和背景保持固定。
     var elapsedMillis by remember { mutableFloatStateOf(0f) }
     LaunchedEffect(success) {
         var lastNanos = withFrameNanos { it }
@@ -639,13 +638,14 @@ private fun UnlockProgressIndicator(success: Boolean, onSuccessAnimationFinished
     val primary = MaterialTheme.colorScheme.primary
         androidx.compose.foundation.Canvas(modifier = Modifier.size(width, height)) {
         // 逐帧状态只在绘制阶段读取，避免解锁关键路径上的整组件逐帧重组。
+        val restingDotRadius = minOf(size.height / 6f, size.width / 15f)
         val stroke = androidx.compose.ui.graphics.drawscope.Stroke(
-            width = 2.5.dp.toPx(),
+            width = restingDotRadius * 2f,
             cap = androidx.compose.ui.graphics.StrokeCap.Round,
             join = androidx.compose.ui.graphics.StrokeJoin.Round,
         )
         if (dotsAlpha.value > 0f) {
-            val radius = minOf(size.height / 6f, size.width / 15f)
+            val radius = restingDotRadius
             repeat(3) { index ->
                 drawCircle(
                     color = primary.copy(alpha = dotsAlpha.value),

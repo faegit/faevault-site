@@ -4,7 +4,7 @@
   "license": "Apache-2.0",
   "platform": "android",
   "version": "4.6.7",
-  "source_commit": "475dfc14843efdd6b20a856376a67417130982e2",
+  "source_commit": "cf74a6457f560e2027ab84f46d4c8d2450e22e99",
   "working_tree_snapshot": true,
   "files": [
     {
@@ -1077,8 +1077,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/ui/AppRoot.kt",
-      "bytes": 80226,
-      "sha256": "6176f2b43d1b2b729f1c5226fb07e0fd48b2275f02bda9a7ced07ff287558037",
+      "bytes": 80323,
+      "sha256": "1f4cf1da488a3bc634fdd981944aa6753e0fbc8293df14cd322e858978f4abf5",
       "kind": "source"
     },
     {
@@ -1353,8 +1353,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/ui/VaultViewModel.kt",
-      "bytes": 414679,
-      "sha256": "d66833ed7121fa549247a6ab6660028e0d97737141d81e456395c69d5f923456",
+      "bytes": 414798,
+      "sha256": "d16594f95c6d20351ebedb3d0f4f2064b4d379243f0bc0c78b7402e9b4f5f9e0",
       "kind": "source"
     },
     {
@@ -1461,8 +1461,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/ui/screens/DevicesDialog.kt",
-      "bytes": 4810,
-      "sha256": "b35b14fd7d6a427d51ba6c6c896b523ee77406d56e06ad880b058cd263add471",
+      "bytes": 5068,
+      "sha256": "012822fbb984a379c9b74c53246e36b6e7b445c0302addfb12e9eef7b886b1bf",
       "kind": "source"
     },
     {
@@ -1563,14 +1563,14 @@
     },
     {
       "path": "app/src/main/java/com/vault/ui/screens/UnlockScreen.kt",
-      "bytes": 40490,
-      "sha256": "94ba97e8ed25e2509b9026548c7dec4b37657bec951a35e268747a9cd2736a71",
+      "bytes": 40391,
+      "sha256": "95eb49f869886a8ca42e1aa8a9161b3611cf474eafc0909773b4c9eb789c6e1e",
       "kind": "source"
     },
     {
       "path": "app/src/main/java/com/vault/ui/screens/UnlockedShell.kt",
-      "bytes": 13152,
-      "sha256": "79df695a7c5449b0c3de8186ef5e6c5e4e482ca58c4c10cc642bc2c9b653a4a9",
+      "bytes": 13094,
+      "sha256": "07cf64311ff4ec40ae719451e46b7eb2b6fe813d4d2af9e1f53d90ab21e4727b",
       "kind": "source"
     },
     {
@@ -2793,8 +2793,8 @@
     },
     {
       "path": "app/src/test/java/com/vault/ui/ThreeDotMotionTest.kt",
-      "bytes": 1104,
-      "sha256": "b9b3326bc1daa8ea67aa53e07c5db49f4649b8390b5e335aaf33f122802ee4fc",
+      "bytes": 1145,
+      "sha256": "533a590fad5aceb204fa7e96589482ab14d1283be11120443d1938111ebd0df9",
       "kind": "source"
     },
     {
