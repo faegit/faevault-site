@@ -12,22 +12,15 @@ Only records features and fixes for the FAEVault desktop client. Android client 
 
 ---
 
-## 4.6.8 - 2026-10-07
-
-### Improved
-- Moved device information into security settings and removed separate sync/maintenance entries.
-- Device names follow the operating system. Android falls back to the model when the system name is unavailable; PC uses the computer name. Views refresh on opening and foreground activation; normal saves and synchronization update remote records.
-- Simplified the device page to names, activity and authenticated authorization records, without an application nickname editor.
-
----
-
 ## 4.6.7 - 2026-10-07
 
 ### Added and improved
 - Unified autofill candidate ranking across website origins, linked applications, titles and keywords, with case-insensitive, full-width and related-name matching. Similar candidates do not bypass origin authorization.
 - Added custom-field matching, manual field-role selection and encrypted remembered autofill associations. Exclusions and associations travel with vault synchronization.
 - Added opt-in remote-update reminders per cloud target, with a silent initial baseline, duplicate suppression and a later option. Checks do not download or overwrite the vault. Android checks while foregrounded and unlocked; PC checks while running and unlocked.
-- Added device information using authenticated activity records. Legacy or unverifiable sources remain unknown. This is an activity view, not server-side access revocation.
+- Moved device information into security settings and removed separate sync/maintenance entries.
+- Device names follow the operating system. Android falls back to the model when the system name is unavailable; PC uses the computer name. Views refresh on opening and foreground activation; normal saves and synchronization update remote records.
+- Simplified the device page to names, activity and authenticated authorization records, without an application nickname editor.
 
 ---
 
