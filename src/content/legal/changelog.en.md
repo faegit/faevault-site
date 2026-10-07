@@ -15,14 +15,18 @@ This changelog records features and fixes for the FAEVault Android client only. 
 ## 4.6.7 - 2026-10-07
 
 ### Added and improved
+- Device records show only verified, currently authorized devices; missing, revoked, expired and invalid authorizations are hidden.
+- Fixed dialog scrolling not refreshing user activity and triggering idle lock; genuine inactivity and background locking remain intact.
+- Login and password verification show three dots pulsing left to right, with a checkmark only on login success; reserved bounds prevent clipping.
+- Card dialogs rise from below, including trash, exclusions and password generation; login pages fade and use a compact waiting container.
 - Unified autofill candidate ranking across website origins, linked applications, titles and keywords, with case-insensitive, full-width and related-name matching. Similar candidates do not bypass origin authorization.
 - Added custom-field matching, manual field-role selection and encrypted remembered autofill associations. Exclusions and associations travel with vault synchronization.
 - Added opt-in remote-update reminders per cloud target, with a silent initial baseline, duplicate suppression and a later option. Checks do not download or overwrite the vault. Android checks while foregrounded and unlocked; PC checks while running and unlocked.
 - Updated the Organize icon and corrected backup-device/cloud-status translations and column-selector layouts.
-- Moved device information into security settings and removed separate sync/maintenance entries.
+- Moved device records into security settings and removed separate sync/maintenance entries.
 - Device names follow the operating system. Android falls back to the model when the system name is unavailable; PC uses the computer name. Views refresh on opening and foreground activation; normal saves and synchronization update remote records.
 - Simplified the device page to names, activity and authenticated authorization records, without an application nickname editor.
-- Made the Organize icon smaller with a lighter outline.
+- Made the Organize icon smaller with a lighter partially filled folder.
 
 ---
 
