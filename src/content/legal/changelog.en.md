@@ -15,6 +15,9 @@ This changelog records features and fixes for the FAEVault Android client only. 
 ## 4.6.7 - 2026-10-07
 
 ### Added and improved
+- Add deletion-record cleanup with per-device checkpoint acknowledgements and a second manual confirmation; new baselines prevent older vaults and backups from merging.
+- Preserve deletion records until explicit cleanup and retain holder history across authorization revocation and password changes.
+- Preserve custom tag text without translating user data.
 - Clear cached OTP display values on lock and disallow cached code reads while locked.
 - Use a balanced5dp checkmark stroke, and reserve a stable device-record viewport so asynchronous loading does not disturb popup motion.
 - Enlarged login dots and success checkmark, matched the Organize icon size to other navigation icons, and disabled phase size animation to prevent diagonal movement on lock.
