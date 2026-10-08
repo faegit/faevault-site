@@ -2305,6 +2305,12 @@ def test_recovery_uses_format_neutral_password_reset_facade(monkeypatch, tmp_pat
     forgot._current_record = lambda: record
     forgot.passed = lambda: None
     forgot.vault = None
+    success_calls = []
+    def complete_recovery(record, accepted_vault):
+        success_calls.append((record, accepted_vault))
+        forgot.vault = accepted_vault
+        QDialog.accept(forgot)
+    forgot._on_unlock_success = complete_recovery
 
     monkeypatch.setattr(dialogs.config, "user_vault_path", lambda _r: path)
     monkeypatch.setattr(dialogs.biometric, "is_enabled", lambda _p: False)
@@ -2348,6 +2354,7 @@ def test_recovery_uses_format_neutral_password_reset_facade(monkeypatch, tmp_pat
 
     assert reset_calls == [(secret, "V7!qL2#nP9@x")]
     assert reissue_calls == [(new_secret, secret)]
+    assert success_calls == [(record, vault)]
     assert forgot.vault is vault
     assert forgot.result() == QDialog.Accepted
     forgot.close()

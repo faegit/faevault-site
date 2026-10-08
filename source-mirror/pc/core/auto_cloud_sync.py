@@ -75,13 +75,21 @@ def _sync_pmve_files(
             if consumed_version:
                 stats["remote_update_consumed_version"] = consumed_version
             if lineage is VaultLineage.SAME:
-                return _acknowledged_result(target, False, False, stats, snapshot)
+                if vault.acknowledge_deletion_checkpoint():
+                    lineage = VaultLineage.REMOTE_STALE
+                else:
+                    return _acknowledged_result(target, False, False, stats, snapshot)
             if lineage is VaultLineage.FAST_FORWARD:
-                vault.replace_authenticated_file(snapshot.path)
+                installed_identity = vault.replace_authenticated_file(snapshot.path)
                 # Re-opened identity must still equal the authenticated snapshot Head.
-                if vault.classify_lineage(vault.pmve_identity, remote_identity) is not VaultLineage.SAME:
+                installed_relation = vault.classify_lineage(remote_identity, vault.pmve_identity)
+                if installed_relation not in (VaultLineage.SAME, VaultLineage.FAST_FORWARD):
                     raise cloud.CloudError("PMVE 本地安装后 Identity 复验失败")
-                return _acknowledged_result(target, False, True, stats, snapshot)
+                acknowledged = vault.acknowledge_deletion_checkpoint()
+                if acknowledged or installed_relation is VaultLineage.FAST_FORWARD:
+                    lineage = VaultLineage.REMOTE_STALE
+                else:
+                    return _acknowledged_result(target, False, True, stats, snapshot)
             if lineage is VaultLineage.REMOTE_STALE:
                 try:
                     vault.compact_before_sync()
@@ -100,7 +108,7 @@ def _sync_pmve_files(
                             committed_identity = None
                         if Vault.classify_lineage(vault.pmve_identity, committed_identity) is VaultLineage.SAME:
                             stats["cas_retries"] = cas_retries
-                            return _acknowledged_result(target, True, False, stats, committed)
+                            return _acknowledged_result(target, True, stats["lineage"] == VaultLineage.FAST_FORWARD.value, stats, committed)
                     cas_retries += 1
                     if attempt == 2:
                         raise cloud.CloudConflict("PMVE CAS 连续竞争，请稍后重试")
@@ -115,7 +123,7 @@ def _sync_pmve_files(
                 if vault.classify_lineage(vault.pmve_identity, verified_identity) is not VaultLineage.SAME:
                     raise cloud.CloudError("PMVE 上传后回读 Identity 不一致")
                 stats["cas_retries"] = cas_retries
-                return _acknowledged_result(target, True, False, stats, verified)
+                return _acknowledged_result(target, True, stats["lineage"] == VaultLineage.FAST_FORWARD.value, stats, verified)
             if lineage is VaultLineage.DIVERGED:
                 # 自动收敛：以远端 Head 为基线提交合并内容（条目 LWW + 密钥版本/注册表
                 # union），原子采纳为本地库，再上传同一文件让远端快速前进。

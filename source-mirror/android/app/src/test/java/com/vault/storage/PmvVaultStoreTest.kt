@@ -32,6 +32,45 @@ import java.util.UUID
 import java.util.concurrent.CancellationException
 
 class PmvVaultStoreTest {
+    @Test
+    fun `checkpoint acceptance persists separately and stale baseline cannot merge`() = withVault { file ->
+        val a = "11111111-1111-4111-8111-111111111111"
+        val b = "22222222-2222-4222-8222-222222222222"
+        val checkpointId = "33333333-3333-4333-8333-333333333333"
+        val purges = mapOf("44444444-4444-4444-8444-444444444444" to 1.0)
+        val checkpoint = com.vault.model.DeletionCheckpoint(checkpointId, purges, listOf(a, b), mapOf(a to checkpointId))
+        val payload = com.vault.model.VaultPayload(purgeTombstones = purges, deletionBaseline = com.vault.model.DeletionBaseline(checkpoint = checkpoint))
+        val vaultId = UUID.randomUUID()
+        val initial = PmvEPayloadAdapter.toMetadata(payload, vaultId)
+        PmvVaultStore.create(file, password, recoverySecret, initial, emptyList(), vaultId = vaultId).close()
+        val peer = File(file.parentFile, "${file.name}.peer")
+        try {
+            file.copyTo(peer, overwrite = true)
+            PmvVaultStore.openPassword(peer, password).use { accepted ->
+                val installedIdentity = accepted.identity()
+                val installed = PmvEPayloadAdapter.fromMetadata(accepted.readMetadata(), emptyList())
+                assertEquals(installedIdentity, accepted.identity()) // authentication is read-only
+                assertFalse(installed.deletionBaseline.checkpoint!!.ready(purges, listOf(a, b)))
+                val acknowledged = installed.copy(deletionBaseline = installed.deletionBaseline.copy(checkpoint = checkpoint.copy(
+                    acknowledgements = checkpoint.acknowledgements + (b to checkpointId))))
+                accepted.saveFull(PmvEPayloadAdapter.toMetadata(acknowledged, vaultId, accepted.readMetadata()), emptyList(), installedIdentity.sequence)
+                assertTrue(accepted.identity().sequence > installedIdentity.sequence)
+            }
+            PmvVaultStore.openPassword(peer, password).use { accepted ->
+                val persisted = PmvEPayloadAdapter.fromMetadata(accepted.readMetadata(), emptyList())
+                assertTrue(persisted.deletionBaseline.checkpoint!!.ready(purges, listOf(a, b)))
+            }
+            PmvVaultStore.openPassword(file, password).use { local ->
+                val cleaned = payload.copy(purgeTombstones = emptyMap(), deletionBaseline = com.vault.model.DeletionBaseline(
+                    generation = 1, epoch = "55555555-5555-4555-8555-555555555555"))
+                local.saveFull(PmvEPayloadAdapter.toMetadata(cleaned, vaultId, local.readMetadata()), emptyList(), local.identity().sequence)
+                PmvVaultStore.openPassword(peer, password).use { stale ->
+                    assertThrows(IllegalArgumentException::class.java) { local.saveMerged(stale, local.readMetadata(), emptyList(), local.identity().sequence) }
+                }
+            }
+        } finally { peer.delete() }
+    }
+
     private val password = "correct horse battery staple".encodeToByteArray()
     private val newPassword = "a newer and longer password".encodeToByteArray()
     private val recoverySecret = ByteArray(32) { (it * 7 + 3).toByte() }
@@ -52,7 +91,7 @@ class PmvVaultStoreTest {
                 originalEntries = listOf(entry("image", "image").copy(fields = mapOf("images" to
                     JsonArray(listOf(PmvMediaRef.Ref(ref.objectId, ref.generation, ref.kind, ref.size, ref.sha256).toJson())))),
                     entry("trash", "trash").copy(deletedAt = 1.0))
-                PmvVaultStore.MutationContent(metadata("extension preserved"), originalEntries)
+                PmvVaultStore.MutationContent(DeletionKnownMembers.retain(metadata("extension preserved"), listOf("11111111-1111-4111-8111-111111111111")), originalEntries)
             }
             source.rewrapPasswordProfile(password, PmvKdfProfile.HARDENED)
             source.rotatePassword(newPassword, newRecovery)
@@ -60,6 +99,7 @@ class PmvVaultStoreTest {
         PmvVaultStore.openPassword(file, newPassword).use { target ->
             assertEquals(originalEntries, target.listSummaries().map { target.readEntry(it.entryId) })
             assertEquals(JsonPrimitive("extension preserved"), target.readMetadata()["future_metadata"])
+            assertEquals(listOf("11111111-1111-4111-8111-111111111111"), DeletionKnownMembers.read(target.readMetadata()))
             val output = ByteArrayOutputStream()
             target.openObject(objectId, 1, output)
             assertArrayEquals(plain, output.toByteArray())

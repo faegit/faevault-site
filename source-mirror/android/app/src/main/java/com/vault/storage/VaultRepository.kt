@@ -212,7 +212,7 @@ class VaultRepository(
         .loadOrCreate().use { it.deviceId.toString() }
 
     private fun activityMetadata(session: PmvVaultStore.Session, metadata: JsonObject): JsonObject =
-        DeviceActivity.touch(metadata, localDeviceId(), SystemDeviceName.read(context), parentCommitId = session.identity().latestCommitId.toString())
+        DeviceActivity.touch(DeletionKnownMembers.retain(metadata, listOf(localDeviceId())), localDeviceId(), SystemDeviceName.read(context), parentCommitId = session.identity().latestCommitId.toString())
 
     fun deviceProfiles(rootKey: ByteArray): List<DeviceActivityProfile> = PmvVaultStore.openRootKey(vaultFile, rootKey).use {
         val id = localDeviceId()
@@ -306,13 +306,13 @@ class VaultRepository(
             initialMetadata = metadata,
             initialEntries = normalized.entries + normalized.trash,
             vaultId = vaultId,
-        ).use(::pmveUnlockResult)
+        ).use { session -> pmveUnlockResult(session) }
     }
 
     fun openPmvE(passwordUtf8: ByteArray): VaultUnlockResult {
         require(isPmvE()) { "保险库不是 PMVE 格式" }
         return try {
-            PmvVaultStore.openPassword(vaultFile, passwordUtf8).use(::pmveUnlockResult)
+            PmvVaultStore.openPassword(vaultFile, passwordUtf8).use { session -> pmveUnlockResult(session) }
         } catch (error: VaultCrypto.DecryptError) {
             throw error
         } catch (_: IllegalArgumentException) {
@@ -325,7 +325,7 @@ class VaultRepository(
     fun openPmvEWithRecoveryKey(recoverySecret: ByteArray): VaultUnlockResult {
         require(isPmvE()) { "保险库不是 PMVE 格式" }
         return try {
-            PmvVaultStore.openRecovery(vaultFile, recoverySecret).use(::pmveUnlockResult)
+            PmvVaultStore.openRecovery(vaultFile, recoverySecret).use { session -> pmveUnlockResult(session) }
         } catch (error: VaultCrypto.DecryptError) {
             throw error
         } catch (_: IllegalArgumentException) {
@@ -336,7 +336,7 @@ class VaultRepository(
 
     fun openPmvEWithRootKey(rootKey: ByteArray): VaultUnlockResult {
         require(isPmvE()) { "保险库不是 PMVE 格式" }
-        return PmvVaultStore.openRootKey(vaultFile, rootKey).use(::pmveUnlockResult)
+        return PmvVaultStore.openRootKey(vaultFile, rootKey).use { session -> pmveUnlockResult(session) }
     }
 
     /** PMVE optimistic full save. Existing unknown metadata is merged back unchanged. */
@@ -450,10 +450,20 @@ class VaultRepository(
         }
     }
 
+    private fun checkedQuerySession(session: PmvVaultStore.Session): VaultQuerySession {
+        try {
+            verifyDeletionFloor(session.identity().vaultId, metadataDeletionBaseline(session))
+            return PmvEQuerySession(session)
+        } catch (error: Throwable) {
+            session.close()
+            throw error
+        }
+    }
+
     fun openQueryWithPassword(passwordUtf8: ByteArray): VaultQuerySession {
         require(isPmvE()) { "保险库不是 PMVE 格式" }
         return try {
-            PmvEQuerySession(PmvVaultStore.openPassword(vaultFile, passwordUtf8))
+            checkedQuerySession(PmvVaultStore.openPassword(vaultFile, passwordUtf8))
         } catch (error: Exception) {
             throw VaultCrypto.DecryptError(error.message ?: "主密码错误或 PMVE 已损坏")
         }
@@ -518,7 +528,7 @@ class VaultRepository(
     fun openQueryWithDeviceKey(deviceKey: ByteArray): VaultQuerySession {
         require(isPmvE()) { "保险库不是 PMVE 格式" }
         return try {
-            PmvEQuerySession(PmvVaultStore.openRootKey(vaultFile, deviceKey))
+            checkedQuerySession(PmvVaultStore.openRootKey(vaultFile, deviceKey))
         } catch (error: Exception) {
             throw VaultCrypto.DecryptError(error.message ?: "RootKey 错误或 PMVE 已损坏")
         }
@@ -565,8 +575,10 @@ class VaultRepository(
         }
     }
 
-    fun currentAuthenticatedFile(rootKey: ByteArray): AuthenticatedVaultFile =
-        authenticateExternalFileWithDeviceKey(vaultFile, rootKey)
+    fun currentAuthenticatedFile(rootKey: ByteArray): AuthenticatedVaultFile {
+        PmvVaultStore.openRootKey(vaultFile, rootKey).use { session -> verifyDeletionFloor(session.identity().vaultId, metadataDeletionBaseline(session)) }
+        return authenticateExternalFileWithDeviceKey(vaultFile, rootKey)
+    }
 
     fun currentIdentity(rootKey: ByteArray): VaultIdentity =
         requireNotNull(currentAuthenticatedFile(rootKey).identity) { "当前保险库不是 PMVE" }
@@ -588,7 +600,10 @@ class VaultRepository(
         expectedRemote: VaultIdentity,
     ): VaultUnlockResult {
         require(candidate.canonicalFile != vaultFile.canonicalFile) { "候选文件不得是当前保险库" }
-        return PmvAppendOnlyFile.withExclusiveWriterLock(vaultFile) {
+        requireFileBaselineCompatible(candidate, rootKey, allowNewer = true)
+        var priorKnownMembers = emptyList<String>()
+        val installedResult = PmvAppendOnlyFile.withExclusiveWriterLock(vaultFile) {
+            priorKnownMembers = PmvVaultStore.openRootKey(vaultFile, rootKey).use(::cleanupMembers)
             val current = currentAuthenticatedFile(rootKey)
             require(current.identity == expectedCurrent) { "当前 PMVE 身份已变化" }
             val authenticatedCandidate = authenticateExternalFileWithDeviceKey(candidate, rootKey)
@@ -606,8 +621,9 @@ class VaultRepository(
                 atomicReplaceFile(install, vaultFile)
                 try {
                     syncParentDirectory(vaultFile)
-                    openPmvEWithRootKey(rootKey).also { installed ->
+                    PmvVaultStore.openRootKey(vaultFile, rootKey).use { session -> pmveUnlockResult(session, trackFloor = false) }.let { installed ->
                         require(installed.identity == expectedRemote) { "安装后的 PMVE 身份不一致" }
+                        installed
                     }
                 } catch (error: Throwable) {
                     try {
@@ -624,6 +640,7 @@ class VaultRepository(
                 restore.delete()
             }
         }
+        return acceptInstalledDeletionCheckpoint(rootKey, installedResult, priorKnownMembers)
     }
 
     /**
@@ -638,7 +655,10 @@ class VaultRepository(
         mergeEntries: (VaultPayload, VaultPayload) -> VaultPayload,
     ): VaultUnlockResult {
         require(candidate.canonicalFile != vaultFile.canonicalFile) { "候选文件不得是当前保险库" }
-        return PmvAppendOnlyFile.withExclusiveWriterLock(vaultFile) {
+        requireFileBaselineCompatible(candidate, rootKey)
+        var priorKnownMembers = emptyList<String>()
+        val installedResult = PmvAppendOnlyFile.withExclusiveWriterLock(vaultFile) {
+            priorKnownMembers = PmvVaultStore.openRootKey(vaultFile, rootKey).use(::cleanupMembers)
             val current = currentAuthenticatedFile(rootKey)
             val authenticatedCandidate = authenticateExternalFileWithDeviceKey(candidate, rootKey)
             require(authenticatedCandidate.identity == expectedRemote) { "候选 PMVE 身份与预期不一致" }
@@ -697,8 +717,9 @@ class VaultRepository(
                 atomicReplaceFile(install, vaultFile)
                 try {
                     syncParentDirectory(vaultFile)
-                    openPmvEWithRootKey(rootKey).also { installed ->
+                    PmvVaultStore.openRootKey(vaultFile, rootKey).use { session -> pmveUnlockResult(session, trackFloor = false) }.let { installed ->
                         require(installed.identity == mergedIdentity.toVaultIdentity()) { "安装后的合并 PMVE 身份不一致" }
+                        installed
                     }
                 } catch (error: Throwable) {
                     try {
@@ -715,6 +736,7 @@ class VaultRepository(
                 restore.delete()
             }
         }
+        return acceptInstalledDeletionCheckpoint(rootKey, installedResult, priorKnownMembers)
     }
 
     /**
@@ -734,6 +756,8 @@ class VaultRepository(
         return PmvVaultStore.openRootKey(vaultFile, rootKey).use { session ->
             val identity = session.identity()
             val normalized = PmvEPayloadAdapter.normalizePayload(payload)
+            verifyDeletionFloor(session.identity().vaultId, metadataDeletionBaseline(session))
+            com.vault.model.DeletionBaseline.requireCompatible(metadataDeletionBaseline(session), normalized.deletionBaseline)
             val localRegistry = PmvDeviceRegistry.decode(session.readMetadata()).also {
                 PmvDeviceRegistry.verifyAll(it, identity.signingPublicKey)
             }
@@ -746,7 +770,7 @@ class VaultRepository(
                 normalized.entries + normalized.trash,
                 expectedSequence ?: identity.sequence,
             )
-            normalized
+            acknowledgeDeletionCheckpoint(session)
         }
     }
 
@@ -777,6 +801,7 @@ class VaultRepository(
         mergeEntries: (VaultPayload, VaultPayload) -> VaultPayload,
     ): VaultUnlockResult {
         require(candidate.canonicalFile != vaultFile.canonicalFile) { "候选文件不得是当前保险库" }
+        requireFileBaselineCompatible(candidate, rootKey)
         val current = currentAuthenticatedFile(rootKey)
         require(current.identity == expectedCurrent) { "当前 PMVE 身份已变化" }
         val authenticatedCandidate = authenticateExternalFileWithDeviceKey(candidate, rootKey)
@@ -808,7 +833,7 @@ class VaultRepository(
                 }
                 if (mergedPayload.syncMeta == localPayload.syncMeta) session.adoptHeader(localHeaderRaw)
             }
-            return PmvVaultStore.openRootKey(candidate, rootKey).use(::pmveUnlockResult)
+            return PmvVaultStore.openRootKey(candidate, rootKey).use { session -> pmveUnlockResult(session, trackFloor = false) }
         } finally {
             localHeaderRaw.fill(0)
         }
@@ -822,7 +847,10 @@ class VaultRepository(
         expectedMerged: VaultIdentity,
     ): VaultUnlockResult {
         require(candidate.canonicalFile != vaultFile.canonicalFile) { "候选文件不得是当前保险库" }
-        return PmvAppendOnlyFile.withExclusiveWriterLock(vaultFile) {
+        requireFileBaselineCompatible(candidate, rootKey)
+        var priorKnownMembers = emptyList<String>()
+        val installedResult = PmvAppendOnlyFile.withExclusiveWriterLock(vaultFile) {
+            priorKnownMembers = PmvVaultStore.openRootKey(vaultFile, rootKey).use(::cleanupMembers)
             val current = currentAuthenticatedFile(rootKey)
             require(current.identity == expectedCurrent) { "发布期间本地保险库已变化，未覆盖本地数据" }
             val prepared = authenticateExternalFileWithDeviceKey(candidate, rootKey)
@@ -838,8 +866,9 @@ class VaultRepository(
                 atomicReplaceFile(install, vaultFile)
                 try {
                     syncParentDirectory(vaultFile)
-                    openPmvEWithRootKey(rootKey).also {
-                        require(it.identity == expectedMerged) { "安装后的云端合并版本身份不一致" }
+                    PmvVaultStore.openRootKey(vaultFile, rootKey).use { session -> pmveUnlockResult(session, trackFloor = false) }.let { installed ->
+                        require(installed.identity == expectedMerged) { "安装后的云端合并版本身份不一致" }
+                        installed
                     }
                 } catch (error: Throwable) {
                     atomicReplaceFile(restore, vaultFile)
@@ -851,6 +880,7 @@ class VaultRepository(
                 restore.delete()
             }
         }
+        return acceptInstalledDeletionCheckpoint(rootKey, installedResult, priorKnownMembers)
     }
 
     fun createSyncSnapshot(): File {
@@ -874,7 +904,7 @@ class VaultRepository(
         PmvVaultStore.openPassword(vaultFile, oldPasswordUtf8).use {
             it.rotatePassword(newPasswordUtf8, recoverySecret, beforeReplace)
         }
-        return PmvVaultStore.openPassword(vaultFile, newPasswordUtf8).use(::pmveUnlockResult)
+        return PmvVaultStore.openPassword(vaultFile, newPasswordUtf8).use { session -> pmveUnlockResult(session) }
     }
 
     /** PMVE 用恢复密钥重置主密码。 */
@@ -883,7 +913,7 @@ class VaultRepository(
         PmvVaultStore.openRecovery(vaultFile, recoverySecret).use {
             it.rotatePassword(newPasswordUtf8, recoverySecret, beforeReplace)
         }
-        return PmvVaultStore.openPassword(vaultFile, newPasswordUtf8).use(::pmveUnlockResult)
+        return PmvVaultStore.openPassword(vaultFile, newPasswordUtf8).use { session -> pmveUnlockResult(session) }
     }
 
     /** 读取当前 PMVH 的 KDF 参数（使用保险库根密钥，无需主密码）。 */
@@ -971,8 +1001,9 @@ class VaultRepository(
         }
     }
 
-    private fun pmveUnlockResult(session: PmvVaultStore.Session): VaultUnlockResult {
+    private fun pmveUnlockResult(session: PmvVaultStore.Session, trackFloor: Boolean = true): VaultUnlockResult {
         val storeIdentity = session.identity()
+        if (trackFloor) verifyDeletionFloor(storeIdentity.vaultId, metadataDeletionBaseline(session))
         return VaultUnlockResult(
             payload = pmvePayload(session),
             rootKey = session.copyRootKeyForDeviceUnlock(),
@@ -989,6 +1020,131 @@ class VaultRepository(
     )
 }
 
+    fun acknowledgeDeletionCleanupCheckpoint(rootKey: ByteArray, expectedSequence: Long): VaultUnlockResult =
+        PmvVaultStore.openRootKey(vaultFile, rootKey).use { session ->
+            require(session.identity().sequence == expectedSequence) { "保险库已变化，请重新同步" }
+            acknowledgeDeletionCheckpoint(session)
+            pmveUnlockResult(session)
+        }
+
+    private fun acceptInstalledDeletionCheckpoint(
+        rootKey: ByteArray,
+        installed: VaultUnlockResult,
+        priorKnownMembers: List<String>,
+    ): VaultUnlockResult {
+        installed.rootKey?.fill(0)
+        // The installation transaction and rollback scope have ended before any new commit.
+        return PmvVaultStore.openRootKey(vaultFile, rootKey).use { session ->
+            require(session.identity().toVaultIdentity() == installed.identity) { "安装后保险库已变化，请重新同步" }
+            verifyDeletionFloor(session.identity().vaultId, metadataDeletionBaseline(session))
+            val metadata = session.readMetadata()
+            val retained = DeletionKnownMembers.retain(metadata, priorKnownMembers + localDeviceId())
+            if (retained != metadata) {
+                val accepted = pmvePayload(session)
+                session.saveFull(activityMetadata(session, retained), accepted.entries + accepted.trash, session.identity().sequence)
+            }
+            acknowledgeDeletionCheckpoint(session)
+            pmveUnlockResult(session)
+        }
+    }
+    private fun acknowledgeDeletionCheckpoint(session: PmvVaultStore.Session): VaultPayload {
+        val accepted = pmvePayload(session)
+        verifyDeletionFloor(session.identity().vaultId, accepted.deletionBaseline)
+        val checkpoint = accepted.deletionBaseline.checkpoint ?: return accepted
+        accepted.deletionBaseline.validate()
+        if (checkpoint.purgeSnapshot != accepted.purgeTombstones || checkpoint.memberIds.toSet() != cleanupMembers(session).toSet() ||
+            checkpoint.acknowledgements[localDeviceId()] == checkpoint.checkpointId) return accepted
+        val acknowledged = accepted.copy(deletionBaseline = accepted.deletionBaseline.copy(checkpoint = checkpoint.copy(
+            acknowledgements = checkpoint.acknowledgements + (localDeviceId() to checkpoint.checkpointId))))
+        val metadata = PmvEPayloadAdapter.toMetadata(acknowledged, session.identity().vaultId, session.readMetadata())
+        session.saveFull(activityMetadata(session, metadata), acknowledged.entries + acknowledged.trash, session.identity().sequence)
+        return acknowledged
+    }
+
+    private fun cleanupMembers(session: PmvVaultStore.Session): List<String> {
+        val metadata = session.readMetadata()
+        val activity = metadata[DeviceActivity.KEY] as? JsonObject
+        require(activity == null || (activity["version"] as? kotlinx.serialization.json.JsonPrimitive)?.content == "1") { "不支持的设备活动记录，请更新应用" }
+        val profiles = DeviceActivity.profiles(metadata)
+        val raw = activity?.get("profiles") as? kotlinx.serialization.json.JsonArray
+        require(activity == null || raw != null && raw.size == profiles.size) { "设备活动记录无效，无法安全清理" }
+        val registry = PmvDeviceRegistry.decode(metadata)
+        PmvDeviceRegistry.verifyAll(registry, session.identity().signingPublicKey)
+        return (DeletionKnownMembers.read(metadata) + profiles.map { it.deviceId } + registry.map { it.deviceId.toString() } + localDeviceId()).distinct().sorted()
+    }
+
+    fun deletionCleanupState(rootKey: ByteArray): com.vault.model.DeletionCleanupState =
+        PmvVaultStore.openRootKey(vaultFile, rootKey).use { session ->
+            val payload = pmvePayload(session)
+            verifyDeletionFloor(session.identity().vaultId, payload.deletionBaseline)
+            val members = cleanupMembers(session)
+            val baseline = payload.deletionBaseline
+            val supported = runCatching { baseline.validate() }.isSuccess
+            val checkpoint = baseline.checkpoint
+            val valid = supported && checkpoint != null && checkpoint.matches(payload.purgeTombstones, members)
+            val acknowledgements = if (valid) checkpoint!!.acknowledgements.filterValues { it == checkpoint.checkpointId }.keys else emptySet()
+            com.vault.model.DeletionCleanupState(payload.purgeTombstones.size, members, acknowledgements,
+                checkpoint?.checkpointId, supported && checkpoint?.ready(payload.purgeTombstones, members) == true, supported)
+        }
+
+    fun startDeletionCleanupCheckpoint(rootKey: ByteArray, expectedSequence: Long): VaultUnlockResult =
+        PmvVaultStore.openRootKey(vaultFile, rootKey).use { session ->
+            val before = pmvePayload(session)
+            verifyDeletionFloor(session.identity().vaultId, before.deletionBaseline)
+            before.deletionBaseline.validate()
+            require(before.purgeTombstones.isNotEmpty()) { "没有可清理的删除记录" }
+            val checkpoint = com.vault.model.DeletionCheckpoint(UUID.randomUUID().toString(), before.purgeTombstones.toMap(), cleanupMembers(session))
+            savePmvE(session, before.copy(deletionBaseline = before.deletionBaseline.copy(checkpoint = checkpoint)), expectedSequence)
+            // A second persisted commit acknowledges the snapshot that this device has already stored.
+            val accepted = pmvePayload(session)
+            savePmvE(session, accepted.copy(deletionBaseline = accepted.deletionBaseline.copy(checkpoint = checkpoint.copy(
+                acknowledgements = mapOf(localDeviceId() to checkpoint.checkpointId)))), session.identity().sequence)
+            pmveUnlockResult(session)
+        }
+
+    fun executeDeletionCleanup(rootKey: ByteArray, expectedSequence: Long, expectedCheckpointId: String): VaultUnlockResult =
+        PmvVaultStore.openRootKey(vaultFile, rootKey).use { session ->
+            val before = pmvePayload(session)
+            verifyDeletionFloor(session.identity().vaultId, before.deletionBaseline)
+            before.deletionBaseline.validate()
+            val checkpoint = requireNotNull(before.deletionBaseline.checkpoint) { "请先创建删除记录检查点" }
+            require(checkpoint.checkpointId == expectedCheckpointId && checkpoint.ready(before.purgeTombstones, cleanupMembers(session))) { "所有已知设备尚未确认同一份删除记录，请先同步" }
+            require(before.deletionBaseline.generation < Long.MAX_VALUE) { "删除记录基线无效" }
+            val next = before.deletionBaseline.copy(generation = before.deletionBaseline.generation + 1,
+                epoch = UUID.randomUUID().toString(), checkpoint = null)
+            val cleaned = before.copy(purgeTombstones = before.purgeTombstones - checkpoint.purgeSnapshot.keys, deletionBaseline = next)
+            session.saveFull(activityMetadata(session, PmvEPayloadAdapter.toMetadata(cleaned, session.identity().vaultId, session.readMetadata())),
+                cleaned.entries + cleaned.trash, expectedSequence)
+            rememberDeletionFloor(session.identity().vaultId, next)
+            pmveUnlockResult(session)
+        }
+
+    private fun rememberDeletionFloor(vaultId: UUID, baseline: com.vault.model.DeletionBaseline) {
+        synchronized(DELETION_FLOOR_LOCK) {
+            val preferences = com.vault.security.SecurePreferences.get(context, "deletion_baseline_floors")
+            val stored = preferences.getString(vaultId.toString(), null)
+            val previous = stored?.let { VaultCodec.json.decodeFromString(com.vault.model.DeletionBaseline.serializer(), it) }
+            val accepted = com.vault.model.DeletionBaseline.acceptedFloor(previous, baseline)
+            if (accepted.generation > 0L && accepted != previous) {
+                require(preferences.edit().putString(vaultId.toString(), VaultCodec.json.encodeToString(
+                    com.vault.model.DeletionBaseline.serializer(), accepted)).commit()) { "无法保存删除记录安全基线" }
+            }
+        }
+    }
+
+    private fun verifyDeletionFloor(vaultId: UUID, baseline: com.vault.model.DeletionBaseline) = rememberDeletionFloor(vaultId, baseline)
+    private fun requireFileBaselineCompatible(candidate: File, rootKey: ByteArray, allowNewer: Boolean = false) {
+        val local = PmvVaultStore.openRootKey(vaultFile, rootKey).use(::metadataDeletionBaseline)
+        val remote = PmvVaultStore.openRootKey(candidate, rootKey).use(::metadataDeletionBaseline)
+        local.validate(); remote.validate()
+        if (!(allowNewer && remote.generation > local.generation))
+            com.vault.model.DeletionBaseline.requireCompatible(local, remote)
+    }
+    private fun metadataDeletionBaseline(session: PmvVaultStore.Session): com.vault.model.DeletionBaseline =
+        session.readMetadata()["deletion_baseline"]?.let {
+            VaultCodec.json.decodeFromJsonElement(com.vault.model.DeletionBaseline.serializer(), it)
+        } ?: com.vault.model.DeletionBaseline()
+
     private fun pmvePayload(session: PmvVaultStore.Session): VaultPayload {
         val metadata = session.readMetadata()
         val entries = session.listSummaries().map { summary ->
@@ -1004,13 +1160,15 @@ class VaultRepository(
     ): VaultPayload {
         val identity = session.identity()
         val normalized = PmvEPayloadAdapter.normalizePayload(payload)
+            verifyDeletionFloor(session.identity().vaultId, metadataDeletionBaseline(session))
+            com.vault.model.DeletionBaseline.requireCompatible(metadataDeletionBaseline(session), normalized.deletionBaseline)
         val metadata = PmvEPayloadAdapter.toMetadata(
             normalized,
             identity.vaultId,
             previousMetadata = session.readMetadata(),
         )
         session.saveFull(activityMetadata(session, metadata), normalized.entries + normalized.trash, expectedSequence)
-        return normalized
+        return acknowledgeDeletionCheckpoint(session)
     }
 
     private fun mutatePmvE(
@@ -1019,7 +1177,9 @@ class VaultRepository(
         transform: (VaultPayload) -> VaultPayload,
     ): VaultIdentity {
         val before = pmvePayload(session)
+        verifyDeletionFloor(session.identity().vaultId, before.deletionBaseline)
         val after = PmvEPayloadAdapter.normalizePayload(transform(before))
+        com.vault.model.DeletionBaseline.requireCompatible(before.deletionBaseline, after.deletionBaseline)
         val metadata = PmvEPayloadAdapter.toMetadata(
             after,
             session.identity().vaultId,
@@ -1054,6 +1214,7 @@ class VaultRepository(
         session: PmvVaultStore.Session,
     ): AuthenticatedVaultFile {
         val storeIdentity = session.identity()
+        metadataDeletionBaseline(session).validate()
         val identity = storeIdentity.toVaultIdentity()
         val ancestors = session.withRootKeyForDeviceUnlock { rootKey ->
             readPmvEAncestorCommitIds(file, rootKey, identity)
@@ -1433,6 +1594,7 @@ class VaultRepository(
     )
 
     private companion object {
+        val DELETION_FLOOR_LOCK = Any()
         const val MAX_PERSISTENT_BACKUP_BYTES = 16L * 1024L * 1024L
         const val MAX_INCREMENTAL_CHANGES = 32
     }

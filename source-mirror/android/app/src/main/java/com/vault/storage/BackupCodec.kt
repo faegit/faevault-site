@@ -28,9 +28,11 @@ object BackupCodec {
         val version: Int = 3,
         val entries: List<Entry> = emptyList(),
         @SerialName("purge_tombstones") val purgeTombstones: Map<String, Double> = emptyMap(),
+        @SerialName("deletion_baseline") val deletionBaseline: com.vault.model.DeletionBaseline = com.vault.model.DeletionBaseline(),
         @SerialName("sync_meta") val syncMeta: SyncMeta = SyncMeta(),
         @SerialName("export_epoch") val exportEpoch: Double? = null,
         @SerialName("autofill_exclusions") val autofillExclusions: com.vault.model.AutofillExclusions = com.vault.model.AutofillExclusions(),
+
     )
 
     private val json = Json {
@@ -48,11 +50,13 @@ object BackupCodec {
         syncMeta: SyncMeta = SyncMeta(),
         purgeTombstones: Map<String, Double> = emptyMap(),
         autofillExclusions: com.vault.model.AutofillExclusions = com.vault.model.AutofillExclusions(),
+        deletionBaseline: com.vault.model.DeletionBaseline = com.vault.model.DeletionBaseline(),
     ) {
         val data = encodeEncrypted(
             BackupPayload(
                 entries = entries,
                 purgeTombstones = purgeTombstones,
+                deletionBaseline = deletionBaseline,
                 syncMeta = syncMeta,
                 exportEpoch = nowSeconds(),
                 autofillExclusions = autofillExclusions.normalized(),

@@ -78,7 +78,8 @@ def with_registry(
     metadata: Mapping[str, Any],
     records: list[pmv_sync_authorization.DeviceAuthorization],
 ) -> dict[str, Any]:
-    updated = dict(metadata)
+    from .deletion_baseline import preserve_members
+    updated = preserve_members(metadata)
     if records:
         updated[METADATA_FIELD] = encode(records)
     else:

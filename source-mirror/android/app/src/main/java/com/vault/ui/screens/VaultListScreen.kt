@@ -806,7 +806,7 @@ fun VaultListScreen(
                                     onClick = {
                                         if (moreActionsTagMode == "add") toggleTagText(t) else tagInput = t
                                     },
-                                    label = { Text(t) },
+                                    label = { Text(androidx.compose.ui.text.AnnotatedString(t)) },
                                     shape = VaultShape,
                                 )
                             }
@@ -909,7 +909,7 @@ private fun TagFilterChip(
             .padding(horizontal = 12.dp, vertical = 6.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Text(label, style = MaterialTheme.typography.labelLarge, color = contentColor, maxLines = 1)
+        Text(androidx.compose.ui.text.AnnotatedString(label), style = MaterialTheme.typography.labelLarge, color = contentColor, maxLines = 1)
     }
 }
 
@@ -1299,7 +1299,7 @@ internal fun EntryCard(
                     if (!moreActionsMode && entry.tags.isNotEmpty()) {
                         Spacer(Modifier.size(2.dp))
                         Text(
-                            entry.tags.joinToString("  "),
+                            androidx.compose.ui.text.AnnotatedString(entry.tags.joinToString("  ")),
                             style = MaterialTheme.typography.labelSmall,
                             color = tint,
                         )

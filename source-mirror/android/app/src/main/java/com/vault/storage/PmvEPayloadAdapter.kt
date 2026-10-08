@@ -78,6 +78,7 @@ internal object PmvEPayloadAdapter {
                     "purge_tombstones",
                     JsonObject(normalized.purgeTombstones.mapValues { JsonPrimitive(it.value) }),
                 )
+                put("deletion_baseline", VaultCodec.json.encodeToJsonElement(com.vault.model.DeletionBaseline.serializer(), normalized.deletionBaseline))
                 put(PAYLOAD_VERSION, JsonPrimitive(normalized.version))
                 put("autofill_exclusions", VaultCodec.json.encodeToJsonElement(
                     AutofillExclusions.serializer(), normalized.autofillExclusions.normalized(),
@@ -149,6 +150,7 @@ internal object PmvEPayloadAdapter {
             entries = entries + trash,
             trash = emptyList(),
             purgeTombstones = purgeTombstones,
+            deletionBaseline = metadata["deletion_baseline"]?.let { VaultCodec.json.decodeFromJsonElement(com.vault.model.DeletionBaseline.serializer(), it) } ?: com.vault.model.DeletionBaseline(),
             syncMeta = SyncMeta(
                 deviceId = deviceId,
                 keyRevision = keyRevision,

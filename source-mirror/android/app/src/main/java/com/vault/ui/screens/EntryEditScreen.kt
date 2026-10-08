@@ -1121,7 +1121,7 @@ fun EntryEditScreen(
                         androidx.compose.material3.FilterChip(
                             selected = t in currentTags,
                             onClick = { toggleTag(t) },
-                            label = { Text(t) },
+                            label = { Text(androidx.compose.ui.text.AnnotatedString(t)) },
                             shape = VaultShape,
                         )
                     }

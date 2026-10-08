@@ -339,7 +339,7 @@ fun EntryDetailScreen(
                         )
                         if (entry.tags.isNotEmpty()) {
                             Text(
-                                entry.tags.joinToString("  "),
+                                androidx.compose.ui.text.AnnotatedString(entry.tags.joinToString("  ")),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = tint,
                             )

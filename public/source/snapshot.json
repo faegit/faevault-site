@@ -1,23 +1,23 @@
 {
   "schema": 1,
-  "snapshot_date": "2026-10-07",
+  "snapshot_date": "2026-10-08",
   "license": "Apache-2.0",
   "platforms": {
     "android": {
       "version": "4.6.7",
-      "file_count": 529,
-      "bytes": 6323664,
-      "archive_bytes": 2038841,
-      "archive_sha256": "0c0b9df33aeebb2aa9150d7bafab423562f4f8bf4ee4a282f344fd249852df61",
-      "source_commit": "cf74a6457f560e2027ab84f46d4c8d2450e22e99"
+      "file_count": 535,
+      "bytes": 6383895,
+      "archive_bytes": 2052792,
+      "archive_sha256": "a008745c3c1523bd2a41c16d9c1df5cadace9d8710f33c176c80aca9aa70721f",
+      "source_commit": "cff9b7e1dfe81ed30b2091de7de5d739ab94bc8d"
     },
     "pc": {
       "version": "4.6.7",
-      "file_count": 350,
-      "bytes": 5519015,
-      "archive_bytes": 1888566,
-      "archive_sha256": "d2ff34f13b3bc266f2e7192f4dd3a6ef520d2480d2057e1e9c952a79f8cd0b02",
-      "source_commit": "6fd8f3926ab6f4241c1c4b469a9084406c999958"
+      "file_count": 355,
+      "bytes": 5567962,
+      "archive_bytes": 1900866,
+      "archive_sha256": "c1a69c694d2a3d2a932e698313900bd0eb9fe0ac9ac66c9cd82a5f519fd1e373",
+      "source_commit": "87548d59dad0021a98d54761d5b963e288a9c84b"
     }
   }
 }

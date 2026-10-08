@@ -48,10 +48,17 @@ def _isolate_device_configuration(monkeypatch, tmp_path, request):
     if request.node.path.name == "test_device_identity.py":
         # These tests explicitly isolate and exercise the actual protected configuration adapter.
         return
-    original_get, original_set = config.get, config.set
+    original_get, original_set, original_update = config.get, config.set, config.update
     isolated = {}
     def own(key):
-        return key == device_identity._CONFIG_KEY
+        return key in (device_identity._CONFIG_KEY, "deletion_baseline_floors")
     monkeypatch.setattr(config, "get", lambda key, default=None: isolated.get(key, default) if own(key) else original_get(key, default))
     monkeypatch.setattr(config, "set", lambda key, value: isolated.__setitem__(key, value) if own(key) else original_set(key, value))
+    def isolated_update(key, updater):
+        if not own(key):
+            return original_update(key, updater)
+        value = updater(isolated.get(key))
+        isolated[key] = value
+        return value
+    monkeypatch.setattr(config, "update", isolated_update)
     monkeypatch.setattr(device_identity, "_path", lambda: tmp_path / "legacy-device.json")

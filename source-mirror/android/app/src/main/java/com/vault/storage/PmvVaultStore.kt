@@ -496,6 +496,11 @@ object PmvVaultStore {
             val snapshot = resolveLatestAuthenticatedSnapshot()
             require(snapshot.commit.revision == expectedSequence) { "提交基线已过期" }
             val sourceSnapshot = source.resolveLatestAuthenticatedSnapshot()
+            fun baseline(value: JsonObject) = value["deletion_baseline"]?.let {
+                VaultCodec.json.decodeFromJsonElement(com.vault.model.DeletionBaseline.serializer(), it)
+            } ?: com.vault.model.DeletionBaseline()
+            com.vault.model.DeletionBaseline.requireCompatible(baseline(readMetadata(snapshot)), baseline(source.readMetadata(sourceSnapshot)))
+            com.vault.model.DeletionBaseline.requireCompatible(baseline(readMetadata(snapshot)), baseline(metadata))
             val available = loadObjectIndex(snapshot).records.map { it.key }.toSet()
             val refs = linkedMapOf<PmvObjectIndexCodec.ObjectKey, PmvMediaRef.Ref>()
             (entries.flatMap(PmvMediaRef::scan) + PmvMediaRef.scanJson(metadata)).forEach { occurrence ->
@@ -925,13 +930,13 @@ object PmvVaultStore {
                 try {
                     val original = identity()
                     val entries = listSummaries().map { requireNotNull(readEntry(it.entryId)) }
-                    val metadata = JsonObject(readMetadata().toMutableMap().apply {
+                    val metadata = JsonObject(DeletionKnownMembers.retain(readMetadata()).toMutableMap().apply {
                         // Authorizations signed by the revoked signing key cannot survive rotation.
                         remove(PmvDeviceRegistry.METADATA_FIELD)
                     })
                     val bootstrap = JsonObject(metadata.filterKeys { it in setOf(
                         "schema", "version", "vault_id", "entry_order", "trash_order", "sync_meta",
-                        "key_revision", "export_epoch", "purge_tombstones",
+                        "key_revision", "export_epoch", "purge_tombstones", "deletion_baseline", DeletionKnownMembers.KEY,
                     ) })
                     create(temporary, newPasswordUtf8, newRecoverySecret, bootstrap, emptyList(),
                         vaultId = vaultId,

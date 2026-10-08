@@ -550,6 +550,7 @@ class LanSyncClient:
             raise SyncError("远端 PMVE Identity 无效")
         # 简化后的双向流程：拉取并校验/采纳后固定回推，
         # 由传输站校验对方身份并合并，随后断开连接。
+        vault.acknowledge_deletion_checkpoint()
         push_result = self._push_vault_file(vault, on_progress=on_upload)
         if isinstance(push_result, dict):
             result["remote_result"] = push_result

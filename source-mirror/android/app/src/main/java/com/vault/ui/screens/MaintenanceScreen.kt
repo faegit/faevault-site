@@ -180,6 +180,7 @@ fun MaintenanceOverviewScreen(
                 }
             }
         }
+        item(key = "deletion_cleanup") { DeletionCleanupCard(vm) }
     }
 }
 

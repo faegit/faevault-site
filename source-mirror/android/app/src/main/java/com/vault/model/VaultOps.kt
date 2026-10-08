@@ -188,7 +188,7 @@ object VaultOps {
         )
     }
 
-    /** 打开时按保留天数清理超期墓碑，同时清理过期的删除日志避免线性增长。 */
+    /** 打开时清理超期回收站条目，删除记录持续保留直到所有设备确认。 */
     fun purgeExpired(payload: VaultPayload, retentionDays: Int): VaultPayload {
         val cutoff = nowSeconds() - retentionDays * 86400.0
         val remain = payload.entries.filterNot { e ->
@@ -198,9 +198,7 @@ object VaultOps {
         if (remain.size == payload.entries.size) return payload
         val purged = payload.entries.filter { it.deletedAt != null && it.deletedAt < cutoff }
         val purgedAt = monotonicTimestamp(purged.maxOf { it.updatedAt })
-        // 清理 2 倍保留期之前的删除日志，远端在此期间未同步的概率极低
-        val tombstoneCutoff = nowSeconds() - retentionDays * 86400.0 * 2
-        val cleanedTombstones = payload.purgeTombstones.filterValues { it >= tombstoneCutoff }
+        val cleanedTombstones = payload.purgeTombstones
         return payload.copy(
             entries = remain,
             purgeTombstones = recordPurges(cleanedTombstones, purged.map { it.id }, purgedAt),
@@ -368,8 +366,11 @@ object VaultOps {
         localNow: Double = nowSeconds(),
         incomingPurgeTombstones: Map<String, Double> = emptyMap(),
         incomingExclusions: AutofillExclusions = AutofillExclusions(),
+        incomingDeletionBaseline: DeletionBaseline = DeletionBaseline(),
         onConflict: (Entry, Entry) -> ConflictChoice = { _, _ -> ConflictChoice.KEEP_BOTH },
     ): Pair<VaultPayload, LwwMergeStats> {
+        DeletionBaseline.requireCompatible(local.deletionBaseline, incomingDeletionBaseline)
+        val mergedBaseline = DeletionBaseline.merge(local.deletionBaseline, incomingDeletionBaseline)
         val stats = LwwMergeStats()
         @Suppress("UNUSED_VARIABLE")
         val ignoredExportEpoch = incomingExportEpoch
@@ -463,7 +464,7 @@ object VaultOps {
             }
         }
 
-        return local.copy(entries = byId.values.toList(), purgeTombstones = mergedPurges,
+        return local.copy(entries = byId.values.toList(), purgeTombstones = mergedPurges, deletionBaseline = mergedBaseline,
             autofillExclusions = local.autofillExclusions.merge(incomingExclusions)) to stats
     }
 
@@ -816,6 +817,7 @@ object VaultOps {
             incomingExportEpoch = remote.exportEpoch,
             incomingPurgeTombstones = remote.purgeTombstones,
             incomingExclusions = remote.autofillExclusions,
+            incomingDeletionBaseline = remote.deletionBaseline,
             onConflict = onConflict,
         )
         return merged.copy(syncMeta = newerKeySyncMeta(local, remote)) to stats

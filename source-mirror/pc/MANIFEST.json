@@ -1,10 +1,10 @@
 {
   "schema": 1,
-  "snapshot_date": "2026-10-07",
+  "snapshot_date": "2026-10-08",
   "license": "Apache-2.0",
   "platform": "pc",
   "version": "4.6.7",
-  "source_commit": "6fd8f3926ab6f4241c1c4b469a9084406c999958",
+  "source_commit": "87548d59dad0021a98d54761d5b963e288a9c84b",
   "working_tree_snapshot": true,
   "files": [
     {
@@ -34,7 +34,7 @@
     {
       "path": "README.md",
       "bytes": 1062,
-      "sha256": "d1a716364c851f6180c2ff19e0eb5bad4a35eccc3719536c36f20a82a1c1920f",
+      "sha256": "83bea88a72bf8ed248cb016c7ff6a3fe4aee6fbb553d8e84c3ce0a46f7a381b6",
       "kind": "publication-notice"
     },
     {
@@ -129,8 +129,8 @@
     },
     {
       "path": "core/auto_cloud_sync.py",
-      "bytes": 11400,
-      "sha256": "2eaf7c4971c92a0b941cb93b309ba7143b3eb8d9c13adacde7b1d93f15b2f6a9",
+      "bytes": 11985,
+      "sha256": "39d95382a3a1c7ea52d1907a81ec1e5c50c339d0b9c5f06a44bcfec35ca04bd0",
       "kind": "source"
     },
     {
@@ -165,8 +165,8 @@
     },
     {
       "path": "core/backup.py",
-      "bytes": 6832,
-      "sha256": "4681b724235e0a20e81c7a5465ba791512b6fe5289f0ad6d6340dce2770efe2d",
+      "bytes": 7098,
+      "sha256": "ece33f591883f81cfb81100581a9399634b567c38d2c1513d7e963c49582a1e4",
       "kind": "source"
     },
     {
@@ -213,14 +213,20 @@
     },
     {
       "path": "core/config.py",
-      "bytes": 34320,
-      "sha256": "5ce68329cc585b762b7c71d831088c20d9cc03e4dc55954c803fff8ea6b551c6",
+      "bytes": 35038,
+      "sha256": "27565d84e39fb9bb94e662245e7a90bf6576759f506449b0831c22f55595ced0",
       "kind": "source"
     },
     {
       "path": "core/crypto.py",
       "bytes": 3704,
       "sha256": "16644f8c31a19079c736617f72f34910170a75b2215785418174af8ab232840a",
+      "kind": "source"
+    },
+    {
+      "path": "core/deletion_baseline.py",
+      "bytes": 8400,
+      "sha256": "a4a94224248dc5606ea956b92e362f52aea8b824c5c97ae0d48d7961df02372f",
       "kind": "source"
     },
     {
@@ -423,8 +429,8 @@
     },
     {
       "path": "core/pmv_device_registry.py",
-      "bytes": 3963,
-      "sha256": "878d10501c09b5c226785290f9fb9cf63c321b867e134d028d0d050d17932133",
+      "bytes": 4033,
+      "sha256": "ac82769c2c8fd42750e5f6ab381ab77b30b38c7cea39ad67248a466c0634739b",
       "kind": "source"
     },
     {
@@ -567,26 +573,26 @@
     },
     {
       "path": "core/storage.py",
-      "bytes": 95892,
-      "sha256": "4d2801eab0b15f2deb574961609bf0fc0bd67d1ea9461d519297b5189f4b4283",
+      "bytes": 101717,
+      "sha256": "5aba45fe1c23811bf1289cd8327b5cfe7fcf82fe911a9694c49b2a59f4fe45fb",
       "kind": "source"
     },
     {
       "path": "core/sync.py",
-      "bytes": 11138,
-      "sha256": "65e602e0e863c4936531373d5697761b015035e4ce71aa4776fb8638aea44156",
+      "bytes": 11349,
+      "sha256": "1abfa1943f15e12dc17253ebd0d957ab4b7d1876715407044a0720c6dc347cdd",
       "kind": "source"
     },
     {
       "path": "core/sync_client.py",
-      "bytes": 39905,
-      "sha256": "a59ce62332550cf9a6483a0ee3eafb86b15650d4960b2b3b8f4537cea64c6dd8",
+      "bytes": 39954,
+      "sha256": "8e69a40d9982e0ae185eaf432872fc7aa271e0e0c5f766bfecd88c67711f175f",
       "kind": "source"
     },
     {
       "path": "core/sync_server.py",
-      "bytes": 82506,
-      "sha256": "69dc962a049b31296b58b89d8c8b57c56f2de8808a57594f3cd7ee6309d81322",
+      "bytes": 82620,
+      "sha256": "f02abda347bc891b9f2770705835187ae03b45818c15f68f4211143b7b6e5ad1",
       "kind": "source"
     },
     {
@@ -1046,6 +1052,12 @@
       "kind": "shared-fixture"
     },
     {
+      "path": "spec/deletion_baseline_v1_fixtures.json",
+      "bytes": 5383,
+      "sha256": "10017a27ccdd5a0a3512ea69c849efde7ceb6b2c9c0851db931930bbff81c262",
+      "kind": "shared-fixture"
+    },
+    {
       "path": "spec/device_activity_v1_fixtures.json",
       "bytes": 2933,
       "sha256": "867c6d77b2f93cb00341ee3b875fa59130d649df556b2999310f721280bbaa79",
@@ -1203,8 +1215,8 @@
     },
     {
       "path": "tests/conftest.py",
-      "bytes": 2505,
-      "sha256": "e73c21832d272e91d3fedd2c43f4c1510a266d90bafc1860ad91f0a0923b8817",
+      "bytes": 2840,
+      "sha256": "b689054a93f9f9b141b97a83008ca20eb944332f2e7a99cd7dfc42368244806e",
       "kind": "source"
     },
     {
@@ -1355,6 +1367,24 @@
       "path": "tests/test_crypto_hardening.py",
       "bytes": 1647,
       "sha256": "ca956742c475a5138d082acac062861cdbf93556bfe9df989a35a080cba1d7fc",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_deletion_baseline.py",
+      "bytes": 12401,
+      "sha256": "23509c9f2e83faa3e9ca0776b96989aeb94c8fd0a58f0cf726959eb7a261d798",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_deletion_cleanup_ui.py",
+      "bytes": 1930,
+      "sha256": "876bdc2075764e04a112d459e0bd8bdfff7027378ae75a8ea7dbb143f23ebed5",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_deletion_floor_config.py",
+      "bytes": 1496,
+      "sha256": "67e6e4f4970b1b1a57f2efefc7ed60e54a019c5df5a90e311670b5ee5c53d555",
       "kind": "source"
     },
     {
@@ -1785,14 +1815,14 @@
     },
     {
       "path": "tests/test_remote_update_sync_ack.py",
-      "bytes": 894,
-      "sha256": "1b727301b8eabdc46cd8404ac26937f6f6c443f6904efd95d49b7bab58b71b25",
+      "bytes": 959,
+      "sha256": "772e0780960e121e4ab1147eec066a85207c35f741490c43ddc90af117f5eb4e",
       "kind": "source"
     },
     {
       "path": "tests/test_security_cloud_redesign.py",
-      "bytes": 26722,
-      "sha256": "d0344b6498c540a3cf9e2ee76d727e28fd11de4291c076312db8bbe016320bb8",
+      "bytes": 26910,
+      "sha256": "6e1258ade7add52d1d474b5d941866445df916ba2defa0e8bd9895a71f5bff2d",
       "kind": "source"
     },
     {
@@ -1857,8 +1887,8 @@
     },
     {
       "path": "tests/test_ui_regressions.py",
-      "bytes": 169030,
-      "sha256": "d55d9d072022830e4d289646ed7860c2defd5c32c887dcf97a34673c89db674d",
+      "bytes": 169331,
+      "sha256": "45113fffafc21cd6f686c3bc1d96d76f727fe18b9ce2364e9e86471b73ef5f3d",
       "kind": "source"
     },
     {
@@ -1911,8 +1941,8 @@
     },
     {
       "path": "ui/app.py",
-      "bytes": 260391,
-      "sha256": "9d9a5ee8d0ed1b918d4773eecb3adb157ba3c6d6558fcea0bb348b2d8fdd5532",
+      "bytes": 264879,
+      "sha256": "e963b746259338a6ceec82f0bc9306eff008f7147c886c853d3172cbb79c2be3",
       "kind": "source"
     },
     {
@@ -1923,8 +1953,8 @@
     },
     {
       "path": "ui/cloud_sync_controller.py",
-      "bytes": 70833,
-      "sha256": "c793c095af8557dc595dbab34c9a5813eafaee883ff20daa7df055a6e86a41ca",
+      "bytes": 70890,
+      "sha256": "3fb8c727b33a1ef219b5cd24da78664fcf203a3f4dd71cdd30065d74f313ff73",
       "kind": "source"
     },
     {
@@ -1977,8 +2007,8 @@
     },
     {
       "path": "ui/i18n.py",
-      "bytes": 77524,
-      "sha256": "673b974b1c03cfd72e73c66f5fa92c16fabc2dcd0b7e8e448a7500b109cd3875",
+      "bytes": 82591,
+      "sha256": "d111bd11d34cba4d19aabcf63d888400cd228a2bf80f345262532cfe0fbe696b",
       "kind": "source"
     },
     {

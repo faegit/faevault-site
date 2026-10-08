@@ -640,7 +640,7 @@ private fun UnlockProgressIndicator(success: Boolean, onSuccessAnimationFinished
         // 逐帧状态只在绘制阶段读取，避免解锁关键路径上的整组件逐帧重组。
         val restingDotRadius = minOf(size.height / 6f, size.width / 15f)
         val stroke = androidx.compose.ui.graphics.drawscope.Stroke(
-            width = restingDotRadius * 2f,
+            width = 5.dp.toPx(),
             cap = androidx.compose.ui.graphics.StrokeCap.Round,
             join = androidx.compose.ui.graphics.StrokeJoin.Round,
         )
