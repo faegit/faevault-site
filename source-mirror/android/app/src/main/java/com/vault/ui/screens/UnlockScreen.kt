@@ -636,7 +636,7 @@ private fun UnlockProgressIndicator(success: Boolean, onSuccessAnimationFinished
         }
     }
     val primary = MaterialTheme.colorScheme.primary
-        androidx.compose.foundation.Canvas(modifier = Modifier.size(width, height)) {
+    androidx.compose.foundation.Canvas(modifier = Modifier.size(width, height)) {
         // 逐帧状态只在绘制阶段读取，避免解锁关键路径上的整组件逐帧重组。
         val restingDotRadius = minOf(size.height / 6f, size.width / 15f)
         val stroke = androidx.compose.ui.graphics.drawscope.Stroke(

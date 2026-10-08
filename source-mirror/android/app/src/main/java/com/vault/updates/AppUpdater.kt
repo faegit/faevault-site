@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import androidx.core.content.FileProvider
+import androidx.core.content.pm.PackageInfoCompat
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
@@ -102,7 +103,7 @@ object AppUpdater {
             ?: return VerifyResult.INVALID_INFO
         // 签名比对是交集语义，同一发布密钥签出的其它包名也能过；这里先把包名钉死。
         if (archive.packageName != context.packageName) return VerifyResult.INVALID_INFO
-        if (archive.longVersionCode < com.vault.BuildConfig.VERSION_CODE) {
+        if (PackageInfoCompat.getLongVersionCode(archive) < com.vault.BuildConfig.VERSION_CODE) {
             return VerifyResult.INVALID_VERSION
         }
         return if (signaturesMatch(context, apk)) VerifyResult.OK else VerifyResult.SIGNATURE_MISMATCH

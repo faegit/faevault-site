@@ -250,14 +250,9 @@ override fun onStart() {
         return super.dispatchTouchEvent(ev)
     }
 
-    override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean {
+    override fun onUserInteraction() {
+        super.onUserInteraction()
         IdleTracker.touch()
-        return super.dispatchKeyEvent(event)
-    }
-
-    override fun dispatchKeyShortcutEvent(event: android.view.KeyEvent): Boolean {
-        IdleTracker.touch()
-        return super.dispatchKeyShortcutEvent(event)
     }
 
     override fun dispatchGenericMotionEvent(event: MotionEvent): Boolean {

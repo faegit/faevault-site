@@ -4,7 +4,7 @@
   "license": "Apache-2.0",
   "platform": "android",
   "version": "4.6.7",
-  "source_commit": "ee310c919f17d693f5657942171a6e66475a61ca",
+  "source_commit": "74cc24e5f95fa5ff7c03c5a9c89197a4992372e5",
   "working_tree_snapshot": true,
   "files": [
     {
@@ -111,8 +111,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/MainActivity.kt",
-      "bytes": 13010,
-      "sha256": "29486fc4bd2dca50a93ff6d9ee8b9e081185d9cf5d8e3a1001200c1d74a71cfb",
+      "bytes": 12792,
+      "sha256": "bc13bfe4a62a650aa76e2f896d03195e74ecb1146a3092e37043b9ef78f983b0",
       "kind": "source"
     },
     {
@@ -1563,8 +1563,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/ui/screens/UnlockScreen.kt",
-      "bytes": 40380,
-      "sha256": "9e7f9695424825e5f4323704577f0054f504fe065a1b5a66b59918a1c47e8bce",
+      "bytes": 40375,
+      "sha256": "30f623b2c766ffda4a97a9cd26ea48911e9f8898a2d4673d8ec2e80dc16d047b",
       "kind": "source"
     },
     {
@@ -1599,8 +1599,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/updates/AppUpdater.kt",
-      "bytes": 6697,
-      "sha256": "3c3d7534530b8d71e48d94fda91e71e3cae389c735b88e7d2f3b8418f6be62b9",
+      "bytes": 6767,
+      "sha256": "b51acc71dcbdfac0c0d2c78278e4c9409e60b19046c5ebfb52f4d53a521cb506",
       "kind": "source"
     },
     {

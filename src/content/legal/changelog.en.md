@@ -15,10 +15,6 @@ This changelog records features and fixes for the FAEVault Android client only. 
 ## 4.6.7 - 2026-10-07
 
 ### Added and improved
-- Fix update version checks on Android 8 and use the system user-interaction callback to reset idle timing for keyboard input.
-- Add confirmed device removal with signed app-sync authorization revocation and persistent record deletion; the current device and peer vault files are retained.
-- Remove deletion-record cleanup; retain permanent deletion markers and reclaim obsolete append blocks through existing compaction.
-- Preserve custom tag text without translating user data.
 - Clear cached OTP display values on lock and disallow cached code reads while locked.
 - Use a balanced5dp checkmark stroke, and reserve a stable device-record viewport so asynchronous loading does not disturb popup motion.
 - Enlarged login dots and success checkmark, matched the Organize icon size to other navigation icons, and disabled phase size animation to prevent diagonal movement on lock.
@@ -34,47 +30,6 @@ This changelog records features and fixes for the FAEVault Android client only. 
 - Device names follow the operating system. Android falls back to the model when the system name is unavailable; PC uses the computer name. Views refresh on opening and foreground activation; normal saves and synchronization update remote records.
 - Simplified the device page to names, activity and authenticated authorization records, without an application nickname editor.
 - Made the Organize icon smaller with a lighter partially filled folder.
-- Merged the camera zoom control into a single pill: it used to show 0.5x/1x/2x side by side, but most devices report a minimum ratio of 1.0, so 0.5x was filtered out and only two buttons actually remained. It now shows the **live** ratio, switches between the two stops when tapped, and follows pinch gestures. The control is hidden entirely when the device cannot zoom to 2x, and falls back to the device minimum when 1x is unreachable. The scan and capture screens share this control.
-
-### Fixed
-- Fixed the in-app updater being triggerable more than once: the guard read a snapshot computed during composition, so a tap still saw the previous frame's value, and double-tapping "Enable" launched two system settings activities and delivered two callbacks. The guard now evaluates the state object itself and is set synchronously outside the coroutine; "Enable" gained its own latch and is disabled while in flight.
-- Fixed concurrent downloads trampling each other: both used the same `.part` file, interleaving their writes, and one side's `finally` deleted the file the other was still writing to, so the SHA-256 could never match. The latch moved down into `AppUpdater`, which owns the shared resource, and the temporary file name is now unique per download.
-- Fixed update downloads being cancelled when leaving the page: they ran in the coroutine scope of the "About" section, which is destroyed by four separate paths (collapsing the accordion, scrolling out of the LazyColumn viewport, switching bottom-nav pages, and rotation), so downloads died halfway and a discovered update vanished silently. State and jobs now live in a process-level coordinator, so downloading continues while backgrounded and across page recreation; returning to settings re-reads the state and picks the progress back up. Background execution is still backed by the existing foreground notification.
-- Fixed a bogus "Update check failed" message when leaving the page: `runCatching` swallows `CancellationException`, so disposal-driven cancellation was reported as a failure.
-- The downloaded package is now checked against the expected package name. Signature comparison uses intersection semantics, so any other package signed with the same release key previously passed `verify()`; version comparison now uses `longVersionCode`.
-- Fixed Chinese leaking into the English UI when history restore failed ("Unlock the vault first", "The vault session changed").
-
----
-
-## 4.6.6 - 2026-10-02
-
-### Added
-- Autofill exclusions: register "do not fill here" per application, website or process, and manage them from settings. Exclusions are written into the encrypted payload and into PMVE metadata as an `autofill_exclusions` object, so they travel with backup export, import, LAN synchronization and cross-vault merges, and the desktop client reads the same rules.
-- Exclusions are recorded as `states` rather than bare lists: each member carries `updated_at` and `deleted`, and merging picks the greater timestamp per key with deletion winning ties. Deletion therefore propagates instead of being local-only, and a later explicit addition restores a removed member. Timestamps increase monotonically, so moving the system clock backwards cannot write an old value back.
-- Local preferences are demoted to a cache: locked and background autofill only read the cache, while edits commit immediately to the authenticated vault and publish exactly what was saved. The cache is refreshed from the vault after unlock, import and synchronization. The first upgrade migrates existing local exclusions instead of overwriting them with empty metadata.
-- The merge contract is shared by both clients: `spec/autofill_exclusions_v1_fixtures.json` is the single source of truth, and Android and desktop must both pass its list-result and commutativity cases.
-
-### Fixed
-- Fixed post-unlock maintenance potentially writing back an older version: the maintenance task saved using the snapshot taken at unlock time, and another process may have committed content during the unlock animation, so the save overwrote it. Maintenance is now rebased onto the latest authenticated commit before saving.
-- Fixed the local device still reporting "transferring" after the peer ended the transfer: shutdown forgot to reset `lanTransferActive`.
-
----
-
-## 4.6.5 - 2026-10-02
-
-### Fixed
-- Fixed passkey entries being unable to use tags. Tags are pure metadata, yet they were excluded in four places: cleared on load, dropped on import, missing from the tag index, and without a bulk entry point in the list. The entries themselves remain uneditable (key material is written only by Credential Manager), but in mixed categories they can now be filtered and reorganized.
-- Fixed the local device still showing "Disconnected" after the peer disconnected: `/api/transfer/end` mistakenly set `transferActive.set(true)`, contradicting the shutdown that followed, so the status flag stayed at "transferring" and `updateStatus()` republished it; the user had to tap once to settle. Shutdown now resets paired, `transferActive` and `latestOp` together.
-- Fixed "Close page" asking for confirmation even after disconnecting: it now only confirms while a session is still live, and returns directly once already disconnected. Both the sync page and the transfer page follow this rule.
-
-### Changed
-- The cooldown is now a persistent countdown notification. The reason for locking was previously emitted once and disappeared, but "how much longer" has to refresh every second. The remaining seconds became independent state rendered by the notification, and other events no longer overwrite it during the cooldown. Errors are now red: `UiEvent.Error` and `Info` have identical fields, so only a state bit can distinguish them, not wording.
-- The cooldown points out that the fingerprint still works: the unlock screen pops up `BiometricPrompt` automatically, so users with a fingerprint enrolled need not simply wait.
-
-### Security
-- Repeated failures during sensitive-action verification now lock the vault. The vault was already unlocked yet the master password was guessed wrong five times in a row, which means whoever is holding the device is probably not the user. That failure demotes the session to locked and clears the decrypted in-memory state (derived keys, plaintext entry cache, media keys). Only that path locks the vault when it fills the counter itself, so a wrong password typed into the autofill or passkey system dialog cannot lock the main session the user is working in.
-- Cooldown state now records the failure source. The unlock page, sensitive-action verification and the autofill/passkey dialogs all share one counter; recording which entry produced each failure lets the lock screen say that a sensitive action was refused rather than implying a mistyped unlock password.
-- A successful fingerprint unlock ends the cooldown immediately. A fingerprint is a live hardware check, not a password guess, so a user who mistyped their password is not left behind their own fingerprint prompt for 30 seconds.
 
 ---
 
