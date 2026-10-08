@@ -1,3 +1,11 @@
+---
+title: "PC 更新日志"
+description: "保险库 PC 客户端更新日志"
+locale: zh-cn
+translationKey: pc-changelog
+order: 10
+---
+
 # PC 更新日志
 
 仅记录保险库桌面端的功能与修复。Android 客户端变更在其独立仓库维护。

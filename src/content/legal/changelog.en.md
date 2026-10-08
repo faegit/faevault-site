@@ -1,3 +1,11 @@
+---
+title: "Changelog"
+description: "FAEVault Android changelog"
+locale: en
+translationKey: changelog
+order: 0
+---
+
 # FAEVault Android Changelog
 
 This changelog records features and fixes for the FAEVault Android client only. Desktop changes are maintained in their own repository.

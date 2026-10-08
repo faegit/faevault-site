@@ -1,3 +1,11 @@
+---
+title: "更新日志"
+description: "保险库 Android 客户端更新日志"
+locale: zh-cn
+translationKey: changelog
+order: 0
+---
+
 # Android 更新日志
 
 仅记录保险库 Android 客户端的功能与修复。桌面端变更在其独立仓库维护。

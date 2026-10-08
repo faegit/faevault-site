@@ -1,3 +1,11 @@
+---
+title: "PC Changelog"
+description: "FAEVault PC changelog"
+locale: en
+translationKey: pc-changelog
+order: 10
+---
+
 # PC Changelog
 
 Only records features and fixes for the FAEVault desktop client. Android client changes are maintained in its own repository.
