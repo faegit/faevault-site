@@ -450,6 +450,29 @@ class VaultRepository(
         }
     }
 
+    /** Atomically retain a signed revocation and remove the descriptive activity record. */
+    fun removeDevice(rootKey: ByteArray, deviceId: UUID, expectedSequence: Long,
+        now: Long = System.currentTimeMillis()): VaultUnlockResult {
+        DeviceActivity.requireOtherDevice(deviceId.toString(), localDeviceId())
+        require(isPmvE()) { "仅 PMVE 支持设备授权" }
+        return PmvVaultStore.openRootKey(vaultFile, rootKey).use { session ->
+            val identity = session.identity()
+            check(identity.sequence == expectedSequence) { "保险库已变化，请刷新后重试" }
+            val current = PmvDeviceRegistry.decode(session.readMetadata()).also {
+                PmvDeviceRegistry.verifyAll(it, identity.signingPublicKey)
+            }
+            val existing = requireNotNull(PmvDeviceRegistry.latest(current, deviceId)) { "设备授权记录不存在" }
+            require(existing.vaultId == identity.vaultId && existing.activeAt(now)) { "设备授权已失效，请刷新" }
+            val removed = DeviceActivity.remove(session.readMetadata(), deviceId.toString(), now)
+            val signed = session.signDeviceAuthorization(existing.copy(
+                revokedAtEpochMillis = maxOf(now, existing.issuedAtEpochMillis, 1L), epoch = Math.addExact(existing.epoch, 1L)))
+            val metadata = PmvDeviceRegistry.withRegistry(removed, current.filter { it.deviceId != deviceId } + signed)
+            val entries = session.listSummaries().map { requireNotNull(session.readEntry(it.entryId)) }
+            session.saveFull(activityMetadata(session, metadata), entries, expectedSequence)
+            pmveUnlockResult(session)
+        }
+    }
+
     fun openQueryWithPassword(passwordUtf8: ByteArray): VaultQuerySession {
         require(isPmvE()) { "保险库不是 PMVE 格式" }
         return try {

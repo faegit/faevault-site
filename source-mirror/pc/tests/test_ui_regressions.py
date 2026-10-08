@@ -1438,6 +1438,7 @@ def test_native_autofill_unlock_keeps_main_window_hidden(monkeypatch):
 
     class FakeRelockDialog:
         unlocked = True
+        vault = SimpleNamespace(path="reopened.pmv")
 
         def __init__(self, *args, **kwargs):
             calls["dialog"] = kwargs
@@ -1456,10 +1457,13 @@ def test_native_autofill_unlock_keeps_main_window_hidden(monkeypatch):
     win._locked = True
     win._native_autofill_unlock_open = False
     win.vault = SimpleNamespace(
+        path="locked.pmv",
         verify_password=lambda _password: True,
         device_unlock_key_format="pmve-root-key",
         pmve_identity=SimpleNamespace(vault_id="vault"),
     )
+    win._locked_vault_identity = win.vault.pmve_identity
+    win._restore_locked_session = lambda vault: setattr(win, "vault", vault)
     win.show = lambda: calls.__setitem__("shown", calls["shown"] + 1)
     win._reset_idle_timer = lambda: calls.__setitem__("reset", calls["reset"] + 1)
     win._run_auto_maintenance = lambda: None

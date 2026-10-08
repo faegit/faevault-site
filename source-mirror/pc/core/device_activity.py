@@ -16,6 +16,17 @@ def normalize(value):
         return copy.deepcopy(value)
     result = copy.deepcopy(value)
     result["version"] = value.get("version", 1)
+    deleted = {}
+    raw_deleted = value.get("deleted_profiles", {})
+    for key, timestamp in raw_deleted.items() if isinstance(raw_deleted, dict) else []:
+        try:
+            if type(timestamp) is int and 0 <= timestamp <= 2**63 - 1:
+                canonical_key = str(uuid.UUID(key))
+                deleted[canonical_key] = max(timestamp, deleted.get(canonical_key, -1))
+        except (ValueError, TypeError, AttributeError):
+            continue
+    if deleted or "deleted_profiles" in value:
+        result["deleted_profiles"] = dict(sorted(deleted.items()))
     by_id = {}
     raw_profiles = value.get("profiles", [])
     for raw in raw_profiles if isinstance(raw_profiles, list) else []:
@@ -32,7 +43,7 @@ def normalize(value):
                 by_id[item["device_id"]] = item
         except (ValueError, TypeError, KeyError):
             continue
-    result["profiles"] = [by_id[key] for key in sorted(by_id)]
+    result["profiles"] = [by_id[key] for key in sorted(by_id) if by_id[key]["updated_at"] > deleted.get(key, -1)]
     writer = value.get("last_writer")
     try:
         result["last_writer"] = {"device_id": str(uuid.UUID(writer["device_id"])), "updated_at": max(0, int(writer["updated_at"]))}
@@ -52,6 +63,11 @@ def merge(left, right):
             combined[key] = copy.deepcopy(value)
     combined["version"] = max(int(a.get("version", 1)), int(b.get("version", 1)))
     combined["profiles"] = a["profiles"] + b["profiles"]
+    deleted = dict(a.get("deleted_profiles", {}))
+    for key, timestamp in b.get("deleted_profiles", {}).items():
+        deleted[key] = max(timestamp, deleted.get(key, -1))
+    if deleted:
+        combined["deleted_profiles"] = deleted
     result = normalize(combined)
     for profile in result["profiles"]:
         profile["last_seen_at"] = max(p["last_seen_at"] for p in a["profiles"] + b["profiles"] if p["device_id"] == profile["device_id"])
@@ -83,7 +99,7 @@ def stamp(metadata, device_id, now=None):
         return updated
     device_id = str(uuid.UUID(str(device_id)))
     now = int(time.time() * 1000) if now is None else int(now)
-    now = max(now, activity.get("last_writer", {}).get("updated_at", -1) + 1)
+    now = max(now, activity.get("last_writer", {}).get("updated_at", -1) + 1, activity.get("deleted_profiles", {}).get(device_id, -1) + 1)
     profile = next((p for p in activity["profiles"] if p["device_id"] == device_id), None)
     name = system_device_name()
     if profile is None:
@@ -130,3 +146,25 @@ def verified_last_writer(store):
         return None
     profile = next((p for p in activity["profiles"] if p["device_id"] == writer["device_id"]), None)
     return copy.deepcopy(profile) if profile else None
+
+
+def remove_profile(metadata, device_id, now=None):
+    updated = copy.deepcopy(metadata)
+    raw_activity = updated.get(FIELD)
+    if FIELD in updated and (not isinstance(raw_activity, dict)
+                             or type(raw_activity.get("version", 1)) is not int
+                             or raw_activity.get("version", 1) != 1):
+        raise ValueError("设备记录版本不受支持，无法删除。")
+    activity = normalize(raw_activity)
+    if activity.get("version", 1) != 1:
+        raise ValueError("设备记录版本不受支持，无法删除。")
+    key = str(uuid.UUID(str(device_id)))
+    timestamp = int(time.time() * 1000) if now is None else int(now)
+    timestamp = max(timestamp, activity.get("last_writer", {}).get("updated_at", -1) + 1,
+                    activity.get("deleted_profiles", {}).get(key, -1) + 1,
+                    max((p["updated_at"] + 1 for p in activity["profiles"] if p["device_id"] == key), default=0))
+    if not 0 <= timestamp <= 2**63 - 1:
+        raise ValueError("设备记录时间超出支持范围，无法删除。")
+    activity.setdefault("deleted_profiles", {})[key] = timestamp
+    updated[FIELD] = normalize(activity)
+    return updated

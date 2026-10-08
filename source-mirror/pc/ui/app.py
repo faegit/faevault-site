@@ -1890,19 +1890,23 @@ class MainWindow(widgets.FramelessMain):
             return True
         if getattr(self, "_native_autofill_unlock_open", False):
             return False
+        if getattr(self, "_lock_cleanup_pending", False):
+            raise native_autofill.NativeAutofillError("正在清理锁定会话，请稍后重新触发自动填充")
         self._native_autofill_unlock_open = True
         try:
             process_name = prepared.target.process_name
             dialog = RelockDialog(
                 config.get_current_user() or "",
-                verify=self.vault.verify_password,
-                expected_pmve_identity=(self.vault.pmve_identity if self.vault.device_unlock_key_format == "pmve-root-key" else None),
+                verify=None,
+                reopen_path=self.vault.path,
+                expected_pmve_identity=self._locked_vault_identity,
                 auto_hello=True,
                 heading="解锁并自动填充",
                 description=(f"验证后将直接向「{process_name}」填充，保险库主页面不会打开。"),
             )
             if dialog.exec() != QDialog.Accepted or not dialog.unlocked:
                 return False
+            self._restore_locked_session(dialog.vault)
             media_files.ensure_vault_context(self.vault)
             self._locked = False
             QTimer.singleShot(0, self._remote_update_tick)
@@ -1921,6 +1925,8 @@ class MainWindow(widgets.FramelessMain):
         self._external_refresh_timer.start()
 
     def _refresh_external_vault(self) -> None:
+        if getattr(self, "_locked", False):
+            return
         if self._cloud_threads_running() or any(worker.isRunning() for worker in self.findChildren(InteractiveCloudSyncWorker)):
             # The worker is atomically reconciling this same vault file. Reopening
             # it mid-commit would both stall the UI and race the verified install.
@@ -2211,6 +2217,8 @@ class MainWindow(widgets.FramelessMain):
 
     # ---------- 前台程序检测 ----------
     def _check_foreground_app(self) -> None:
+        if getattr(self, "_locked", False):
+            return
         app = window_tracker.foreground_process_name()
         if app == self._active_app:
             if app and not self._app_timer.property("update_pending"):
@@ -2289,8 +2297,12 @@ class MainWindow(widgets.FramelessMain):
         """标记锁定并清理安全会话，不弹解锁框（供托盘隐藏等静默锁定场景）。"""
         if self._locked:
             return
-        self._close_workspace_pages("lock")
+        self._locked_vault_identity = self.vault.pmve_identity if self.vault.device_unlock_key_format == "pmve-root-key" else None
         self._locked = True
+        self._lock_cleanup_pending = True
+        from .lock_cleanup import clear_window_session, finish_cleanup
+        clear_window_session(self)
+        self._close_workspace_pages("lock")
         _clear_security_sessions()
         media_files.clear_media_context()
         if self._leak_worker is not None and self._leak_worker.isRunning():
@@ -2301,6 +2313,7 @@ class MainWindow(widgets.FramelessMain):
             if isinstance(w, QDialog):
                 w.reject()
         self.hide()
+        QTimer.singleShot(0, self, lambda: finish_cleanup(self))
 
     def _start_passkey_broker(self) -> None:
         """Expose this unlocked Vault session to the signed Windows provider."""
@@ -2429,6 +2442,11 @@ class MainWindow(widgets.FramelessMain):
 
     def _relock_prompt(self, reason: str | None) -> None:
         """交互式重新解锁；用户取消或放弃时退出程序。"""
+        if not self._locked:
+            return
+        if getattr(self, "_lock_cleanup_pending", False):
+            QTimer.singleShot(100, self, lambda: self._relock_prompt(reason))
+            return
         if getattr(self, "_relock_prompt_open", False):
             # 托盘双击可能连发两次激活，避免同时弹出多个解锁窗口。
             return
@@ -2437,11 +2455,13 @@ class MainWindow(widgets.FramelessMain):
             while True:
                 dlg = RelockDialog(
                     config.get_current_user() or "",
-                    verify=self.vault.verify_password,
+                    verify=None,
+                    reopen_path=self.vault.path,
                     reason=reason,
-                    expected_pmve_identity=(self.vault.pmve_identity if self.vault.device_unlock_key_format == "pmve-root-key" else None),
+                    expected_pmve_identity=self._locked_vault_identity,
                 )
                 if dlg.exec() == QDialog.Accepted:
+                    self._restore_locked_session(dlg.vault)
                     _log.info("重新解锁成功，恢复主界面")
                     break
                 if dlg.switch_requested:
@@ -2451,8 +2471,7 @@ class MainWindow(widgets.FramelessMain):
                         _log.info("用户放弃登录，退出程序")
                         QApplication.instance().quit()
                         return
-                    if udlg.vault.path != self.vault.path:
-                        self._switch_vault(udlg.vault)
+                    self._restore_locked_session(udlg.vault)
                     _log.info("切换账号成功，恢复主界面")
                     break
                 _log.info("用户放弃解锁，退出程序")
@@ -2468,6 +2487,25 @@ class MainWindow(widgets.FramelessMain):
             QTimer.singleShot(0, self._run_auto_maintenance)
         finally:
             self._relock_prompt_open = False
+
+    def _restore_locked_session(self, vault: Vault) -> None:
+        if vault is None:
+            raise RuntimeError("解锁未返回新的保险库会话")
+        self.vault = vault
+        self._locked = False
+        self._install_local_backup_hooks()
+        from core.autofill_exclusions import sync_local_config
+        sync_local_config(vault, migrate=True)
+        self._filter_source_entries = ()
+        self._filter_query_entries = ()
+        self.reload()
+        from .lock_cleanup import SESSION_TIMERS
+        for name in SESSION_TIMERS:
+            if name in {"_app_timer", "_otp_ticker", "_leak_recheck_timer", "_auto_sync_timer", "_local_backup_timer"}:
+                timer = getattr(self, name, None)
+                if timer is not None:
+                    timer.start()
+        self._locked_vault_identity = None
 
     def _switch_vault(self, vault: Vault) -> None:
         """切换到另一个用户的密码库，并刷新整个界面状态。"""
@@ -2563,6 +2601,8 @@ class MainWindow(widgets.FramelessMain):
             self.vault._faevault_backup_wrapped = True  # type: ignore[attr-defined]
 
     def _run_auto_maintenance(self) -> None:
+        if getattr(self, "_locked", False):
+            return
         """启动/解锁后的统一后台维护（对齐安卓端解锁后台维护）。
 
         临时文件回收、过期回收站清理与 PMVE 压缩都在后台自动完成，不再要求
@@ -3228,6 +3268,8 @@ class MainWindow(widgets.FramelessMain):
 
     # ---------- 数据刷新 ----------
     def reload(self, *, data_changed: bool = True) -> None:
+        if getattr(self, "_locked", False):
+            return
         # A category/tag/search change projects the current snapshot. Mutations,
         # synchronization and settings keep calling reload() to invalidate it.
         if getattr(self, "_filter_source_vault", None) is not self.vault:
@@ -3455,12 +3497,14 @@ class MainWindow(widgets.FramelessMain):
             return
         worker = _PasswordStatsWorker(self.vault, sig, self._password_is_weak)
         worker.result.connect(self._on_password_stats_done)
-        worker.finished.connect(lambda: setattr(self, "_pw_stats_worker", None))
+        worker.finished.connect(lambda w=worker: setattr(self, "_pw_stats_worker", None) if self._pw_stats_worker is w else None)
         worker.finished.connect(worker.deleteLater)
         self._pw_stats_worker = worker
         worker.start()
 
     def _on_password_stats_done(self, sig: str, counts: dict, id_sets: dict) -> None:
+        if getattr(self, "_locked", False):
+            return
         if self._stats_signature()[1] != sig:
             return  # 保险库已变化，丢弃过期结果避免错误筛选
         self._password_stats_cache = counts
@@ -3687,6 +3731,8 @@ class MainWindow(widgets.FramelessMain):
             self.edit_entry()
 
     def _do_show_selected(self) -> None:
+        if getattr(self, "_locked", False):
+            return
         current = self._pending_select
         if isinstance(current, EntryListItem):
             self._show_entry(current.entry, display_type=current.display_type)
@@ -4832,7 +4878,7 @@ class MainWindow(widgets.FramelessMain):
                 self._flash("已复制到剪贴板")
         if self._clipboard_clear_ms:
             _clipboard.remember_text_expiry(text, self._clipboard_clear_ms // 1000)
-            QTimer.singleShot(self._clipboard_clear_ms, lambda t=text: _clipboard.clear_if_match(t))
+            QTimer.singleShot(self._clipboard_clear_ms, _clipboard.sweep_expired_text)
         if btn is not None:
             widgets.flash_copy_success(btn)
 
@@ -5521,6 +5567,9 @@ class MainWindow(widgets.FramelessMain):
 
     def _adopt_cloud_vault(self, refreshed: Vault) -> None:
         """同步已产生新保险库对象：替换主窗口引用并刷新列表。"""
+        if self._locked:
+            refreshed.close()
+            return
         old = self.vault
         self.vault = refreshed
         old.close()

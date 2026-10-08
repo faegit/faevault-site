@@ -46,6 +46,8 @@ def current_locale() -> str:
 
 
 _EN = {
+    "正在清理锁定会话，请稍后重新触发自动填充": "Clearing the locked session. Try autofill again shortly.",
+    "解锁未返回新的保险库会话": "Unlock did not return a new vault session",
     "输入排除项，例如 chrome.exe 或 example.com": "Enter an exclusion, such as chrome.exe or example.com",
     "从运行中的程序选择…": "Choose a running app…",
     "选择正在运行的程序，包含后台程序": "Choose a running app, including background apps",
@@ -647,6 +649,19 @@ _EN.update({
     "远端版本已变化，请重新验证设备信息": "The remote version changed. Verify it again to view device information.",
 })
 
+_EN.update({
+    "删除设备记录": "Remove device record",
+    "删除会撤销此设备的应用同步授权；不会删除任何设备的保险库文件，也不会撤销云服务凭据。": "Removal revokes this device's app sync authorization. Vault files and cloud credentials are retained.",
+    "确定删除所选设备记录并撤销其应用同步授权吗？保险库文件和云服务凭据将保留。": "Remove the selected device record and revoke its app sync authorization? Vault files and cloud credentials will be retained.",
+    "设备记录已删除，应用同步授权已撤销。": "Device record removed and app sync authorization revoked.",
+    "设备记录时间超出支持范围，无法删除。": "Device record timestamp is out of range; removal is unavailable.",
+    "设备记录版本不受支持，无法删除。": "Unsupported device record version; removal is unavailable.",
+    "保险库已锁定。": "The vault is locked.",
+    "不能删除本机设备记录。": "This device cannot be removed.",
+    "设备授权属于其他保险库。": "Device authorization belongs to another vault.",
+    "设备授权记录不存在。": "Device authorization record does not exist.",
+})
+
 _CATALOGS = {"en": _EN}
 
 
@@ -666,6 +681,7 @@ _EN["解锁成功"] = "Unlocked"
 _DYNAMIC = {
     "en": (
         *_EN_COMPLETE_DYNAMIC,
+        (r"^无法打开保险库：(.+)$", r"Could not open vault: \1"),
         (r"^保存排除项失败：(.+)$", r"Could not save exclusions: \1"),
         (r"^已保存 (.+) 的当前账号$", r"Saved the current account for \1"),
         (r"^已更新 (.+) 的所选账号$", r"Updated the selected account for \1"),

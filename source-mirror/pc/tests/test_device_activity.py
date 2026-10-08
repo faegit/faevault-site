@@ -112,3 +112,141 @@ def test_device_view_hides_missing_revoked_and_expired_authorizations(monkeypatc
     vault = SimpleNamespace(_pmve_store=SimpleNamespace(metadata=lambda: {device_activity.FIELD: {"version": 1, "profiles": profiles}},
                             identity=SimpleNamespace(signing_public_key=b"public", vault_id=scope)))
     assert [record["device_id"] for record in device_activity.devices(vault)] == [str(ids[0])]
+
+
+def test_deleted_profile_max_union_and_reauthorization():
+    key = str(uuid.UUID(int=8))
+    stale = {"version": 1, "profiles": [{"device_id": key, "name": "old", "platform": "pc", "updated_at": 4, "last_seen_at": 7}]}
+    removed = device_activity.remove_profile({device_activity.FIELD: stale}, key, 10)[device_activity.FIELD]
+    assert device_activity.merge(removed, stale)["profiles"] == []
+    assert device_activity.merge(stale, removed) == device_activity.merge(removed, stale)
+    renewed = device_activity.stamp({device_activity.FIELD: removed}, key, 1)[device_activity.FIELD]
+    assert renewed["profiles"][0]["updated_at"] > removed["deleted_profiles"][key]
+    with pytest.raises(ValueError):
+        device_activity.remove_profile({device_activity.FIELD: {"version": 2}}, key)
+
+
+def _authorize_remote(vault):
+    from core import pmv_device_registry, pmv_sync_authorization
+    from core.device_identity import device_public_key
+    store = vault._pmve_store
+    target = uuid.UUID(int=8)
+    record = store.sign_device_authorization(pmv_sync_authorization.DeviceAuthorization(
+        vault_id=store.identity.vault_id, device_id=target, device_public_key=device_public_key(b"t" * 32),
+        permissions=3, issued_at_epoch_millis=1, expires_at_epoch_millis=0, revoked_at_epoch_millis=0, epoch=1))
+    metadata = pmv_device_registry.with_registry(store.metadata(), [record])
+    metadata[device_activity.FIELD] = {"version": 1, "profiles": [{"device_id": str(target), "name": "remote", "platform": "android", "updated_at": 2, "last_seen_at": 2}]}
+    store.save_full(expected_sequence=store.identity.sequence, metadata=metadata, entries=[])
+    vault._pmve_metadata = metadata
+    vault._pmve_sequence = store.identity.sequence
+    return target, record
+
+
+def test_remove_device_revocation_is_durable_and_dominates_old_grant(vault):
+    from core import pmv_device_registry
+    target, grant = _authorize_remote(vault)
+    sequence = vault._pmve_sequence
+    vault.remove_device_record(target)
+    metadata = vault._pmve_store.metadata()
+    revoke = pmv_device_registry.latest(pmv_device_registry.decode(metadata), target)
+    assert revoke.epoch > grant.epoch and not revoke.active_at(10)
+    assert pmv_device_registry.latest([grant, revoke], target) == revoke
+    assert vault._pmve_sequence == sequence + 1
+    assert str(target) in metadata[device_activity.FIELD]["deleted_profiles"]
+    assert not any(p["device_id"] == str(target) for p in metadata[device_activity.FIELD]["profiles"])
+    assert not any(p["device_id"] == str(target) for p in device_activity.devices(vault))
+    reopened = Vault.open(vault.path, "master")
+    try:
+        persisted = pmv_device_registry.latest(pmv_device_registry.decode(reopened._pmve_store.metadata()), target)
+        assert persisted == revoke
+        assert not any(p["device_id"] == str(target) for p in device_activity.devices(reopened))
+    finally:
+        reopened.close()
+    with pytest.raises(ValueError):
+        vault.remove_device_record(uuid.UUID(int=7))
+
+
+def test_remove_failure_keeps_memory_and_disk(vault, monkeypatch):
+    import copy
+    target, _ = _authorize_remote(vault)
+    metadata = copy.deepcopy(vault._pmve_metadata)
+    sequence = vault._pmve_sequence
+    def fail(**kwargs):
+        raise OSError("commit failed")
+    monkeypatch.setattr(vault._pmve_store, "save_full", fail)
+    with pytest.raises(OSError):
+        vault.remove_device_record(target)
+    assert vault._pmve_metadata == metadata
+    assert vault._pmve_sequence == sequence
+    assert vault._pmve_store.metadata() == metadata
+
+
+def test_shared_device_removal_fixtures():
+    import json
+    from pathlib import Path
+    cases = json.loads(Path("spec/device_removal_v1_fixtures.json").read_text())["cases"]
+    for case in cases:
+        result = device_activity.merge(case["left"], case["right"])
+        assert result == device_activity.merge(case["right"], case["left"]), case["name"]
+        assert [p["device_id"] for p in result["profiles"]] == case["expected_ids"], case["name"]
+        assert result.get("deleted_profiles", {}) == case["expected_deleted"], case["name"]
+
+
+def test_future_activity_removal_fails_without_commit(vault):
+    target, _ = _authorize_remote(vault)
+    metadata = vault._pmve_store.metadata()
+    metadata[device_activity.FIELD] = {"version": 2, "future": "keep"}
+    store = vault._pmve_store
+    store.save_full(expected_sequence=store.identity.sequence, metadata=metadata, entries=[])
+    sequence = store.identity.sequence
+    with pytest.raises(ValueError):
+        vault.remove_device_record(target)
+    assert store.identity.sequence == sequence
+    assert store.metadata() == metadata
+
+
+def test_max_profile_timestamp_removal_fails_atomically(vault):
+    import copy
+    target, _ = _authorize_remote(vault)
+    store = vault._pmve_store
+    metadata = store.metadata()
+    metadata[device_activity.FIELD]["profiles"][0]["updated_at"] = 2**63 - 1
+    store.save_full(expected_sequence=store.identity.sequence, metadata=metadata, entries=[])
+    vault._pmve_metadata = copy.deepcopy(metadata)
+    vault._pmve_sequence = store.identity.sequence
+    sequence = store.identity.sequence
+    with pytest.raises(ValueError):
+        vault.remove_device_record(target)
+    assert store.identity.sequence == sequence
+    assert store.metadata() == metadata
+    assert vault._pmve_metadata == metadata
+    assert vault._pmve_sequence == sequence
+
+
+def test_canonical_deletion_aliases_keep_max_timestamp():
+    key = "abcdefab-abcd-4abc-8abc-abcdefabcdef"
+    profile = {"device_id": key, "name": "old", "platform": "pc", "updated_at": 50, "last_seen_at": 50}
+    left = {"version": 1, "profiles": [profile], "deleted_profiles": {key: 99, key.upper(): 1}}
+    right = {"version": 1, "profiles": [profile], "deleted_profiles": {key.upper(): 1, key: 99}}
+    assert device_activity.normalize(left) == device_activity.normalize(right)
+    assert device_activity.normalize(left)["deleted_profiles"] == {key: 99}
+    assert device_activity.normalize(left)["profiles"] == []
+
+
+@pytest.mark.parametrize("opaque", [[], ["future"], "future", None, {"version": True}, {"version": "1"}])
+def test_opaque_activity_removal_fails_atomically(vault, opaque):
+    import copy
+    target, _ = _authorize_remote(vault)
+    store = vault._pmve_store
+    metadata = store.metadata()
+    metadata[device_activity.FIELD] = opaque
+    store.save_full(expected_sequence=store.identity.sequence, metadata=metadata, entries=[])
+    vault._pmve_metadata = copy.deepcopy(metadata)
+    vault._pmve_sequence = store.identity.sequence
+    sequence = store.identity.sequence
+    with pytest.raises(ValueError):
+        vault.remove_device_record(target)
+    assert store.identity.sequence == sequence
+    assert store.metadata() == metadata
+    assert vault._pmve_metadata == metadata
+    assert vault._pmve_sequence == sequence

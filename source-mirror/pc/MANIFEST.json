@@ -4,7 +4,7 @@
   "license": "Apache-2.0",
   "platform": "pc",
   "version": "4.6.7",
-  "source_commit": "1d1149d71cf0412ad71b4a2603618da533cced0a",
+  "source_commit": "03e31be7cc5a295cdbb8343365a039d0886c2e7e",
   "working_tree_snapshot": true,
   "files": [
     {
@@ -225,8 +225,8 @@
     },
     {
       "path": "core/device_activity.py",
-      "bytes": 6179,
-      "sha256": "0a0f07da6f453e44d6fa0a3f259679593a907a51914168700dec404b4e71ae9a",
+      "bytes": 8352,
+      "sha256": "cdc6b18460ac09391c946e2740ba26d5cba45df5954a23dd97c3b35a28d4f3a1",
       "kind": "source"
     },
     {
@@ -567,8 +567,8 @@
     },
     {
       "path": "core/storage.py",
-      "bytes": 95141,
-      "sha256": "87f4ec57f9369037c211b4dcade2b6822d00b9e4327610c92dc26c2470f5926a",
+      "bytes": 98389,
+      "sha256": "0ea261cfd0d350f33df7d0b4ffb229019946f67721bb38ff32e35a1b524b25f9",
       "kind": "source"
     },
     {
@@ -1052,6 +1052,12 @@
       "kind": "shared-fixture"
     },
     {
+      "path": "spec/device_removal_v1_fixtures.json",
+      "bytes": 2827,
+      "sha256": "24b9593fdafd863320b5551b82dc618e854a3e02d89b254d963772e6e672f34f",
+      "kind": "shared-fixture"
+    },
+    {
       "path": "spec/interop/pmv_next/v1/argon2id.json",
       "bytes": 960,
       "sha256": "eb49ef38b4a88a334f3906d64dbda4b34c91747fe6fb78d14dc094faa26576f4",
@@ -1359,8 +1365,8 @@
     },
     {
       "path": "tests/test_device_activity.py",
-      "bytes": 6261,
-      "sha256": "88b071889a2cde7994e9f0d0028f3967f53bf64b5f7439204a57f5c5be10dc2f",
+      "bytes": 13285,
+      "sha256": "b66f6e2a919851925e28a4399df2cc072a35de0ed9edcc44ac199f7bcbf2d99a",
       "kind": "source"
     },
     {
@@ -1377,8 +1383,8 @@
     },
     {
       "path": "tests/test_devices_page.py",
-      "bytes": 1326,
-      "sha256": "f6afd47979ec7addc1626f7648bc9ee4cf4734e89150f1bd5a2317ef9c7f8ea5",
+      "bytes": 2801,
+      "sha256": "711a1a475ccc63cbc2e58b0301a7a8ebfa0aa0405482e3257d23ad4e586f2408",
       "kind": "source"
     },
     {
@@ -1451,6 +1457,12 @@
       "path": "tests/test_local_backup.py",
       "bytes": 7119,
       "sha256": "9aa91f3c977d827a9a4001b052c47b9e4c4d2dfd73d22130a98878e3d9512117",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_lock_memory_cleanup.py",
+      "bytes": 7037,
+      "sha256": "9298217123d2a9d630165e523358b8ca1c5b39d7b7ce8cd18388ddd16fdfde33",
       "kind": "source"
     },
     {
@@ -1857,8 +1869,8 @@
     },
     {
       "path": "tests/test_ui_regressions.py",
-      "bytes": 169331,
-      "sha256": "45113fffafc21cd6f686c3bc1d96d76f727fe18b9ce2364e9e86471b73ef5f3d",
+      "bytes": 169549,
+      "sha256": "f4f36ea040840899b771e7b7cdcf913082f1121f5f9c493dc306cc91612cc25f",
       "kind": "source"
     },
     {
@@ -1911,8 +1923,8 @@
     },
     {
       "path": "ui/app.py",
-      "bytes": 260273,
-      "sha256": "cbb84837ac149796c654419c7d9b848941dd76be5b5a989e2e4faa92962425c3",
+      "bytes": 262351,
+      "sha256": "1ef734df3498810b1037a57cbb1e2d50477e93ae227677dd5766f453c9fbd824",
       "kind": "source"
     },
     {
@@ -1935,14 +1947,14 @@
     },
     {
       "path": "ui/devices_page.py",
-      "bytes": 2907,
-      "sha256": "fff8b9a95e459cb1a1956d4674d04cd5dffab79b77319a70a3f1426d5b9e63c9",
+      "bytes": 5484,
+      "sha256": "84e29f69d6278d9e6c7088ccd9a24c19ca4e3bf6e814467a96a806369b8d453b",
       "kind": "source"
     },
     {
       "path": "ui/dialogs.py",
-      "bytes": 244174,
-      "sha256": "e6b86fb5e7299155e66eabf3c4334b6808057e5427fd3a26386906f7b6a6a7e1",
+      "bytes": 245018,
+      "sha256": "4e6640a41abc34e5a1c4451f5ed582aa6aef1715c78bbe5cae87a5c77985a934",
       "kind": "source"
     },
     {
@@ -1977,8 +1989,8 @@
     },
     {
       "path": "ui/i18n.py",
-      "bytes": 77562,
-      "sha256": "0ad1d52ffc61136ebbad97094503378eac497b7972efe1fed34b87704f5fc56e",
+      "bytes": 79100,
+      "sha256": "69fb6b683014e083d4bceebaa1c017758f66ee110f3795d5321e72ec47709f22",
       "kind": "source"
     },
     {
@@ -2003,6 +2015,12 @@
       "path": "ui/large_image_decode.py",
       "bytes": 2976,
       "sha256": "940de6d46d55cf553d93c069afd4f82a6c2a3d99f3bc6670ef7a8eec278eba00",
+      "kind": "source"
+    },
+    {
+      "path": "ui/lock_cleanup.py",
+      "bytes": 4599,
+      "sha256": "bfa2acf53618bde20a2432ee2c5a41f89d13ee979cd85432e11b57d080c72d11",
       "kind": "source"
     },
     {

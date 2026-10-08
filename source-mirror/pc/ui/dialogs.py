@@ -589,7 +589,9 @@ class RecoveryKeyConfirmDialog(widgets.ShadowDialog):
         def copy_key() -> None:
             text = sheet_text()
             QApplication.clipboard().setText(text)
-            QTimer.singleShot(60_000, lambda: QApplication.clipboard().clear() if QApplication.clipboard().text() == text else None)
+            from . import _clipboard
+            _clipboard.remember_text_expiry(text, 60)
+            QTimer.singleShot(60_000, _clipboard.sweep_expired_text)
             widgets.flash_copy_success(copy_btn)
             reveal_verification("复制密钥")
 
@@ -1213,9 +1215,12 @@ class RelockDialog(LockoutMixin, widgets.ShadowDialog):
         auto_hello: bool = False,
         heading: str | None = None,
         description: str | None = None,
+        reopen_path: Path | None = None,
     ):
         super().__init__("保险库", parent, width=380)
         self._verify = verify
+        self._reopen_path = reopen_path
+        self.vault = None
         self.unlocked = False
         self.switch_requested = False
         self._username = username
@@ -1333,7 +1338,7 @@ class RelockDialog(LockoutMixin, widgets.ShadowDialog):
     def _unlock_with_hello(self) -> None:
         if getattr(self, "_unlocking", False) or not self._username:
             return
-        path = config.user_vault_path(config._user_record(self._username))
+        path = self._reopen_path or config.user_vault_path(config._user_record(self._username))
         try:
             opened = biometric.open_vault(path)
         except biometric.DeviceEnvelopeError as exc:
@@ -1356,13 +1361,17 @@ class RelockDialog(LockoutMixin, widgets.ShadowDialog):
                     and opened.pmve_identity == self._expected_pmve_identity
                 )
         finally:
-            opened.close()
+            if not matches or self._reopen_path is None:
+                opened.close()
         if not matches:
             biometric.disable(path)
             self._mark_hello_expired()
             self.warn("生物识别凭据已失效，请用主密码登录后重新启用")
             return
+        if self._reopen_path is not None:
+            self.vault = opened
         self.unlocked = True
+        self.pw.clear()
         self.passed()
         super().accept()
 
@@ -1379,11 +1388,26 @@ class RelockDialog(LockoutMixin, widgets.ShadowDialog):
         if not pw:
             self.warn("主密码不能为空")
             return
-        if not self._verify(pw):
+        if self._reopen_path is not None:
+            try:
+                opened = Vault.open(self._reopen_path, pw)
+            except crypto.DecryptError:
+                opened = None
+            except Exception as exc:
+                self.pw.clear()
+                self.warn(f"无法打开保险库：{exc}")
+                return
+            verified = opened is not None
+        else:
+            opened = None
+            verified = self._verify(pw)
+        if not verified:
             self.pw.clear()
             self.wrong_password()
             return
+        self.vault = opened
         self.unlocked = True
+        self.pw.clear()
         self.passed()
         super().accept()
 

@@ -562,6 +562,29 @@ class VaultViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     suspend fun deviceProfiles(): List<com.vault.storage.DeviceActivityProfile> = deviceOperation { r, key -> r.deviceProfiles(key) }
+    suspend fun removeDevice(deviceId: String) {
+        val token = captureVaultSession()
+        vaultOperationMutex.withLock {
+            requireVaultSessionCurrent(token)
+            val repository = repo() ?: error(localizeUiTextFor(getApplication(), "请先解锁保险库"))
+            val credential = _state.value.rootKey ?: error(localizeUiTextFor(getApplication(), "请先解锁保险库"))
+            withContext(Dispatchers.IO) {
+                val accepted = vaultSessionFence.runIfCurrent(token, _currentVault.value) {
+                    credential.withRootKey(credential.identity) { key ->
+                        val result = repository.removeDevice(key, UUID.fromString(deviceId), repository.currentIdentity(key).sequence)
+                        try {
+                            replacePmvESessionRoot(requireNotNull(result.rootKey), requireNotNull(result.identity))
+                            val sealed = sealPayload(result.payload)
+                            _state.update { it.copy(payload = sealed, listIndex = VaultListIndex.from(sealed)) }
+                        } finally { result.rootKey?.fill(0) }
+                    }
+                }
+                if (!accepted) throw kotlinx.coroutines.CancellationException("Vault session changed")
+            }
+            requireVaultSessionCurrent(token)
+        }
+    }
+
     private fun isVaultSessionCurrent(token: VaultSessionFence.Token): Boolean =
         vaultSessionFence.isCurrent(token, _currentVault.value)
 

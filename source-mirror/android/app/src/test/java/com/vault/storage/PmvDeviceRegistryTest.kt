@@ -109,4 +109,30 @@ class PmvDeviceRegistryTest {
         }
         assertTrue(PmvDeviceRegistry.decode(JsonObject(emptyMap())).isEmpty())
     }
+    @Test fun `removed device keeps signed higher epoch revocation after stale metadata merge`() {
+        val id = UUID.fromString("00000000-0000-0000-0000-000000000001")
+        val old = PmvDeviceRegistry.withRegistry(DeviceActivity.touch(JsonObject(emptyMap()), id.toString(), "Fake phone", now = 2000), listOf(record(id, 1)))
+        val removed = PmvDeviceRegistry.withRegistry(DeviceActivity.remove(old, id.toString(), now = 3000), listOf(record(id, 2, revokedAt = 3000)))
+        val merged = DeviceActivity.merge(PmvDeviceRegistry.withRegistry(removed, PmvDeviceRegistry.decode(old) + PmvDeviceRegistry.decode(removed)), old)
+        val grant = PmvDeviceRegistry.decode(merged).single()
+        PmvDeviceRegistry.verifyAll(listOf(grant), vaultPublicKey)
+        assertEquals(2L, grant.epoch)
+        assertTrue(!grant.activeAt(4000))
+        assertTrue(DeviceActivity.profiles(merged).isEmpty())
+    }
+
+    @Test fun `future issued grant can be revoked despite local clock skew`() {
+        val id = UUID.fromString("00000000-0000-0000-0000-000000000001")
+        val existing = PmvSyncAuthorization.signAuthorization(record(id, 1).copy(
+            issuedAtEpochMillis = 9000L), vaultSeed)
+        val now = 3000L
+        val revoked = PmvSyncAuthorization.signAuthorization(existing.copy(
+            revokedAtEpochMillis = maxOf(now, existing.issuedAtEpochMillis, 1L),
+            epoch = Math.addExact(existing.epoch, 1L)), vaultSeed)
+        PmvDeviceRegistry.verifyAll(listOf(revoked), vaultPublicKey)
+        assertEquals(9000L, revoked.revokedAtEpochMillis)
+        assertTrue(!revoked.activeAt(now))
+        assertTrue(!revoked.activeAt(10000L))
+    }
+
 }

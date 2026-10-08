@@ -15,9 +15,6 @@ Only records features and fixes for the FAEVault desktop client. Android client 
 ## 4.6.7 - 2026-10-07
 
 ### Added and improved
-- Release vault keys, decrypted entries and UI caches after locking and safely settling active tasks; unlock opens a fresh vault session.
-- Add confirmed device removal with signed app-sync authorization revocation and persistent record deletion; the current device and peer vault files are retained.
-- Remove deletion-record cleanup; retain permanent deletion markers and reclaim obsolete append blocks through existing compaction.
 - Device records show only verified, currently authorized devices; missing, revoked, expired and invalid authorizations are hidden.
 - Login and password verification show three dots pulsing left to right, with a checkmark only on login success; reserved bounds prevent clipping.
 - Unified autofill candidate ranking across website origins, linked applications, titles and keywords, with case-insensitive, full-width and related-name matching. Similar candidates do not bypass origin authorization.

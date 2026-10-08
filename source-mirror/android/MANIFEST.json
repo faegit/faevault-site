@@ -4,7 +4,7 @@
   "license": "Apache-2.0",
   "platform": "android",
   "version": "4.6.7",
-  "source_commit": "d28bda0751fbbf1384fdcbc49f4955d036cbe31a",
+  "source_commit": "ee310c919f17d693f5657942171a6e66475a61ca",
   "working_tree_snapshot": true,
   "files": [
     {
@@ -765,8 +765,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/storage/DeviceActivity.kt",
-      "bytes": 5917,
-      "sha256": "cfaa31f80edf5496e1b42e7ce8c13622390fd8e6a3af86639fc816402165cc85",
+      "bytes": 8626,
+      "sha256": "d30b97fc6b892e74cbb7404f6a79f76d3d5f38ddeb85daf1557465247c468c0d",
       "kind": "source"
     },
     {
@@ -1059,8 +1059,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/storage/VaultRepository.kt",
-      "bytes": 68186,
-      "sha256": "7c23419ffb03a3f93c442caa954699a04cd04cf1cd289fdc3307f0aca9d119e9",
+      "bytes": 71345,
+      "sha256": "50c794ab49c313799bf23a87c299a890ecb9ccc0eaf7527a0da10a61357695f4",
       "kind": "source"
     },
     {
@@ -1263,8 +1263,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/ui/UiCopyExtra.kt",
-      "bytes": 94733,
-      "sha256": "473e1bd71ae1175fd07754723b3c6c1a60049a248466972ef6ef04a9b7381e0b",
+      "bytes": 95401,
+      "sha256": "19ef64bb3ba90b4dc06eed55e733e9e27892c1c9bc8a2cd05af1562401367c83",
       "kind": "source"
     },
     {
@@ -1353,8 +1353,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/ui/VaultViewModel.kt",
-      "bytes": 406891,
-      "sha256": "43878b38cb87097eeb14a8045395e5edbde8802881fd8fec1f432a65c6488fba",
+      "bytes": 416177,
+      "sha256": "3ffe69468522e713609946173b082ca0498b8d8730ba880bd86ceee36bd70cf5",
       "kind": "source"
     },
     {
@@ -1461,8 +1461,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/ui/screens/DevicesDialog.kt",
-      "bytes": 5068,
-      "sha256": "012822fbb984a379c9b74c53246e36b6e7b445c0302addfb12e9eef7b886b1bf",
+      "bytes": 7731,
+      "sha256": "5df8051b6fddeefa21847b4f57920403cf706a32486b994eb18450f90f5c4e10",
       "kind": "source"
     },
     {
@@ -2349,8 +2349,8 @@
     },
     {
       "path": "app/src/test/java/com/vault/storage/DeviceActivityTest.kt",
-      "bytes": 3449,
-      "sha256": "d0ce042652dcc7fb2a33c54bdb592626070afd4e62a64a8df0788a58ebec9c64",
+      "bytes": 8640,
+      "sha256": "a10aba73f2419a8ebd801e9cbb84a5721c504631ca5c84f724e1deff4938dc83",
       "kind": "source"
     },
     {
@@ -2457,8 +2457,8 @@
     },
     {
       "path": "app/src/test/java/com/vault/storage/PmvDeviceRegistryTest.kt",
-      "bytes": 4957,
-      "sha256": "2ff0a6447ba0edbc6c6eb9b65e5981e46744ba160deeac2a24827442deb56c23",
+      "bytes": 6655,
+      "sha256": "762c13949b8bc4f7d19a491f93b63fdd5e637b268a9982ad16c5fe0b124895cc",
       "kind": "source"
     },
     {
@@ -3023,6 +3023,12 @@
       "path": "spec/device_activity_v1_fixtures.json",
       "bytes": 2933,
       "sha256": "867c6d77b2f93cb00341ee3b875fa59130d649df556b2999310f721280bbaa79",
+      "kind": "source"
+    },
+    {
+      "path": "spec/device_removal_v1_fixtures.json",
+      "bytes": 2827,
+      "sha256": "24b9593fdafd863320b5551b82dc618e854a3e02d89b254d963772e6e672f34f",
       "kind": "source"
     },
     {

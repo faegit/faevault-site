@@ -8,6 +8,7 @@ import os
 import shutil
 import time
 import uuid
+from weakref import WeakValueDictionary
 from collections import defaultdict
 from collections.abc import Mapping
 from contextlib import contextmanager
@@ -278,6 +279,7 @@ class Vault:
         # 在条目数较大时（分类切换等高频路径）成为主要开销。元信息与载荷已常驻内存，
         # 故缓存对象本身；任何写操作都经由 save()，在 save() 中统一失效。
         self._entry_cache: dict[str, tuple[dict, dict, "Entry"]] = {}
+        self._session_entries = WeakValueDictionary()
         self._purge_tombstones: dict[str, float] = {}
         self.device_id: str = ""
         self.key_revision: int = 0
@@ -349,6 +351,7 @@ class Vault:
         entry = Entry.from_dict(copy.deepcopy({**meta, **(payload or {})}))
         entry.vault = self
         self._entry_cache[eid] = (payload, meta, entry)
+        self._session_entries[id(entry)] = entry
         return entry
 
     def _encrypt_payload(self, entry_id: str, data: dict):
@@ -1142,7 +1145,10 @@ class Vault:
         """Decrypt one PMVE entry without materializing the full vault."""
         if self._pmve_store is not None:
             try:
-                return self._pmve_store.read_entry(uuid.UUID(entry_id))
+                entry = self._pmve_store.read_entry(uuid.UUID(entry_id))
+                if entry is not None:
+                    self._session_entries[id(entry)] = entry
+                return entry
             except (TypeError, ValueError):
                 return None
         if entry_id not in self._entry_order and entry_id not in self._trash_order:
@@ -1160,6 +1166,35 @@ class Vault:
             for entry_id in self._entry_order
             if secret_type is None or self._entry_meta[entry_id].get("secret_type") == secret_type
         )
+
+    def remove_device_record(self, device_id) -> None:
+        """Persist a signed revocation and descriptive-profile tombstone atomically."""
+        from dataclasses import replace
+        from . import device_activity, pmv_device_registry
+        if self._pmve_store is None:
+            raise ValueError("保险库已锁定。")
+        target = uuid.UUID(str(device_id))
+        store = self._pmve_store
+        identity = store.identity
+        if str(target) == device_activity.current_device_id(self):
+            raise ValueError("不能删除本机设备记录。")
+        metadata = store.metadata()
+        records = pmv_device_registry.verify_all(pmv_device_registry.decode(metadata), identity.signing_public_key)
+        if any(record.vault_id != identity.vault_id for record in records):
+            raise ValueError("设备授权属于其他保险库。")
+        record = pmv_device_registry.latest(records, target)
+        if record is None:
+            raise ValueError("设备授权记录不存在。")
+        now = max(int(time.time() * 1000), record.issued_at_epoch_millis, record.revoked_at_epoch_millis + 1)
+        revoked = store.sign_device_authorization(replace(record, revoked_at_epoch_millis=now, epoch=record.epoch + 1))
+        updated = pmv_device_registry.with_registry(metadata, [r for r in records if r.device_id != target] + [revoked])
+        updated = device_activity.remove_profile(updated, target, now)
+        updated = device_activity.stamp(updated, device_activity.current_device_id(self))
+        updated[device_activity.FIELD]["last_writer"]["parent_commit_id"] = str(identity.commit_id)
+        entries = [entry for summary in store.list() if (entry := store.read_entry(summary.entry_id)) is not None]
+        store.save_full(expected_sequence=identity.sequence, metadata=updated, entries=entries)
+        self._pmve_metadata = copy.deepcopy(updated)
+        self._pmve_sequence = store.identity.sequence
 
     def ensure_device_authorized(self) -> None:
         """PMVE 设备自注册（惰性，同步前调用）：为本机生成/恢复设备身份并确保在授权清单中。"""
@@ -1431,11 +1466,32 @@ class Vault:
         if self._pmve_store is not None:
             self._pmve_store.close()
             self._pmve_store = None
+        session_entries = {id(entry): entry for _payload, _meta, entry in self._entry_cache.values()}
+        session_entries.update(self._session_entries)
+        for entry in session_entries.values():
+            release = getattr(entry, "release_sensitive", None)
+            if callable(release):
+                release()
+            else:
+                for name in ("title", "username", "password", "url", "notes", "target_app", "_haystack", "_title_lower"):
+                    setattr(entry, name, "")
+                entry.fields.clear()
+                entry.tags.clear()
+            entry.vault = None
+        for meta in (*self._entry_meta.values(), *self._trash_meta.values()):
+            meta.clear()
+        self._entry_meta.clear()
+        self._trash_meta.clear()
+        self._entry_order.clear()
+        self._trash_order.clear()
+        self._pmve_metadata.clear()
+        self._purge_tombstones.clear()
         for payload in self._payloads.values():
             if isinstance(payload, dict):
                 payload.clear()
         self._payloads.clear()
         self._entry_cache.clear()
+        self._session_entries.clear()
         self._password.clear()
         media_files.remove_vault_context(self)
 
