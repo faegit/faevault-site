@@ -2600,8 +2600,7 @@ class MainWindow(widgets.FramelessMain):
     def _purge_expired_trash(self) -> int:
         """解锁后清理超过保留期的回收站条目，返回移除的条目数。
 
-        即使回收站为空也要调用：``purge_expired`` 同时回收过期的删除日志，
-        不调用会让日志线性增长（安卓端同样在每次解锁时无条件执行）。
+        删除日志永久保留，防止旧副本重新带回已删除条目。
         """
         days = int(
             config.get("recycle_bin_retention_days", config.DEFAULT_RECYCLE_BIN_RETENTION_DAYS)
@@ -2817,71 +2816,7 @@ class MainWindow(widgets.FramelessMain):
         menu = QMenu(i18n.tr("库维护"), parent)
         menu.addAction(i18n.tr("重复条目合并"), self.dedup_entries)
         menu.addAction(i18n.tr("相同服务合并"), self.merge_same_service_entries)
-        menu.addAction("清理删除记录", self._open_deletion_cleanup)
         return menu
-
-    def _open_deletion_cleanup(self):
-        from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton
-        dialog = QDialog(self)
-        dialog.setWindowTitle("清理删除记录")
-        layout = QVBoxLayout(dialog)
-        description = QLabel("清理用于防止已删除条目重新出现的记录。所有持有库副本的设备须先同步，包括已撤销设备。旧副本和备份可能含已删除内容；清理后须从当前完整库重新初始化旧设备，旧备份只能单独恢复。旧客户端仍可能覆盖云端文件；新版客户端会拒绝旧基线。程序只能核验已知设备，未登记的库副本需自行确认。")
-        description.setWordWrap(True)
-        layout.addWidget(description)
-        status = QLabel()
-        status.setWordWrap(True)
-        layout.addWidget(status)
-        start = QPushButton("开始同步检查")
-        finish = QPushButton("清理删除记录")
-        layout.addWidget(start)
-        layout.addWidget(finish)
-        refresh_button = QPushButton("刷新同步状态")
-        layout.addWidget(refresh_button)
-        def refresh():
-            try:
-                value, ready = self.vault.deletion_cleanup_state()
-                cp = value["checkpoint"]
-                count = len(self.vault._purge_tombstones)
-                pending = [m for m in cp["member_ids"] if cp["acknowledgements"].get(m) != cp["checkpoint_id"]] if cp else []
-                from core import deletion_baseline as baseline
-                from core.device_activity import current_device_id
-                metadata = self.vault.metadata
-                unchanged = cp and cp["purge_snapshot"] == metadata.get("purge_tombstones", {}) and cp["member_ids"] == baseline.members(metadata, current_device_id(self.vault))
-                profiles = {p["device_id"]: p.get("name", "") for p in metadata.get("_device_activity_v1", {}).get("profiles", [])}
-                pending_names = "、".join(profiles.get(m) or m[:8] for m in pending)
-                condition = "记录或设备已变化，请重新开始同步确认" if cp and not unchanged else f"等待 {len(pending)} 台已知设备同步：{pending_names}" if cp and not ready else "所有已知设备已确认，可清理" if ready else "请开始检查；新增删除记录或设备后须重新检查"
-                status.setText(i18n.tr_dynamic(f"删除记录：{count} 条") + "\n" + i18n.tr_dynamic(condition))
-                start.setEnabled(bool(count))
-                finish.setEnabled(ready)
-                finish.setProperty("checkpoint_id", cp["checkpoint_id"] if cp else "")
-            except ValueError as exc:
-                status.setText(str(exc))
-                start.setEnabled(False)
-                finish.setEnabled(False)
-        def begin():
-            try:
-                self.vault.start_deletion_cleanup()
-            except Exception as exc:
-                widgets.message(dialog, "检查失败", str(exc), kind="error")
-            refresh()
-        def complete():
-            checkpoint = finish.property("checkpoint_id")
-            if not widgets.confirm(dialog, "清理删除记录", "已确认所有持有副本的设备都已同步，并了解旧副本、旧备份可能使已删除内容重新出现。继续清理？", kind="warn"):
-                return
-            if not widgets.confirm(dialog, "确认清理删除记录", "清理将建立新基线，旧设备必须从当前完整库重新初始化。确定立即清理？", kind="warn"):
-                return
-            try:
-                self.vault.finish_deletion_cleanup(checkpoint)
-                widgets.message(dialog, "清理完成", "删除记录已清理，新基线已保存。请同步到所有设备。", kind="success")
-            except Exception as exc:
-                widgets.message(dialog, "清理失败", str(exc), kind="error")
-            refresh()
-        start.clicked.connect(begin)
-        finish.clicked.connect(complete)
-        refresh_button.clicked.connect(refresh)
-        refresh()
-        dialog.resize(520, 320)
-        dialog.exec()
 
     def _update_top_nav_layout(self) -> None:
         if not hasattr(self, "_security_btn"):
@@ -5344,7 +5279,6 @@ class MainWindow(widgets.FramelessMain):
             device_id=self.vault.device_id,
             purge_tombstones=self.vault._purge_tombstones,
             autofill_exclusions=self.vault.autofill_exclusions,
-            deletion_baseline=self.vault.metadata.get("deletion_baseline"),
         )
         _log.info("加密备份导出：%d 条 → %s", len(entries), path)
         self._flash(f"已导出加密备份（{len(entries)} 条）")
@@ -5659,7 +5593,6 @@ class MainWindow(widgets.FramelessMain):
         source: str,
         purge_tombstones: dict[str, float] | None = None,
         autofill_exclusions: dict | None = None,
-        deletion_baseline: dict | None = None,
     ) -> dict:
         """Sync v2 合并：按 id 做 LWW，同秒冲突自动保留双份（无需用户逐条选择）。"""
         stats = self.vault.sync_merge(
@@ -5668,7 +5601,6 @@ class MainWindow(widgets.FramelessMain):
             on_conflict=lambda l, r: sync.ConflictChoice.KEEP_BOTH,
             incoming_purge_tombstones=purge_tombstones,
             incoming_autofill_exclusions=autofill_exclusions,
-            incoming_deletion_baseline=deletion_baseline,
         )
         self.reload()
         self._update_recycle_btn()
@@ -5735,7 +5667,6 @@ class MainWindow(widgets.FramelessMain):
                 "加密备份",
                 payload.purge_tombstones,
                 payload.autofill_exclusions,
-                payload.deletion_baseline,
             )
         except ValueError as exc:
             _log.warning("Passkey 加密备份导入被拒绝：%s", exc)

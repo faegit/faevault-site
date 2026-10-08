@@ -4,7 +4,7 @@
   "license": "Apache-2.0",
   "platform": "android",
   "version": "4.6.7",
-  "source_commit": "cff9b7e1dfe81ed30b2091de7de5d739ab94bc8d",
+  "source_commit": "d28bda0751fbbf1384fdcbc49f4955d036cbe31a",
   "working_tree_snapshot": true,
   "files": [
     {
@@ -326,15 +326,9 @@
       "kind": "source"
     },
     {
-      "path": "app/src/main/java/com/vault/model/DeletionBaseline.kt",
-      "bytes": 3286,
-      "sha256": "375e777a46da94c23f2cb30b5d1191171b44ed644956fa076ca80e4808f55ad7",
-      "kind": "source"
-    },
-    {
       "path": "app/src/main/java/com/vault/model/Entry.kt",
-      "bytes": 11177,
-      "sha256": "ee24d5a67f2b38f9ef2a4d02c348686882e13a34050ead055e51cd703e2e70a6",
+      "bytes": 10850,
+      "sha256": "2fd50a893ade83757d1079f38669dd4e3a22dd2e26d74445b8c103d0b32b21cf",
       "kind": "source"
     },
     {
@@ -369,8 +363,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/model/VaultOps.kt",
-      "bytes": 37549,
-      "sha256": "74b1ecd0cc42e92f279eaf6fd19b14db4248140fff13268896e41cc8d48a8f84",
+      "bytes": 37147,
+      "sha256": "ae2eaf668db48dfea03920503fe24aac326da4b161c037f2feb8c6adc95aa056",
       "kind": "source"
     },
     {
@@ -717,8 +711,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/storage/BackupCodec.kt",
-      "bytes": 5190,
-      "sha256": "d7e6c36f3db1ae96e4fd1c68163c19e207c6b22eb6ee802739d23329f28b632f",
+      "bytes": 4783,
+      "sha256": "ea15321a9c1203d4d76eef411276b62eb4befcd912e071cc987f5cb0b8d154b0",
       "kind": "source"
     },
     {
@@ -770,15 +764,9 @@
       "kind": "source"
     },
     {
-      "path": "app/src/main/java/com/vault/storage/DeletionKnownMembers.kt",
-      "bytes": 2336,
-      "sha256": "6cc0e961ff989aef79492e0a447204c77de8a33cae8c6109a2a130a92db5f046",
-      "kind": "source"
-    },
-    {
       "path": "app/src/main/java/com/vault/storage/DeviceActivity.kt",
-      "bytes": 6086,
-      "sha256": "0c4ded22d9e952966d12f1635f61f66a806f24bec8d4ce2f3984d3dfcc057ad0",
+      "bytes": 5917,
+      "sha256": "cfaa31f80edf5496e1b42e7ce8c13622390fd8e6a3af86639fc816402165cc85",
       "kind": "source"
     },
     {
@@ -879,8 +867,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/storage/PmvEPayloadAdapter.kt",
-      "bytes": 9728,
-      "sha256": "0185a40c1db1ad20de553525a0f506b1d650d7008cf7898962c003d456dc8b5c",
+      "bytes": 9476,
+      "sha256": "0840d15aae575afbe80e80970775720b2ec937d41827a385b2639997f075370c",
       "kind": "source"
     },
     {
@@ -981,8 +969,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/storage/PmvVaultStore.kt",
-      "bytes": 116845,
-      "sha256": "feced793de9de79ec73fc4a51bff56b70b66eb0b1b336ceeed5a8346ddbdf6e4",
+      "bytes": 116394,
+      "sha256": "bb4fb8bdd3848d681787a119cdf180d2ef6273709998a8d78e674f336835026b",
       "kind": "source"
     },
     {
@@ -1071,8 +1059,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/storage/VaultRepository.kt",
-      "bytes": 81724,
-      "sha256": "5f7538ab97f17258e0b8757f95c79383c4c18b7ffdadbb0dbe738395121f2136",
+      "bytes": 68186,
+      "sha256": "7c23419ffb03a3f93c442caa954699a04cd04cf1cd289fdc3307f0aca9d119e9",
       "kind": "source"
     },
     {
@@ -1281,8 +1269,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/ui/UiText.kt",
-      "bytes": 93888,
-      "sha256": "bfe35b3dce44fe15c5de68cdd7ad105aeafb96a6616f67235706a358d3efdb21",
+      "bytes": 89944,
+      "sha256": "2befa7df3d2ae42749406d725e6b409605e3f84879c00eecac02655a3eb9d458",
       "kind": "source"
     },
     {
@@ -1365,8 +1353,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/ui/VaultViewModel.kt",
-      "bytes": 420899,
-      "sha256": "c9bc4fdcd6b62fe30582aafaea451ad2fe7d222abe12c207ec74e4d45d21a17c",
+      "bytes": 406891,
+      "sha256": "43878b38cb87097eeb14a8045395e5edbde8802881fd8fec1f432a65c6488fba",
       "kind": "source"
     },
     {
@@ -1472,12 +1460,6 @@
       "kind": "source"
     },
     {
-      "path": "app/src/main/java/com/vault/ui/screens/DeletionCleanupCard.kt",
-      "bytes": 6726,
-      "sha256": "bf7995c12817ae7b86827d7d687bef036c1ba4bc33f15f8318a30406937f8f31",
-      "kind": "source"
-    },
-    {
       "path": "app/src/main/java/com/vault/ui/screens/DevicesDialog.kt",
       "bytes": 5068,
       "sha256": "012822fbb984a379c9b74c53246e36b6e7b445c0302addfb12e9eef7b886b1bf",
@@ -1521,8 +1503,8 @@
     },
     {
       "path": "app/src/main/java/com/vault/ui/screens/MaintenanceScreen.kt",
-      "bytes": 38628,
-      "sha256": "ba073dc398cc21a6d7aee0f51224bb1691c097796111b2462661be5fa00a7512",
+      "bytes": 37751,
+      "sha256": "2343e3b99b8ba39489fbe6cd03791cafb69a0f7259ed48ca3772665d62fad43c",
       "kind": "source"
     },
     {
@@ -1641,8 +1623,8 @@
     },
     {
       "path": "app/src/main/res/values-en/strings.xml",
-      "bytes": 14443,
-      "sha256": "9a251d363a0144556e66d694888447aeb120b9018ebf5bfe24c94c5e68b184be",
+      "bytes": 12287,
+      "sha256": "50d6780e46d2dd54197984af654ba674a68e10de236afd575191484ddf8c8b99",
       "kind": "source"
     },
     {
@@ -1725,8 +1707,8 @@
     },
     {
       "path": "app/src/main/res/values/strings.xml",
-      "bytes": 13591,
-      "sha256": "e8526ada1f79ce255b851355fcc2f37a0e3c69d2db5167583e6cdba72b6195f1",
+      "bytes": 11573,
+      "sha256": "87991ab6cd4beaba668edf0c99cb71e9d13e39dd05d9a949bead034c5bf12327",
       "kind": "source"
     },
     {
@@ -2019,8 +2001,8 @@
     },
     {
       "path": "app/src/test/java/com/vault/VaultOpsTombstoneTest.kt",
-      "bytes": 6423,
-      "sha256": "47c57de7678fd8fb22e2966c46b2afa6d5fc20c405432e4e16cef3de5dfd95ba",
+      "bytes": 7313,
+      "sha256": "9233a4a660bb6d90eec1d201173de4ebefeac45f8bc42f8b2d82d2a1acf354a1",
       "kind": "source"
     },
     {
@@ -2204,12 +2186,6 @@
       "kind": "source"
     },
     {
-      "path": "app/src/test/java/com/vault/model/DeletionBaselineTest.kt",
-      "bytes": 3653,
-      "sha256": "5eaf46bb4ecfe0c2ad0e841b84a3b2ec47024b40a96b6ce3ce8698e0e908bb8e",
-      "kind": "source"
-    },
-    {
       "path": "app/src/test/java/com/vault/model/EntryNormalizeTagsTest.kt",
       "bytes": 1456,
       "sha256": "ca0fbad7126f5a95cc9376319150005989fb29bcba464ddadeb2852dd82436de",
@@ -2369,12 +2345,6 @@
       "path": "app/src/test/java/com/vault/storage/CloudTreeStorageTest.kt",
       "bytes": 623,
       "sha256": "2c579a14542b9126c8923c48c61e6d5641b55a267dd19feec039e8a2e9d38f01",
-      "kind": "source"
-    },
-    {
-      "path": "app/src/test/java/com/vault/storage/DeletionKnownMembersTest.kt",
-      "bytes": 2816,
-      "sha256": "e5cfbfc04f32c212e4f252cbc31cd49748075a1f8fdbe370d3dbcb88d66f9ff0",
       "kind": "source"
     },
     {
@@ -2589,8 +2559,8 @@
     },
     {
       "path": "app/src/test/java/com/vault/storage/PmvVaultStoreTest.kt",
-      "bytes": 72838,
-      "sha256": "92a9d7e7fe4c69e2303539f4d2d37203491242b955b72d94aa24256fca1b7004",
+      "bytes": 68371,
+      "sha256": "2c98b7d8ad6379e75ca4d70055a61562cf67849660fd9d6be40497a4f131f33e",
       "kind": "source"
     },
     {
@@ -2835,8 +2805,8 @@
     },
     {
       "path": "app/src/test/java/com/vault/ui/UiTextTest.kt",
-      "bytes": 9742,
-      "sha256": "985e8dccbf409e566ca97bd2cdb2754f1521677b9a72b8354b38b45fe54eb8b8",
+      "bytes": 9148,
+      "sha256": "7528eeb52c6d037bc2d00961ad6fd5119f1afeaf989d2ce94077e7be1c964df3",
       "kind": "source"
     },
     {
@@ -3047,12 +3017,6 @@
       "path": "spec/backup_v2_fixture.json",
       "bytes": 883,
       "sha256": "9b560385cbf6f1d056d71cd691432063cde94ece47102b33d04477a80e191063",
-      "kind": "source"
-    },
-    {
-      "path": "spec/deletion_baseline_v1_fixtures.json",
-      "bytes": 5383,
-      "sha256": "10017a27ccdd5a0a3512ea69c849efde7ceb6b2c9c0851db931930bbff81c262",
       "kind": "source"
     },
     {

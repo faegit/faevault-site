@@ -8,13 +8,6 @@ import org.junit.Assert.assertFalse
 import org.junit.Test
 
 class UiTextTest {
-    @Test
-    fun deletionCleanupErrorsRemainLocalized() {
-        assertEquals("Invalid deletion-record checkpoint.", localizeUiText("删除记录检查点无效", "en"))
-        assertEquals("No deletion records to clean up.", localizeUiText("没有可清理的删除记录", "en"))
-        assertEquals("删除记录检查点无效", localizeUiText("删除记录检查点无效", "zh-CN"))
-    }
-
     @Test fun persistedBackupFallbackLabelsFollowCurrentLanguage() {
         assertEquals("Backup device(VOL-a1b2) · 64 GB", localizeBackupDeviceLabel("备份设备（VOL-a1b2） · 64 GB", "en-US"))
         assertEquals("本机存储（VOL-ab12）", localizeBackupDeviceLabel("Local storage(VOL-ab12)", "zh-CN"))

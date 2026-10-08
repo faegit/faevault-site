@@ -204,8 +204,6 @@ def merge_with_purges(
     local_purges: dict[str, float] | None = None,
     incoming_purges: dict[str, float] | None = None,
     on_conflict: OnConflict | None = None,
-    local_deletion_baseline: dict | None = None,
-    incoming_deletion_baseline: dict | None = None,
 ) -> tuple[list[Entry], dict, dict[str, float]]:
     """LWW merge plus physical-delete tombstones.
 
@@ -213,8 +211,6 @@ def merge_with_purges(
     wins over an entry only when ``purged_at > entry.updated_at``; a newer entry
     keeps the data and suppresses an older purge.
     """
-    from .deletion_baseline import guard
-    guard(local_deletion_baseline, incoming_deletion_baseline)
     local_purges = {str(k): float(v) for k, v in (local_purges or {}).items()}
     incoming_purges = {str(k): float(v) for k, v in (incoming_purges or {}).items()}
     merged_purges = dict(local_purges)

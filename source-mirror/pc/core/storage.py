@@ -600,8 +600,6 @@ class Vault:
             self._pmve_metadata if metadata is None else metadata
         )
         if metadata is not None:
-            from .deletion_baseline import guard, FIELD as BASELINE_FIELD
-            guard(self._pmve_metadata.get(BASELINE_FIELD), metadata_seed.get(BASELINE_FIELD))
             from .autofill_exclusions import FIELD, merge as merge_exclusions
             if FIELD in self._pmve_metadata or FIELD in metadata_seed:
                 metadata_seed[FIELD] = merge_exclusions(self._pmve_metadata.get(FIELD), metadata_seed.get(FIELD))
@@ -731,8 +729,7 @@ class Vault:
             )
             identity = candidate.identity
             # Force authentication of PMVR children used by production reads.
-            from .deletion_baseline import baseline, FIELD as BASELINE_FIELD
-            baseline(candidate.metadata().get(BASELINE_FIELD))
+            candidate.metadata()
             candidate.list()
             return PmvEIdentity(
                 identity.vault_id,
@@ -818,8 +815,6 @@ class Vault:
 
         if self._pmve_store is None:
             raise crypto.DecryptError("仅 PMVE 支持认证整库替换")
-        from . import deletion_baseline
-        previous_members = deletion_baseline.members(self._pmve_metadata, None)
         candidate_path = Path(candidate_path)
         remote_identity = self.authenticate_external_file(candidate_path)
         local_identity = self.pmve_identity
@@ -845,39 +840,23 @@ class Vault:
             copy_durable(candidate_path, stage)
             if self.authenticate_external_file(stage) != remote_identity:
                 raise crypto.DecryptError("PMVE 替换暂存文件复验不一致")
-            from .deletion_baseline import commit_with_floor, FIELD as BASELINE_FIELD
-            probe = PmvVaultStore.open_root_key(stage, bytes(root_key))
-            try:
-                incoming_metadata = probe.metadata()
-                incoming_baseline = incoming_metadata.get(BASELINE_FIELD)
-                deletion_baseline.guard_adoption(self._pmve_metadata.get(BASELINE_FIELD), incoming_baseline)
-                missing = set(previous_members) - set(deletion_baseline.members(incoming_metadata, None))
-                if missing:
-                    incoming_metadata[deletion_baseline.KNOWN_FIELD] = sorted(set(deletion_baseline.members(incoming_metadata, None)) | set(previous_members))
-                    probe.save_full(expected_sequence=probe.identity.sequence, metadata=incoming_metadata, entries=[probe.read_entry(summary.entry_id) for summary in probe.list()])
-                installed_expected_identity = probe.identity
-            finally:
-                probe.close()
-            def install():
-                nonlocal replaced
-                with _vault_write_lock(self.path):
-                    if self.pmve_identity != local_identity:
-                        raise ExternalVaultChange("本地 PMVE 在替换前发生并发修改")
-                    copy_durable(self.path, backup)
-                    self._pmve_store.close()
-                    self._pmve_store = None
-                    _replace_with_retry(stage, self.path)
-                    replaced = True
-                    _fsync_parent_directory(self.path)
-                    reopened = Vault._open_pmve_store(self.path, "", PmvVaultStore.open_root_key(self.path, bytes(root_key)), record_floor=False)
-                    if reopened._pmve_store.identity != installed_expected_identity:
-                        reopened.close()
-                        raise crypto.DecryptError("PMVE 替换后身份复验失败")
-                    self._password.clear()
-                    self.__dict__.clear()
-                    self.__dict__.update(reopened.__dict__)
-                return self.pmve_identity
-            return commit_with_floor(local_identity.vault_id, incoming_baseline, install)
+            with _vault_write_lock(self.path):
+                if self.pmve_identity != local_identity:
+                    raise ExternalVaultChange("本地 PMVE 在替换前发生并发修改")
+                copy_durable(self.path, backup)
+                self._pmve_store.close()
+                self._pmve_store = None
+                _replace_with_retry(stage, self.path)
+                replaced = True
+                _fsync_parent_directory(self.path)
+                reopened = Vault.open_with_root_key(self.path, bytes(root_key))
+                if reopened.pmve_identity != remote_identity:
+                    reopened.close()
+                    raise crypto.DecryptError("PMVE 替换后身份复验失败")
+                self._password.clear()
+                self.__dict__.clear()
+                self.__dict__.update(reopened.__dict__)
+            return self.pmve_identity
         except Exception:
             if replaced and backup.exists():
                 copy_durable(backup, rollback)
@@ -931,15 +910,11 @@ class Vault:
 
             local_entries, local_metadata = load_payload(self._pmve_store)
             remote_entries, remote_metadata = load_payload(remote_store)
-            from . import deletion_baseline
-            deletion_baseline.guard(local_metadata.get(deletion_baseline.FIELD), remote_metadata.get(deletion_baseline.FIELD))
             merged_entries, _stats, merged_purges = merge_with_purges(
                 local_entries,
                 remote_entries,
                 local_metadata.get("purge_tombstones", {}),
                 remote_metadata.get("purge_tombstones", {}),
-                local_deletion_baseline=local_metadata.get(deletion_baseline.FIELD),
-                incoming_deletion_baseline=remote_metadata.get(deletion_baseline.FIELD),
                 on_conflict=lambda _local, _remote: ConflictChoice.KEEP_BOTH,
             )
 
@@ -987,10 +962,7 @@ class Vault:
             if chosen_time:
                 sync_meta["key_updated_at"] = float(chosen_time)
             merged_metadata["sync_meta"] = sync_meta
-            merged_metadata[deletion_baseline.KNOWN_FIELD] = sorted(set(deletion_baseline.members(local_metadata, current_device_id(self))) | set(deletion_baseline.members(remote_metadata, current_device_id(self))))
             merged_metadata["purge_tombstones"] = merged_purges
-            merged_metadata[deletion_baseline.FIELD] = deletion_baseline.merge(local_metadata.get(deletion_baseline.FIELD), remote_metadata.get(deletion_baseline.FIELD))
-            merged_metadata = deletion_baseline.acknowledge(merged_metadata, current_device_id(self))
             merged_metadata.pop("passkey_keyset", None)
             merged_registry = union(registry_of(local_metadata), registry_of(remote_metadata))
             merged_metadata = pmv_device_registry.with_registry(
@@ -1031,32 +1003,23 @@ class Vault:
             copy_durable(candidate_path, stage)
             if self.authenticate_external_file(stage) != merged_identity:
                 raise crypto.DecryptError("PMVE 合并暂存文件复验不一致")
-            from .deletion_baseline import commit_with_floor, FIELD as BASELINE_FIELD
-            probe = PmvVaultStore.open_root_key(stage, bytes(root_key))
-            try:
-                incoming_baseline = probe.metadata().get(BASELINE_FIELD)
-            finally:
-                probe.close()
-            def install():
-                nonlocal replaced
-                with _vault_write_lock(self.path):
-                    if self.pmve_identity != local_identity:
-                        raise ExternalVaultChange("本地 PMVE 在合并前发生并发修改")
-                    copy_durable(self.path, backup)
-                    self._pmve_store.close()
-                    self._pmve_store = None
-                    _replace_with_retry(stage, self.path)
-                    replaced = True
-                    _fsync_parent_directory(self.path)
-                    reopened = Vault._open_pmve_store(self.path, "", PmvVaultStore.open_root_key(self.path, root_key), record_floor=False)
-                    if reopened.pmve_identity != merged_identity:
-                        reopened.close()
-                        raise crypto.DecryptError("PMVE 合并后身份复验失败")
-                    self._password.clear()
-                    self.__dict__.clear()
-                    self.__dict__.update(reopened.__dict__)
-                return self.pmve_identity
-            return commit_with_floor(local_identity.vault_id, incoming_baseline, install)
+            with _vault_write_lock(self.path):
+                if self.pmve_identity != local_identity:
+                    raise ExternalVaultChange("本地 PMVE 在合并前发生并发修改")
+                copy_durable(self.path, backup)
+                self._pmve_store.close()
+                self._pmve_store = None
+                _replace_with_retry(stage, self.path)
+                replaced = True
+                _fsync_parent_directory(self.path)
+                reopened = Vault.open_with_root_key(self.path, root_key)
+                if reopened.pmve_identity != merged_identity:
+                    reopened.close()
+                    raise crypto.DecryptError("PMVE 合并后身份复验失败")
+                self._password.clear()
+                self.__dict__.clear()
+                self.__dict__.update(reopened.__dict__)
+            return self.pmve_identity
         except Exception:
             if replaced and backup.exists():
                 copy_durable(backup, rollback)
@@ -1100,14 +1063,12 @@ class Vault:
         path: Path,
         password: str | bytearray | crypto.SecureString,
         store: PmvVaultStore,
-        *, record_floor: bool = True,
     ) -> "Vault":
         """Adapt one authenticated PMVE Store snapshot to the application facade."""
 
         try:
             identity = store.identity
             metadata = store.metadata()
-            from .deletion_baseline import accept_floor, FIELD as BASELINE_FIELD
             summaries = store.list()
             entry_order = [str(value) for value in metadata.get("entry_order", [])]
             trash_order = [str(value) for value in metadata.get("trash_order", [])]
@@ -1152,8 +1113,6 @@ class Vault:
                 for key, value in (metadata.get("purge_tombstones", {}) or {}).items()
             }
             vault._disk_revision = identity.root_digest
-            if record_floor:
-                accept_floor(identity.vault_id, metadata.get(BASELINE_FIELD))
             return vault
         except Exception:
             store.close()
@@ -1300,13 +1259,11 @@ class Vault:
             raise crypto.DecryptError("PMVE Store 会话不可用")
 
         from .device_activity import stamp, current_device_id, FIELD as ACTIVITY_FIELD
-        from .deletion_baseline import preserve_members
-        metadata = stamp(preserve_members(self._pmve_metadata, current_device_id(self)), current_device_id(self))
+        metadata = stamp(self._pmve_metadata, current_device_id(self))
+        metadata.pop("deletion_baseline", None)
+        metadata.pop("_deletion_known_members_v1", None)
         if metadata[ACTIVITY_FIELD].get("version", 1) == 1:
             metadata[ACTIVITY_FIELD]["last_writer"]["parent_commit_id"] = str(store.identity.commit_id)
-        from .deletion_baseline import acknowledge, preserve_members
-        metadata = preserve_members(metadata, current_device_id(self))
-        metadata = acknowledge(metadata, current_device_id(self))
         metadata.setdefault("schema", "pmv-vault-metadata")
         metadata.setdefault("version", 1)
         metadata["vault_id"] = self._vault_id
@@ -1333,19 +1290,16 @@ class Vault:
             entry.id = self._canonical_uuid_text(entry.id)
             entries.append(entry)
         try:
-            from .deletion_baseline import commit_with_floor, FIELD as BASELINE_FIELD
-            identity = commit_with_floor(self._vault_id, metadata.get(BASELINE_FIELD), lambda: store.save_full(
+            identity = store.save_full(
                 expected_sequence=self._pmve_sequence,
                 metadata=metadata,
                 entries=entries,
-            ))
+            )
         except ValueError as exc:
             if "stale" in str(exc).lower():
                 raise ExternalVaultChange("保险库已被其他进程修改，请刷新后重试") from exc
             raise
         self._pmve_metadata = store.metadata()
-        from .deletion_baseline import accept_floor, FIELD as BASELINE_FIELD
-        accept_floor(self._vault_id, self._pmve_metadata.get(BASELINE_FIELD))
         self._pmve_sequence = identity.sequence
         self._disk_revision = identity.root_digest
 
@@ -1752,55 +1706,6 @@ class Vault:
         self._trash_order = remaining
         self.save()
 
-    def acknowledge_deletion_checkpoint(self):
-        from . import deletion_baseline
-        from .device_activity import current_device_id
-        updated = deletion_baseline.acknowledge(self.metadata, current_device_id(self))
-        if updated != self.metadata:
-            old = copy.deepcopy(self._pmve_metadata)
-            self._pmve_metadata = updated
-            try:
-                self.save()
-            except Exception:
-                self._pmve_metadata = old
-                raise
-            return True
-        return False
-
-    def deletion_cleanup_state(self):
-        from . import deletion_baseline
-        from .device_activity import current_device_id
-        metadata = self.metadata
-        return deletion_baseline.baseline(metadata.get(deletion_baseline.FIELD)), deletion_baseline.ready(metadata, current_device_id(self))
-
-    def start_deletion_cleanup(self):
-        from . import deletion_baseline
-        from .device_activity import current_device_id
-        old = copy.deepcopy(self._pmve_metadata)
-        self._pmve_metadata = deletion_baseline.start(self.metadata, current_device_id(self))
-        try:
-            self.save()
-        except Exception:
-            self._pmve_metadata = old
-            raise
-
-    def finish_deletion_cleanup(self, checkpoint_id):
-        from . import deletion_baseline
-        from .device_activity import current_device_id
-        old = copy.deepcopy(self._pmve_metadata)
-        old_purges = dict(self._purge_tombstones)
-        metadata = self.metadata
-        metadata["purge_tombstones"] = dict(self._purge_tombstones)
-        updated = deletion_baseline.finish(metadata, current_device_id(self), checkpoint_id)
-        self._pmve_metadata = updated
-        self._purge_tombstones = dict(updated["purge_tombstones"])
-        try:
-            self.save(with_lock=False)
-        except Exception:
-            self._pmve_metadata = old
-            self._purge_tombstones = old_purges
-            raise
-
     def _record_purge(self, entry_id: str, purged_at: float | None = None) -> None:
         meta = self._trash_meta.get(str(entry_id)) or self._entry_meta.get(str(entry_id)) or {}
         previous_revision = float(meta.get("updated_at", 0.0) or 0.0)
@@ -1833,8 +1738,6 @@ class Vault:
     def merge(self, incoming: list[Entry], resolver) -> dict:
         from . import sync
 
-        from .deletion_baseline import guard, FIELD as BASELINE_FIELD
-        guard(self._pmve_metadata.get(BASELINE_FIELD), None)
         _log.info("开始合并 %d 条外部记录", len(incoming))
         by_key: dict[tuple, Entry] = {}
         for eid in self._entry_order:
@@ -1964,12 +1867,9 @@ class Vault:
         on_conflict=None,
         incoming_purge_tombstones: dict[str, float] | None = None,
         incoming_autofill_exclusions: dict | None = None,
-        incoming_deletion_baseline: dict | None = None,
     ) -> dict:
         from . import sync
 
-        from . import deletion_baseline
-        deletion_baseline.guard(self._pmve_metadata.get(deletion_baseline.FIELD), incoming_deletion_baseline)
         _log.info("Sync 合并 %d 条远端记录（remote_epoch=%s）", len(incoming), remote_export_epoch)
         calibrated = sync.calibrate(incoming, remote_export_epoch, time.time())
         merged, stats, purges = sync.merge_with_purges(
@@ -1978,15 +1878,12 @@ class Vault:
             self._purge_tombstones,
             incoming_purge_tombstones,
             on_conflict,
-            local_deletion_baseline=self._pmve_metadata.get(deletion_baseline.FIELD),
-            incoming_deletion_baseline=incoming_deletion_baseline,
         )
         self._purge_tombstones = purges
         self._split_tombstones(merged)
         if incoming_autofill_exclusions is not None:
             from .autofill_exclusions import FIELD, merge as merge_exclusions
             self._pmve_metadata[FIELD] = merge_exclusions(self.autofill_exclusions, incoming_autofill_exclusions)
-        self._pmve_metadata[deletion_baseline.FIELD] = deletion_baseline.merge(self._pmve_metadata.get(deletion_baseline.FIELD), incoming_deletion_baseline)
         self._pmve_metadata.pop("passkey_keyset", None)
         self.save()
         _log.info(

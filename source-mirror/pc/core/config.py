@@ -101,7 +101,6 @@ _GLOBAL_CONFIG_KEYS = frozenset(
         "trashed_accounts",
         "account_settings",
         "pmve_compact_state",
-        "deletion_baseline_floors",
         "list_pane_ratio",
         "clipboard_cleanup",
         "silent_start",
@@ -400,24 +399,6 @@ def set_many(values: dict[str, object]) -> None:
         _config_dirty = True
         _save_uncached(data, expected_revision=revision, check_revision=True)
         _config_dirty = False
-
-
-def update(key: str, updater):
-    """Read, validate and update one protected setting under the process lock."""
-    global _config_cache, _config_dirty
-    with _config_write_lock, _interprocess_config_lock():
-        _require_writable()
-        data = _load_uncached()
-        _require_writable()
-        revision = _configuration_revision(_config_path())
-        old = _read_key(data, key)
-        value = updater(old)
-        if value != old:
-            _write_key(data, key, value)
-            _save_uncached(data, expected_revision=revision, check_revision=True)
-        _config_cache = data
-        _config_dirty = False
-        return value
 
 
 def stage_many(values: dict[str, object]) -> None:

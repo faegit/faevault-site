@@ -137,7 +137,6 @@ data class VaultPayload(
     val entries: List<Entry> = emptyList(),
     val trash: List<Entry> = emptyList(),
     @SerialName("purge_tombstones") val purgeTombstones: Map<String, Double> = emptyMap(),
-    @SerialName("deletion_baseline") val deletionBaseline: DeletionBaseline = DeletionBaseline(),
     @SerialName("sync_meta") val syncMeta: SyncMeta = SyncMeta(),
     // 写入时刻（秒，UTC）。仅作为导出元数据和旧格式兼容字段；
     // 同步直接比较条目的原始 updatedAt，不使用该字段改写条目时间。

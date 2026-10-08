@@ -496,11 +496,6 @@ object PmvVaultStore {
             val snapshot = resolveLatestAuthenticatedSnapshot()
             require(snapshot.commit.revision == expectedSequence) { "提交基线已过期" }
             val sourceSnapshot = source.resolveLatestAuthenticatedSnapshot()
-            fun baseline(value: JsonObject) = value["deletion_baseline"]?.let {
-                VaultCodec.json.decodeFromJsonElement(com.vault.model.DeletionBaseline.serializer(), it)
-            } ?: com.vault.model.DeletionBaseline()
-            com.vault.model.DeletionBaseline.requireCompatible(baseline(readMetadata(snapshot)), baseline(source.readMetadata(sourceSnapshot)))
-            com.vault.model.DeletionBaseline.requireCompatible(baseline(readMetadata(snapshot)), baseline(metadata))
             val available = loadObjectIndex(snapshot).records.map { it.key }.toSet()
             val refs = linkedMapOf<PmvObjectIndexCodec.ObjectKey, PmvMediaRef.Ref>()
             (entries.flatMap(PmvMediaRef::scan) + PmvMediaRef.scanJson(metadata)).forEach { occurrence ->
@@ -930,13 +925,13 @@ object PmvVaultStore {
                 try {
                     val original = identity()
                     val entries = listSummaries().map { requireNotNull(readEntry(it.entryId)) }
-                    val metadata = JsonObject(DeletionKnownMembers.retain(readMetadata()).toMutableMap().apply {
+                    val metadata = JsonObject(readMetadata().toMutableMap().apply {
                         // Authorizations signed by the revoked signing key cannot survive rotation.
                         remove(PmvDeviceRegistry.METADATA_FIELD)
                     })
                     val bootstrap = JsonObject(metadata.filterKeys { it in setOf(
                         "schema", "version", "vault_id", "entry_order", "trash_order", "sync_meta",
-                        "key_revision", "export_epoch", "purge_tombstones", "deletion_baseline", DeletionKnownMembers.KEY,
+                        "key_revision", "export_epoch", "purge_tombstones",
                     ) })
                     create(temporary, newPasswordUtf8, newRecoverySecret, bootstrap, emptyList(),
                         vaultId = vaultId,
@@ -2204,7 +2199,10 @@ object PmvVaultStore {
         }
 
         private fun normalizeMetadata(metadata: JsonObject, entries: List<Entry>): JsonObject {
-            val updated = metadata.toMutableMap()
+            val updated = metadata.toMutableMap().apply {
+                remove("deletion_baseline")
+                remove("_deletion_known_members_v1")
+            }
             updated["vault_id"] = JsonPrimitive(vaultId.toString())
             updated["key_revision"] = JsonPrimitive(keyRevision)
             updated["entry_order"] = JsonArray(entries.filter { it.deletedAt == null }.map { JsonPrimitive(it.id) })

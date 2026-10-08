@@ -12,6 +12,23 @@ import org.junit.Test
 /** Step 3 删除语义：删除 / 恢复 / 物理清理 全在 entries 上以 deletedAt 标记完成。 */
 class VaultOpsTombstoneTest {
 
+    @Test
+    fun expiredTrashKeepsOldDeletionRecordsAndBlocksStaleReimport() {
+        val oldId = "11111111-1111-4111-8111-111111111111"
+        val expiredId = "22222222-2222-4222-8222-222222222222"
+        val payload = VaultPayload(
+            entries = listOf(entry(expiredId).copy(deletedAt = 1.0, updatedAt = 1.0)),
+            purgeTombstones = mapOf(oldId to 2.0),
+        )
+        val purged = VaultOps.purgeExpired(payload, 30)
+        assertEquals(2.0, purged.purgeTombstones.getValue(oldId), 0.0)
+        assertTrue(purged.purgeTombstones.containsKey(expiredId))
+        val stale = VaultPayload(entries = listOf(entry(oldId).copy(updatedAt = 1.0), entry(expiredId)))
+        val merged = VaultOps.mergeLww(purged, stale.entries).first
+        assertTrue(merged.entries.isEmpty())
+        assertEquals(purged.purgeTombstones, merged.purgeTombstones)
+    }
+
     private fun entry(id: String, title: String = "T-$id"): Entry =
         Entry(id = id, title = title, createdAt = 1000.0, updatedAt = 1000.0)
 

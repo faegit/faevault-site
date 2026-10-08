@@ -425,7 +425,6 @@ class DownloadReplaceWorker(QThread):
                 vault = Vault.open_with_password_buffer(self.vault_path, password)
             try:
                 identity = vault.replace_authenticated_file(self.remote_path, force=self.force)
-                vault.acknowledge_deletion_checkpoint()
             finally:
                 vault.close()
                 self.remote_path.unlink(missing_ok=True)

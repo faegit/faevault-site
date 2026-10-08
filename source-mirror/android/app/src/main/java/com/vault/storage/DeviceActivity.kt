@@ -27,8 +27,7 @@ object DeviceActivity {
     fun merge(left: JsonObject, right: JsonObject): JsonObject {
         val leftVersion = ((left[KEY] as? JsonObject)?.get("version") as? JsonPrimitive)?.intOrNull ?: 1
         val rightVersion = ((right[KEY] as? JsonObject)?.get("version") as? JsonPrimitive)?.intOrNull ?: 1
-        val retainedLeft = DeletionKnownMembers.merge(left, right)
-        if (maxOf(leftVersion, rightVersion) > 1) return JsonObject(retainedLeft.toMutableMap().apply {
+        if (maxOf(leftVersion, rightVersion) > 1) return JsonObject(left.toMutableMap().apply {
             if (rightVersion > leftVersion) right[KEY]?.let { put(KEY, it) }
         })
         val activity = ((right[KEY] as? JsonObject).orEmpty() + (left[KEY] as? JsonObject).orEmpty()).toMutableMap()
@@ -50,7 +49,7 @@ object DeviceActivity {
         writers.maxWithOrNull(compareBy<JsonObject> { (it["updated_at"] as? JsonPrimitive)?.longOrNull ?: 0 }
             .thenBy { (it["device_id"] as? JsonPrimitive)?.contentOrNull.orEmpty() }
             .thenBy { it.toString() })?.let { activity["last_writer"] = it }
-        return JsonObject(retainedLeft.toMutableMap().apply { put(KEY, JsonObject(activity)) })
+        return JsonObject(left.toMutableMap().apply { put(KEY, JsonObject(activity)) })
     }
 
     fun touch(metadata: JsonObject, id: String, name: String? = null, now: Long = System.currentTimeMillis(), parentCommitId: String? = null): JsonObject {

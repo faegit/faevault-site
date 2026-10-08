@@ -169,21 +169,4 @@
     <string name="settings_kdf_hardened">Hardened</string>
     <string name="settings_kdf_profile_summary">Memory %1$d KiB · iterations %2$d · parallelism %3$d</string>
     <string name="cooling_retry_button">Retry in %1$d s</string>
-
-    <string name="deletion_cleanup_title">Clean up deletion records</string>
-    <string name="deletion_cleanup_description">Remove sync records that prevent deleted entries from returning and simplify sync metadata. Every device holding this vault must sync first; an unsynced old device or backup may bring deleted content back. Cleanup still requires confirmation after the sync conditions are met. Only known devices can be verified; check unregistered copies yourself. Older backups must be restored separately and cannot be merged directly.</string>
-    <string name="deletion_cleanup_count">Deletion records: %1$d</string>
-    <string name="deletion_cleanup_progress">Device confirmations: %1$d / %2$d</string>
-    <string name="deletion_cleanup_start">Start sync confirmation</string>
-    <string name="deletion_cleanup_refresh">Refresh sync progress</string>
-    <string name="deletion_cleanup_confirm">Confirm cleanup</string>
-    <string name="deletion_cleanup_ack">I confirm that every device holding this vault has synced, and understand that unsynced old devices or backups may bring deleted content back.</string>
-    <string name="deletion_cleanup_started">Sync confirmation started. Sync the other devices.</string>
-    <string name="deletion_cleanup_success">Deletion records cleaned up</string>
-    <string name="deletion_cleanup_unsupported">The current sync protocol cannot safely clean up records. Update all devices first.</string>
-    <string name="deletion_cleanup_ready">All known devices have confirmed; cleanup is available</string>
-    <string name="deletion_cleanup_empty">No deletion records to clean up</string>
-    <string name="deletion_cleanup_waiting">Sync every device, then refresh progress. Changes to records or devices require a new confirmation checkpoint.</string>
-    <string name="deletion_cleanup_device_waiting">Awaiting sync confirmation</string>
-    <string name="deletion_cleanup_device_ack">Sync confirmed</string>
 </resources>

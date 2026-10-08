@@ -991,12 +991,10 @@ class _SyncHandler(http.server.BaseHTTPRequestHandler):
             except Exception:
                 lineage = VaultLineage.INVALID
             if lineage is VaultLineage.SAME:
-                vault.acknowledge_deletion_checkpoint()
                 stats = {"lineage": lineage.value, "replaced": False}
             elif lineage is VaultLineage.FAST_FORWARD:
                 convergence = pmve_key_convergence_kind(vault, tmp)
                 vault.replace_authenticated_file(tmp)
-                vault.acknowledge_deletion_checkpoint()
                 stats = {
                     "lineage": lineage.value,
                     "replaced": True,

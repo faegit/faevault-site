@@ -59,7 +59,6 @@ class BackupPayload:
     key_revision: int = 0
     purge_tombstones: dict[str, float] = field(default_factory=dict)
     autofill_exclusions: dict = field(default_factory=dict)
-    deletion_baseline: dict | None = None
 
 
 def export_encrypted(
@@ -70,7 +69,6 @@ def export_encrypted(
     key_revision: int = 0,
     purge_tombstones: dict[str, float] | None = None,
     autofill_exclusions: dict | None = None,
-    deletion_baseline: dict | None = None,
 ) -> None:
     _log.info("加密导出 %d 条 → %s", len(entries), path)
     if contains_syncable_passkeys(entries) and not is_strong_passphrase(password):
@@ -90,8 +88,6 @@ def export_encrypted(
     if autofill_exclusions is not None:
         from .autofill_exclusions import normalize
         payload["autofill_exclusions"] = normalize(autofill_exclusions)
-    from .deletion_baseline import baseline
-    payload["deletion_baseline"] = baseline(deletion_baseline)
     plaintext = bytearray(json.dumps(payload, ensure_ascii=False).encode("utf-8"))
     try:
         data = pmv_backup.encrypt_v2(plaintext, password.encode("utf-8"))
@@ -157,7 +153,6 @@ def import_encrypted_with_meta(path: str | Path, password: str) -> BackupPayload
         key_revision=key_revision,
         purge_tombstones=purges,
         autofill_exclusions=data.get("autofill_exclusions", {}),
-        deletion_baseline=data.get("deletion_baseline"),
     )
 
 

@@ -337,7 +337,6 @@ def test_download_replacement_reopens_vault_on_worker_thread(app, monkeypatch, t
     replacement = SimpleNamespace(close=lambda: closed.append("replacement"))
     original = SimpleNamespace(
         replace_authenticated_file=lambda *a, **k: "identity",
-        acknowledge_deletion_checkpoint=lambda: False,
         close=lambda: closed.append("original"),
     )
 

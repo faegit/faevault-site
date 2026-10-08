@@ -416,3 +416,29 @@ def test_purge_expired_removes_stale_trash_entries(tmp_path) -> None:
     assert stale.id not in remaining
     assert fresh.id in remaining
     vault.close()
+
+
+def test_recycle_retention_keeps_old_purge_records(tmp_path) -> None:
+    vault = Vault.create(tmp_path / "retain-purges.pmv", PASSWORD)
+    entry_id = str(uuid.uuid4())
+    vault._purge_tombstones[entry_id] = 1.0
+    vault._pmve_metadata["deletion_baseline"] = {"schema_version": 99}
+    vault._pmve_metadata["_deletion_known_members_v1"] = ["obsolete"]
+    vault.save()
+    expired = _entry()
+    vault.entries = [expired]
+    vault.save()
+    vault.delete(expired.id)
+    vault._trash_meta[expired.id]["deleted_at"] = time.time() - 40 * 86400
+    vault.purge_expired(30)
+    assert not vault.trash
+    vault.save()
+    vault.close()
+    reopened = Vault.open(tmp_path / "retain-purges.pmv", PASSWORD)
+    try:
+        assert reopened._purge_tombstones[entry_id] == 1.0
+        assert expired.id in reopened._purge_tombstones
+        assert "deletion_baseline" not in reopened.metadata
+        assert "_deletion_known_members_v1" not in reopened.metadata
+    finally:
+        reopened.close()

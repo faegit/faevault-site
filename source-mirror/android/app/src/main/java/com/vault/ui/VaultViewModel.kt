@@ -452,7 +452,6 @@ class VaultViewModel(app: Application) : AndroidViewModel(app) {
         val incomingDeviceId: String,
         val incomingExportEpoch: Double?,
         val incomingPurgeTombstones: Map<String, Double> = emptyMap(),
-        val incomingDeletionBaseline: com.vault.model.DeletionBaseline = com.vault.model.DeletionBaseline(),
         val incomingExclusions: com.vault.model.AutofillExclusions = com.vault.model.AutofillExclusions(),
         val sourceLabel: String = "",
         /**
@@ -559,49 +558,6 @@ class VaultViewModel(app: Application) : AndroidViewModel(app) {
                 requireVaultSessionCurrent(token)
                 credential.withRootKey(credential.identity) { key -> block(repository, key) }
             }.also { requireVaultSessionCurrent(token) }
-        }
-    }
-
-    suspend fun deletionCleanupState(): com.vault.model.DeletionCleanupState =
-        deviceOperation { repository, key -> repository.deletionCleanupState(key) }
-
-    suspend fun startDeletionCleanupCheckpoint() = mutateDeletionCleanup(null)
-
-    suspend fun executeDeletionCleanup(checkpointId: String) = mutateDeletionCleanup(checkpointId)
-
-    private suspend fun mutateDeletionCleanup(checkpointId: String?) {
-        val token = captureVaultSession()
-        vaultOperationMutex.withLock {
-            requireVaultSessionCurrent(token)
-            val repository = repo() ?: error("保险库会话已失效")
-            val root = _state.value.rootKey ?: error("保险库会话已失效")
-            withContext(Dispatchers.IO) {
-                var accepted = false
-                vaultSessionFence.runIfCurrent(token, _currentVault.value) {
-                    root.withRootKey(root.identity) { key ->
-                        val before = repository.openPmvEWithRootKey(key)
-                        val sequence = try { requireNotNull(before.identity).sequence }
-                            finally { before.rootKey?.fill(0) }
-                        val opened = if (checkpointId == null)
-                            repository.startDeletionCleanupCheckpoint(key, sequence)
-                        else repository.executeDeletionCleanup(key, sequence, checkpointId)
-                        try {
-                            val replacementRoot = VaultSessionCredential.RootKey(key, requireNotNull(opened.identity).deviceBinding())
-                            val password = _state.value.credential.sessionPassword()
-                            val replacement = if (password == null) replacementRoot
-                                else VaultSessionCredential.Compound(password, replacementRoot)
-                            val sealed = sealPayload(opened.payload)
-                            _state.update { it.copy(payload = sealed, listIndex = VaultListIndex.from(sealed), credential = replacement) }
-                            root.close()
-                            accepted = true
-                        } finally { opened.rootKey?.fill(0) }
-                    }
-                }
-                if (!accepted) throw kotlinx.coroutines.CancellationException("Vault session changed")
-            }
-            requireVaultSessionCurrent(token)
-            emitInfo(getApplication<Application>().getString(if (checkpointId == null)
-                R.string.deletion_cleanup_started else R.string.deletion_cleanup_success))
         }
     }
 
@@ -2040,13 +1996,11 @@ class VaultViewModel(app: Application) : AndroidViewModel(app) {
                 .getOrElse { throw SyncServerHost.HostError(409, "远端 PMVE 文件认证失败") }
             when (PmvELineageClassifier.classify(local.toPmvELineage(), remote.toPmvELineage())) {
                 PmvELineageRelation.SAME -> {
-                    val accepted = repository.acknowledgeDeletionCleanupCheckpoint(rootKey, requireNotNull(local.identity).sequence)
-                    try {
-                        replacePmvESessionRoot(requireNotNull(accepted.rootKey), requireNotNull(accepted.identity))
-                    } finally { accepted.rootKey?.fill(0) }
-                    _state.update { it.withPayload(sealPayload(accepted.payload)) }
                     emitInfo(getApplication<Application>().getString(R.string.viewmodel_sync_content_same))
-                    JSONObject().put("identical", accepted.payload.entries.size).put("lineage", "same").toString()
+                    JSONObject()
+                        .put("identical", localPayload.entries.size)
+                        .put("lineage", "same")
+                        .toString()
                 }
                 PmvELineageRelation.FAST_FORWARD -> {
                     val keyConvergence = pmveKeyConvergenceKind(repository, rootKey, candidateFile)
@@ -4139,7 +4093,6 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
                     payload.syncMeta,
                     payload.purgeTombstones,
                     payload.autofillExclusions,
-                    payload.deletionBaseline,
                 )
             }
         }.onSuccess {
@@ -4213,7 +4166,7 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
             val incomingLineage = incoming.syncMeta.deviceId
             val sameLineage = localLineage.isNotEmpty() && localLineage == incomingLineage
             if (sameLineage) {
-                applyBackupMerge(latestPayload, incoming.entries, incoming.purgeTombstones, incoming.exportEpoch, r, incomingExclusions = incoming.autofillExclusions, incomingDeletionBaseline = incoming.deletionBaseline, sessionToken = sessionToken)
+                applyBackupMerge(latestPayload, incoming.entries, incoming.purgeTombstones, incoming.exportEpoch, r, incomingExclusions = incoming.autofillExclusions, sessionToken = sessionToken)
                 SyncForegroundService.succeedTask(
                     getApplication(),
                     BACKUP_IMPORT_TASK_ID,
@@ -4223,7 +4176,6 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
                 _pendingCrossAccountImport.value = PendingCrossAccountImport(
                     incomingEntries = incoming.entries,
                     incomingPurgeTombstones = incoming.purgeTombstones,
-                    incomingDeletionBaseline = incoming.deletionBaseline,
                     incomingExclusions = incoming.autofillExclusions,
                     incomingDeviceId = incomingLineage,
                     incomingExportEpoch = incoming.exportEpoch,
@@ -4486,7 +4438,6 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
             r,
             emitSummary = true,
             incomingExclusions = pending.incomingExclusions,
-            incomingDeletionBaseline = pending.incomingDeletionBaseline,
             sessionToken = token,
         )
     }
@@ -4499,7 +4450,6 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
         r: VaultRepository,
         emitSummary: Boolean = true,
         incomingExclusions: com.vault.model.AutofillExclusions = com.vault.model.AutofillExclusions(),
-        incomingDeletionBaseline: com.vault.model.DeletionBaseline = com.vault.model.DeletionBaseline(),
         sessionToken: VaultSessionFence.Token = captureVaultSession(),
     ): Pair<VaultPayload, VaultOps.LwwMergeStats> {
         requireVaultSessionCurrent(sessionToken)
@@ -4520,7 +4470,6 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
             incomingExportEpoch = incomingExportEpoch,
             incomingPurgeTombstones = incomingPurgeTombstones,
             incomingExclusions = incomingExclusions,
-            incomingDeletionBaseline = incomingDeletionBaseline,
         )
         requireVaultSessionCurrent(sessionToken)
         val committed = withContext(Dispatchers.IO) { saveAndPublishForSession(sessionToken, r, newPayload, expectedSequence) }
@@ -5046,11 +4995,6 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
                                 // 会话根密钥替换与文件写同锁：避免并发编辑读到已关闭的旧密钥。
                                 if (preparedAction is CloudSyncAction.Completed) {
                                     applyPmvEReplacement(preparedAction.result)
-                                } else if (preparedAction is CloudSyncAction.UploadPending) {
-                                    preparedAction.acceptedLocal?.let { accepted ->
-                                        savedPayload = accepted.payload
-                                        applyPmvEReplacement(accepted)
-                                    }
                                 }
                                 preparedAction to stateBefore
                             }
@@ -5292,18 +5236,10 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
                 val remote = repository.authenticateExternalFileWithDeviceKey(remoteFile, rootKey)
                 val relation = PmvELineageClassifier.classify(local.toPmvELineage(), remote.toPmvELineage())
                 val adoption = when (relation) {
-                    PmvELineageRelation.SAME -> {
-                        var acceptedValue: VaultUnlockResult? = null
-                        check(vaultSessionFence.runIfCurrent(sessionToken, _currentVault.value) {
-                            acceptedValue = repository.acknowledgeDeletionCleanupCheckpoint(rootKey, requireNotNull(local.identity).sequence)
-                        }) { "保险库会话已失效" }
-                        val accepted = requireNotNull(acceptedValue)
-                        try {
-                            replacePmvESessionRoot(requireNotNull(accepted.rootKey), requireNotNull(accepted.identity))
-                        } finally { accepted.rootKey?.fill(0) }
-                        _state.update { it.withPayload(sealPayload(accepted.payload)) }
-                        LanSyncAdoption(accepted.payload, VaultOps.LwwMergeStats(identical = accepted.payload.entries.size))
-                    }
+                    PmvELineageRelation.SAME -> LanSyncAdoption(
+                        payload = localPayload,
+                        stats = VaultOps.LwwMergeStats(identical = localPayload.entries.size),
+                    )
                     PmvELineageRelation.FAST_FORWARD -> {
                         val localIdentity = requireNotNull(local.identity)
                         val remoteIdentity = requireNotNull(remote.identity)
@@ -5473,7 +5409,6 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
             val expectedCurrent: VaultIdentity? = null,
             val expectedMerged: VaultIdentity? = null,
             val expectedRemoteIdentity: VaultIdentity? = null,
-            val acceptedLocal: LanSyncResult? = null,
         ) : CloudSyncAction
     }
 
@@ -5493,9 +5428,6 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
         rootKey: ByteArray,
     ): CloudSyncAction {
         val local = repository.currentAuthenticatedFile(rootKey)
-        val currentOpened = repository.openPmvEWithRootKey(rootKey)
-        val effectiveLocalPayload = currentOpened.payload
-        currentOpened.rootKey?.fill(0)
         if (!hasRemote) {
             // 远端为空：上传本地快照，避免锁外上传时本地文件被并发替换。
             compactBeforeCloudSync(repository, rootKey)
@@ -5503,7 +5435,7 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
                 source = repository.createSyncSnapshot(),
                 expectedIdentity = requireNotNull(local.identity),
                 relation = PmvELineageRelation.REMOTE_STALE,
-                localPayload = effectiveLocalPayload,
+                localPayload = localPayload,
                 keyConvergence = KeyConvergenceKind.NONE,
             )
         }
@@ -5512,16 +5444,14 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
         }
         val remote = repository.authenticateExternalFileWithDeviceKey(downloadedFile, rootKey)
         return when (PmvELineageClassifier.classify(local.toPmvELineage(), remote.toPmvELineage())) {
-            PmvELineageRelation.SAME -> {
-                val accepted = repository.acknowledgeDeletionCleanupCheckpoint(rootKey, requireNotNull(local.identity).sequence)
-                val result = LanSyncResult(accepted.payload, VaultOps.LwwMergeStats(identical = accepted.payload.entries.size),
-                    uploaded = false, verified = true, replacementRootKey = accepted.rootKey, replacementIdentity = accepted.identity)
-                if (accepted.identity != remote.identity) {
-                    CloudSyncAction.UploadPending(repository.createSyncSnapshot(), requireNotNull(accepted.identity),
-                        PmvELineageRelation.REMOTE_STALE, accepted.payload, KeyConvergenceKind.NONE,
-                        expectedRemoteIdentity = remote.identity, acceptedLocal = result)
-                } else CloudSyncAction.Completed(result)
-            }
+            PmvELineageRelation.SAME -> CloudSyncAction.Completed(
+                LanSyncResult(
+                    localPayload,
+                    VaultOps.LwwMergeStats(identical = localPayload.entries.size),
+                    uploaded = false,
+                    verified = true,
+                ),
+            )
             PmvELineageRelation.FAST_FORWARD -> {
                 val keyConvergence = pmveKeyConvergenceKind(repository, rootKey, downloadedFile)
                 val installed = repository.replaceAuthenticatedFile(
@@ -5530,22 +5460,25 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
                     expectedCurrent = requireNotNull(local.identity),
                     expectedRemote = requireNotNull(remote.identity),
                 )
-                val result = LanSyncResult(installed.payload, VaultOps.LwwMergeStats(takeRemote = installed.payload.entries.size),
-                    uploaded = false, verified = true, replacementRootKey = installed.rootKey,
-                    replacementIdentity = installed.identity, keyConvergence = keyConvergence)
-                if (installed.identity != remote.identity) {
-                    CloudSyncAction.UploadPending(repository.createSyncSnapshot(), requireNotNull(installed.identity),
-                        PmvELineageRelation.REMOTE_STALE, installed.payload, keyConvergence,
-                        expectedRemoteIdentity = remote.identity, acceptedLocal = result)
-                } else CloudSyncAction.Completed(result)
+                CloudSyncAction.Completed(
+                    LanSyncResult(
+                        installed.payload,
+                        VaultOps.LwwMergeStats(takeRemote = installed.payload.entries.size),
+                        uploaded = false,
+                        verified = true,
+                        replacementRootKey = requireNotNull(installed.rootKey),
+                        replacementIdentity = requireNotNull(installed.identity),
+                        keyConvergence = keyConvergence,
+                    ),
+                )
             }
-            PmvELineageRelation.REMOTE_STALE -> {
+PmvELineageRelation.REMOTE_STALE -> {
                 compactBeforeCloudSync(repository, rootKey)
                 CloudSyncAction.UploadPending(
                     source = repository.createSyncSnapshot(),
                     expectedIdentity = requireNotNull(local.identity),
                     relation = PmvELineageRelation.REMOTE_STALE,
-                    localPayload = effectiveLocalPayload,
+                    localPayload = localPayload,
                     keyConvergence = KeyConvergenceKind.NONE,
                     expectedRemoteIdentity = requireNotNull(remote.identity),
                 )
@@ -5566,7 +5499,6 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
                             incoming.entries,
                             incomingExportEpoch = incoming.exportEpoch,
                             incomingPurgeTombstones = incoming.purgeTombstones,
-                    incomingDeletionBaseline = incoming.deletionBaseline,
                             incomingExclusions = incoming.autofillExclusions,
                         ).first.copy(syncMeta = VaultOps.newerKeySyncMeta(local, incoming))
                     },
@@ -5577,7 +5509,7 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
                     source = downloadedFile,
                     expectedIdentity = mergedIdentity,
                     relation = PmvELineageRelation.DIVERGED,
-                    localPayload = effectiveLocalPayload,
+                    localPayload = localPayload,
                     keyConvergence = keyConvergence,
                     expectedCurrent = localIdentity,
                     expectedMerged = mergedIdentity,
@@ -5606,10 +5538,9 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
         return when (action.relation) {
             PmvELineageRelation.REMOTE_STALE -> LanSyncResult(
                 action.localPayload,
-                action.acceptedLocal?.stats ?: VaultOps.LwwMergeStats(takeLocal = action.localPayload.entries.size),
+                VaultOps.LwwMergeStats(takeLocal = action.localPayload.entries.size),
                 uploaded = true,
                 verified = true,
-                keyConvergence = action.keyConvergence,
             )
             PmvELineageRelation.DIVERGED -> {
                 val installed = repository.installPreparedMergedFile(
@@ -5623,9 +5554,8 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
                     installed.payload.entries,
                     incomingExportEpoch = installed.payload.exportEpoch,
                     incomingPurgeTombstones = installed.payload.purgeTombstones,
-                    incomingDeletionBaseline = installed.payload.deletionBaseline,
                     incomingExclusions = installed.payload.autofillExclusions,
-                    ).second
+                ).second
                 onLocalSaved(installed.payload)
                 LanSyncResult(
                     installed.payload,
@@ -6207,11 +6137,6 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
                                 // 会话根密钥替换与文件写同锁：避免并发编辑读到已关闭的旧密钥。
                                 if (preparedAction is CloudSyncAction.Completed) {
                                     applyPmvEReplacement(preparedAction.result)
-                                } else if (preparedAction is CloudSyncAction.UploadPending) {
-                                    preparedAction.acceptedLocal?.let { accepted ->
-                                        savedPayload = accepted.payload
-                                        applyPmvEReplacement(accepted)
-                                    }
                                 }
                                 preparedAction to stateBefore
                             }
