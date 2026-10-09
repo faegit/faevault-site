@@ -12,6 +12,17 @@ This changelog records features and fixes for the FAEVault Android client only. 
 
 ---
 
+## 4.6.8 - 2026-10-09
+
+### Improved and fixed
+- Move encrypted preference work off the main thread for cloud-card expansion, switches and provider changes; inspect only the visible sync provider.
+- Keep ordinary settings immediately effective while saving in order in the background; re-entering a page sees pending values.
+- Reduce per-frame recomposition and gesture restarts in switches, segmented controls, buttons, QR/image scaling and security overview animations.
+- Reuse existing tag suggestions while editing instead of scanning and sorting vault entries after each keystroke.
+- Fix WebDAV association loading and stale results during rapid toggles, locking, vault switching and sync acknowledgement.
+
+---
+
 ## 4.6.7 - 2026-10-07
 
 ### Added and improved
