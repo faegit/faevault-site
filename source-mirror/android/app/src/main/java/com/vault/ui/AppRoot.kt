@@ -793,9 +793,11 @@ internal fun AppRoot(remoteUpdateRequest: RemoteUpdateOpenRequest? = null, onRem
                                                 setExternalActionInProgress = vm::setExternalActionInProgress,
                                                 // 标签按类别隔离：编辑页只提供与当前条目同类型的已有标签，
                                                 // 避免登录等类别的标签串到其他类别的编辑页。
-                                                existingTags = payload.entries
-                                                    .filter { it.deletedAt == null && it.secretType == currentRoute.type }
-                                                    .flatMap { it.tags }.distinct().sorted(),
+                                                existingTags = remember(payload, currentRoute.type) {
+                                                    payload.entries
+                                                        .filter { it.deletedAt == null && it.secretType == currentRoute.type }
+                                                        .flatMap { it.tags }.distinct().sorted()
+                                                },
                                                 autofillSourceOptions = remember(payload, currentRoute.id) {
                                                     autofillSourceEntries(
                                                         payload.entries,

@@ -14,15 +14,14 @@ object AutoHidePref {
     val seconds: MutableState<Int> = mutableStateOf(DEFAULT_SECONDS)
 
     fun init(context: Context) {
-        val p = SecurePreferences.get(context.applicationContext, vaultPrefName(PREF, CurrentVaultKey.current()))
-        seconds.value = p.getInt(KEY_SECONDS, DEFAULT_SECONDS).coerceIn(MIN_SECONDS, MAX_SECONDS)
+        val prefName = vaultPrefName(PREF, CurrentVaultKey.current())
+        seconds.value = PreferencePersistence.getInt(context, prefName, KEY_SECONDS, DEFAULT_SECONDS).coerceIn(MIN_SECONDS, MAX_SECONDS)
     }
 
     fun setSeconds(context: Context, v: Int) {
         val clamped = v.coerceIn(MIN_SECONDS, MAX_SECONDS)
         if (seconds.value == clamped) return
         seconds.value = clamped
-        SecurePreferences.get(context.applicationContext, vaultPrefName(PREF, CurrentVaultKey.current()))
-            .edit().putInt(KEY_SECONDS, clamped).apply()
+        PreferencePersistence.putInt(context, vaultPrefName(PREF, CurrentVaultKey.current()), KEY_SECONDS, clamped)
     }
 }

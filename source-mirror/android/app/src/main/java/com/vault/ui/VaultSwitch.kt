@@ -90,7 +90,7 @@ fun VaultSwitch(
             Box(
                 modifier = Modifier
                     .size(ThumbSize)
-                    .offset(x = offsetX)
+                    .offset { androidx.compose.ui.unit.IntOffset(offsetX.roundToPx(), 0) }
                     .background(thumbColor, CircleShape),
             )
         }

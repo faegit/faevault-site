@@ -28,7 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
@@ -109,7 +109,7 @@ internal fun VaultButton(
     // 按压反馈：已 clip(shape)，Material ripple 跟随圆角，不会出现矩形色块
     Row(
         modifier = modifier
-            .scale(scale)
+            .graphicsLayer { scaleX = scale; scaleY = scale }
             .minimumInteractiveComponentSize()
             .defaultMinSize(
                 minWidth = SharedVaultButtonGeometry.minWidth,

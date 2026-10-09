@@ -1,6 +1,5 @@
 package com.vault.storage
 
-import com.vault.security.SecurePreferences
 import android.content.Context
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -20,15 +19,14 @@ object ClipboardTtlPref {
     val seconds: MutableState<Int> = mutableStateOf(DEFAULT_SECONDS)
 
     fun init(context: Context) {
-        val p = SecurePreferences.get(context.applicationContext, com.vault.security.vaultPrefName(PREF, com.vault.security.CurrentVaultKey.current()))
-        seconds.value = p.getInt(KEY_SECONDS, DEFAULT_SECONDS).coerceIn(MIN_SECONDS, MAX_SECONDS)
+        val prefName = com.vault.security.vaultPrefName(PREF, com.vault.security.CurrentVaultKey.current())
+        seconds.value = com.vault.security.PreferencePersistence.getInt(context, prefName, KEY_SECONDS, DEFAULT_SECONDS).coerceIn(MIN_SECONDS, MAX_SECONDS)
     }
 
     fun setSeconds(context: Context, v: Int) {
         val clamped = v.coerceIn(MIN_SECONDS, MAX_SECONDS)
         if (seconds.value == clamped) return
         seconds.value = clamped
-        SecurePreferences.get(context.applicationContext, com.vault.security.vaultPrefName(PREF, com.vault.security.CurrentVaultKey.current()))
-            .edit().putInt(KEY_SECONDS, clamped).apply()
+        com.vault.security.PreferencePersistence.putInt(context, com.vault.security.vaultPrefName(PREF, com.vault.security.CurrentVaultKey.current()), KEY_SECONDS, clamped)
     }
 }

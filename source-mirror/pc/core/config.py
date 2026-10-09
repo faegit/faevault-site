@@ -16,6 +16,7 @@ import tempfile
 import threading
 import time
 import base64
+import itertools
 from contextlib import contextmanager
 from functools import lru_cache
 from hashlib import sha256
@@ -88,6 +89,23 @@ _config_integrity_failed: bool = False
 
 # 写配置时串行化（browser_host 等常驻进程与主程序并发写同一个 config.json）。
 _config_write_lock = threading.RLock()
+# UI-only overlay for background-written, non-secret scheduler preferences.
+# Regular disk writes may replace _config_cache; this preserves newer staged UI
+# values until their corresponding completion is reconciled on the UI thread.
+_staged_cloud_auto: dict[str, object] = {}
+_staged_cloud_auto_generations: dict[str, int] = {}
+_preference_generations = itertools.count(1)
+_cloud_auto_unset = object()
+_staged_settings: dict[tuple[str | None, str], object] = {}
+_staged_settings_generations: dict[tuple[str | None, str], int] = {}
+# Background persistence accepts only ordinary UI preferences. Credentials,
+# master-password gates and screen-capture grants deliberately stay outside it.
+ASYNC_SETTINGS_KEYS = frozenset({
+    "theme_mode", "language_mode", "lock_enabled", "lock_seconds",
+    "clipboard_clear_seconds", "reveal_hide_seconds", "recycle_bin_retention_days",
+    "background_hide", "silent_start", "native_autofill_enabled",
+})
+_ASYNC_BOOL_KEYS = frozenset({"lock_enabled", "background_hide", "silent_start", "native_autofill_enabled"})
 
 # ── 账户（保险库）隔离层 ───────────────────────────────────────────────
 # 除账户注册表 / 云同步 / 压缩状态等全局键外，所有设置按当前账户
@@ -338,6 +356,12 @@ def save(data: dict) -> None:
 
 
 def get(key: str, default=None):
+    staged = _staged_cloud_auto.get(key, _cloud_auto_unset)
+    if staged is not _cloud_auto_unset:
+        return staged
+    staged = _staged_settings.get(_settings_scope(load().get("current_user"), key), _cloud_auto_unset)
+    if staged is not _cloud_auto_unset:
+        return staged
     return _read_key(load(), key, default)
 
 
@@ -371,6 +395,12 @@ def set(key: str, value) -> None:
         _save_uncached(data, expected_revision=revision, check_revision=True)
         _config_dirty = False
 
+        # An explicit synchronous change supersedes an older queued UI value.
+        _staged_cloud_auto.pop(key, None)
+        _staged_cloud_auto_generations.pop(key, None)
+        _staged_settings.pop(_settings_scope(data.get("current_user"), key), None)
+        _staged_settings_generations.pop(_settings_scope(data.get("current_user"), key), None)
+
 
 def set_many(values: dict[str, object]) -> None:
     """Persist several settings atomically with one encrypted fsync.
@@ -395,10 +425,20 @@ def set_many(values: dict[str, object]) -> None:
                 changed = True
         _config_cache = data
         if not changed:
+            for key in values:
+                _staged_cloud_auto.pop(key, None)
+                _staged_cloud_auto_generations.pop(key, None)
+                _staged_settings.pop(_settings_scope(data.get("current_user"), key), None)
+                _staged_settings_generations.pop(_settings_scope(data.get("current_user"), key), None)
             return
         _config_dirty = True
         _save_uncached(data, expected_revision=revision, check_revision=True)
         _config_dirty = False
+        for key in values:
+            _staged_cloud_auto.pop(key, None)
+            _staged_cloud_auto_generations.pop(key, None)
+            _staged_settings.pop(_settings_scope(data.get("current_user"), key), None)
+            _staged_settings_generations.pop(_settings_scope(data.get("current_user"), key), None)
 
 
 def stage_many(values: dict[str, object]) -> None:
@@ -410,6 +450,177 @@ def stage_many(values: dict[str, object]) -> None:
     for key, value in values.items():
         _write_key(data, key, value)
     _config_cache = data
+
+
+def _validate_cloud_auto_values(values: dict[str, object]) -> None:
+    if any(not key.startswith("cloud_auto") or type(value) not in (bool, int, float)
+           for key, value in values.items()):
+        raise ValueError("Only non-secret cloud_auto scheduler preferences are supported")
+
+
+def stage_cloud_auto_many(values: dict[str, object]) -> dict[str, int]:
+    """UI-thread overlay; ordinary account writes cannot erase queued flags."""
+    _validate_cloud_auto_values(values)
+    _staged_cloud_auto.update(values)
+    generations = {key: next(_preference_generations) for key in values}
+    _staged_cloud_auto_generations.update(generations)
+    return generations
+
+
+def reconcile_cloud_auto_many(values: dict[str, object], generations: dict[str, int] | None = None) -> None:
+    """On the UI thread, publish completed keys only if still the latest value."""
+    data = load()
+    for key, value in values.items():
+        if (generations is None or _staged_cloud_auto_generations.get(key) == generations.get(key)) and _staged_cloud_auto.get(key, object()) == value:
+            data[key] = value
+            _staged_cloud_auto.pop(key, None)
+            _staged_cloud_auto_generations.pop(key, None)
+
+
+def persist_cloud_auto_many(values: dict[str, object], *, generations: dict[str, int] | None = None) -> None:
+    """Persist staged, vault-scoped scheduler flags without replacing the UI cache.
+
+    Only non-secret global cloud_auto preferences are accepted. A serialized
+    background writer can merge these keys into the latest encrypted disk state
+    while the UI stages a newer slider value or switches accounts. Updating the
+    cache here would overwrite that newer state with an older disk snapshot.
+    """
+    if not values:
+        return
+    _validate_cloud_auto_values(values)
+    with _config_write_lock, _interprocess_config_lock():
+        _require_writable()
+        data = _load_uncached()
+        _require_writable()
+        revision = _configuration_revision(_config_path())
+        changed = False
+        for key, value in values.items():
+            # A direct set/set_many (for example disabling automatic sync)
+            # supersedes queued values and removes their overlay under this lock.
+            if key not in _staged_cloud_auto:
+                continue
+            if generations is not None and _staged_cloud_auto_generations.get(key) != generations.get(key):
+                continue
+            if data.get(key, object()) != value:
+                data[key] = value
+                changed = True
+        if changed:
+            _save_uncached(data, expected_revision=revision, check_revision=True)
+
+
+def _settings_scope(account: str | None, key: str) -> tuple[str | None, str]:
+    return (None if _is_global_key(key) else account or None, key)
+
+
+def _validate_async_settings(values: dict[str, object]) -> None:
+    for key, value in values.items():
+        if key not in ASYNC_SETTINGS_KEYS:
+            raise ValueError("Setting is outside the non-secret background preference allowlist")
+        if key in _ASYNC_BOOL_KEYS:
+            valid = type(value) is bool
+        elif key == "theme_mode":
+            valid = isinstance(value, str) and value in {"light", "dark", "auto", "brand_blue"}
+        elif key == "language_mode":
+            valid = isinstance(value, str) and value in {"auto", "zh-Hans", "en"}
+        else:
+            valid = type(value) is int
+        if not valid:
+            raise ValueError("Invalid background preference value")
+
+
+def stage_settings_many(account: str | None, values: dict[str, object]) -> dict[str, int]:
+    """UI-thread staging with an explicitly captured account namespace."""
+    _validate_async_settings(values)
+    generations = {}
+    for key, value in values.items():
+        scope = _settings_scope(account, key)
+        _staged_settings[scope] = value
+        generations[key] = next(_preference_generations)
+        _staged_settings_generations[scope] = generations[key]
+    return generations
+
+
+def settings_generations_snapshot(account, values) -> dict[str, int]:
+    return {key: _staged_settings_generations.get(_settings_scope(account, key)) for key in values}
+
+
+def _write_settings_scope(data: dict, account: str | None, key: str, value: object) -> None:
+    scope, _ = _settings_scope(account, key)
+    if scope is None:
+        data[key] = value
+    else:
+        table = data.get("account_settings")
+        if not isinstance(table, dict):
+            table = {}
+        settings = table.get(scope)
+        if not isinstance(settings, dict):
+            settings = {}
+        settings[key] = value
+        table[scope] = settings
+        data["account_settings"] = table
+
+
+def _settings_account_exists(data: dict, account: str) -> bool:
+    table = data.get("account_settings")
+    users = data.get("users")
+    return (isinstance(table, dict) and account in table
+            or data.get("current_user") == account
+            or isinstance(users, list) and any(
+                record.get("name") == account for record in users if isinstance(record, dict)))
+
+
+def reconcile_settings_many(account: str | None, values: dict[str, object], generations: dict[str, int] | None = None) -> None:
+    """UI-thread completion preserves newer edits and updates their own account."""
+    data = load()
+    for key, value in values.items():
+        scope = _settings_scope(account, key)
+        if (generations is None or _staged_settings_generations.get(scope) == generations.get(key)) and _staged_settings.get(scope, _cloud_auto_unset) == value:
+            if scope[0] is not None and not _settings_account_exists(data, scope[0]):
+                _staged_settings.pop(scope, None)
+                _staged_settings_generations.pop(scope, None)
+                continue
+            _write_settings_scope(data, account, key, value)
+            _staged_settings.pop(scope, None)
+            _staged_settings_generations.pop(scope, None)
+
+
+def persist_settings_many(account: str | None, values: dict[str, object], *, generations: dict[str, int] | None = None) -> None:
+    """Merge captured-account preferences into latest encrypted disk state.
+
+    The worker never replaces the cache or changes current_user. Direct writes
+    supersede queued preferences by removing their matching overlay scopes.
+    """
+    _validate_async_settings(values)
+    if not values:
+        return
+    with _config_write_lock, _interprocess_config_lock():
+        _require_writable()
+        data = _load_uncached()
+        _require_writable()
+        revision = _configuration_revision(_config_path())
+        changed = False
+        for key, value in values.items():
+            scope, _ = _settings_scope(account, key)
+            if (scope, key) not in _staged_settings:
+                continue
+            if generations is not None and _staged_settings_generations.get((scope, key)) != generations.get(key):
+                continue
+            if scope is None:
+                old = data.get(key, _cloud_auto_unset)
+            else:
+                table = data.get("account_settings")
+                table = table if isinstance(table, dict) else {}
+                # Never recreate a renamed or deleted account on a late callback.
+                if not _settings_account_exists(data, scope):
+                    raise ValueError("Captured settings account no longer exists")
+                settings = table.get(scope)
+                settings = settings if isinstance(settings, dict) else {}
+                old = settings.get(key, data.get(key, _cloud_auto_unset))
+            if old != value:
+                _write_settings_scope(data, account, key, value)
+                changed = True
+        if changed:
+            _save_uncached(data, expected_revision=revision, check_revision=True)
 
 
 def flush() -> None:
@@ -456,6 +667,9 @@ def _migrate_theme_mode(mode: str) -> str:
 def theme_mode() -> str:
     """返回主题模式；优先当前账户设置，否则旧版 dark 布尔配置，最后默认。"""
     name = load().get("current_user")
+    staged = _staged_settings.get(_settings_scope(name, "theme_mode"), _cloud_auto_unset)
+    if staged is not _cloud_auto_unset:
+        return _migrate_theme_mode(staged)
     if name:
         table = load().get("account_settings")
         if isinstance(table, dict):
@@ -476,6 +690,9 @@ def theme_mode() -> str:
 def language_mode() -> str:
     """返回界面语言；优先当前账户设置，旧配置和未知值统一回退到跟随系统。"""
     name = load().get("current_user")
+    staged = _staged_settings.get(_settings_scope(name, "language_mode"), _cloud_auto_unset)
+    if staged is not _cloud_auto_unset:
+        return staged
     if name:
         table = load().get("account_settings")
         if isinstance(table, dict):
@@ -491,6 +708,9 @@ def language_mode() -> str:
 def lock_seconds() -> int:
     """返回自动锁定秒数，优先当前账户设置，兼容旧版 lock_minutes 配置。"""
     name = load().get("current_user")
+    staged = _staged_settings.get(_settings_scope(name, "lock_seconds"), _cloud_auto_unset)
+    if staged is not _cloud_auto_unset:
+        return max(MIN_LOCK_SECONDS, min(MAX_LOCK_SECONDS, int(staged)))
     if name:
         table = load().get("account_settings")
         if isinstance(table, dict):
@@ -612,6 +832,13 @@ def register_user(name: str, filename: str) -> dict:
 
 def rename_user(old_name: str, new_name: str) -> dict:
     """重命名账户的显示名（文件与库内容不变），同步 current_user 与回收站映射。"""
+    # A background preference transaction must finish before the registry
+    # snapshot is taken; otherwise rename could overwrite its latest settings.
+    with _config_write_lock:
+        return _rename_user_locked(old_name, new_name)
+
+
+def _rename_user_locked(old_name: str, new_name: str) -> dict:
     name = str(new_name or "").strip()
     if not name or _INVALID_NAME_CHARS.search(name):
         raise ValueError("账户名不合法")
@@ -630,12 +857,21 @@ def rename_user(old_name: str, new_name: str) -> dict:
     trashed = data.get("trashed_accounts")
     if isinstance(trashed, dict) and old_name in trashed:
         trashed[name] = trashed.pop(old_name)
+    # Include still-debounced ordinary preferences in the same rename commit.
+    # Old queued jobs then lose their overlay tokens and cannot recreate the
+    # previous name or overwrite the migrated settings.
+    staged_scopes = [scope for scope in _staged_settings if scope[0] == old_name]
+    for scope in staged_scopes:
+        _write_settings_scope(data, old_name, scope[1], _staged_settings[scope])
     # 账户重命名同步迁移其设置命名空间，避免设置随显示名变化而丢失。
     table = data.get("account_settings")
     if isinstance(table, dict) and old_name in table:
         table[name] = table.pop(old_name)
         data["account_settings"] = table
     save(data)
+    for scope in staged_scopes:
+        _staged_settings.pop(scope, None)
+        _staged_settings_generations.pop(scope, None)
     return target
 
 

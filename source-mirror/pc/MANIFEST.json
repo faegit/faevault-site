@@ -1,10 +1,10 @@
 {
   "schema": 1,
-  "snapshot_date": "2026-10-08",
+  "snapshot_date": "2026-10-09",
   "license": "Apache-2.0",
   "platform": "pc",
-  "version": "4.6.7",
-  "source_commit": "03e31be7cc5a295cdbb8343365a039d0886c2e7e",
+  "version": "4.6.8",
+  "source_commit": "d66437c069f4f1cc1dade8e17f173d9183c4b402",
   "working_tree_snapshot": true,
   "files": [
     {
@@ -34,7 +34,7 @@
     {
       "path": "README.md",
       "bytes": 1062,
-      "sha256": "83bea88a72bf8ed248cb016c7ff6a3fe4aee6fbb553d8e84c3ce0a46f7a381b6",
+      "sha256": "49be0f26a7f32577f12638429cdd118a06ce2e95d779b08c5913ae5d689842a8",
       "kind": "publication-notice"
     },
     {
@@ -213,8 +213,8 @@
     },
     {
       "path": "core/config.py",
-      "bytes": 33415,
-      "sha256": "4378e4303112a377b87168322cfda3493f6e2bda05eaf2736454925a5b7ebdc3",
+      "bytes": 44943,
+      "sha256": "178c12c41725382f9d53df9b90d7f688b9e906e19596f4d4a6c84e097e385307",
       "kind": "source"
     },
     {
@@ -975,8 +975,8 @@
     },
     {
       "path": "pyproject.toml",
-      "bytes": 1151,
-      "sha256": "f7b2f1523b15eb44c57ce8cb3d6119ac2d11eb8f331802d3eaed06722b9cc93e",
+      "bytes": 1150,
+      "sha256": "cde21863208b0898e250367b7b8e45ec39b8fa53f38e7fcdf0f5ce98fcf1b21a",
       "kind": "source"
     },
     {
@@ -1337,6 +1337,12 @@
       "path": "tests/test_cloud_credential_crypto.py",
       "bytes": 1417,
       "sha256": "2842d373d14c13b5722263902a04d837a4ad4bc60256545dd5bff790ad1c8d5c",
+      "kind": "source"
+    },
+    {
+      "path": "tests/test_cloud_preferences_fluency.py",
+      "bytes": 10553,
+      "sha256": "15e45d5ace188fd4135267362c983463fc0e3d3ea5bf96bb869c6916deb0692e",
       "kind": "source"
     },
     {
@@ -1808,6 +1814,12 @@
       "kind": "source"
     },
     {
+      "path": "tests/test_settings_preferences_fluency.py",
+      "bytes": 11171,
+      "sha256": "c3e03c1adb6bd2770ba5f3405efa546422a485ff6193e44389f775458eb64b6d",
+      "kind": "source"
+    },
+    {
       "path": "tests/test_smooth_scroll.py",
       "bytes": 4111,
       "sha256": "791ecf107eb4d8c2a605a89fb9928f98f32750ab9ef39a4ef077120c201dc1bc",
@@ -1869,8 +1881,8 @@
     },
     {
       "path": "tests/test_ui_regressions.py",
-      "bytes": 169549,
-      "sha256": "f4f36ea040840899b771e7b7cdcf913082f1121f5f9c493dc306cc91612cc25f",
+      "bytes": 169669,
+      "sha256": "ac8d16754d8a79e194184a47e7e8c23903b134ea227010af384ec4f7e8d62017",
       "kind": "source"
     },
     {
@@ -1931,6 +1943,12 @@
       "path": "ui/autofill_memory.py",
       "bytes": 5079,
       "sha256": "ae3e4bd029b40eb98191566c7e2a7950511113c623fcfbee60306bf480b9bb38",
+      "kind": "source"
+    },
+    {
+      "path": "ui/cloud_preferences.py",
+      "bytes": 4988,
+      "sha256": "52d6ab7a93e5c82341e8836a54bcc49009edbc42dd8771a2942e79477e6f063d",
       "kind": "source"
     },
     {
@@ -2061,8 +2079,8 @@
     },
     {
       "path": "ui/settings_page.py",
-      "bytes": 55811,
-      "sha256": "eadcd84ce5009e19703d7ad1ae4dce3ed121852e5ae5aed3eb52850d37317fe8",
+      "bytes": 57674,
+      "sha256": "0aa0ca7284ee631ca412287d39a5e3cea0047b5e1ae37b6742cd0176db1d95ab",
       "kind": "source"
     },
     {
@@ -2079,8 +2097,8 @@
     },
     {
       "path": "ui/sync_pages.py",
-      "bytes": 151715,
-      "sha256": "424bd3a8a6b8a8f2ecaa53c361541896b2e9f201e8a4ff081132a93dda046682",
+      "bytes": 152276,
+      "sha256": "af364e16440001ab0fbeef7126aa54cf8b88a482a973534e65f078d6d4e13a5b",
       "kind": "source"
     },
     {

@@ -22,22 +22,20 @@ object IdleLockPref {
     val seconds: MutableState<Int> = mutableStateOf(DEFAULT_SECONDS)
 
     fun init(context: Context) {
-        val p = SecurePreferences.get(context.applicationContext, vaultPrefName(PREF, CurrentVaultKey.current()))
-        enabled.value = p.getBoolean(KEY_ENABLED, false)
-        seconds.value = snapSeconds(p.getInt(KEY_SECONDS, DEFAULT_SECONDS))
+        val prefName = vaultPrefName(PREF, CurrentVaultKey.current())
+        enabled.value = PreferencePersistence.getBoolean(context, prefName, KEY_ENABLED, false)
+        seconds.value = snapSeconds(PreferencePersistence.getInt(context, prefName, KEY_SECONDS, DEFAULT_SECONDS))
     }
 
     fun setEnabled(context: Context, v: Boolean) {
         enabled.value = v
-        SecurePreferences.get(context.applicationContext, vaultPrefName(PREF, CurrentVaultKey.current()))
-            .edit().putBoolean(KEY_ENABLED, v).apply()
+        PreferencePersistence.putBoolean(context, vaultPrefName(PREF, CurrentVaultKey.current()), KEY_ENABLED, v)
     }
 
     fun setSeconds(context: Context, v: Int) {
         val snapped = snapSeconds(v)
         seconds.value = snapped
-        SecurePreferences.get(context.applicationContext, vaultPrefName(PREF, CurrentVaultKey.current()))
-            .edit().putInt(KEY_SECONDS, snapped).apply()
+        PreferencePersistence.putInt(context, vaultPrefName(PREF, CurrentVaultKey.current()), KEY_SECONDS, snapped)
     }
 
     /** 秒数对齐到最接近的启用档位（不含"关闭"档）。 */

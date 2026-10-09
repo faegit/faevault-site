@@ -19,15 +19,14 @@ object LeakCheckIntervalPref {
     val days: MutableState<Int> = mutableStateOf(DEFAULT_DAYS)
 
     fun init(context: Context) {
-        val p = SecurePreferences.get(context.applicationContext, vaultPrefName(PREF, CurrentVaultKey.current()))
-        days.value = p.getInt(KEY_DAYS, DEFAULT_DAYS).coerceIn(MIN_DAYS, MAX_DAYS)
+        val prefName = vaultPrefName(PREF, CurrentVaultKey.current())
+        days.value = PreferencePersistence.getInt(context, prefName, KEY_DAYS, DEFAULT_DAYS).coerceIn(MIN_DAYS, MAX_DAYS)
     }
 
     fun setDays(context: Context, v: Int) {
         val clamped = v.coerceIn(MIN_DAYS, MAX_DAYS)
         if (days.value == clamped) return
         days.value = clamped
-        SecurePreferences.get(context.applicationContext, vaultPrefName(PREF, CurrentVaultKey.current()))
-            .edit().putInt(KEY_DAYS, clamped).apply()
+        PreferencePersistence.putInt(context, vaultPrefName(PREF, CurrentVaultKey.current()), KEY_DAYS, clamped)
     }
 }

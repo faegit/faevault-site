@@ -1641,7 +1641,6 @@ def test_screen_capture_permission_blocks_by_default_and_keeps_explicit_choices(
 
 def test_closing_settings_flushes_only_values_changed_on_that_page(monkeypatch):
     calls = []
-    monkeypatch.setattr(app_ui.config, "set_many", lambda values: calls.append(values.copy()))
     window = SimpleNamespace(
         apply_lock_settings=lambda: None,
         apply_privacy_settings=lambda: None,
@@ -1650,13 +1649,16 @@ def test_closing_settings_flushes_only_values_changed_on_that_page(monkeypatch):
     page = SimpleNamespace(
         _config_save_timer=SimpleNamespace(stop=lambda: None),
         _pending_config_saves={"theme_mode": "dark"},
+        _pending_config_generations={"theme_mode": 1},
+        _settings_account="FAE",
+        _preference_writer=SimpleNamespace(submit=lambda account, values, tokens: calls.append((account, values.copy()))),
         _window=window,
     )
     page._flush_config_saves = lambda: SettingsPage._flush_config_saves(page)
 
     SettingsPage._save_all(page)
 
-    assert calls == [{"theme_mode": "dark"}]
+    assert calls == [("FAE", {"theme_mode": "dark"})]
     assert page._pending_config_saves == {}
 
 

@@ -178,9 +178,10 @@ class VaultViewModel(app: Application) : AndroidViewModel(app) {
     private var postUnlockJob: Job? = null
     private var autoCloudSyncJob: Job? = null
     private var remoteUpdateJob: Job? = null
-    private var remoteUpdateOperationGeneration = 0L
-    private var remoteUpdatePaused = false
-    private val remoteUpdateMutex = kotlinx.coroutines.sync.Mutex()
+    @Volatile private var remoteUpdateOperationGeneration = 0L
+    @Volatile private var remoteUpdatePaused = false
+    private val remoteUpdateSettingsGate = RemoteUpdateSettingsGate()
+    private val remoteUpdateMutex = remoteUpdateSettingsGate.persistenceMutex
     private data class RemoteUpdateProof(val session: VaultSessionFence.Token, val association: String, val version: String, val consumedVersion: String = "")
     private val remoteUpdateProofs = java.util.concurrent.ConcurrentHashMap<String, RemoteUpdateProof>()
     private val _remoteUpdateStates = MutableStateFlow<Map<String, com.vault.storage.RemoteUpdateState>>(emptyMap())
@@ -548,6 +549,13 @@ class VaultViewModel(app: Application) : AndroidViewModel(app) {
     private fun captureVaultSession(): VaultSessionFence.Token =
         vaultSessionFence.capture(_currentVault.value)
 
+    private fun installCurrentVault(name: String?) {
+        synchronized(vaultSessionFence) {
+            com.vault.security.CurrentVaultKey.install(name ?: com.vault.security.CurrentVaultKey.DEFAULT)
+            _currentVault.value = name
+        }
+    }
+
     private suspend fun <T> deviceOperation(block: (VaultRepository, ByteArray) -> T): T {
         val token = captureVaultSession()
         return vaultOperationMutex.withLock {
@@ -618,6 +626,7 @@ class VaultViewModel(app: Application) : AndroidViewModel(app) {
         remoteUpdateJob?.cancel()
         remoteUpdateJob = null
         _remoteUpdateStates.value = emptyMap()
+        pendingRemoteUpdateSettings.clear()
         vaultSessionFence.invalidate()
 
         // 待确认的跨账户导入持有 A 库的明文条目，锁定/切库/删除时立即销毁（H-10）：
@@ -1911,7 +1920,7 @@ class VaultViewModel(app: Application) : AndroidViewModel(app) {
                     val repo = VaultRepository(getApplication(), registry, name)
                     repo.importFromFile(cache)
                     registry.setCurrent(name)
-                    _currentVault.value = name
+                    installCurrentVault(name)
                     refreshVaultList()
                     importedName = name
                 }
@@ -2621,7 +2630,7 @@ class VaultViewModel(app: Application) : AndroidViewModel(app) {
         clearEntryStore()
         clearUnlockPipeline()
         registry.setCurrent(name)
-        _currentVault.value = name
+        installCurrentVault(name)
         _state.value = UiState(phase = Phase.LOCKED)
         clearSecurityReport()
     }
@@ -2631,8 +2640,7 @@ class VaultViewModel(app: Application) : AndroidViewModel(app) {
             .onSuccess {
                 refreshVaultList()
                 if (_currentVault.value == old) {
-                    _currentVault.value = new
-                    com.vault.security.CurrentVaultKey.install(new)
+                    installCurrentVault(new)
                 }
                 emitInfo(getApplication<Application>().getString(R.string.viewmodel_renamed, new))
             }
@@ -2660,7 +2668,7 @@ class VaultViewModel(app: Application) : AndroidViewModel(app) {
             _state.value.credential?.close()
             clearEntryStore()
             clearUnlockPipeline()
-            _currentVault.value = registry.current()
+            installCurrentVault(registry.current())
             _state.value = if (_currentVault.value == null) UiState(phase = Phase.NO_VAULT)
             else UiState(phase = Phase.LOCKED)
             clearSecurityReport()
@@ -2690,7 +2698,7 @@ class VaultViewModel(app: Application) : AndroidViewModel(app) {
             _state.value.credential?.close()
             clearEntryStore()
             clearUnlockPipeline()
-            _currentVault.value = registry.current()
+            installCurrentVault(registry.current())
             _state.value = if (_currentVault.value == null) UiState(phase = Phase.NO_VAULT)
             else UiState(phase = Phase.LOCKED)
             clearSecurityReport()
@@ -2735,7 +2743,7 @@ class VaultViewModel(app: Application) : AndroidViewModel(app) {
                 )
                 opened.rootKey?.fill(0)
                 registry.setCurrent(name)
-                _currentVault.value = name
+                installCurrentVault(name)
                 refreshVaultList()
                 _state.update {
                     it.withPayload(sealPayload(opened.payload)).copy(
@@ -2944,7 +2952,7 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
         runCatching { withContext(Dispatchers.IO) { tempRepo.importFromUri(uri) } }
             .onSuccess {
                 registry.setCurrent(name)
-                _currentVault.value = name
+                installCurrentVault(name)
                 refreshVaultList()
                 VaultMaintenancePref.recordImport(getApplication(), name)
                 _state.value = UiState(phase = Phase.LOCKED)
@@ -2985,7 +2993,7 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
         runCatching { withContext(Dispatchers.IO) { tempRepo.importFromUri(uri) } }
             .onSuccess {
                 registry.setCurrent(name)
-                _currentVault.value = name
+                installCurrentVault(name)
                 refreshVaultList()
                 _state.value = UiState(phase = Phase.LOCKED)
                 clearSecurityReport()
@@ -3639,6 +3647,48 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
         restartAutoCloudSync()
     }
 
+    private val cloudSettingsWrites = com.vault.storage.CloudSettingsWriteQueue()
+
+    /** Values and keys in [edit] must be captured before calling, not read from Compose state. */
+    fun updateCloudSyncPreferences(edit: android.content.SharedPreferences.Editor.() -> Unit): Job {
+        val token = captureVaultSession()
+        return viewModelScope.launch {
+            cloudSettingsWrites.write {
+                if (isVaultSessionCurrent(token)) {
+                    com.vault.security.SecurePreferences.get(getApplication(), "cloud_sync")
+                        .edit().apply(edit).apply()
+                }
+            }
+        }
+    }
+
+    fun setCloudSyncEnabled(enabled: Boolean) {
+        val token = captureVaultSession()
+        val key = AutoCloudSyncPrefs.key(cloudVaultKey(), "enabled")
+        viewModelScope.launch {
+            cloudSettingsWrites.write {
+                if (isVaultSessionCurrent(token)) {
+                    com.vault.security.SecurePreferences.get(getApplication(), "cloud_sync")
+                        .edit().putBoolean(key, enabled).apply()
+                }
+            }
+            if (isVaultSessionCurrent(token)) checkRemoteUpdates()
+        }
+    }
+
+    fun saveAutoCloudSyncSettings(enabled: Boolean, target: String, interval: Int) {
+        val token = captureVaultSession()
+        val vaultKey = cloudVaultKey()
+        viewModelScope.launch {
+            cloudSettingsWrites.write {
+                if (isVaultSessionCurrent(token)) {
+                    AutoCloudSyncPrefs.save(getApplication(), vaultKey, enabled, target, interval)
+                }
+            }
+            if (isVaultSessionCurrent(token)) refreshAutoCloudSyncSchedule()
+        }
+    }
+
     private fun restartAutoCloudSync() {
         restartRemoteUpdateDetection()
         autoCloudSyncJob?.cancel()
@@ -3656,8 +3706,8 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
         remoteUpdateJob?.cancel()
         if (_state.value.phase != Phase.UNLOCKED) return
         remoteUpdatePaused = false
-        reloadRemoteUpdateStates()
         remoteUpdateJob = viewModelScope.launch {
+            remoteUpdateMutex.withLock { withContext(Dispatchers.IO) { reloadRemoteUpdateStates() } }
             while (_state.value.phase == Phase.UNLOCKED) {
                 checkRemoteUpdates().join()
                 delay(60_000L)
@@ -3666,19 +3716,57 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
     }
 
     private fun reloadRemoteUpdateStates() {
-        _remoteUpdateStates.value = listOf("drive", "webdav").associateWith {
-            com.vault.storage.RemoteUpdatePrefs.load(getApplication(), vaultName(), it)
+        val token = captureVaultSession()
+        val vault = vaultName()
+        val settingRevision = remoteUpdateSettingsGate.revision
+        val loaded = listOf("drive", "webdav").associateWith {
+            com.vault.storage.RemoteUpdatePrefs.load(getApplication(), vault, it)
+        }
+        remoteUpdateSettingsGate.publishIfCurrent(settingRevision) {
+            if (isVaultSessionCurrent(token) && _state.value.phase == Phase.UNLOCKED) {
+                _remoteUpdateStates.value = loaded.mapValues { (target, stored) ->
+                    pendingRemoteUpdateSettings["$vault:$target"]?.let { pending ->
+                        stored.copy(enabled = pending.second, pending = if (pending.second) stored.pending else "",
+                            detectedAt = if (pending.second) stored.detectedAt else 0)
+                    } ?: stored
+                }
+            }
         }
     }
 
+    private val pendingRemoteUpdateSettings = java.util.concurrent.ConcurrentHashMap<String, Pair<Long, Boolean>>()
+
     fun setRemoteUpdateDetection(target: String, enabled: Boolean) {
         if (target !in listOf("drive", "webdav") || _state.value.phase != Phase.UNLOCKED) return
-        val state = com.vault.storage.RemoteUpdatePrefs.load(getApplication(), vaultName(), target)
-        com.vault.storage.RemoteUpdatePrefs.save(getApplication(), vaultName(), target,
-            state.copy(enabled = enabled, pending = if (enabled) state.pending else "", detectedAt = if (enabled) state.detectedAt else 0))
-        reloadRemoteUpdateStates()
-        if (!enabled) RemoteUpdateNotifications.cancel(getApplication(), vaultName(), target)
-        else checkRemoteUpdates(target)
+        val token = captureVaultSession()
+        val vault = vaultName()
+        val settingKey = "$vault:$target"
+        val pending = remoteUpdateSettingsGate.change { revision ->
+            val pending = revision to enabled
+            pendingRemoteUpdateSettings[settingKey] = pending
+            _remoteUpdateStates.update { states ->
+                val state = states[target] ?: com.vault.storage.RemoteUpdateState()
+                states + (target to state.copy(enabled = enabled,
+                    pending = if (enabled) state.pending else "", detectedAt = if (enabled) state.detectedAt else 0))
+            }
+            pending
+        }
+        if (!enabled) RemoteUpdateNotifications.cancel(getApplication(), vault, target)
+        viewModelScope.launch {
+            remoteUpdateMutex.withLock {
+                if (!isVaultSessionCurrent(token)) return@withLock
+                withContext(Dispatchers.IO) {
+                    val state = com.vault.storage.RemoteUpdatePrefs.load(getApplication(), vault, target)
+                    com.vault.storage.RemoteUpdatePrefs.save(getApplication(), vault, target,
+                        state.copy(enabled = enabled, pending = if (enabled) state.pending else "", detectedAt = if (enabled) state.detectedAt else 0))
+                    remoteUpdateSettingsGate.change { pendingRemoteUpdateSettings.remove(settingKey, pending) }
+                    reloadRemoteUpdateStates()
+                }
+            }
+            if (!isVaultSessionCurrent(token)) return@launch
+            if (!enabled) RemoteUpdateNotifications.cancel(getApplication(), vault, target)
+            else checkRemoteUpdates(target)
+        }
     }
 
     fun snoozeRemoteUpdate(target: String) {
@@ -3700,7 +3788,7 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
         return RemoteAssociation(hash, config = config)
     }
 
-    fun checkRemoteUpdates(target: String? = null, force: Boolean = false): Job = viewModelScope.launch {
+    fun checkRemoteUpdates(target: String? = null, force: Boolean = false): Job = viewModelScope.launch(Dispatchers.IO) {
         if (remoteUpdatePaused || !remoteUpdateMutex.tryLock()) return@launch
         try {
             val token = captureVaultSession()
@@ -3722,9 +3810,11 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
                 }
                 com.vault.storage.RemoteUpdatePrefs.associate(getApplication(), vault, key, association.identity)
                 val state = com.vault.storage.RemoteUpdatePrefs.load(getApplication(), vault, key)
+                val settingRevision = remoteUpdateSettingsGate.revision
                 if (state.pending.isBlank()) RemoteUpdateNotifications.cancel(getApplication(), vault, key)
                 val now = System.currentTimeMillis()
-                if (!state.enabled || (!force && now - state.lastCheckedAt in 0 until 300_000L)) continue
+                if (!state.enabled || pendingRemoteUpdateSettings["$vault:$key"] != null ||
+                    (!force && now - state.lastCheckedAt in 0 until 300_000L)) continue
                 com.vault.storage.RemoteUpdatePrefs.save(getApplication(), vault, key, state.copy(lastCheckedAt = now))
                 val operationGeneration = remoteUpdateOperationGeneration
                 val version = runCatching { withContext(Dispatchers.IO) {
@@ -3737,12 +3827,19 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
                     remoteAssociation(key)?.identity != association.identity || !com.vault.storage.RemoteUpdatePolicy.mayAcceptObservation(operationGeneration, remoteUpdateOperationGeneration, remoteUpdatePaused) || _state.value.cloudSyncRunning ||
                     _cloudSyncState.value.phase == CloudSyncPhase.RUNNING) continue
                 val current = com.vault.storage.RemoteUpdatePrefs.load(getApplication(), vault, key)
-                if (!current.enabled || version == null) continue
+                if (!current.enabled || version == null || pendingRemoteUpdateSettings["$vault:$key"] != null ||
+                    remoteUpdateSettingsGate.revision != settingRevision) continue
                 val observation = com.vault.storage.RemoteUpdatePolicy.observe(current, version, now)
                 if (observation.state.pending.isNotBlank() && observation.state.pending != current.pending) cloudPreviewCache.invalidate(key)
                 com.vault.storage.RemoteUpdatePrefs.save(getApplication(), vault, key, observation.state)
                 if (observation.state.pending.isBlank()) RemoteUpdateNotifications.cancel(getApplication(), vault, key)
-                if (observation.notify) RemoteUpdateNotifications.show(getApplication(), vault, key, now)
+                if (observation.notify) withContext(Dispatchers.Main.immediate) {
+                    if (isVaultSessionCurrent(token) && _state.value.phase == Phase.UNLOCKED &&
+                        pendingRemoteUpdateSettings["$vault:$key"] == null &&
+                        remoteUpdateSettingsGate.revision == settingRevision) {
+                        RemoteUpdateNotifications.show(getApplication(), vault, key, now)
+                    }
+                }
             }
             if (isVaultSessionCurrent(token) && _state.value.phase == Phase.UNLOCKED) reloadRemoteUpdateStates()
         } finally { remoteUpdateMutex.unlock() }
@@ -3754,17 +3851,23 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
             consumedVersion.ifBlank { consumedMetadata?.let(com.vault.storage.RemoteUpdatePolicy::version).orEmpty() })
     }
 
-    private fun acknowledgeRemoteUpdate(target: String) {
-        val proof = remoteUpdateProofs.remove(target) ?: return
-        if (_state.value.phase != Phase.UNLOCKED || !isVaultSessionCurrent(proof.session) ||
-            remoteAssociation(target)?.identity != proof.association) return
+    private fun acknowledgeRemoteUpdate(target: String): Job = viewModelScope.launch {
+        val proof = remoteUpdateProofs.remove(target) ?: return@launch
         val vault = vaultName()
-        com.vault.storage.RemoteUpdatePrefs.associate(getApplication(), vault, target, proof.association)
-        val state = com.vault.storage.RemoteUpdatePrefs.load(getApplication(), vault, target)
-        val acknowledged = com.vault.storage.RemoteUpdatePolicy.acknowledge(state, proof.version, proof.consumedVersion)
-        com.vault.storage.RemoteUpdatePrefs.save(getApplication(), vault, target, acknowledged)
-        reloadRemoteUpdateStates()
-        if (acknowledged.pending.isBlank()) RemoteUpdateNotifications.cancel(getApplication(), vault, target)
+        remoteUpdateMutex.withLock {
+            withContext(Dispatchers.IO) {
+                if (_state.value.phase != Phase.UNLOCKED || !isVaultSessionCurrent(proof.session) ||
+                    remoteAssociation(target)?.identity != proof.association) return@withContext
+                val accepted = vaultSessionFence.runIfCurrent(proof.session, _currentVault.value) {
+                    com.vault.storage.RemoteUpdatePrefs.associate(getApplication(), vault, target, proof.association)
+                    val state = com.vault.storage.RemoteUpdatePrefs.load(getApplication(), vault, target)
+                    val acknowledged = com.vault.storage.RemoteUpdatePolicy.acknowledge(state, proof.version, proof.consumedVersion)
+                    com.vault.storage.RemoteUpdatePrefs.save(getApplication(), vault, target, acknowledged)
+                    if (acknowledged.pending.isBlank()) RemoteUpdateNotifications.cancel(getApplication(), vault, target)
+                }
+                if (accepted) reloadRemoteUpdateStates()
+            }
+        }
     }
 
     private suspend fun runAutoCloudSyncIfDue() {
@@ -3780,7 +3883,7 @@ fun validateImportFile(uri: Uri, onValid: () -> Unit) = viewModelScope.launch {
         for (target in listOf("drive", "webdav")) {
             if (_state.value.cloudSyncRunning || _cloudSyncState.value.phase == CloudSyncPhase.RUNNING) return
             // 读取与到期判定统一由 AutoCloudSyncPrefs 负责，避免此处再写一份周期逻辑。
-            val settings = AutoCloudSyncPrefs.loadTarget(app, vaultId, target)
+            val settings = withContext(Dispatchers.IO) { AutoCloudSyncPrefs.loadTarget(app, vaultId, target) }
             if (!AutoCloudSyncPrefs.isDue(settings, now)) continue
 
             AutoCloudSyncPrefs.clearFailure(app, vaultId)
@@ -6319,7 +6422,9 @@ PmvELineageRelation.REMOTE_STALE -> {
         force: Boolean = false,
         onResult: (CloudSyncPreview) -> Unit,
     ) = viewModelScope.launch {
-        val config = loadCloudConfig()
+        val token = captureVaultSession()
+        val config = withContext(Dispatchers.IO) { loadCloudConfig() }
+        if (!isVaultSessionCurrent(token)) return@launch
         if (config == null) {
             onResult(CloudSyncPreview("unlinked", cloudDisplayLabel("webdav"), message = getApplication<Application>().getString(R.string.viewmodel_cloud_unlinked)))
             return@launch
@@ -7073,7 +7178,6 @@ PmvELineageRelation.REMOTE_STALE -> {
     fun cloudVaultKey(): String {
         val key = _state.value.payload?.syncMeta?.deviceId?.takeIf { it.isNotBlank() }
             ?: _currentVault.value.orEmpty()
-        com.vault.security.CurrentVaultKey.install(vaultName())
         return key
     }
 
@@ -7106,12 +7210,62 @@ PmvELineageRelation.REMOTE_STALE -> {
         checkRemoteUpdates("webdav")
     }
 
-    fun clearCloudConfig() {
-        val root = _state.value.credential.sessionRootKey() ?: return
-        CloudCredentialStore.clear(getApplication(), root.identity.vaultId.toString(), cloudVaultKey())
-        com.vault.storage.RemoteUpdatePrefs.associate(getApplication(), vaultName(), "webdav", "")
-        RemoteUpdateNotifications.cancel(getApplication(), vaultName(), "webdav")
-        reloadRemoteUpdateStates()
+    fun saveCloudConfigAsync(config: WebDavConfig, onSaved: () -> Unit): Job {
+        val token = captureVaultSession()
+        val root = _state.value.credential.sessionRootKey()
+        return viewModelScope.launch {
+            try {
+                remoteUpdateMutex.withLock {
+                    cloudSettingsWrites.write {
+                        val accepted = vaultSessionFence.runIfCurrent(token, _currentVault.value) {
+                            val credential = requireNotNull(root) { "Vault session is locked" }
+                            credential.withRootKey(credential.identity) { raw ->
+                                CloudCredentialStore.save(getApplication(), credential.identity.vaultId.toString(), config, raw)
+                            }
+                        }
+                        if (!accepted) throw kotlinx.coroutines.CancellationException("Vault session changed")
+                    }
+                }
+                if (isVaultSessionCurrent(token)) {
+                    checkRemoteUpdates("webdav")
+                    onSaved()
+                }
+            } catch (cancelled: kotlinx.coroutines.CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                if (isVaultSessionCurrent(token)) emitError(cloudSyncError("WebDAV", error, false))
+            }
+        }
+    }
+
+    fun clearCloudConfigAsync(onCleared: () -> Unit): Job {
+        val token = captureVaultSession()
+        val root = _state.value.credential.sessionRootKey()
+        val vaultKey = cloudVaultKey()
+        val vault = vaultName()
+        return viewModelScope.launch {
+            try {
+                remoteUpdateMutex.withLock {
+                    cloudSettingsWrites.write {
+                        val accepted = vaultSessionFence.runIfCurrent(token, _currentVault.value) {
+                            val credential = requireNotNull(root) { "Vault session is locked" }
+                            CloudCredentialStore.clear(getApplication(), credential.identity.vaultId.toString(), vaultKey)
+                            com.vault.storage.RemoteUpdatePrefs.associate(getApplication(), vault, "webdav", "")
+                        }
+                        if (!accepted) throw kotlinx.coroutines.CancellationException("Vault session changed")
+                        reloadRemoteUpdateStates()
+                    }
+                }
+                if (isVaultSessionCurrent(token)) {
+                    RemoteUpdateNotifications.cancel(getApplication(), vault, "webdav")
+                    onCleared()
+                }
+            } catch (cancelled: kotlinx.coroutines.CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                if (isVaultSessionCurrent(token)) emitError(cloudSyncError("WebDAV", error, false))
+            }
+        }
     }
 
     // —— KDF 安全等级（审计发现 5）——
@@ -7483,7 +7637,7 @@ PmvELineageRelation.REMOTE_STALE -> {
         uploaded: Boolean = false,
         verified: Boolean = true,
     ) {
-        acknowledgeRemoteUpdate(targetKey)
+        acknowledgeRemoteUpdate(targetKey).join()
         if (verified) markPasskeysBackedUpAfterExternalCopy()
         val now = System.currentTimeMillis()
         AutoCloudSyncPrefs.success(

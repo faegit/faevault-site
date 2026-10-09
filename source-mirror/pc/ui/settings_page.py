@@ -9,7 +9,7 @@ import time
 import tomllib
 from pathlib import Path
 
-from PySide6.QtCore import QEvent, QObject, QThread, QTimer, QUrl, Qt, Signal
+from PySide6.QtCore import QEvent, QObject, QThread, QTimer, QUrl, Qt, Signal, Slot
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (
     QAbstractButton,
@@ -46,6 +46,7 @@ from .dialogs import (
     _spinbox_row,
 )
 from .editor_workspace import EditorPage, page_shell
+from .cloud_preferences import settings_preference_writer
 
 
 _CONTACT_EMAIL = "2123696066@qq.com"
@@ -108,6 +109,10 @@ class SettingsPage(EditorPage):
     def __init__(self, window, parent=None):
         super().__init__(parent)
         self._window = window
+        self._settings_account = config.get_current_user() or None
+        self._settings_closed = False
+        self._preference_writer = settings_preference_writer()
+        self._preference_writer.failed.connect(self._on_config_save_failed)
         self._orig_mode = config.theme_mode()
         self._orig_language = config.language_mode()
         self._delete_occurred = False
@@ -489,6 +494,7 @@ class SettingsPage(EditorPage):
 
     def close_page(self, reason: str) -> None:
         self._save_all()
+        self._settings_closed = True
         self.clear_security_session()
         worker = self._kdf_worker
         if worker is not None and worker.isRunning():
@@ -851,10 +857,12 @@ class SettingsPage(EditorPage):
 
     def _connect_auto_save(self) -> None:
         self._pending_config_saves: dict[str, object] = {}
+        self._pending_config_generations: dict[str, int] = {}
         self._config_save_timer = QTimer(self)
         self._config_save_timer.setSingleShot(True)
         self._config_save_timer.setInterval(160)
         self._config_save_timer.timeout.connect(self._flush_config_saves)
+        QApplication.instance().aboutToQuit.connect(self._flush_config_saves)
         for w, key in [
             (self.lock_enabled, "lock_enabled"),
             (self.lock_seconds, "lock_seconds"),
@@ -887,15 +895,31 @@ class SettingsPage(EditorPage):
 
     def _queue_config_save(self, key: str, value: object) -> None:
         self._pending_config_saves[key] = value
-        config.stage_many({key: value})
+        if key in config.ASYNC_SETTINGS_KEYS:
+            self._pending_config_generations.update(config.stage_settings_many(self._settings_account, {key: value}))
+        else:
+            # Master-confirmed grants retain their existing persistence path.
+            config.stage_many({key: value})
         self._config_save_timer.start()
 
+    @Slot()
     def _flush_config_saves(self) -> None:
         pending = self._pending_config_saves
         if not pending:
             return
         self._pending_config_saves = {}
-        config.set_many(pending)
+        generations, self._pending_config_generations = self._pending_config_generations, {}
+        ordinary = {key: value for key, value in pending.items() if key in config.ASYNC_SETTINGS_KEYS}
+        protected = {key: value for key, value in pending.items() if key not in config.ASYNC_SETTINGS_KEYS}
+        if ordinary:
+            self._preference_writer.submit(self._settings_account, ordinary, generations)
+        if protected:
+            config.set_many(protected)
+
+    @Slot(object, str)
+    def _on_config_save_failed(self, account, error: str) -> None:
+        if not self._settings_closed and account == self._settings_account:
+            self.statusMessage.emit(f"设置保存失败：{error}")
 
     def _on_require_master_toggled(self, checked: bool) -> None:
         if checked:
@@ -1079,6 +1103,13 @@ class SettingsPage(EditorPage):
         except ValueError as exc:
             widgets.message(self, i18n.tr("重命名失败"), str(exc), kind="error")
             return
+        self._settings_account = config.get_current_user() or None
+        # Rename already committed the latest ordinary overlay with its new
+        # namespace. Keep protected pending grants on their existing path.
+        for key in list(self._pending_config_saves):
+            if key in config.ASYNC_SETTINGS_KEYS:
+                self._pending_config_saves.pop(key, None)
+                self._pending_config_generations.pop(key, None)
         if hasattr(self, "_user_lbl"):
             self._user_lbl.setText(f"当前用户：{config.get_current_user() or ''}")
         self._window.reload()

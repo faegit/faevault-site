@@ -10,17 +10,14 @@ object BackgroundHidePref {
     val enabled: MutableState<Boolean> = mutableStateOf(false)
 
     fun init(context: Context) {
-        val prefs = SecurePreferences.get(context.applicationContext, vaultPrefName(PREF, CurrentVaultKey.current()))
-        enabled.value = prefs.getBoolean(KEY_HIDE, false)
+        val prefName = vaultPrefName(PREF, CurrentVaultKey.current())
+        enabled.value = PreferencePersistence.getBoolean(context, prefName, KEY_HIDE, false)
     }
 
     fun isEnabled(context: Context): Boolean = enabled.value
 
     fun setEnabled(context: Context, value: Boolean) {
         enabled.value = value
-        SecurePreferences.get(context.applicationContext, vaultPrefName(PREF, CurrentVaultKey.current()))
-            .edit()
-            .putBoolean(KEY_HIDE, value)
-            .apply()
+        PreferencePersistence.putBoolean(context, vaultPrefName(PREF, CurrentVaultKey.current()), KEY_HIDE, value)
     }
 }

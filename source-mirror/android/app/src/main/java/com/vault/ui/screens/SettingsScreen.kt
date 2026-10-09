@@ -217,7 +217,6 @@ import com.vault.security.BackgroundHidePref
 import com.vault.security.WindowSecurity
 import com.vault.security.LocalBackupPref
 import com.vault.security.IdleLockPref
-import com.vault.security.CloudCredentialStore
 import com.vault.storage.ClipboardTtlPref
 import com.vault.storage.AutoCloudSyncPrefs
 import com.vault.storage.AutoCloudSyncSettings
@@ -316,17 +315,12 @@ private data class LocalBackupUiSnapshot(
     val deviceLabel: String? = null,
 )
 
-private fun loadSettingsCloudSnapshot(ctx: Context, vaultId: String): SettingsCloudSnapshot {
+private fun loadSettingsCloudSnapshot(ctx: Context, vaultId: String, webDav: WebDavConfig?): SettingsCloudSnapshot {
     val p = com.vault.security.SecurePreferences.get(ctx, "cloud_sync")
     val suffix = java.security.MessageDigest.getInstance("SHA-256")
         .digest(vaultId.toByteArray()).take(12).joinToString("") { "%02x".format(it) }
     fun key(name: String) = "${name}_$suffix"
     val uri = p.getString(key("uri"), "").orEmpty()
-    val webDav = try {
-            CloudCredentialStore.load(ctx, vaultId, ByteArray(32))
-        } catch (_: Exception) {
-            null
-        }
     return SettingsCloudSnapshot(
         enabled = p.getBoolean(key("enabled"), false),
         provider = p.getString(key("provider"), "").orEmpty(),
@@ -440,7 +434,6 @@ fun SettingsScreen(
     var pendingImportCsvUri by remember { mutableStateOf<android.net.Uri?>(null) }
     var pendingExportArchiveUri by remember { mutableStateOf<android.net.Uri?>(null) }
     var passkeyModeMenuExpanded by remember { mutableStateOf(false) }
-    val cloudPrefs = remember { com.vault.security.SecurePreferences.get(ctx, "cloud_sync") }
     val cloudSuffix = remember(currentVault) {
         java.security.MessageDigest.getInstance("SHA-256").digest(vm.cloudVaultKey().toByteArray())
             .take(12).joinToString("") { "%02x".format(it) }
@@ -451,7 +444,7 @@ fun SettingsScreen(
     var cloudSnapshot by remember(currentVault) { mutableStateOf<SettingsCloudSnapshot?>(null) }
     LaunchedEffect(currentVault) {
         cloudSnapshot = withContext(Dispatchers.IO) {
-            loadSettingsCloudSnapshot(ctx, vm.cloudVaultKey())
+            loadSettingsCloudSnapshot(ctx, vm.cloudVaultKey(), vm.loadCloudConfig())
         }
     }
     var cloudEnabled by remember(currentVault) { mutableStateOf(false) }
@@ -491,7 +484,7 @@ fun SettingsScreen(
     fun applyAutoSyncEnabled(rawEnabled: Boolean, targetAvailable: Boolean) {
         autoSyncEnabled = rawEnabled && targetAvailable
         if (rawEnabled && !targetAvailable) {
-            AutoCloudSyncPrefs.save(ctx, vm.cloudVaultKey(), false, cloudProviderMode, autoSyncInterval)
+            vm.saveAutoCloudSyncSettings(false, cloudProviderMode, autoSyncInterval)
         }
     }
     // 后台快照到达后一次性写入云端相关状态。
@@ -558,7 +551,7 @@ fun SettingsScreen(
             if (cloudProviderMode == "drive") snapshot.diskUri.isNotBlank() else snapshot.webDav != null
         autoSyncEnabled = loaded.first && targetAvailable
         if (loaded.first && !targetAvailable) {
-            AutoCloudSyncPrefs.save(ctx, vm.cloudVaultKey(), false, cloudProviderMode, loaded.second)
+            vm.saveAutoCloudSyncSettings(false, cloudProviderMode, loaded.second)
         }
         autoSyncInterval = loaded.second
         autoNextRunBase = loaded.third.first
@@ -673,12 +666,11 @@ fun SettingsScreen(
 
     fun saveAutoSyncPrefs() {
         autoSyncTarget = cloudProviderMode
-        AutoCloudSyncPrefs.save(ctx, vm.cloudVaultKey(), autoSyncEnabled, autoSyncTarget, autoSyncInterval)
+        vm.saveAutoCloudSyncSettings(autoSyncEnabled, autoSyncTarget, autoSyncInterval)
     }
 
     fun saveAutoSyncSettings() {
         saveAutoSyncPrefs()
-        vm.refreshAutoCloudSyncSchedule()
     }
 
     fun releaseCloudAccess(fileUri: String, treeUri: String = "") {
@@ -690,6 +682,16 @@ fun SettingsScreen(
                 android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION or android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
             )
         }
+    }
+
+    fun persistCloudStrings(vararg values: Pair<String, String>) {
+        val captured = values.map { (name, value) -> cloudKey(name) to value }
+        vm.updateCloudSyncPreferences { captured.forEach { (key, value) -> putString(key, value) } }
+    }
+
+    fun removeCloudPreferences(vararg names: String) {
+        val keys = names.map { cloudKey(it) }
+        vm.updateCloudSyncPreferences { keys.forEach { remove(it) } }
     }
 
     fun persistCloudCheck(check: com.vault.storage.CloudFileCheck, updateBaseline: Boolean) {
@@ -710,12 +712,20 @@ fun SettingsScreen(
             cloudDiskModified = metadata.lastModified
             cloudDiskLogicalRevision = ""
         }
-        cloudPrefs.edit()
-            .putString(cloudKey("disk_status"), cloudDiskStatus)
-            .putLong(cloudKey("disk_size"), cloudDiskSize)
-            .putLong(cloudKey("disk_modified"), cloudDiskModified)
-            .putString(cloudKey("disk_logical_revision"), cloudDiskLogicalRevision)
-            .apply()
+        val statusKey = cloudKey("disk_status")
+        val sizeKey = cloudKey("disk_size")
+        val modifiedKey = cloudKey("disk_modified")
+        val revisionKey = cloudKey("disk_logical_revision")
+        val status = cloudDiskStatus
+        val size = cloudDiskSize
+        val modified = cloudDiskModified
+        val revision = cloudDiskLogicalRevision
+        vm.updateCloudSyncPreferences {
+            putString(statusKey, status)
+            putLong(sizeKey, size)
+            putLong(modifiedKey, modified)
+            putString(revisionKey, revision)
+        }
     }
 
     fun checkAssociatedCloudFile(updateBaseline: Boolean = false, onReady: (() -> Unit)? = null) {
@@ -730,7 +740,7 @@ fun SettingsScreen(
         ) { check ->
             if (check == null) {
                 cloudDiskStatus = "failed"
-                cloudPrefs.edit().putString(cloudKey("disk_status"), cloudDiskStatus).apply()
+                persistCloudStrings("disk_status" to cloudDiskStatus)
                 if (onReady != null) vm.postError(cloudAssociationReadError)
             } else {
                 persistCloudCheck(check, updateBaseline)
@@ -763,12 +773,12 @@ fun SettingsScreen(
         if (candidate.previousFileUri != candidate.newFileUri || candidate.previousTreeUri != candidate.newTreeUri) {
             cloudDiskLogicalRevision = ""
         }
-        cloudPrefs.edit()
-            .putString(cloudKey("uri"), candidate.newFileUri)
-            .putString(cloudKey("tree_uri"), candidate.newTreeUri)
-            .putString(cloudKey("disk_status"), "ok")
-            .putString(cloudKey("disk_logical_revision"), cloudDiskLogicalRevision)
-            .apply()
+        persistCloudStrings(
+            "uri" to candidate.newFileUri,
+            "tree_uri" to candidate.newTreeUri,
+            "disk_status" to "ok",
+            "disk_logical_revision" to cloudDiskLogicalRevision,
+        )
         if ((candidate.previousFileUri.isNotBlank() || candidate.previousTreeUri.isNotBlank()) &&
             (candidate.previousFileUri != candidate.newFileUri || candidate.previousTreeUri != candidate.newTreeUri)
         ) {
@@ -779,23 +789,20 @@ fun SettingsScreen(
 
     fun finishWebDavAssociation(config: WebDavConfig, success: Boolean) {
         if (!success) return
-        vm.saveCloudConfig(config)
-        webDavAssociated = true
-        webDavStatus = "ok"
-        cloudMode = "webdav"
-        cloudProvider = config.label
-        cloudPrefs.edit()
-            .putString(cloudKey("mode"), cloudMode)
-            .putString(cloudKey("provider"), cloudProvider)
-            .putString(cloudKey("webdav_status"), "ok")
-            .apply()
-        // 关联成功后立即识别远端文件并展示结果，避免“创建/连接成功但没有反馈”。
-        webDavPreview = VaultViewModel.CloudSyncPreview(
-            "checking",
-            "WebDAV",
-            message = "正在识别远端保险库文件…",
-        )
-        vm.previewWebDav { if (latestIsActive) webDavPreview = it }
+        vm.saveCloudConfigAsync(config) {
+            persistCloudStrings("mode" to "webdav", "provider" to config.label, "webdav_status" to "ok")
+            webDavAssociated = true
+            webDavStatus = "ok"
+            cloudMode = "webdav"
+            cloudProvider = config.label
+            // 关联成功后立即识别远端文件并展示结果，避免“创建/连接成功但没有反馈”。
+            webDavPreview = VaultViewModel.CloudSyncPreview(
+                "checking",
+                "WebDAV",
+                message = "正在识别远端保险库文件…",
+            )
+            if (latestIsActive) vm.previewWebDav { if (latestIsActive) webDavPreview = it }
+        }
     }
 
     fun handleCloudSelection(uri: android.net.Uri?, treeUri: String = "") {
@@ -983,10 +990,7 @@ fun SettingsScreen(
         if (cloudMode in setOf("google", "microsoft", "saf")) {
             cloudMode = ""
             cloudProvider = ""
-            cloudPrefs.edit()
-                .remove(cloudKey("mode"))
-                .remove(cloudKey("provider"))
-                .apply()
+            removeCloudPreferences("mode", "provider")
         }
     }
     // 云同步卡展开状态以稳定 ID 判断，避免语言切换时标题变化导致检查流程中断。
@@ -1001,6 +1005,7 @@ fun SettingsScreen(
         cloudDiskUri,
         cloudDiskTreeUri,
         webDavAssociated,
+        cloudProviderMode,
     ) {
         if (!isActive || contentMode != SettingsContentMode.TRANSFER || !cloudEnabled || !cloudSyncCardExpanded) {
             return@LaunchedEffect
@@ -1013,25 +1018,24 @@ fun SettingsScreen(
                 vm.previewWebDav { if (latestIsActive) webDavPreview = it }
             } else webDavPreview = null
         }
-        if (cloudDiskUri.isNotBlank()) {
+        if (cloudProviderMode == "webdav") {
+            inspectWebDav()
+        } else if (cloudDiskUri.isNotBlank()) {
             if (cloudDiskTreeUri.isNotBlank()) checkAssociatedCloudFile()
             val uri = android.net.Uri.parse(cloudDiskUri)
             val cached = vm.cachedCloudVaultPreview(uri)
             if (cached != null) {
                 cloudDiskPreview = cached
-                inspectWebDav()
             } else {
                 cloudDiskPreview = VaultViewModel.CloudSyncPreview("checking", "云端硬盘", message = localizeUiTextFor(ctx, "正在检测远端数据…"))
                 vm.previewCloudVault(uri) {
                     if (latestIsActive) {
                         cloudDiskPreview = it
-                        inspectWebDav()
                     }
                 }
             }
         } else {
             cloudDiskPreview = null
-            inspectWebDav()
         }
     }
     // 轮询只读取当前模式（云端硬盘/WebDAV）的独立自动同步设置，
@@ -1060,7 +1064,7 @@ fun SettingsScreen(
                         }
                     } else {
                         cloudDiskStatus = if (success) "ok" else "failed"
-                        cloudPrefs.edit().putString(cloudKey("disk_status"), cloudDiskStatus).apply()
+                        persistCloudStrings("disk_status" to cloudDiskStatus)
                         if (success) vm.previewCloudVault(android.net.Uri.parse(cloudDiskUri), force = true) { cloudDiskPreview = it }
                     }
                 }
@@ -1069,7 +1073,7 @@ fun SettingsScreen(
             vm.syncWebDav { success ->
                 if (success) vm.previewWebDav(force = true) { webDavPreview = it }
                 webDavStatus = if (success) "ok" else "failed"
-                cloudPrefs.edit().putString(cloudKey("webdav_status"), webDavStatus).apply()
+                persistCloudStrings("webdav_status" to webDavStatus)
             }
         }
     }
@@ -2202,8 +2206,7 @@ fun SettingsScreen(
                                 }
                             } else {
                                 cloudEnabled = false
-                                cloudPrefs.edit().putBoolean(cloudKey("enabled"), false).apply()
-                                vm.checkRemoteUpdates()
+                                vm.setCloudSyncEnabled(false)
                             }
                         },
                     )
@@ -2324,7 +2327,7 @@ fun SettingsScreen(
                                                 if (success && cloudDiskTreeUri.isNotBlank()) checkAssociatedCloudFile(updateBaseline = true)
                                                 else {
                                                     cloudDiskStatus = if (success) "ok" else "failed"
-                                                    cloudPrefs.edit().putString(cloudKey("disk_status"), cloudDiskStatus).apply()
+                                                    persistCloudStrings("disk_status" to cloudDiskStatus)
                                                 }
                                                 if (success) vm.previewCloudVault(android.net.Uri.parse(cloudDiskUri), force = true) { cloudDiskPreview = it }
                                             }
@@ -2337,7 +2340,7 @@ fun SettingsScreen(
                                         checkAssociatedCloudFile {
                                             vm.downloadOverwriteCloudVault(android.net.Uri.parse(cloudDiskUri)) { success ->
                                                 cloudDiskStatus = if (success) "ok" else "failed"
-                                                cloudPrefs.edit().putString(cloudKey("disk_status"), cloudDiskStatus).apply()
+                                                persistCloudStrings("disk_status" to cloudDiskStatus)
                                                 if (success) vm.previewCloudVault(android.net.Uri.parse(cloudDiskUri), force = true) { cloudDiskPreview = it }
                                             }
                                         }
@@ -2361,14 +2364,7 @@ fun SettingsScreen(
                                             cloudDiskModified = 0L
                                             cloudDiskLogicalRevision = ""
                                             cloudDiskPreview = null
-                                            cloudPrefs.edit()
-                                                .remove(cloudKey("uri"))
-                                                .remove(cloudKey("tree_uri"))
-                                                .remove(cloudKey("disk_status"))
-                                                .remove(cloudKey("disk_size"))
-                                                .remove(cloudKey("disk_modified"))
-                                                .remove(cloudKey("disk_logical_revision"))
-                                                .apply()
+                                            removeCloudPreferences("uri", "tree_uri", "disk_status", "disk_size", "disk_modified", "disk_logical_revision")
                                         }
                                     }
                                 }, enabled = !state.cloudSyncRunning) { Text(uiText("取消关联")) }
@@ -2432,7 +2428,7 @@ fun SettingsScreen(
                                     pendingCloudOverwrite = "WebDAV" to {
                                         vm.overwriteWebDav { success ->
                                             webDavStatus = if (success) "ok" else "failed"
-                                            cloudPrefs.edit().putString(cloudKey("webdav_status"), webDavStatus).apply()
+                                            persistCloudStrings("webdav_status" to webDavStatus)
                                             if (success) {
                                                 webDavPreview = VaultViewModel.CloudSyncPreview(
                                                     "same",
@@ -2448,7 +2444,7 @@ fun SettingsScreen(
                                     pendingDownloadOverwrite = PendingDownloadOverwrite("WebDAV", action = {
                                         vm.downloadOverwriteWebDav { success ->
                                             webDavStatus = if (success) "ok" else "failed"
-                                            cloudPrefs.edit().putString(cloudKey("webdav_status"), webDavStatus).apply()
+                                            persistCloudStrings("webdav_status" to webDavStatus)
                                             if (success) {
                                                 webDavPreview = VaultViewModel.CloudSyncPreview(
                                                     "same",
@@ -2469,13 +2465,14 @@ fun SettingsScreen(
                                 SettingsOutlinedButton(onClick = {
                                     guard(localizeUiTextFor(ctx, "取消 WebDAV 关联需要验证当前主密码。")) {
                                         pendingAssociationCancel = "WebDAV" to {
-                                            vm.clearCloudConfig()
-                                            webDavAssociated = false
-                                            webDavStatus = ""
-                                            webDavPreview = null
-                                            cloudMode = ""
-                                            cloudProvider = ""
-                                            cloudPrefs.edit().remove(cloudKey("mode")).remove(cloudKey("provider")).remove(cloudKey("webdav_status")).apply()
+                                            vm.clearCloudConfigAsync {
+                                                removeCloudPreferences("mode", "provider", "webdav_status")
+                                                webDavAssociated = false
+                                                webDavStatus = ""
+                                                webDavPreview = null
+                                                cloudMode = ""
+                                                cloudProvider = ""
+                                            }
                                         }
                                     }
                                 }, enabled = !state.cloudSyncRunning) { Text(uiText("取消关联")) }
@@ -2900,7 +2897,7 @@ if (showCloudEnableAcknowledgement) {
         onConfirm = {
             showCloudEnableAcknowledgement = false
             cloudEnabled = true
-            cloudPrefs.edit().putBoolean(cloudKey("enabled"), true).apply()
+            vm.setCloudSyncEnabled(true)
         },
         dismissText = stringResource(R.string.settings_remaining_cancel),
     )
@@ -3754,6 +3751,20 @@ fun SecurityCenterScreen(
 }
 
 @Composable
+private fun SecurityOverviewPercentage(
+    report: PasswordHealthReport,
+    scanning: Boolean,
+    progress: androidx.compose.runtime.State<Float>,
+) {
+    Text(
+        if (scanning) "${(progress.value * 100).toInt()}%"
+        else if (report.total > 0) "${(report.healthy.size * 100 / report.total)}%" else "--",
+        style = MaterialTheme.typography.headlineMedium,
+        fontWeight = FontWeight.Bold,
+    )
+}
+
+@Composable
 private fun SecurityOverviewDonut(
     report: PasswordHealthReport,
     scanning: Boolean,
@@ -3765,7 +3776,8 @@ private fun SecurityOverviewDonut(
     val high by animateFloatAsState(report.highRisk.size.toFloat() / total, label = "security-high")
     val improvement by animateFloatAsState(report.improvement.size.toFloat() / total, label = "security-improvement")
     val healthy by animateFloatAsState(report.healthy.size.toFloat() / total, label = "security-healthy")
-    val animatedProgress by animateFloatAsState(scanProgress.coerceIn(0f, 1f), label = "security-scan-progress")
+    val progressState = animateFloatAsState(scanProgress.coerceIn(0f, 1f), label = "security-scan-progress")
+    val animatedProgress by progressState
     val reveal = remember { Animatable(1f) }
     var pressedSegment by remember { mutableStateOf<String?>(null) }
     val highExpansion by animateFloatAsState(
@@ -3789,7 +3801,7 @@ private fun SecurityOverviewDonut(
     }
     val rotation = if (scanning) {
         val transition = androidx.compose.animation.core.rememberInfiniteTransition(label = "security-scan")
-        val animatedRotation by transition.animateFloat(
+        transition.animateFloat(
             initialValue = 0f,
             targetValue = 360f,
             animationSpec = androidx.compose.animation.core.infiniteRepeatable(
@@ -3797,9 +3809,8 @@ private fun SecurityOverviewDonut(
             ),
             label = "security-scan-rotation",
         )
-        animatedRotation
     } else {
-        0f
+        null
     }
     Column(
         modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
@@ -3813,7 +3824,7 @@ private fun SecurityOverviewDonut(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(196.dp)
-                    .pointerInput(high, improvement, healthy) {
+                    .pointerInput(onSelect) {
                         fun segmentAt(offset: Offset): String? {
                             val center = size.width / 2f
                             val dx = offset.x - center
@@ -3899,7 +3910,7 @@ private fun SecurityOverviewDonut(
                         )
                         drawArc(
                             scanColor,
-                            rotation - 90f,
+                            (rotation?.value ?: 0f) - 90f,
                             68f,
                             false,
                             topLeft = ringOffset,
@@ -3909,12 +3920,7 @@ private fun SecurityOverviewDonut(
                     }
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        if (scanning) "${(animatedProgress * 100).toInt()}%"
-                        else if (report.total > 0) "${(report.healthy.size * 100 / report.total)}%" else "--",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                    )
+                    SecurityOverviewPercentage(report, scanning, progressState)
                     Text(
                         uiText(if (scanning) "正在扫描" else "密码安全性"),
                         style = MaterialTheme.typography.labelLarge,
@@ -6149,7 +6155,7 @@ private fun LanModeSlider(
         ) {
             Box(
                 modifier = Modifier
-                    .offset(x = thumbOffset)
+                    .offset { androidx.compose.ui.unit.IntOffset(thumbOffset.roundToPx(), 0) }
                     .width(segmentWidth)
                     .fillMaxHeight()
                     .padding(4.dp)

@@ -74,7 +74,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -457,7 +457,7 @@ fun EntryDetailScreen(
                                 )
                                 VaultActionButton(
                                     onClick = { showWifiQr = true },
-                                    modifier = Modifier.scale(qrScale).fillMaxWidth().padding(vertical = 8.dp),
+                                    modifier = Modifier.graphicsLayer { scaleX = qrScale; scaleY = qrScale }.fillMaxWidth().padding(vertical = 8.dp),
                                     interactionSource = qrInteractionSource,
                                 ) {
                                     Icon(Icons.Default.QrCode2, null)
@@ -1493,7 +1493,7 @@ private fun GuardedImageCard(
     )
     Box(
         modifier = Modifier
-            .scale(imgScale)
+            .graphicsLayer { scaleX = imgScale; scaleY = imgScale }
             .size(220.dp, 160.dp)
             .clip(VaultShape)
             .background(MaterialTheme.colorScheme.surfaceVariant)

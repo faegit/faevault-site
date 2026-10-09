@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.IntOffset
 
 /** 胶囊分段控件的一段。 */
 data class CapsuleOption(val label: String)
@@ -75,7 +76,7 @@ fun CapsuleSegmentedControl(
         ) {
             Box(
                 modifier = Modifier
-                    .offset(x = thumbOffset)
+                    .offset { IntOffset(thumbOffset.roundToPx(), 0) }
                     .width(segmentWidth)
                     .fillMaxHeight()
                     .padding(4.dp)

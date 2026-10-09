@@ -15,13 +15,12 @@ object PhotoBlurPref {
     val enabled: MutableState<Boolean> = mutableStateOf(DEFAULT_ENABLED)
 
     fun init(context: Context) {
-        val p = SecurePreferences.get(context.applicationContext, vaultPrefName(PREF, CurrentVaultKey.current()))
-        enabled.value = p.getBoolean(KEY_ENABLED, DEFAULT_ENABLED)
+        val prefName = vaultPrefName(PREF, CurrentVaultKey.current())
+        enabled.value = PreferencePersistence.getBoolean(context, prefName, KEY_ENABLED, DEFAULT_ENABLED)
     }
 
     fun setEnabled(context: Context, v: Boolean) {
         enabled.value = v
-        SecurePreferences.get(context.applicationContext, vaultPrefName(PREF, CurrentVaultKey.current()))
-            .edit().putBoolean(KEY_ENABLED, v).apply()
+        PreferencePersistence.putBoolean(context, vaultPrefName(PREF, CurrentVaultKey.current()), KEY_ENABLED, v)
     }
 }

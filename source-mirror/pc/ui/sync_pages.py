@@ -36,6 +36,7 @@ from core import log as _log_mod
 from . import i18n, widgets
 from .cloud_sync_controller import CloudSyncController
 from .cloud_sync_page import CloudSyncPage
+from .cloud_preferences import cloud_preference_writer
 from .dialogs import _NoScrollComboBox, _NoScrollSlider
 from .editor_workspace import EditorPage, page_shell
 from .lan_panels import LanSyncStatusPanel, LanTransferPanel
@@ -113,6 +114,9 @@ class CloudSyncWorkspacePage(EditorPage):
         self._busy_targets: set[str] = set()
         self._subscriptions = []
         self._view_detached = False
+        self._preference_writer = cloud_preference_writer()
+        self._subscribe(self._preference_writer.failed,
+                        lambda error: self.statusMessage.emit(f"自动同步设置保存失败：{error}"))
         self._build_cloud_ui()
         from core import remote_update
         import datetime
@@ -190,6 +194,7 @@ class CloudSyncWorkspacePage(EditorPage):
         return True
 
     def close_page(self, reason: str) -> None:
+        self._preference_writer.flush()
         self._detach_view()
         if reason != "user" or self.controller.parent() is self:
             self.controller.cancel_active_operations()
@@ -378,10 +383,13 @@ class CloudSyncWorkspacePage(EditorPage):
             def save(en: bool | None = None, interval: int | None = None):
                 en = toggle.isChecked() if en is None else en
                 interval = _AUTO_SYNC_INTERVALS[slider.value()] if interval is None else interval
-                config.set(self._window._auto_sync_target_pref_key("enabled", target_name), en)
-                config.set(self._window._auto_sync_target_pref_key("interval", target_name), interval)
+                values = {
+                    self._window._auto_sync_target_pref_key("enabled", target_name): en,
+                    self._window._auto_sync_target_pref_key("interval", target_name): interval,
+                }
                 if en and not float(config.get(self._window._auto_sync_target_pref_key("enabled_at", target_name), 0.0) or 0.0):
-                    config.set(self._window._auto_sync_target_pref_key("enabled_at", target_name), time.time())
+                    values[self._window._auto_sync_target_pref_key("enabled_at", target_name)] = time.time()
+                self._preference_writer.stage(values)
                 st = _status_text()
                 last_success = float(config.get(self._window._auto_sync_target_pref_key("last_success", target_name), 0.0) or 0.0)
                 if en:
@@ -452,17 +460,21 @@ class CloudSyncWorkspacePage(EditorPage):
             if not health:
                 return
             label.setText("● " + connected_text)
-            label.setProperty("state", "ok" if health == "ok" else "failed")
-            label.style().unpolish(label)
-            label.style().polish(label)
+            state = "ok" if health == "ok" else "failed"
+            if label.property("state") != state:
+                label.setProperty("state", state)
+                label.style().unpolish(label)
+                label.style().polish(label)
 
         last_form_config = [self.controller.webdav_config]
 
         def set_phase(label: QLabel, target: str) -> None:
             label.setText("● " + str(self.controller.status_text(target)))
-            label.setProperty("state", str(self.controller.status_state(target)))
-            label.style().unpolish(label)
-            label.style().polish(label)
+            state = str(self.controller.status_state(target))
+            if label.property("state") != state:
+                label.setProperty("state", state)
+                label.style().unpolish(label)
+                label.style().polish(label)
 
         def set_progress(bar: QProgressBar, target: str, busy: bool) -> None:
             bar.setVisible(busy)

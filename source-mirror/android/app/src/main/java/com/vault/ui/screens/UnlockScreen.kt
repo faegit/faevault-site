@@ -178,6 +178,12 @@ fun UnlockScreen(vm: VaultViewModel) {
     val showUnlockOverlay = state.busy || completed
     val blurAlpha by animateFloatAsState(if (busy) 1f else 0f, tween(220), label = "unlockBlur")
     val overlayAlpha by animateFloatAsState(if (showUnlockOverlay) 1f else 0f, tween(220), label = "unlockOverlay")
+    val blurVisible by remember {
+        androidx.compose.runtime.derivedStateOf(androidx.compose.runtime.structuralEqualityPolicy()) { blurAlpha > 0f }
+    }
+    val overlayVisible by remember {
+        androidx.compose.runtime.derivedStateOf(androidx.compose.runtime.structuralEqualityPolicy()) { overlayAlpha > 0f }
+    }
 
     val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) {
         if (it != null) vm.validateImportFile(it) { pendingImportUri = it }
@@ -409,12 +415,12 @@ fun UnlockScreen(vm: VaultViewModel) {
         }
         }
 
-        if (busy || blurAlpha > 0f) {
+        if (busy || blurVisible) {
             Box(Modifier.fillMaxSize().graphicsLayer { alpha = blurAlpha }
                 .vaultBackdrop(shape = androidx.compose.ui.graphics.RectangleShape,
                     baseColor = MaterialTheme.colorScheme.background, state = unlockBackground))
         }
-        if (showUnlockOverlay || overlayAlpha > 0f) {
+        if (showUnlockOverlay || overlayVisible) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
