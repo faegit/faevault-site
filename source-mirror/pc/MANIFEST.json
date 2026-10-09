@@ -4,7 +4,7 @@
   "license": "Apache-2.0",
   "platform": "pc",
   "version": "4.6.8",
-  "source_commit": "d66437c069f4f1cc1dade8e17f173d9183c4b402",
+  "source_commit": "f7e22f15909daaac5337f231df0c4092ac0f6c40",
   "working_tree_snapshot": true,
   "files": [
     {
@@ -1280,6 +1280,12 @@
       "kind": "source"
     },
     {
+      "path": "tests/test_backup_password_retry.py",
+      "bytes": 3769,
+      "sha256": "8da0ba60a59c2c1c51a864cf3aebcfe5d072f291e3154f09878b10c02d25848e",
+      "kind": "source"
+    },
+    {
       "path": "tests/test_backup_v2_vectors.py",
       "bytes": 3289,
       "sha256": "f26f756d861347acb14eb817bce90df0c78873835dafbd3b95d9461a6d2e87b7",
@@ -1935,8 +1941,8 @@
     },
     {
       "path": "ui/app.py",
-      "bytes": 262351,
-      "sha256": "1ef734df3498810b1037a57cbb1e2d50477e93ae227677dd5766f453c9fbd824",
+      "bytes": 261415,
+      "sha256": "3fa57d2b23025e18580e240c3366fd54d8721b1bb12b882e8cf978193264b338",
       "kind": "source"
     },
     {
@@ -1971,8 +1977,8 @@
     },
     {
       "path": "ui/dialogs.py",
-      "bytes": 245018,
-      "sha256": "4e6640a41abc34e5a1c4451f5ed582aa6aef1715c78bbe5cae87a5c77985a934",
+      "bytes": 249734,
+      "sha256": "49c50404cb11047170cedcda81a79dfa0d4376245051e723fb8534b70f7cdcc7",
       "kind": "source"
     },
     {
@@ -2007,8 +2013,8 @@
     },
     {
       "path": "ui/i18n.py",
-      "bytes": 79100,
-      "sha256": "69fb6b683014e083d4bceebaa1c017758f66ee110f3795d5321e72ec47709f22",
+      "bytes": 79878,
+      "sha256": "4482033ee4ba4d7f59f82e882c36c81373d4fa5ca89e6b39d65eb1aa16370d10",
       "kind": "source"
     },
     {

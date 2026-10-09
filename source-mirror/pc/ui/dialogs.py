@@ -86,6 +86,7 @@ QStackedWidget,
 )
 
 from core import (
+    backup,
     biometric,
     browser_install,
     config,
@@ -5229,13 +5230,58 @@ class AccountRenameDialog(HintMixin, widgets.ShadowDialog):
         super().accept()
 
 
+def _discard_backup_payload(payload):
+    for entry in payload.entries:
+        for name in ("title", "username", "password", "url", "notes", "target_app", "_haystack", "_title_lower"):
+            setattr(entry, name, "")
+        entry.fields.clear()
+        entry.tags.clear()
+        release = getattr(entry, "release_sensitive", None)
+        if callable(release):
+            release()
+    payload.entries.clear()
+    payload.autofill_exclusions.clear()
+    payload.purge_tombstones.clear()
+
+
+class _BackupDecryptWorker(QThread):
+    succeeded = Signal(object)
+    failed = Signal(str, str)
+
+    def __init__(self, path, password):
+        super().__init__(QApplication.instance())
+        self._path = path
+        self._password = bytearray(password.encode("utf-8"))
+
+    def run(self):
+        try:
+            payload = backup.import_encrypted_with_meta(self._path, self._password.decode("utf-8"))
+            if self.isInterruptionRequested():
+                _discard_backup_payload(payload)
+            else:
+                self.succeeded.emit(payload)
+        except crypto.DecryptError:
+            if not self.isInterruptionRequested():
+                self.failed.emit("decrypt", "")
+        except Exception as error:
+            if not self.isInterruptionRequested():
+                self.failed.emit("error", str(error))
+        finally:
+            self._password[:] = b"\0" * len(self._password)
+
+
 class BackupPasswordDialog(widgets.ShadowDialog):
     """导出/导入加密备份时输入独立的备份密码。"""
 
-    def __init__(self, mode: str, parent=None):
+    def __init__(self, mode: str, parent=None, *, requires_strong_password=False, import_path=None):
         assert mode in ("export", "import")
         super().__init__("导出加密备份" if mode == "export" else "导入加密备份", parent, width=380)
         self.mode = mode
+        self._requires_strong_password = requires_strong_password
+        self._import_path = import_path
+        self._worker = None
+        self._closed = False
+        self.payload = None
         self.password = ""
 
         title = widgets.icon_text(
@@ -5267,23 +5313,101 @@ class BackupPasswordDialog(widgets.ShadowDialog):
             self.body.addWidget(self.pw2)
 
         ok_text = "导出" if mode == "export" else "导入"
-        self.body.addLayout(_confirm_bar(self, ok_text=ok_text, align="right", auto_default=False))
+        self.hint = QLabel()
+        self.hint.setObjectName("FieldError")
+        self.hint.setWordWrap(True)
+        self.hint.hide()
+        self.body.addWidget(self.hint)
+        self.pw.textEdited.connect(lambda: self.hint.hide())
+        self.pw2.textEdited.connect(lambda: self.hint.hide())
+        self.btn = _BusyButton(ok_text)
+        self.btn.setObjectName("Primary")
+        self.btn.setAutoDefault(False)
+        self.btn.clicked.connect(self.accept)
+        bar = QHBoxLayout()
+        bar.addStretch()
+        cancel = QPushButton("取消")
+        cancel.setAutoDefault(False)
+        cancel.clicked.connect(self.reject)
+        bar.addWidget(cancel)
+        bar.addWidget(self.btn)
+        self.body.addLayout(bar)
         self.pw.setFocus()
 
+    def _warn(self, text, field=None):
+        self.hint.setText(i18n.tr(text))
+        self.hint.show()
+        field = field or self.pw
+        field.setFocus()
+        field.selectAll()
+
     def accept(self) -> None:
+        if self._closed or self._worker is not None:
+            return
         pw = self.pw.text()
         if not pw:
-            widgets.message(self, "提示", "备份密码不能为空", kind="warn")
+            self._warn("备份密码不能为空")
             return
         if self.mode == "export":
             if len(pw) < 4:
-                widgets.message(self, "提示", "备份密码至少 4 位", kind="warn")
+                self._warn("备份密码至少 4 位")
                 return
             if pw != self.pw2.text():
-                widgets.message(self, "提示", "两次输入的备份密码不一致", kind="warn")
+                self._warn("两次输入的备份密码不一致", self.pw2)
                 return
+            if self._requires_strong_password and not backup.is_strong_passphrase(pw):
+                self._warn("备份包含可同步 Passkey，口令至少需要 14 位，并包含大小写字母、数字、符号中的至少三类。")
+                return
+        if self.mode == "import" and self._import_path is not None:
+            worker = _BackupDecryptWorker(self._import_path, pw)
+            self._worker = worker
+            self.pw.setEnabled(False)
+            self.btn.setEnabled(False)
+            self.btn.start_busy(i18n.tr("正在验证…"))
+            worker.succeeded.connect(self._verified)
+            worker.failed.connect(self._verification_failed)
+            worker.finished.connect(worker.deleteLater)
+            worker.start()
+            return
         self.password = pw
         super().accept()
+
+    def _finish_verification(self):
+        self._worker = None
+        self.btn.stop_busy()
+        self.btn.setEnabled(True)
+        self.pw.setEnabled(True)
+
+    def _verified(self, payload):
+        if self._closed:
+            _discard_backup_payload(payload)
+            return
+        self._finish_verification()
+        self.payload = payload
+        self.pw.clear()
+        super().accept()
+
+    def _verification_failed(self, kind, message):
+        if self._closed:
+            return
+        self._finish_verification()
+        self.pw.clear()
+        if kind == "decrypt":
+            self._warn("备份密码错误或文件已损坏。")
+        else:
+            self._warn(i18n.tr("导入失败") + ": " + message)
+
+    def reject(self):
+        self._closed = True
+        if self._worker is not None:
+            self._worker.requestInterruption()
+        if self.payload is not None:
+            _discard_backup_payload(self.payload)
+            self.payload = None
+        self.password = ""
+        self.pw.clear()
+        self.pw2.clear()
+        super().reject()
 
 
 class ArchivePasswordDialog(widgets.ShadowDialog):
@@ -5320,19 +5444,33 @@ class ArchivePasswordDialog(widgets.ShadowDialog):
         self.pw2.returnPressed.connect(self.accept)
         self.body.addWidget(self.pw2)
 
+        self.hint = QLabel()
+        self.hint.setObjectName("FieldError")
+        self.hint.setWordWrap(True)
+        self.hint.hide()
+        self.body.addWidget(self.hint)
+        self.pw.textEdited.connect(lambda: self.hint.hide())
+        self.pw2.textEdited.connect(lambda: self.hint.hide())
         self.body.addLayout(_confirm_bar(self, ok_text="导出", align="right", auto_default=False))
         self.pw.setFocus()
+
+    def _warn(self, text, field=None):
+        self.hint.setText(i18n.tr(text))
+        self.hint.show()
+        field = field or self.pw
+        field.setFocus()
+        field.selectAll()
 
     def accept(self) -> None:
         pw = self.pw.text()
         if not pw:
-            widgets.message(self, "提示", "导出口令不能为空", kind="warn")
+            self._warn("导出口令不能为空")
             return
         if len(pw) < 4:
-            widgets.message(self, "提示", "导出口令至少 4 位", kind="warn")
+            self._warn("导出口令至少 4 位")
             return
         if pw != self.pw2.text():
-            widgets.message(self, "提示", "两次输入的导出口令不一致", kind="warn")
+            self._warn("两次输入的导出口令不一致", self.pw2)
             return
         self.password = pw
         super().accept()

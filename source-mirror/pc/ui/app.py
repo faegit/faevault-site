@@ -5298,16 +5298,9 @@ class MainWindow(widgets.FramelessMain):
         if not _confirm_master_password(self.vault, "导出加密备份", "导出加密备份需要验证当前主密码。", self, session_required=True):
             return
         entries = list(self.vault.entries) + list(self.vault.trash)
-        dlg = BackupPasswordDialog("export", self)
+        dlg = BackupPasswordDialog("export", self,
+                                   requires_strong_password=backup.contains_syncable_passkeys(entries))
         if not dlg.exec():
-            return
-        if backup.contains_syncable_passkeys(entries) and not backup.is_strong_passphrase(dlg.password):
-            widgets.message(
-                self,
-                "提示",
-                "备份包含可同步 Passkey，口令至少需要 14 位，并包含大小写字母、数字、符号中的至少三类。",
-                kind="warn",
-            )
             return
         path, _ = QFileDialog.getSaveFileName(
             self,
@@ -5687,24 +5680,10 @@ class MainWindow(widgets.FramelessMain):
         )
         if not path:
             return
-        dlg = BackupPasswordDialog("import", self)
+        dlg = BackupPasswordDialog("import", self, import_path=path)
         if not dlg.exec():
             return
-        try:
-            payload = backup.import_encrypted_with_meta(path, dlg.password)
-        except crypto.DecryptError:
-            _log.warning("加密备份导入失败：密码错误或文件损坏 %s", path)
-            widgets.message(self, "导入失败", "备份密码错误或文件已损坏。", kind="error")
-            return
-        except ValueError as exc:
-            _log.warning("加密备份导入失败：Passkey 元数据无效 %s", path)
-            widgets.message(
-                self,
-                "导入失败",
-                f"备份中的 Passkey 元数据无效：{exc}",
-                kind="error",
-            )
-            return
+        payload = dlg.payload
         _log.info("加密备份导入：解密 %d 条，来自 %s", len(payload.entries), path)
         if not self._lineage_allows_merge(payload.device_id, "加密备份"):
             self._flash("已取消导入，本地数据未改动")
