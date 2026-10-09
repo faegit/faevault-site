@@ -12,6 +12,16 @@ Only records features and fixes for the FAEVault desktop client. Android client 
 
 ---
 
+## 4.6.8 - 2026-10-09
+
+### Improved and fixed
+- Cloud sync switches and interval sliders update immediately, coalesce rapid changes and persist encrypted preferences in the background to reduce interaction and animation stalls.
+- Batch ordinary appearance, language, idle-lock, clipboard and reveal-time settings in the background; closing a page hands off pending saves.
+- Avoid redundant sync-status style updates while retaining the existing layout and motion.
+- Prevent stale completions from overwriting newer settings during rapid toggles, account switching and renaming.
+
+---
+
 ## 4.6.7 - 2026-10-07
 
 ### Added and improved
