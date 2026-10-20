@@ -12,6 +12,29 @@ This changelog records features and fixes for the FAEVault Android client only. 
 
 ---
 
+## 4.6.9 - 2026-10-20
+
+### Security hardening
+- Screen capture consent lasts for the unlocked session and is revoked on lock, vault switch or restart; protect paused UI and Android 13+ recent-task previews.
+- Route pairing URLs through sensitive clipboard cleanup and explain system/keyboard history limits.
+- Isolate autofill fields by origin and require confirmation for multi-origin forms.
+- Constrain remote browser trust to signing identities bundled in the app.
+- Require an authenticated Keystore CryptoObject for explicit Passkey verification; explain permanently invalidated device keys and handle cancellation quietly.
+- Authenticate and encrypt WebDAV routing and credentials together, migrate legacy settings, and validate download and redirect targets.
+- Bound update and breach-check responses and redact entry logging.
+
+### Media and attachments
+- Write selected images and attachments straight into the encrypted vault instead of copying them into cache and migrating on save; media added while editing is tracked in a pending list, released after the entry is saved, cleared immediately when editing is cancelled, and stale sessions older than 7 days are pruned on the next import.
+- Stream content of unknown length directly into the vault, so large files need no up-front size check or extra disk space.
+- Show a blocking import dialog with byte progress: keep the app in the foreground, do not close it, and do not delete or move the source files; large files also warn about the wait. The dialog keeps the screen on and blocks the back gesture.
+- Preserve both local and remote pending media lists when merging diverged vaults so attachments being edited are not reclaimed by sync.
+
+### Improved and fixed
+- Add a Background lock setting: lock immediately (default), or after 15 seconds, 30 seconds, 1 minute or 2 minutes. The UI stays hidden during the grace period, the deadline is re-checked on return using the monotonic clock, and a reclaimed process locks immediately because the key disappears with memory.
+- Narrow the popup entry rise from 48dp to 16dp and fade the elevation shadow in only after the card lands, fixing the right-angled shadow rectangle produced by the dialog window clipping and by shadow rendering from a translucent layer's bounds.
+
+---
+
 ## 4.6.8 - 2026-10-09
 
 ### Improved and fixed
