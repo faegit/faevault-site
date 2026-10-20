@@ -12,6 +12,11 @@ This changelog records features and fixes for the FAEVault Android client only. 
 
 ---
 
+## Unreleased - 2026-10-20
+
+### Improved and fixed
+- The update dialog can now be closed while downloading, verifying or preparing the install. The task continues in the background, the foreground-service notification stays visible with progress, and reopening About shows the dialog again.
+
 ## 4.6.9 - 2026-10-20
 
 ### Security hardening
