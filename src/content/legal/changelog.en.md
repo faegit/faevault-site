@@ -16,6 +16,9 @@ This changelog records features and fixes for the FAEVault Android client only. 
 
 ### Improved and fixed
 - The update dialog can now be closed while downloading, verifying or preparing the install. The task continues in the background, the foreground-service notification stays visible with progress, and reopening About shows the dialog again.
+- Fix upward drag-to-reorder on the home category grid repeatedly jumping: auto-scroll no longer attaches and detaches the placement animation every frame, and the other cards use a shorter transition into their new positions.
+- Start the popup shadow about 40 ms after the card and reach full strength when the card settles, keeping a subtle sense of depth without a noticeable lag.
+- Change the Background lock presets to immediately, 5 seconds, 15 seconds, 30 seconds and 1 minute; a legacy 2-minute value migrates to the nearest 1-minute preset.
 
 ## 4.6.9 - 2026-10-20
 
