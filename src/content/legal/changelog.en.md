@@ -12,9 +12,11 @@ This changelog records features and fixes for the FAEVault Android client only. 
 
 ---
 
-## Unreleased - 2026-10-20
+## 4.6.10 - 2026-10-23
 
 ### Improved and fixed
+- Move the screen-capture session note into the Allow screenshots help tooltip and remove the inline note below the switch to reduce settings-page visual noise.
+- Unify search fields across settings, security lists and pickers, lock the bottom navigation order, reuse the maintenance/security header icons, and keep bottom sheets anchored while expanding to the status bar when the keyboard opens.
 - The update dialog can now be closed while downloading, verifying or preparing the install. The task continues in the background, the foreground-service notification stays visible with progress, and reopening About shows the dialog again.
 - Fix upward drag-to-reorder on the home category grid repeatedly jumping: auto-scroll no longer attaches and detaches the placement animation every frame, and the other cards use a shorter transition into their new positions.
 - Start the popup shadow about 40 ms after the card and reach full strength when the card settles, keeping a subtle sense of depth without a noticeable lag.
