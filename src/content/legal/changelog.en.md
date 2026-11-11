@@ -12,6 +12,17 @@ This changelog records features and fixes for the FAEVault Android client only. 
 
 ---
 
+## 4.6.11 - 2026-11-11
+
+### Features and fixes
+- Add global entry search on the home screen and focus its input when search opens.
+- Allow home categories to be archived while arranging them and restored from the hidden categories view.
+- Improve browser autofill suggestions during keyboard transitions.
+- Use circular selection controls throughout, including touch feedback and hidden category selection.
+- Refine card expansion, dialogs, and scrolling to reduce jumps and extra bounce.
+
+---
+
 ## 4.6.10 - 2026-10-23
 
 ### Improved and fixed
