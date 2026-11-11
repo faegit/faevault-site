@@ -12,6 +12,17 @@ This changelog records features and fixes for the FAEVault Android client only. 
 
 ---
 
+## 4.6.12 - 2026-11-11
+
+- Import `.md` files in the Markdown editor and export Markdown, PDF, or long PNG images from the detail view. The editor scrolls independently, and task lists retain square checkboxes.
+- Share images through Android's share sheet. Compress saved images in the editor, and hide the compression option once compression succeeds.
+- Read images and attachments one at a time during batch import, pause saving while imports finish, and fix a duplicate-attachment bug that could remove an existing file.
+- Align full-screen card headers, respect bottom safe areas, improve search keyboard and sheet transitions, and raise the trash action bar. In-app notices stay in place above dialogs.
+- Return to the originating page after opening a search result. Manage hidden categories in one confirmation dialog and use long-press on the home screen to reorder categories.
+- Hide sensitive one-time codes by default, simplify their details, and refine English category names.
+
+---
+
 ## 4.6.11 - 2026-11-11
 
 ### Features and fixes
