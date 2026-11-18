@@ -12,9 +12,18 @@ This changelog records features and fixes for the FAEVault Android client only. 
 
 ---
 
+## 4.6.13 - 2026-11-18
+
+- Connect to an existing vault file directly. Cancelling a reconnection or encountering an error keeps the previous connection, and shared folder access stays available to other vaults and local backups.
+- Manage tags by category. Renaming, batch edits, and sorting apply to the current category.
+- Check now starts the password scan after the detection settings card finishes collapsing.
+- Cloud sync, transfers, and imports and exports start a foreground service when the task begins. The same progress notification stays visible in the background. Tasks that require an unlocked vault stop when it locks.
+
+---
+
 ## 4.6.12 - 2026-11-11
 
-- Import `.md` files in the Markdown editor and export Markdown, PDF, or long PNG images from the detail view. The editor scrolls independently, and task lists retain square checkboxes.
+- Import `.md` files in the Markdown editor, download `.md` files from the detail view, and save individual Mermaid diagrams as PNGs. The editor scrolls independently, and task lists retain square checkboxes.
 - Share images through Android's share sheet. Compress saved images in the editor, and hide the compression option once compression succeeds.
 - Read images and attachments one at a time during batch import, pause saving while imports finish, and fix a duplicate-attachment bug that could remove an existing file.
 - Align full-screen card headers, respect bottom safe areas, improve search keyboard and sheet transitions, and raise the trash action bar. In-app notices stay in place above dialogs.
