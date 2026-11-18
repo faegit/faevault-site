@@ -1,16 +1,11 @@
 ---
+import { getCollection } from "astro:content";
 import type { Locale } from "../i18n/config";
 import PageShell from "./PageShell.astro";
 
-/**
- * 版本与下载地址在构建时从 GitHub Releases 读取，避免官网与实际发布版本脱节。
- * 分别选择 Android 和 PC 的正式发布，且 PC 发布必须包含对应的安装包。
- * 网络不可用时回退到 FALLBACK_VERSION，保证本地构建与 Pages 构建都能成功。
- */
 const RELEASES_API = "https://api.github.com/repos/faegit/faevault-site/releases?per_page=100";
 const ANDROID_TAG_PREFIX = "android/v";
 const PC_TAG_PREFIX = "pc/v";
-const FALLBACK_VERSION = "4.6.8";
 const APK_ASSET = "faevault-arm64-v8a.apk";
 const PC_CERT_ASSET = "FAE-Vault-CodeSigning.cer";
 const CHECKSUM_ASSET = "SHA256SUMS.txt";
@@ -19,39 +14,75 @@ type ReleaseAsset = { name?: string; browser_download_url?: string };
 type Release = { tag_name?: string; draft?: boolean; prerelease?: boolean; html_url?: string; assets?: ReleaseAsset[] };
 
 function versionKey(version: string): number {
-    const match = /^(\d+)\.(\d+)\.(\d+)/.exec(version);
+    const match = /^(\d+)\.(\d+)\.(\d+)$/.exec(version);
     if (!match) return 0;
     return Number(match[1]) * 1_000_000 + Number(match[2]) * 1_000 + Number(match[3]);
 }
 
+// The synced changelogs record the most recent published version of each platform.
+const legalEntries = await getCollection("legal");
+const changelogVersions: Record<string, string> = {};
+for (const entry of legalEntries) {
+    const key = entry.data.translationKey;
+    if (entry.data.draft || (key !== "changelog" && key !== "pc-changelog")) continue;
+    const version = /^##\s+(\d+\.\d+\.\d+)(?=\s|$)/m.exec(entry.body ?? "")?.[1];
+    if (version && versionKey(version) > versionKey(changelogVersions[key] ?? "")) {
+        changelogVersions[key] = version;
+    }
+}
+
 async function latestReleases(): Promise<Release[]> {
+    const headers: Record<string, string> = {
+        Accept: "application/vnd.github+json",
+        "User-Agent": "FAEVault-site-build",
+    };
+    const token = import.meta.env.GITHUB_TOKEN;
+    if (token) headers.Authorization = `Bearer ${token}`;
     try {
-        const response = await fetch(RELEASES_API, {
-            headers: { Accept: "application/vnd.github+json", "User-Agent": "FAEVault-site-build" },
-        });
-        if (!response.ok) return [];
-        return (await response.json()) as Release[];
-    } catch {
+        const response = await fetch(RELEASES_API, { headers, signal: AbortSignal.timeout(15_000) });
+        if (!response.ok) {
+            console.warn(`[download] GitHub Releases returned HTTP ${response.status}. Using the published changelogs.`);
+            return [];
+        }
+        const releases: unknown = await response.json();
+        if (!Array.isArray(releases)) throw new Error("Invalid release list");
+        return releases as Release[];
+    } catch (error) {
+        console.warn(`[download] Could not read GitHub Releases. Using the published changelogs. ${error}`);
         return [];
     }
 }
 
-function latestRelease(releases: Release[], prefix: string, requiredAsset: (version: string) => string): Release | null {
-    return releases
-        .filter((item) => typeof item?.tag_name === "string"
-            && item.tag_name.startsWith(prefix)
-            && !item.draft && !item.prerelease
-            && item.assets?.some((asset) => asset.name === requiredAsset(item.tag_name!.slice(prefix.length))))
+function downloadFor(
+    releases: Release[],
+    prefix: string,
+    changelogKey: string,
+    requiredAsset: (version: string) => string,
+): { release: Release | null; version: string } {
+    const release = releases
+        .filter((item) => {
+            if (typeof item?.tag_name !== "string" || !item.tag_name.startsWith(prefix) || item.draft || item.prerelease) return false;
+            const version = item.tag_name.slice(prefix.length);
+            return versionKey(version) > 0
+                && item.assets?.some((asset) => asset.name === requiredAsset(version));
+        })
         .sort((a, b) =>
             versionKey(b.tag_name!.slice(prefix.length))
             - versionKey(a.tag_name!.slice(prefix.length)))[0] ?? null;
+    const version = release?.tag_name?.slice(prefix.length);
+    const documentedVersion = changelogVersions[changelogKey];
+    if (documentedVersion && (!version || versionKey(documentedVersion) > versionKey(version))) {
+        return { release: null, version: documentedVersion };
+    }
+    if (!version) throw new Error(`[download] No published version found for ${prefix}`);
+    return { release, version };
 }
 
 const releases = await latestReleases();
-const release = latestRelease(releases, ANDROID_TAG_PREFIX, () => APK_ASSET);
-const pcRelease = latestRelease(releases, PC_TAG_PREFIX, (version) => `FAEVault_v${version}_Setup.exe`);
-const ver = release ? release.tag_name!.slice(ANDROID_TAG_PREFIX.length) : FALLBACK_VERSION;
-const pcVer = pcRelease ? pcRelease.tag_name!.slice(PC_TAG_PREFIX.length) : FALLBACK_VERSION;
+const { release, version: ver } = downloadFor(releases, ANDROID_TAG_PREFIX, "changelog", () => APK_ASSET);
+const { release: pcRelease, version: pcVer } = downloadFor(
+    releases, PC_TAG_PREFIX, "pc-changelog", (version) => `FAEVault_v${version}_Setup.exe`,
+);
 const androidApk =
     release?.assets?.find((asset) => asset.name === APK_ASSET)?.browser_download_url
     ?? `https://github.com/faegit/faevault-site/releases/download/${ANDROID_TAG_PREFIX}${ver}/${APK_ASSET}`;
