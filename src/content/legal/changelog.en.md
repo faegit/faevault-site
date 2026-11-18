@@ -14,6 +14,7 @@ This changelog records features and fixes for the FAEVault Android client only. 
 
 ## 4.6.13 - 2026-11-18
 
+- Fix the blank Mermaid download menu in the detail view and editor preview. The format picker shows both SVG and PNG options.
 - Download Mermaid diagrams as scalable SVGs or high-resolution PNGs. PNG export uses a higher resolution and caps the pixel count for large diagrams.
 - Connect to an existing vault file directly. Cancelling a reconnection or encountering an error keeps the previous connection, and shared folder access stays available to other vaults and local backups.
 - Manage tags by category. Renaming, batch edits, and sorting apply to the current category.
