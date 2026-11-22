@@ -12,6 +12,15 @@ This changelog records features and fixes for the FAEVault Android client only. 
 
 ---
 
+## 4.6.14 - 2026-11-22
+
+- Press and hold to play GIFs, animated WebP images, and Motion Photos with embedded MP4 video. Release to return to the still image. Playable photos show a LIVE badge, and backups retain the original attachments.
+- The main pages use floating capsule bars. Content scrolls behind them and fades near the edges of the screen. Subpage scroll areas extend to the bottom of the screen.
+- LAN sync, full-vault import, and file transfer use separate authorization flows. Sync verifies vault identity, and file transfers require the host to approve the connection.
+- Remove line breaks typed or pasted into username and password fields when editing entries.
+
+---
+
 ## 4.6.13 - 2026-11-18
 
 - Fix the blank Mermaid download menu in the detail view and editor preview. The menu shares the entry context menu’s translucent background, shadow, and rounded ripple, and shows both SVG and high-resolution PNG options.
