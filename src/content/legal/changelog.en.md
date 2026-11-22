@@ -21,6 +21,7 @@ This changelog records features and fixes for the FAEVault Android client only. 
 
 ---
 
+
 ## 4.6.13 - 2026-11-18
 
 - Fix the blank Mermaid download menu in the detail view and editor preview. The menu shares the entry context menu’s translucent background, shadow, and rounded ripple, and shows both SVG and high-resolution PNG options.
